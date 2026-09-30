@@ -1,0 +1,57 @@
+name: PostgreSQL fork source builds
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+defaults:
+  run:
+    shell: bash
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        version: [14, 15, 16, 17, 18]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: REL_${{ matrix.version }}_STABLE_neon
+          path: source
+          persist-credentials: false
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential bison flex libreadline-dev zlib1g-dev libssl-dev libicu-dev libxml2-dev libxslt1-dev liblz4-dev libzstd-dev
+      - name: Compile and run PostgreSQL regression tests
+        run: |
+          set -euo pipefail
+          mkdir build install
+          cd build
+          sha=$(git -C ../source rev-parse HEAD)
+          ../source/configure --prefix="$GITHUB_WORKSPACE/install" --enable-cassert --with-ssl=openssl --with-icu --with-lz4 --with-zstd --with-extra-version=" (william-$sha)"
+          make -j2
+          make -j2 check
+          make -j2 install
+          ./src/bin/pg_config/pg_config --version
+          cd ..
+          printf '%s\n' "$sha" > install/SOURCE_COMMIT
+          tar -czf "postgres-${{ matrix.version }}-linux-amd64.tar.gz" -C install .
+      - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: postgres-${{ matrix.version }}-linux-amd64
+          path: postgres-*-linux-amd64.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+      - name: Preserve regression failure logs
+        if: failure()
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        with:
+          name: postgres-${{ matrix.version }}-failure
+          path: |
+            build/config.log
+            build/src/test/regress/regression.*
+          if-no-files-found: ignore

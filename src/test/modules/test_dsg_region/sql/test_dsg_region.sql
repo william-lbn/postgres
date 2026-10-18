@@ -1,0 +1,14 @@
+CREATE EXTENSION test_dsg_region;
+SELECT test_dsg_region('populate_preserves_prefix');
+SELECT test_dsg_region('release_preserves_boundary_pages');
+SELECT test_dsg_region('partial_page_noop');
+SELECT test_dsg_region('zero_at_end');
+SELECT test_dsg_region('overflow');
+SELECT test_dsg_region('past_end');
+SELECT test_dsg_region('reserve_twice');
+SELECT test_dsg_region('reserve_zero');
+SELECT test_dsg_region('reserve_overflow');
+SELECT test_dsg_region('unmapped_populate');
+SELECT test_dsg_region('rounded_mapping_limit');
+SELECT test_dsg_region('destroy_twice');
+DROP EXTENSION test_dsg_region;

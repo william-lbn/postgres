@@ -1,0 +1,27 @@
+Parsed test spec with 2 sessions
+
+starting permutation: write_first read_first write_second read_second
+step write_first: SELECT test_dsg_shared_write(17);
+test_dsg_shared_write
+---------------------
+                     
+(1 row)
+
+step read_first: SELECT test_dsg_shared_read() = 17 AS shared;
+shared
+------
+t     
+(1 row)
+
+step write_second: SELECT test_dsg_shared_write(34);
+test_dsg_shared_write
+---------------------
+                     
+(1 row)
+
+step read_second: SELECT test_dsg_shared_read() = 34 AS shared;
+shared
+------
+t     
+(1 row)
+

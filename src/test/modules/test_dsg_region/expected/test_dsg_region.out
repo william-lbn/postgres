@@ -1,0 +1,46 @@
+CREATE EXTENSION test_dsg_region;
+SELECT test_dsg_region('populate_preserves_prefix');
+ test_dsg_region 
+-----------------
+ t
+(1 row)
+
+SELECT test_dsg_region('release_preserves_boundary_pages');
+ test_dsg_region 
+-----------------
+ t
+(1 row)
+
+SELECT test_dsg_region('partial_page_noop');
+ test_dsg_region 
+-----------------
+ t
+(1 row)
+
+SELECT test_dsg_region('zero_at_end');
+ test_dsg_region 
+-----------------
+ t
+(1 row)
+
+SELECT test_dsg_region('overflow');
+ERROR:  DSGA memory range is outside the reserved region
+SELECT test_dsg_region('past_end');
+ERROR:  DSGA memory range is outside the reserved region
+SELECT test_dsg_region('reserve_twice');
+ERROR:  invalid DSGA region reservation
+SELECT test_dsg_region('reserve_zero');
+ERROR:  invalid DSGA region reservation
+SELECT test_dsg_region('reserve_overflow');
+ERROR:  invalid DSGA region reservation
+SELECT test_dsg_region('unmapped_populate');
+ERROR:  DSGA memory range is outside the reserved region
+SELECT test_dsg_region('rounded_mapping_limit');
+ERROR:  DSGA memory range is outside the reserved region
+SELECT test_dsg_region('destroy_twice');
+ test_dsg_region 
+-----------------
+ t
+(1 row)
+
+DROP EXTENSION test_dsg_region;

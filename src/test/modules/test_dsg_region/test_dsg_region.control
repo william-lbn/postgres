@@ -1,0 +1,4 @@
+comment = 'DSGA region provider tests'
+default_version = '1.0'
+module_pathname = '$libdir/test_dsg_region'
+relocatable = true

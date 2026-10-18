@@ -44,6 +44,10 @@ SUBDIRS = \
 		  worker_spi \
 		  xid_wraparound
 
+ifneq ($(PORTNAME),win32)
+SUBDIRS += test_dsg_region
+endif
+
 
 ifeq ($(enable_injection_points),yes)
 SUBDIRS += injection_points gin hash

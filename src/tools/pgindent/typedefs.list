@@ -636,6 +636,9 @@ DropSubscriptionStmt
 DropTableSpaceStmt
 DropUserMappingStmt
 DropdbStmt
+DsgMemoryResult
+DsgMemoryStatus
+DsgRegion
 DumpComponents
 DumpId
 DumpOptions

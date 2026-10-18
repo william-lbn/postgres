@@ -112,6 +112,25 @@ sub adjust_database_contents
 			'drop extension if exists test_ext7');
 	}
 
+	# We can no longer upgrade bpchar indexes that claim deduplication ability
+	# (amcheck will complain about them), so drop them if source is pre-v14.
+	if ($old_version < 14)
+	{
+		if ($dbnames{"regression"})
+		{
+			_add_st($result, 'regression',
+					'drop index if exists public.hslot_hubname',
+					'drop index if exists public.hslot_name',
+					'drop index if exists public.hub_name',
+					'drop index if exists public.iface_name',
+					'drop index if exists public.phone_name',
+					'drop index if exists public.pline_name',
+					'drop index if exists public.pslot_name',
+					'drop index if exists public.room_rno',
+					'drop index if exists public.wslot_name');
+		}
+	}
+
 	# we removed this test-support function in v17
 	if ($old_version >= 15 && $old_version < 17)
 	{
@@ -156,6 +175,14 @@ sub adjust_database_contents
 				$result, $regrdb,
 				'drop function if exists public.putenv(text)',
 				'drop function if exists public.wait_pid(integer)');
+		}
+
+		# delete seg row that pre-14 was printed incorrectly but would now
+		# be printed correctly
+		if ($dbnames{contrib_regression_seg})
+		{
+			_add_st($result, 'contrib_regression_seg',
+				"delete from test_seg where s = '4.6 .. ~7.0'");
 		}
 	}
 

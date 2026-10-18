@@ -18,6 +18,66 @@
 # Be sure to replace "<ADD JUSTIFICATION HERE>" with details of your change and
 # why it is deemed acceptable.
 
+624bd2b1fc0c9750c28a55b436e17b109b72d701
+#
+# Reorderbuffer: handle catalog-change-bearing aborted subxacts better
+# Wed Oct 14 19:42:04 2026 +0200
+#
+# ReorderBufferAddNewTupleCids()'s signature changes and struct
+# ReorderBufferChange gains a field, but no known third-party calls the
+# former or constructs the latter.
+
+0405dcf7c6b1162dd1e4377d1862aa0a38629e6b
+#
+# Fix tuple search during apply after concurrent index DDL.
+# 2026-09-28 06:44:47 -0400
+#
+# LogicalRepRelMapEntry gains a bool field in existing alignment padding,
+# so existing member offsets and sizeof(LogicalRepRelMapEntry) remain unchanged.
+
+13466d1f78394a8ec2d6d0b1c9d8bf5ac3acb99a
+#
+# Perform join removal by editing the query's jointree.
+# 2026-08-28 15:12:26 -0400
+#
+# remove_useless_joins (now remove_useless_outer_joins) and
+# reduce_unique_semijoins have changed behavior and return types.
+# I am unaware of any impacted third-party code; if there is any,
+# it is probably vulnerable to the same bugs this patch is fixing.
+
+d1c8aa0b09f18bba1343ce2e4aa537a17a8a972f
+#
+# Check for USAGE privilege on types used by stored expressions.
+# 2026-08-10 06:38:19 -0700
+#
+# The addition of a parameter to AlterDomainAddConstraint() breaks ABI
+# compatibility, but we are unaware of any impacted third-party code.
+
+01992176e08169b7aedf2d61be9e22518b5c6640
+#
+# Add an output_plugin_libraries GUC to bless trusted output plugins
+# 2026-08-10 06:38:18 -0700
+#
+# Addition of a new GUC enlarges ConfigureNamesString[],
+# but that is not harmful.
+
+75a03c569c761fa27ba15975f342b72ab0d28946
+#
+# Preserve the owner of extended statistics rebuilt by ALTER TABLE.
+# 2026-08-10 06:38:18 -0700
+#
+# CreateStatistics()'s signature changes and CreateStatsStmt gains a field,
+# but no known third-party code calls the former or constructs the latter.
+
+586f4266fb4945f6ea3564b9c1bab093eb74bee4
+#
+# Fix ABI break by moving PROCSIG_SLOTSYNC_MESSAGE in ProcSignalReason
+# 2026-04-09 15:30:59 +0900
+#
+# This commit added PROCSIG_SLOTSYNC_MESSAGE just before the final entry,
+# NUM_PROCSIGNALS, in enum ProcSignalReason. This increased the value of
+# NUM_PROCSIGNALS, but no affected third-party code is known.
+
 4dac22aa10d2882c2e6fb465d7c314cc2d8fb754
 #
 # Add file_extend_method=posix_fallocate,write_zeros.

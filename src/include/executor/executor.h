@@ -590,6 +590,7 @@ extern Relation ExecOpenScanRelation(EState *estate, Index scanrelid, int eflags
 extern void ExecInitRangeTable(EState *estate, List *rangeTable, List *permInfos);
 extern void ExecCloseRangeTableRelations(EState *estate);
 extern void ExecCloseResultRelations(EState *estate);
+extern void ExecCloseTrigTargetRelations(EState *estate);
 
 static inline RangeTblEntry *
 exec_rt_fetch(Index rti, EState *estate)
@@ -659,6 +660,11 @@ extern bool RelationFindReplTupleByIndex(Relation rel, Oid idxoid,
 										 LockTupleMode lockmode,
 										 TupleTableSlot *searchslot,
 										 TupleTableSlot *outslot);
+extern bool RelationFindReplTupleByIndexExt(Relation rel, Oid idxoid,
+											bool skipduplicates,
+											LockTupleMode lockmode,
+											TupleTableSlot *searchslot,
+											TupleTableSlot *outslot);
 extern bool RelationFindReplTupleSeq(Relation rel, LockTupleMode lockmode,
 									 TupleTableSlot *searchslot, TupleTableSlot *outslot);
 

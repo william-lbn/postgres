@@ -1572,9 +1572,16 @@ UPDATE ft2 d SET c2 = CASE WHEN random() >= 0 THEN d.c2 ELSE 0 END
 ALTER SERVER loopback OPTIONS (DROP extensions);
 INSERT INTO ft2 (c1,c2,c3)
   SELECT id, id % 10, to_char(id, 'FM00000') FROM generate_series(2001, 2010) id;
+
+-- this will do a remote seqscan, causing unstable result order, so sort
 EXPLAIN (verbose, costs off)
-UPDATE ft2 SET c3 = 'bar' WHERE postgres_fdw_abs(c1) > 2000 RETURNING *;            -- can't be pushed down
-UPDATE ft2 SET c3 = 'bar' WHERE postgres_fdw_abs(c1) > 2000 RETURNING *;
+WITH cte AS (
+  UPDATE ft2 SET c3 = 'bar' WHERE postgres_fdw_abs(c1) > 2000 RETURNING *
+) SELECT * FROM cte ORDER BY c1;          -- can't be pushed down
+WITH cte AS (
+  UPDATE ft2 SET c3 = 'bar' WHERE postgres_fdw_abs(c1) > 2000 RETURNING *
+) SELECT * FROM cte ORDER BY c1;
+
 EXPLAIN (verbose, costs off)
 UPDATE ft2 SET c3 = 'baz'
   FROM ft4 INNER JOIN ft5 ON (ft4.c1 = ft5.c1)
@@ -3904,6 +3911,16 @@ INSERT INTO result_tbl SELECT * FROM async_pt WHERE b === 505;
 SELECT * FROM result_tbl ORDER BY a;
 DELETE FROM result_tbl;
 
+-- Test ExecAppendAsyncReset code path that drains outstanding async requests
+-- (case where subplans are re-scanned with parameter changes)
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT o.x FROM (VALUES (2505), (3505)) o(x), LATERAL (SELECT a FROM async_pt WHERE a = o.x OR a = 1505 LIMIT 1) s ORDER BY o.x;
+SELECT o.x FROM (VALUES (2505), (3505)) o(x), LATERAL (SELECT a FROM async_pt WHERE a = o.x OR a = 1505 LIMIT 1) s ORDER BY o.x;
+
+EXPLAIN (VERBOSE, COSTS OFF)
+SELECT o.x FROM (VALUES (2505), (3505)) o(x), LATERAL (SELECT a FROM async_pt WHERE a = o.x OR (a = 1505 AND o.x = 2505) LIMIT 1) s ORDER BY o.x;
+SELECT o.x FROM (VALUES (2505), (3505)) o(x), LATERAL (SELECT a FROM async_pt WHERE a = o.x OR (a = 1505 AND o.x = 2505) LIMIT 1) s ORDER BY o.x;
+
 DROP FOREIGN TABLE async_p3;
 DROP TABLE base_tbl3;
 
@@ -4140,8 +4157,8 @@ DROP TABLE base_tbl2;
 DROP TABLE result_tbl;
 DROP TABLE join_tbl;
 
--- Test that an asynchronous fetch is processed before restarting the scan in
--- ReScanForeignScan
+-- Test ExecAppendAsyncReset code path that drains outstanding async requests
+-- (case where subplans are re-scanned without parameter changes)
 CREATE TABLE base_tbl (a int, b int);
 INSERT INTO base_tbl VALUES (1, 11), (2, 22), (3, 33);
 CREATE FOREIGN TABLE foreign_tbl (b int)
@@ -4338,3 +4355,54 @@ ANALYZE analyze_ftable;
 -- cleanup
 DROP FOREIGN TABLE analyze_ftable;
 DROP TABLE analyze_table;
+
+-- ===================================================================
+-- test cleanup of failed connections on abort
+-- ===================================================================
+
+CREATE VIEW my_backend_pid (pid) AS SELECT pg_backend_pid();
+CREATE FOREIGN TABLE remote_backend_pid (pid int)
+  SERVER loopback OPTIONS (table_name 'my_backend_pid');
+CREATE FUNCTION wait_for_backend_termination(int) RETURNS void AS $$
+  BEGIN
+    WHILE (SELECT count(*) FROM pg_stat_activity WHERE pid = $1) > 0
+    LOOP
+      PERFORM pg_stat_clear_snapshot();
+    END LOOP;
+  END
+$$ LANGUAGE plpgsql;
+
+SET client_min_messages = 'ERROR';
+
+BEGIN;
+DECLARE c CURSOR FOR SELECT * FROM ft1 ORDER BY c1;
+SAVEPOINT s;
+SELECT pid AS remote_pid FROM remote_backend_pid \gset
+SELECT pg_terminate_backend(:remote_pid);
+SELECT wait_for_backend_termination(:remote_pid);
+ROLLBACK TO SAVEPOINT s;
+SELECT pid FROM remote_backend_pid;
+ROLLBACK TO SAVEPOINT s;
+RELEASE SAVEPOINT s;
+FETCH c;
+ABORT;
+
+BEGIN;
+DECLARE c CURSOR FOR SELECT * FROM ft1 ORDER BY c1;
+FETCH c;
+SAVEPOINT s;
+SELECT pid AS remote_pid FROM remote_backend_pid \gset
+SELECT pg_terminate_backend(:remote_pid);
+SELECT wait_for_backend_termination(:remote_pid);
+ROLLBACK TO SAVEPOINT s;
+SELECT pid FROM remote_backend_pid;
+ROLLBACK TO SAVEPOINT s;
+RELEASE SAVEPOINT s;
+CLOSE c;
+ABORT;
+
+RESET client_min_messages;
+
+DROP FUNCTION wait_for_backend_termination(int);
+DROP FOREIGN TABLE remote_backend_pid;
+DROP VIEW my_backend_pid;

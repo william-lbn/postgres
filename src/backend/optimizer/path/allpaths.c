@@ -1043,13 +1043,22 @@ set_append_rel_size(PlannerInfo *root, RelOptInfo *rel,
 		 * for the child.  This saves some effort while processing the child
 		 * rel, and it also avoids an implementation restriction in
 		 * adjust_appendrel_attrs (it can't apply nullingrels to a non-Var).
+		 *
+		 * clause_relids does not reflect references to this rel that appear
+		 * within PlaceHolderVars, but those are lateral references, so we
+		 * also skip quals that use any rel laterally referencing this rel.
+		 * This is safe since such quals are useless for the child: enforcing
+		 * one at a scan of this rel would require the scan to be
+		 * parameterized by a rel that laterally references this rel, which is
+		 * impossible since that rel needs this rel's output first.
 		 */
 		childrinfos = NIL;
 		foreach(lc, rel->joininfo)
 		{
 			RestrictInfo *rinfo = (RestrictInfo *) lfirst(lc);
 
-			if (!bms_overlap(rinfo->clause_relids, rel->nulling_relids))
+			if (!bms_overlap(rinfo->clause_relids, rel->nulling_relids) &&
+				!bms_overlap(rinfo->clause_relids, rel->lateral_referencers))
 				childrinfos = lappend(childrinfos,
 									  adjust_appendrel_attrs(root,
 															 (Node *) rinfo,
@@ -3365,7 +3374,8 @@ make_rel_from_joinlist(PlannerInfo *root, List *joinlist)
 		 * using a plugin, GEQO, or the regular join search code.
 		 *
 		 * We put the initial_rels list into a PlannerInfo field because
-		 * has_legal_joinclause() needs to look at it (ugly :-().
+		 * has_legal_joinclause() and join_is_legal() need to look at it (ugly
+		 * :-().
 		 */
 		root->initial_rels = initial_rels;
 
@@ -3748,7 +3758,7 @@ check_output_expressions(Query *subquery, pushdown_safety_info *safetyInfo)
 		/* If subquery uses window functions, check point 4 */
 		if (subquery->hasWindowFuncs &&
 			(safetyInfo->unsafeFlags[tle->resno] &
-			 UNSAFE_NOTIN_DISTINCTON_CLAUSE) == 0 &&
+			 UNSAFE_NOTIN_PARTITIONBY_CLAUSE) == 0 &&
 			!targetIsInAllPartitionLists(tle, subquery))
 		{
 			/* not present in all PARTITION BY clauses, so mark it unsafe */

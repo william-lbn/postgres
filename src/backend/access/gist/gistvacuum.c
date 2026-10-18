@@ -384,7 +384,6 @@ restart:
 			MarkBufferDirty(buffer);
 
 			PageIndexMultiDelete(page, todelete, ntodelete);
-			GistMarkTuplesDeleted(page);
 
 			if (RelationNeedsWAL(rel))
 			{

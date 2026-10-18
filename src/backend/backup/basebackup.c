@@ -305,10 +305,10 @@ perform_base_backup(basebackup_options *opt, bbsink *sink,
 
 				if (tmp->path == NULL)
 					tmp->size = sendDir(sink, ".", 1, true, state.tablespaces,
-										true, NULL, InvalidOid, NULL);
+										true, NULL, InvalidOid, ib);
 				else
 					tmp->size = sendTablespace(sink, tmp->path, tmp->oid, true,
-											   NULL, NULL);
+											   NULL, ib);
 				state.bytes_total += tmp->size;
 			}
 			state.bytes_total_is_valid = true;
@@ -651,12 +651,11 @@ perform_base_backup(basebackup_options *opt, bbsink *sink,
 
 	if (total_checksum_failures)
 	{
-		if (total_checksum_failures > 1)
-			ereport(WARNING,
-					(errmsg_plural("%lld total checksum verification failure",
-								   "%lld total checksum verification failures",
-								   total_checksum_failures,
-								   total_checksum_failures)));
+		ereport(WARNING,
+				(errmsg_plural("%lld total checksum verification failure",
+							   "%lld total checksum verification failures",
+							   total_checksum_failures,
+							   total_checksum_failures)));
 
 		ereport(ERROR,
 				(errcode(ERRCODE_DATA_CORRUPTED),
@@ -672,8 +671,6 @@ perform_base_backup(basebackup_options *opt, bbsink *sink,
 
 	/* clean up the resource owner we created */
 	WalSndResourceCleanup(true);
-
-	basebackup_progress_done();
 }
 
 /*
@@ -1174,7 +1171,8 @@ sendTablespace(bbsink *sink, char *path, Oid spcoid, bool sizeonly,
 /*
  * Include all files from the given directory in the output tar stream. If
  * 'sizeonly' is true, we just calculate a total length and return it, without
- * actually sending anything.
+ * actually sending anything. A file that will be sent incrementally is
+ * counted at the size of the incremental file.
  *
  * Omit any directory in the tablespaces list, to avoid backing up
  * tablespaces twice when they were created inside PGDATA.
@@ -1807,7 +1805,7 @@ sendFile(bbsink *sink, const char *readfilename, const char *tarfilename,
 
 	CloseTransientFile(fd);
 
-	if (checksum_failures > 1)
+	if (checksum_failures > 0)
 	{
 		ereport(WARNING,
 				(errmsg_plural("file \"%s\" has a total of %d checksum verification failure",

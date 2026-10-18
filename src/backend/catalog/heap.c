@@ -509,9 +509,13 @@ CheckAttributeNamesTypes(TupleDesc tupdesc, char relkind,
 	 */
 	for (i = 0; i < natts; i++)
 	{
-		CheckAttributeType(NameStr(TupleDescAttr(tupdesc, i)->attname),
-						   TupleDescAttr(tupdesc, i)->atttypid,
-						   TupleDescAttr(tupdesc, i)->attcollation,
+		Form_pg_attribute attr = TupleDescAttr(tupdesc, i);
+
+		if (attr->attisdropped)
+			continue;
+		CheckAttributeType(NameStr(attr->attname),
+						   attr->atttypid,
+						   attr->attcollation,
 						   NIL, /* assume we're creating a new rowtype */
 						   flags);
 	}
@@ -645,6 +649,16 @@ CheckAttributeType(const char *attname,
 		 */
 		CheckAttributeType(attname, get_range_subtype(atttypid),
 						   get_range_collation(atttypid),
+						   containing_rowtypes,
+						   flags);
+	}
+	else if (att_typtype == TYPTYPE_MULTIRANGE)
+	{
+		/*
+		 * If it's a multirange, recurse to check its plain range type.
+		 */
+		CheckAttributeType(attname, get_multirange_range(atttypid),
+						   InvalidOid,	/* range types are not collatable */
 						   containing_rowtypes,
 						   flags);
 	}
@@ -840,6 +854,9 @@ AddNewAttributeTuples(Oid new_rel_oid,
 	/* add dependencies on their datatypes and collations */
 	for (int i = 0; i < natts; i++)
 	{
+		if (tupdesc->attrs[i].attisdropped)
+			continue;
+
 		/* Add dependency info */
 		ObjectAddressSubSet(myself, RelationRelationId, new_rel_oid, i + 1);
 		ObjectAddressSet(referenced, TypeRelationId,
@@ -2125,6 +2142,9 @@ SetAttrMissing(Oid relid, char *attname, char *value)
  * in the pg_class entry for the relation.
  *
  * The OID of the new constraint is returned.
+ *
+ * NB: Caller is responsible for ensuring the user has USAGE on all types expr
+ * depends on.
  */
 static Oid
 StoreRelCheck(Relation rel, const char *ccname, Node *expr,
@@ -2239,7 +2259,7 @@ StoreRelCheck(Relation rel, const char *ccname, Node *expr,
 static void
 StoreConstraints(Relation rel, List *cooked_constraints, bool is_internal)
 {
-	int			numchecks = 0;
+	int16		numchecks = 0;
 	ListCell   *lc;
 
 	if (cooked_constraints == NIL)
@@ -2263,12 +2283,18 @@ StoreConstraints(Relation rel, List *cooked_constraints, bool is_internal)
 											   is_internal, false);
 				break;
 			case CONSTR_CHECK:
+				if (pg_add_s16_overflow(numchecks, 1, &numchecks))
+					ereport(ERROR,
+							errcode(ERRCODE_PROGRAM_LIMIT_EXCEEDED),
+							errmsg("too many check constraints on relation \"%s\"",
+								   RelationGetRelationName(rel)));
+
 				con->conoid =
 					StoreRelCheck(rel, con->name, con->expr,
 								  !con->skip_validation, con->is_local,
 								  con->inhcount, con->is_no_inherit,
 								  is_internal);
-				numchecks++;
+
 				break;
 			default:
 				elog(ERROR, "unrecognized constraint type: %d",
@@ -2325,7 +2351,7 @@ AddRelationNewConstraints(Relation rel,
 	int			numoldchecks;
 	ParseState *pstate;
 	ParseNamespaceItem *nsitem;
-	int			numchecks;
+	int16		numchecks;
 	List	   *checknames;
 	Node	   *expr;
 	CookedConstraint *cooked;
@@ -2385,6 +2411,13 @@ AddRelationNewConstraints(Relation rel,
 			 castNode(Const, expr)->constisnull))
 			continue;
 
+		/*
+		 * The below call to StoreAttrDefault() adds the dependencies on
+		 * types.  We are responsible for checking USAGE.
+		 */
+		if (!is_internal)
+			CheckUsageOnTypesInSingleRelExpr(expr, RelationGetRelid(rel), GetUserId());
+
 		defOid = StoreAttrDefault(rel, colDef->attnum, expr, is_internal,
 								  false);
 
@@ -2424,6 +2457,14 @@ AddRelationNewConstraints(Relation rel,
 				 */
 				expr = cookConstraint(pstate, cdef->raw_expr,
 									  RelationGetRelationName(rel));
+
+				/*
+				 * The below call to StoreRelCheck() calls
+				 * CreateConstraintEntry(), which adds the dependencies on
+				 * types.  We are responsible for checking USAGE.
+				 */
+				if (!is_internal)
+					CheckUsageOnTypesInSingleRelExpr(expr, RelationGetRelid(rel), GetUserId());
 			}
 			else
 			{
@@ -2509,13 +2550,21 @@ AddRelationNewConstraints(Relation rel,
 			}
 
 			/*
+			 * pg_class.relchecks stores this count in an int16, so we should
+			 * avoid overflowing that field
+			 */
+			if (pg_add_s16_overflow(numchecks, 1, &numchecks))
+				ereport(ERROR,
+						errcode(ERRCODE_PROGRAM_LIMIT_EXCEEDED),
+						errmsg("too many check constraints on relation \"%s\"",
+							   RelationGetRelationName(rel)));
+
+			/*
 			 * OK, store it.
 			 */
 			constrOid =
 				StoreRelCheck(rel, ccname, expr, cdef->initially_valid, is_local,
 							  is_local ? 0 : 1, cdef->is_no_inherit, is_internal);
-
-			numchecks++;
 
 			cooked = (CookedConstraint *) palloc(sizeof(CookedConstraint));
 			cooked->contype = CONSTR_CHECK;
@@ -2725,6 +2774,10 @@ SetRelationNumChecks(Relation rel, int numchecks)
 
 	if (relStruct->relchecks != numchecks)
 	{
+		if (numchecks > INT16_MAX || numchecks < 0)
+			elog(ERROR, "invalid new relchecks %d for relation %u",
+				 numchecks, RelationGetRelid(rel));
+
 		relStruct->relchecks = numchecks;
 
 		CatalogTupleUpdate(relrel, &reltup->t_self, reltup);
@@ -3478,12 +3531,16 @@ StorePartitionKey(Relation rel,
 	 * columns, i.e. they become internally dependent on the whole table.
 	 */
 	if (partexprs)
+	{
+		CheckUsageOnTypesInSingleRelExpr((Node *) partexprs, RelationGetRelid(rel),
+										 GetUserId());
 		recordDependencyOnSingleRelExpr(&myself,
 										(Node *) partexprs,
 										RelationGetRelid(rel),
 										DEPENDENCY_NORMAL,
 										DEPENDENCY_INTERNAL,
 										true /* reverse the self-deps */ );
+	}
 
 	/*
 	 * We must invalidate the relcache so that the next

@@ -480,6 +480,32 @@ get_publications_str(List *publications, StringInfo dest, bool quote_literal)
 }
 
 /*
+ * Append a suitably-quoted identifier or string literal to buf.
+ * "quote" should be either a double-quote or single-quote character.
+ *
+ * Caution: this quoting logic is sufficient for identifiers and literals
+ * in the replication grammar, but not always in regular SQL.  Specifically,
+ * it'd fail for a string literal if standard_conforming_strings is off.
+ */
+static void
+appendQuotedString(StringInfo buf, const char *str, char quote)
+{
+	appendStringInfoChar(buf, quote);
+	while (*str)
+	{
+		char		c = *str++;
+
+		if (c == quote)
+			appendStringInfoChar(buf, c);
+		appendStringInfoChar(buf, c);
+	}
+	appendStringInfoChar(buf, quote);
+}
+
+#define appendQuotedIdentifier(b, s)	appendQuotedString(b, s, '"')
+#define appendQuotedLiteral(b, s)		appendQuotedString(b, s, '\'')
+
+/*
  * Check that the specified publications are present on the publisher.
  */
 static void
@@ -1860,7 +1886,9 @@ ReplicationSlotDropAtPubNode(WalReceiverConn *wrconn, char *slotname, bool missi
 	load_file("libpqwalreceiver", false);
 
 	initStringInfo(&cmd);
-	appendStringInfo(&cmd, "DROP_REPLICATION_SLOT %s WAIT", quote_identifier(slotname));
+	appendStringInfoString(&cmd, "DROP_REPLICATION_SLOT ");
+	appendQuotedIdentifier(&cmd, slotname);
+	appendStringInfoString(&cmd, " WAIT");
 
 	PG_TRY();
 	{
@@ -2075,11 +2103,28 @@ check_publications_origin(WalReceiverConn *wrconn, List *publications,
 	for (i = 0; i < subrel_count; i++)
 	{
 		Oid			relid = subrel_local_oids[i];
-		char	   *schemaname = get_namespace_name(get_rel_namespace(relid));
-		char	   *tablename = get_rel_name(relid);
+		char	   *schemaname;
+		char	   *tablename;
+		char	   *schemaname_lit;
+		char	   *tablename_lit;
 
-		appendStringInfo(&cmd, "AND NOT (N.nspname = '%s' AND C.relname = '%s')\n",
-						 schemaname, tablename);
+		/* The table may have been dropped concurrently; skip if gone. */
+		tablename = get_rel_name(relid);
+		if (tablename == NULL)
+			continue;
+
+		schemaname = get_namespace_name(get_rel_namespace(relid));
+		if (schemaname == NULL)
+			continue;
+
+		schemaname_lit = quote_literal_cstr(schemaname);
+		tablename_lit = quote_literal_cstr(tablename);
+
+		appendStringInfo(&cmd, "AND NOT (N.nspname = %s AND C.relname = %s)\n",
+						 schemaname_lit, tablename_lit);
+
+		pfree(schemaname_lit);
+		pfree(tablename_lit);
 	}
 
 	res = walrcv_exec(wrconn, cmd.data, 1, tableRow);

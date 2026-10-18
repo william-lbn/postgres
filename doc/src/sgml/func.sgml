@@ -863,6 +863,13 @@ SELECT NOT(ROW(table.*) IS NOT NULL) FROM TABLE; -- detect at least one null in 
     are resolved by using the type appearing later in these lists.
    </para>
 
+   <para>
+    The behavior of bitwise shifting, both left and right, has
+    platform-dependent behavior both in cases of left shifting that results in
+    a signed overflow and in cases of the results of shifting by more bits
+    than exist in the type or from shifting by a negative value.
+   </para>
+
    <table id="functions-math-op-table">
     <title>Mathematical Operators</title>
 
@@ -4116,7 +4123,7 @@ SELECT format('INSERT INTO %I VALUES(%L)', 'Foo bar', E'O\'Reilly');
 <lineannotation>Result: </lineannotation><computeroutput>INSERT INTO "Foo bar" VALUES('O''Reilly')</computeroutput>
 
 SELECT format('INSERT INTO %I VALUES(%L)', 'locations', 'C:\Program Files');
-<lineannotation>Result: </lineannotation><computeroutput>INSERT INTO locations VALUES('C:\Program Files')</computeroutput>
+<lineannotation>Result: </lineannotation><computeroutput>INSERT INTO locations VALUES(E'C:\\Program Files')</computeroutput>
 </screen>
     </para>
 
@@ -8877,7 +8884,7 @@ SELECT regexp_match('abc01234xyz', '(?:(.*?)(\d+)(.*)){1,1}');
        </row>
        <row>
         <entry><literal>to_char(485, 'PL999')</literal></entry>
-        <entry><literal>'+485'</literal></entry>
+        <entry><literal>'+ 485'</literal></entry>
        </row>
        <row>
         <entry><literal>to_char(485, 'SG999')</literal></entry>
@@ -21979,6 +21986,9 @@ SELECT NULLIF(value, '(none)') ...
         are coerced to text; value arguments are converted as per
         <function>to_json</function> or <function>to_jsonb</function>.
         Values can be null, but keys cannot.
+        If a key appears more than once, the <type>json</type> result keeps
+        every pair, while the <type>jsonb</type> result keeps only the last
+        value for that key.
        </para></entry>
        <entry>No</entry>
       </row>
@@ -22006,8 +22016,11 @@ SELECT NULLIF(value, '(none)') ...
         Collects all the key/value pairs into a JSON object.  Key arguments
         are coerced to text; value arguments are converted as per
         <function>to_json</function> or <function>to_jsonb</function>.
-        The <parameter>key</parameter> can not be null. If the
-        <parameter>value</parameter> is null then the entry is skipped,
+        The <parameter>key</parameter> cannot be null. If the
+        <parameter>value</parameter> is null then the pair is skipped.
+        Duplicate keys are handled as for <function>json_object_agg</function>
+        and <function>jsonb_object_agg</function>, after removing any pairs
+        with null values.
        </para></entry>
        <entry>No</entry>
       </row>
@@ -22064,9 +22077,10 @@ SELECT NULLIF(value, '(none)') ...
         Collects all the key/value pairs into a JSON object.  Key arguments
         are coerced to text; value arguments are converted as per
         <function>to_json</function> or <function>to_jsonb</function>.
-        The <parameter>key</parameter> can not be null. If the
-        <parameter>value</parameter> is null then the entry is skipped.
-        If there is a duplicate key an error is thrown.
+        The <parameter>key</parameter> cannot be null. If the
+        <parameter>value</parameter> is null then the pair is skipped.
+        If there is a duplicate key (including pairs with null values)
+        an error is thrown.
        </para></entry>
        <entry>No</entry>
       </row>
@@ -24596,13 +24610,20 @@ SELECT * FROM pg_ls_dir('.') WITH ORDINALITY AS t(ls,n);
         One server process blocks another if it either holds a lock that
         conflicts with the blocked process's lock request (hard block), or is
         waiting for a lock that would conflict with the blocked process's lock
-        request and is ahead of it in the wait queue (soft block).  When using
-        parallel queries the result always lists client-visible process IDs
-        (that is, <function>pg_backend_pid</function> results) even if the
-        actual lock is held or awaited by a child worker process.  As a result
-        of that, there may be duplicated PIDs in the result.  Also note that
-        when a prepared transaction holds a conflicting lock, it will be
-        represented by a zero process ID.
+        request and is ahead of it in the wait queue (soft block).  A prepared
+        transaction that holds a conflicting lock is represented by a zero
+        process ID.
+       </para>
+       <para>
+        When using parallel queries the result always lists client-visible
+        process IDs (that is, <function>pg_backend_pid</function> results)
+        even if the actual lock is held or awaited by a child worker process.
+        As a result of that, there may be duplicated PIDs in the result.  Note
+        that the processes of a parallel query can block each other on
+        relation extension locks (lock type <literal>extend</literal> in
+        <link linkend="view-pg-locks"><structname>pg_locks</structname></link>),
+        in which case the result contains the blocked session's own process
+        ID.
        </para>
        <para>
         Frequent calls to this function could have some impact on database
@@ -25318,20 +25339,6 @@ SELECT has_function_privilege('joeuser', 'myfunc(int, text)', 'execute');
         </para>
         <para>
          <literal>'{calvin=r*w/hobbes,hobbes=r*w*/postgres}'::aclitem[] @&gt; 'calvin=r*/hobbes'::aclitem</literal>
-         <returnvalue>t</returnvalue>
-        </para></entry>
-       </row>
-
-       <row>
-        <entry role="func_table_entry"><para role="func_signature">
-         <type>aclitem[]</type> <literal>~</literal> <type>aclitem</type>
-         <returnvalue>boolean</returnvalue>
-        </para>
-        <para>
-         This is a deprecated alias for <literal>@&gt;</literal>.
-        </para>
-        <para>
-         <literal>'{calvin=r*w/hobbes,hobbes=r*w*/postgres}'::aclitem[] ~ 'calvin=r*/hobbes'::aclitem</literal>
          <returnvalue>t</returnvalue>
         </para></entry>
        </row>

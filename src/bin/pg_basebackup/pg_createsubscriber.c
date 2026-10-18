@@ -1063,18 +1063,23 @@ drop_existing_subscriptions(PGconn *conn, const char *subname, const char *dbnam
 {
 	PQExpBuffer query = createPQExpBuffer();
 	PGresult   *res;
+	char	   *subname_esc;
 
 	Assert(conn != NULL);
+
+	subname_esc = PQescapeIdentifier(conn, subname, strlen(subname));
 
 	/*
 	 * Construct a query string. These commands are allowed to be executed
 	 * within a transaction.
 	 */
 	appendPQExpBuffer(query, "ALTER SUBSCRIPTION %s DISABLE;",
-					  subname);
+					  subname_esc);
 	appendPQExpBuffer(query, " ALTER SUBSCRIPTION %s SET (slot_name = NONE);",
-					  subname);
-	appendPQExpBuffer(query, " DROP SUBSCRIPTION %s;", subname);
+					  subname_esc);
+	appendPQExpBuffer(query, " DROP SUBSCRIPTION %s;", subname_esc);
+
+	PQfreemem(subname_esc);
 
 	pg_log_info("dropping subscription \"%s\" in database \"%s\"",
 				subname, dbname);
@@ -1397,7 +1402,6 @@ drop_replication_slot(PGconn *conn, struct LogicalRepInfo *dbinfo,
 		{
 			pg_log_error("could not drop replication slot \"%s\" in database \"%s\": %s",
 						 slot_name, dbinfo->dbname, PQresultErrorMessage(res));
-			dbinfo->made_replslot = false;	/* don't try again. */
 		}
 
 		PQclear(res);
@@ -1660,7 +1664,6 @@ drop_publication(PGconn *conn, struct LogicalRepInfo *dbinfo)
 		{
 			pg_log_error("could not drop publication \"%s\" in database \"%s\": %s",
 						 dbinfo->pubname, dbinfo->dbname, PQresultErrorMessage(res));
-			dbinfo->made_publication = false;	/* don't try again. */
 
 			/*
 			 * Don't disconnect and exit here. This routine is used by primary

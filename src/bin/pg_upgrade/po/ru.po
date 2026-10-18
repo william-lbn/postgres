@@ -1,14 +1,14 @@
 # Russian message translation file for pg_upgrade
 # Copyright (C) 2017 PostgreSQL Global Development Group
 # This file is distributed under the same license as the PostgreSQL package.
-# SPDX-FileCopyrightText: 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025 Alexander Lakhin <a.lakhin@postgrespro.ru>
+# SPDX-FileCopyrightText: 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026 Alexander Lakhin <a.lakhin@postgrespro.ru>
 # Maxim Yablokov <m.yablokov@postgrespro.ru>, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: pg_upgrade (PostgreSQL) 10\n"
 "Report-Msgid-Bugs-To: pgsql-bugs@lists.postgresql.org\n"
-"POT-Creation-Date: 2025-08-09 07:11+0300\n"
-"PO-Revision-Date: 2025-08-09 07:24+0300\n"
+"POT-Creation-Date: 2026-08-05 06:37+0300\n"
+"PO-Revision-Date: 2026-08-05 07:50+0300\n"
 "Last-Translator: Alexander Lakhin <exclusion@gmail.com>\n"
 "Language-Team: Russian <pgsql-ru-general@postgresql.org>\n"
 "Language: ru\n"
@@ -18,16 +18,26 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../../common/fe_memutils.c:35 ../../common/fe_memutils.c:75
-#: ../../common/fe_memutils.c:98 ../../common/fe_memutils.c:161
+#: ../../common/fe_memutils.c:41 ../../common/fe_memutils.c:81
+#: ../../common/fe_memutils.c:104 ../../common/fe_memutils.c:167
 #, c-format
 msgid "out of memory\n"
 msgstr "нехватка памяти\n"
 
-#: ../../common/fe_memutils.c:92 ../../common/fe_memutils.c:153
+#: ../../common/fe_memutils.c:98 ../../common/fe_memutils.c:159
 #, c-format
 msgid "cannot duplicate null pointer (internal error)\n"
 msgstr "попытка дублирования нулевого указателя (внутренняя ошибка)\n"
+
+#: ../../common/fe_memutils.c:209
+#, c-format
+msgid "invalid memory allocation request size %zu + %zu\n"
+msgstr "недопустимый размер в запросе на выделение памяти: %zu + %zu\n"
+
+#: ../../common/fe_memutils.c:228
+#, c-format
+msgid "invalid memory allocation request size %zu * %zu\n"
+msgstr "недопустимый размер в запросе на выделение памяти: %zu * %zu\n"
 
 #: ../../common/restricted_token.c:168
 #, c-format
@@ -267,7 +277,7 @@ msgstr "Список проблемных столбцов приведён в �
 #: check.c:496 check.c:971 check.c:1144 check.c:1259 check.c:1353 check.c:1481
 #: check.c:1557 check.c:1634 check.c:1700 check.c:1773 check.c:1952
 #: check.c:1971 check.c:2040 check.c:2092 file.c:378 file.c:415 function.c:189
-#: option.c:493 version.c:79 version.c:177
+#: option.c:493 version.c:110 version.c:208
 #, c-format
 msgid "could not open file \"%s\": %m"
 msgstr "не удалось открыть файл \"%s\": %m"
@@ -835,7 +845,7 @@ msgstr "В исходном кластере не хватает информа�
 msgid "The target cluster lacks cluster state information:"
 msgstr "В целевом кластере не хватает информации о состоянии кластера:"
 
-#: controldata.c:213 dump.c:50 exec.c:118 pg_upgrade.c:558 pg_upgrade.c:598
+#: controldata.c:213 dump.c:54 exec.c:118 pg_upgrade.c:558 pg_upgrade.c:598
 #: pg_upgrade.c:947 relfilenumber.c:233 server.c:34 util.c:337
 #, c-format
 msgid "%s"
@@ -1103,7 +1113,7 @@ msgstr ""
 msgid "Creating dump of global objects"
 msgstr "Формирование выгрузки глобальных объектов"
 
-#: dump.c:32
+#: dump.c:33
 #, c-format
 msgid "Creating dump of database schemas"
 msgstr "Формирование выгрузки схем базы данных"
@@ -2077,17 +2087,17 @@ msgstr "копирование \"%s\" в \"%s\" с помощью copy_file_rang
 msgid "linking \"%s\" to \"%s\""
 msgstr "создание ссылки на \"%s\" в \"%s\""
 
-#: server.c:39 server.c:143 util.c:248 util.c:278
+#: server.c:39 server.c:145 util.c:248 util.c:278
 #, c-format
 msgid "Failure, exiting\n"
 msgstr "Ошибка, выполняется выход\n"
 
-#: server.c:133
+#: server.c:135
 #, c-format
 msgid "executing: %s"
 msgstr "выполняется: %s"
 
-#: server.c:139
+#: server.c:141
 #, c-format
 msgid ""
 "SQL command failed\n"
@@ -2098,17 +2108,17 @@ msgstr ""
 "%s\n"
 "%s"
 
-#: server.c:169
+#: server.c:171
 #, c-format
 msgid "could not open version file \"%s\": %m"
 msgstr "не удалось открыть файл с версией \"%s\": %m"
 
-#: server.c:173
+#: server.c:175
 #, c-format
 msgid "could not parse version file \"%s\""
 msgstr "не удалось разобрать файл с версией \"%s\""
 
-#: server.c:299
+#: server.c:301
 #, c-format
 msgid ""
 "\n"
@@ -2117,7 +2127,7 @@ msgstr ""
 "\n"
 "%s"
 
-#: server.c:303
+#: server.c:305
 #, c-format
 msgid ""
 "could not connect to source postmaster started with the command:\n"
@@ -2127,7 +2137,7 @@ msgstr ""
 "командой:\n"
 "%s"
 
-#: server.c:307
+#: server.c:309
 #, c-format
 msgid ""
 "could not connect to target postmaster started with the command:\n"
@@ -2137,26 +2147,26 @@ msgstr ""
 "командой:\n"
 "%s"
 
-#: server.c:321
+#: server.c:323
 #, c-format
 msgid "pg_ctl failed to start the source server, or connection failed"
 msgstr ""
 "программа pg_ctl не смогла запустить исходный сервер, либо к нему не удалось "
 "подключиться"
 
-#: server.c:323
+#: server.c:325
 #, c-format
 msgid "pg_ctl failed to start the target server, or connection failed"
 msgstr ""
 "программа pg_ctl не смогла запустить целевой сервер, либо к нему не удалось "
 "подключиться"
 
-#: server.c:368
+#: server.c:370
 #, c-format
 msgid "out of memory"
 msgstr "нехватка памяти"
 
-#: server.c:381
+#: server.c:383
 #, c-format
 msgid "libpq environment variable %s has a non-local server value: %s"
 msgstr ""
@@ -2202,17 +2212,17 @@ msgstr "ошибка при обращении к каталогу \"%s\": %m"
 msgid "ok"
 msgstr "ок"
 
-#: version.c:44
+#: version.c:75
 #, c-format
 msgid "Checking for hash indexes"
 msgstr "Проверка хеш-индексов"
 
-#: version.c:121
+#: version.c:152
 #, c-format
 msgid "warning"
 msgstr "предупреждение"
 
-#: version.c:123
+#: version.c:154
 #, c-format
 msgid ""
 "\n"
@@ -2227,7 +2237,7 @@ msgstr ""
 "перестроить с помощью команды REINDEX. По завершении обновления вы получите\n"
 "инструкции по выполнению REINDEX."
 
-#: version.c:129
+#: version.c:160
 #, c-format
 msgid ""
 "\n"
@@ -2246,17 +2256,17 @@ msgstr ""
 "будучи выполненным администратором БД в psql, пересоздаст все неправильные\n"
 "индексы; до этого никакие хеш-индексы не будут использоваться."
 
-#: version.c:153
+#: version.c:184
 #, c-format
 msgid "Checking for extension updates"
 msgstr "Проверка обновлённых расширений"
 
-#: version.c:200
+#: version.c:231
 #, c-format
 msgid "notice"
 msgstr "замечание"
 
-#: version.c:201
+#: version.c:232
 #, c-format
 msgid ""
 "\n"

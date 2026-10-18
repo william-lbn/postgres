@@ -1464,15 +1464,11 @@ executeItemOptUnwrapTarget(JsonPathExecContext *cxt, JsonPathItem *jsp,
 				if (jsp->type == jpiDecimal && jsp->content.args.left)
 				{
 					Datum		numdatum;
-					Datum		dtypmod;
+					int32		dtypmod;
 					int32		precision;
 					int32		scale = 0;
 					bool		have_error;
 					bool		noerr;
-					ArrayType  *arrtypmod;
-					Datum		datums[2];
-					char		pstr[12];	/* sign, 10 digits and '\0' */
-					char		sstr[12];	/* sign, 10 digits and '\0' */
 					ErrorSaveContext escontext = {T_ErrorSaveContext};
 
 					jspGetLeftArg(jsp, &elem);
@@ -1502,18 +1498,11 @@ executeItemOptUnwrapTarget(JsonPathExecContext *cxt, JsonPathItem *jsp,
 														 jspOperationName(jsp->type)))));
 					}
 
-					/*
-					 * numerictypmodin() takes the precision and scale in the
-					 * form of CString arrays.
-					 */
-					pg_ltoa(precision, pstr);
-					datums[0] = CStringGetDatum(pstr);
-					pg_ltoa(scale, sstr);
-					datums[1] = CStringGetDatum(sstr);
-					arrtypmod = construct_array_builtin(datums, 2, CSTRINGOID);
-
-					dtypmod = DirectFunctionCall1(numerictypmodin,
-												  PointerGetDatum(arrtypmod));
+					/* Pack the precision and scale into a numeric typmod */
+					dtypmod = make_numeric_typmod_safe(precision, scale,
+													   jspThrowErrors(cxt) ? NULL : (Node *) &escontext);
+					if (escontext.error_occurred)
+						return jperError;
 
 					/* Convert numstr to Numeric with typmod */
 					Assert(numstr != NULL);
@@ -1529,7 +1518,6 @@ executeItemOptUnwrapTarget(JsonPathExecContext *cxt, JsonPathItem *jsp,
 													 numstr, jspOperationName(jsp->type)))));
 
 					num = DatumGetNumeric(numdatum);
-					pfree(arrtypmod);
 				}
 
 				jb = &jbv;
@@ -3074,10 +3062,14 @@ JsonItemFromDatum(Datum val, Oid typid, int32 typmod, JsonbValue *res)
 			break;
 		case TEXTOID:
 		case VARCHAROID:
-			res->type = jbvString;
-			res->val.string.val = VARDATA_ANY(val);
-			res->val.string.len = VARSIZE_ANY_EXHDR(val);
-			break;
+			{
+				text	   *txt = DatumGetTextPP(val);
+
+				res->type = jbvString;
+				res->val.string.val = VARDATA_ANY(txt);
+				res->val.string.len = VARSIZE_ANY_EXHDR(txt);
+				break;
+			}
 		case DATEOID:
 		case TIMEOID:
 		case TIMETZOID:
@@ -4420,7 +4412,7 @@ JsonTablePlanJoinNextRow(JsonTablePlanState *planstate)
 		 */
 		if (!JsonTablePlanNextRow(planstate->right))
 		{
-			/* Right sibling ran out of row, so there are more rows. */
+			/* Right sibling ran out of rows too, so there are no more rows. */
 			return false;
 		}
 	}

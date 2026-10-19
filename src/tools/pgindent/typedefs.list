@@ -646,6 +646,7 @@ DsgBufferOperation
 DsgBufferOperationPhase
 DsgBufferOperationReason
 DsgBufferSnapshot
+DsgGrowCleanup
 DsgMemoryResult
 DsgMemoryStatus
 DsgRegion

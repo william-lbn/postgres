@@ -40,6 +40,7 @@ PG_FUNCTION_INFO_V1(test_dsg_mapping_free);
 PG_FUNCTION_INFO_V1(test_dsg_checkpoint_control);
 PG_FUNCTION_INFO_V1(test_dsg_io);
 PG_FUNCTION_INFO_V1(test_dsg_io_control);
+PG_FUNCTION_INFO_V1(test_dsg_grow_control);
 
 void		_PG_init(void);
 
@@ -59,6 +60,8 @@ typedef struct DsgTestSharedState
 	pg_atomic_uint32 io_buffer;
 	pg_atomic_uint32 io_audit;
 	pg_atomic_uint32 fast_drop_found;
+	pg_atomic_uint32 grow_exit_gate;
+	pg_atomic_uint32 grow_prepare_gate;
 } DsgTestSharedState;
 
 static void test_dsg_wait_gate(pg_atomic_uint32 *gate, const char *event_name);
@@ -75,8 +78,43 @@ extern PGDLLEXPORT void test_dsg_checkpoint_pause(const char *name, const void *
 extern PGDLLEXPORT void test_dsg_checkpoint_fail(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_io_pause(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_fast_drop(const char *name, const void *private_data);
+extern PGDLLEXPORT void test_dsg_grow_pause(const char *name, const void *private_data);
 static bool io_writer_armed;
 static bool io_waiter_armed;
+static int	grow_mode;
+
+/*-
+ * 此回调后登记、先执行，恰好暂停在 PG 原生已放锁、内核 Grow 清理之前。
+ * 不修改被测操作；控制端必须观察本门禁后才启动下一真实协调者。
+ */
+static void
+test_dsg_grow_exit_pause(int code, Datum arg)
+{
+	Assert(!LWLockHeldByMe(&DSBCtrl->resize_lock));
+	test_dsg_wait_gate(&((DsgTestSharedState *) inherited_region.address)->grow_exit_gate,
+					   "DsgTestGrowExit");
+}
+
+void
+test_dsg_grow_pause(const char *name, const void *private_data)
+{
+	int			mode = grow_mode;
+
+	grow_mode = 0;
+	if (mode == 1)
+	{
+		before_shmem_exit(test_dsg_grow_exit_pause, (Datum) 0);
+		ereport(FATAL, (errmsg("DSGA test Grow FATAL")));
+	}
+	else if (mode == 2)
+	{
+		Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+		test_dsg_wait_gate(&((DsgTestSharedState *) inherited_region.address)->grow_prepare_gate,
+						   "DsgTestGrowPrepare");
+	}
+	else if (mode == 3)
+		ereport(FATAL, (errmsg("DSGA test Grow FATAL")));
+}
 
 /*-
  * 只改本测试 Backend 的页表，不改共享 backing 和其他 Backend 的访问权。
@@ -166,6 +204,8 @@ _PG_init(void)
 		pg_atomic_init_u32(&state->io_buffer, 0);
 		pg_atomic_init_u32(&state->io_audit, 0);
 		pg_atomic_init_u32(&state->fast_drop_found, 0);
+		pg_atomic_init_u32(&state->grow_exit_gate, 0);
+		pg_atomic_init_u32(&state->grow_prepare_gate, 0);
 	}
 }
 
@@ -346,6 +386,61 @@ test_dsg_grow_snapshot(PG_FUNCTION_ARGS)
 	PG_RETURN_TEXT_P(cstring_to_text(psprintf("phase=%d reason=%d high=%d generation=" UINT64_FORMAT " unknown=%d charged_tail=%d",
 											  snapshot.operation.phase, snapshot.operation.reason, snapshot.high,
 											  snapshot.generation, unknown, charged_tail)));
+}
+
+/* Grow 退出回归的调度接口，不写操作 phase/reason/预算或伪造锁所有权。 */
+Datum
+test_dsg_grow_control(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	DsgTestSharedState *state;
+	char	   *action = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	const char *result = "ok";
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	state = (DsgTestSharedState *) inherited_region.address;
+	if (strcmp(action, "attach") == 0 || strcmp(action, "attach_after_publish") == 0)
+		InjectionPointAttach(strcmp(action, "attach") == 0 ?
+							 "dsg-buffer-grow-before-publish" : "dsg-buffer-grow-after-publish",
+							 "test_dsg_region", "test_dsg_grow_pause", NULL, 0);
+	else if (strcmp(action, "arm_fatal") == 0)
+		grow_mode = 1;
+	else if (strcmp(action, "arm_pause") == 0)
+		grow_mode = 2;
+	else if (strcmp(action, "arm_fatal_unpaused") == 0)
+		grow_mode = 3;
+	else if (strcmp(action, "exit_waiting") == 0)
+		result = pg_atomic_read_u32(&state->grow_exit_gate) == 1 ? "yes" : "no";
+	else if (strcmp(action, "prepare_waiting") == 0)
+		result = pg_atomic_read_u32(&state->grow_prepare_gate) == 1 ? "yes" : "no";
+	else if (strcmp(action, "release_exit") == 0)
+		pg_atomic_write_u32(&state->grow_exit_gate, 2);
+	else if (strcmp(action, "release_prepare") == 0)
+		pg_atomic_write_u32(&state->grow_prepare_gate, 2);
+	else if (strcmp(action, "detach") == 0)
+	{
+		InjectionPointDetach("dsg-buffer-grow-before-publish");
+		InjectionPointDetach("dsg-buffer-grow-after-publish");
+	}
+	else if (strcmp(action, "operation") == 0)
+	{
+		DsgBufferSnapshot snapshot;
+
+		DsgBufferGetSnapshot(&snapshot);
+		PG_RETURN_TEXT_P(cstring_to_text(psprintf("op=" UINT64_FORMAT " phase=%d reason=%d high=%d generation=" UINT64_FORMAT,
+												  snapshot.operation.request.operation_id_low,
+												  snapshot.operation.phase, snapshot.operation.reason,
+												  snapshot.high, snapshot.generation)));
+	}
+	else
+		ereport(ERROR, (errmsg("invalid DSGA Grow test action")));
+	pfree(action);
+	PG_RETURN_TEXT_P(cstring_to_text(result));
+#else
+	ereport(ERROR, (errmsg("DSGA Grow tests require injection points")));
+	PG_RETURN_NULL();
+#endif
 }
 
 /*-

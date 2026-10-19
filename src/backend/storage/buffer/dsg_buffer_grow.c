@@ -17,6 +17,18 @@
 #include "utils/wait_event.h"
 
 static void DsgGrowDeny(DsgBufferOperationReason reason);
+static bool DsgGrowSameRequest(const DsgBufferGrowRequest *a, const DsgBufferGrowRequest *b);
+
+/*-
+ * 回调只能清理本次真正建立的操作，不能把共享目录的当前操作当成自己。
+ * 上下文在 PG_TRY 之前分配，指针此后不变；将可变标志放在堆上，避免
+ * longjmp 后读取已修改的非 volatile 自动变量。事务内存清理晚于本回调。
+ */
+typedef struct DsgGrowCleanup
+{
+	DsgBufferGrowRequest request;
+	bool		operation_started;
+} DsgGrowCleanup;
 
 void
 DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot)
@@ -110,8 +122,33 @@ DsgGrowGranules(int active, int prepared, DsgBufferGranuleState pending,
 static void
 DsgGrowInterrupted(int code, Datum arg)
 {
-	if (DSBCtrl->operation.phase == DSG_OP_PREPARING)
+	DsgGrowCleanup *cleanup = (DsgGrowCleanup *) DatumGetPointer(arg);
+	bool		acquired = false;
+	bool		own_preparing;
+
+	if (!cleanup->operation_started)
+		return;
+
+	/*-
+	 * 普通 ERROR 局部展开时仍持串行锁；FATAL 的 shmem_exit 却先释放
+	 * 所有 LWLock，再运行退出回调。后者必须重新条件取得串行权，不能
+	 * 等待正在执行的新操作，也不能在别人持锁时更改其目录/终态。
+	 * 取得失败就保留旧预算事实；下一协调者按 revision/当前事实对账。
+	 */
+	if (!LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE))
+	{
+		if (!LWLockConditionalAcquire(&DSBCtrl->resize_lock, LW_EXCLUSIVE))
+			return;
+		acquired = true;
+	}
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	own_preparing = DSBCtrl->operation.phase == DSG_OP_PREPARING &&
+		DsgGrowSameRequest(&DSBCtrl->operation.request, &cleanup->request);
+	SpinLockRelease(&DSBCtrl->status_lock);
+	if (own_preparing)
 		DsgGrowDeny(DSG_REASON_INTERRUPTED);
+	if (acquired)
+		LWLockRelease(&DSBCtrl->resize_lock);
 }
 
 static bool
@@ -125,6 +162,7 @@ DsgGrowSameRequest(const DsgBufferGrowRequest *a, const DsgBufferGrowRequest *b)
 static void
 DsgGrowDeny(DsgBufferOperationReason reason)
 {
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
 	DsgGrowGranules(GetHighNBuffers(), GetHighNBuffers(), DSG_GRANULE_RESERVED,
 					pg_atomic_read_u64(&DSBCtrl->generation));
 	SpinLockAcquire(&DSBCtrl->status_lock);
@@ -258,6 +296,7 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 {
 	instr_time	started;
 	DsgBufferOperation previous;
+	DsgGrowCleanup *cleanup;
 	uint64		generation;
 	bool		committed = false;
 	bool		replayed = false;
@@ -286,9 +325,11 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 		return false;
 	}
 
+	cleanup = palloc0(sizeof(*cleanup));
+	cleanup->request = *request;
 	/*- 与长遍历 Guard 相同：协调期间允许取消，释放时再成对 HOLD。 */
 	RESUME_INTERRUPTS();
-	PG_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, (Datum) 0);
+	PG_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, PointerGetDatum(cleanup));
 	{
 		SpinLockAcquire(&DSBCtrl->status_lock);
 		previous = DSBCtrl->operation;
@@ -318,6 +359,7 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 			DSBCtrl->operation.original_buffers = GetHighNBuffers();
 			DSBCtrl->operation.phase = DSG_OP_PREPARING;
 			DSBCtrl->operation.reason = DSG_REASON_NONE;
+			cleanup->operation_started = true;
 			SpinLockRelease(&DSBCtrl->status_lock);
 			DsgGrowGranules(GetHighNBuffers(), request->target_buffers, DSG_GRANULE_PREPARING, generation);
 			if (request->target_buffers == GetHighNBuffers())
@@ -331,7 +373,8 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 				committed = DsgGrowPrepareAndPublish(request, started, timeout_ms);
 		}
 	}
-	PG_END_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, (Datum) 0);
+	PG_END_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, PointerGetDatum(cleanup));
+	pfree(cleanup);
 	DsgBufferGetSnapshot(snapshot);
 	snapshot->replayed = replayed;
 	HOLD_INTERRUPTS();

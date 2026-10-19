@@ -1,6 +1,6 @@
 # PG17 官方维护补丁与 Neon 差异合并记录
 
-状态：本地集成与验证中，尚未提交。动态共享缓冲池功能不包含在本批次。
+状态：维护基线已分批验证和提交；以下按时间保留合并记录。动态共享缓冲池功能不包含在维护批次。
 
 ## 固定输入
 
@@ -89,3 +89,38 @@ build/check-world-pg17-upstream-latest.log。Linux、存储端到端和性能未
 regress 225/225、isolation 123/123 通过。日志 build/dsg-feature-upstream-build.log、
 build/dsg-feature-upstream-core.log、build/dsg-feature-upstream-isolation.log。
 维护同步与随后恢复的 M2e 业务模块独立提交，最终组合另跑完整开/关回归。
+
+## 2026-10-19 V3 恢复实施前的最新维护合并
+
+用户确认以 V3 为实施标准后，重新拉取三仓和 PG14–18 官方分支。Neon main 仍为
+`fa504217c61bbcaf5c512d75830564541f917f8f`，Autoscaling main 仍为
+`a4bce09e4d6bd7932ea634a1ed79afe26a9cfd1f`；自有 main 分别多 16/3 个提交、落后 0。
+Neon PG17 稳定头仍为 `56692dfb680281a963c7470fc7f0fec7f65ecfd4`。
+
+社区 PG17 新头为 `63de1f8fa42060e10326d2d9a0d48e559594ab86`，完整合入前次
+`94035972af3f10cdaf9ff2b5d232ad5f45463469` 之后的两项官方提交：
+
+1. `723075b0315d7a71c8d99252938f3582c6c1cee9`：`jsonb_set_lax` 不再改写调用方
+   fcinfo 的常量 NULL 参数，避免后续行访问已释放的 per-tuple 内存；包含官方多行回归。
+2. `63de1f8fa42060e10326d2d9a0d48e559594ab86`：AllocSet 从 context freelist
+   复用且 maxBlockSize 改变时重新计算 allocChunkLimit，避免过量 malloc 或 pfree 后
+   多块内存滞留至 context reset。它是内存使用/性能稳定性修复，不是持久内存泄漏修复。
+
+4 个官方文件无冲突，逐文件与社区新头一致；官方实现和注释原样保留。本中文记录说明
+合并原因和边界，不混入 DSGA 代码。工作区中的 M2f 草稿未被此维护 worktree 改动。
+
+实际 Mac 验证：Apple clang 15 + MacOSX14.4 SDK，Assert/debug/depend/injection-points；
+构建并安装成功，版本标识 `upstream63de1f8-candidate`。按该头重新 clean 编译配套
+`neon_rmgr` 后完整 check-world **79 组 / 660 项报告检查通过，零 not ok**，包含
+核心 regress 225 和 isolation 123；TAP 未启用。没有据此宣称 Linux/存储端到端通过。
+
+日志：工作区 `build/pg17-upstream-63de-configure.log`、
+`build/pg17-upstream-63de-build.log`、`build/check-world-pg17-upstream-63de.log`。
+功能分支须再合入该维护头、验证组合并更新 Neon 的 gitlink 和两份版本锁。
+
+V3 功能分支合入验证：先保存 M2f 未提交草稿，在纯 M2e + 最新维护代码上完成
+Mac 构建安装；clean 重编配套 rmgr，动态模式下核心 regress **225/225**、
+isolation **123/123** 通过。合并冲突仅为本中文记录末尾的两侧追加，保留全部记录；
+4 个官方代码/回归文件与维护头一致。日志 `build/v3-feature-upstream-build.log`、
+`build/v3-feature-upstream-core.log`、`build/v3-feature-upstream-isolation.log`。
+随后才恢复 M2f 草稿，维护同步与业务改动分别提交。

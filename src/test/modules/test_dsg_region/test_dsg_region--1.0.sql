@@ -12,3 +12,10 @@ CREATE FUNCTION test_dsg_shared_read() RETURNS integer
 AS 'MODULE_PATHNAME' LANGUAGE C;
 REVOKE ALL ON FUNCTION test_dsg_shared_write(integer) FROM PUBLIC;
 REVOKE ALL ON FUNCTION test_dsg_shared_read() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_buffer_layout() RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C;
+CREATE FUNCTION test_dsg_boot_id() RETURNS bigint
+AS 'MODULE_PATHNAME' LANGUAGE C;
+REVOKE ALL ON FUNCTION test_dsg_buffer_layout() FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_boot_id() FROM PUBLIC;

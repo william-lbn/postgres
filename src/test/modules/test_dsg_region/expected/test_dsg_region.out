@@ -1,4 +1,10 @@
 CREATE EXTENSION test_dsg_region;
+SELECT test_dsg_buffer_layout();
+ test_dsg_buffer_layout 
+------------------------
+ t
+(1 row)
+
 SELECT test_dsg_region('populate_preserves_prefix');
  test_dsg_region 
 -----------------

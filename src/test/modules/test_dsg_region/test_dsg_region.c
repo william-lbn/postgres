@@ -5,7 +5,9 @@
 #include "fmgr.h"
 #include "miscadmin.h"
 #include "port/atomics.h"
+#include "storage/buf_internals.h"
 #include "storage/dsg_region.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "utils/builtins.h"
 
@@ -13,6 +15,8 @@ PG_MODULE_MAGIC;
 PG_FUNCTION_INFO_V1(test_dsg_region);
 PG_FUNCTION_INFO_V1(test_dsg_shared_write);
 PG_FUNCTION_INFO_V1(test_dsg_shared_read);
+PG_FUNCTION_INFO_V1(test_dsg_buffer_layout);
+PG_FUNCTION_INFO_V1(test_dsg_boot_id);
 
 void		_PG_init(void);
 
@@ -71,6 +75,63 @@ test_dsg_check(bool condition, const char *message)
 {
 	if (!condition)
 		elog(ERROR, "DSGA provider test failed: %s", message);
+}
+
+Datum
+test_dsg_boot_id(PG_FUNCTION_ARGS)
+{
+	(void) test_dsg_shared_value();
+	if (DSBCtrl == NULL)
+		PG_RETURN_NULL();
+	PG_RETURN_INT64((int64) DSBCtrl->boot_id);
+}
+
+/*-
+ * 断言实际 Buffer Manager 指针来自目录中的共享映射，并校验只提交初始
+ * 前缀、四数组分别按 M 预留。嵌套 Guard 测试覆盖重复读锁的释放责任。
+ * 这里不触摸未发布尾部，避免测试自身把整个 M 变成实际占用。
+ */
+Datum
+test_dsg_buffer_layout(PG_FUNCTION_ARGS)
+{
+	DsgBufferAccess outer;
+	DsgBufferAccess inner;
+	int			i;
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffer layout is disabled");
+	outer = DsgBufferAccessBegin();
+	inner = DsgBufferAccessBegin();
+	test_dsg_check(outer.acquired && !inner.acquired, "nested guard acquired twice");
+	test_dsg_check(outer.count == inner.count && outer.count == GetLowNBuffers() &&
+				   outer.count == NBuffers && outer.count < GetMaxNBuffers(),
+				   "invalid initial L/H/M");
+	test_dsg_check(BufferDescriptors ==
+				   (BufferDescPadded *) DSBCtrl->arrays[DSG_BUFFER_DESCRIPTORS].region.address &&
+				   BufferBlocks == DSBCtrl->arrays[DSG_BUFFER_BLOCKS].region.address &&
+				   BufferIOCVArray ==
+				   (ConditionVariableMinimallyPadded *) DSBCtrl->arrays[DSG_BUFFER_IOCV].region.address &&
+				   CkptBufferIds ==
+				   (CkptSortItem *) DSBCtrl->arrays[DSG_BUFFER_CHECKPOINT].region.address,
+				   "buffer arrays do not use directory mappings");
+	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
+	{
+		DsgBufferArray *array = &DSBCtrl->arrays[i];
+		Size		active = mul_size(outer.count, array->element_bytes);
+
+		test_dsg_check(array->region.maximum_bytes ==
+					   mul_size(GetMaxNBuffers(), array->element_bytes), "incorrect reservation");
+		test_dsg_check(array->committed_upper_bytes ==
+					   TYPEALIGN(array->region.page_bytes, active) &&
+					   !array->allocation_unknown, "incorrect initial commitment budget");
+	}
+	test_dsg_check(GetBufferDescriptor(outer.count - 1)->buf_id == outer.count - 1,
+				   "last active descriptor is not initialized");
+	DsgBufferAccessEnd(&inner);
+	test_dsg_check(LWLockHeldByMe(&DSBCtrl->access_lock), "inner guard released outer lock");
+	DsgBufferAccessEnd(&outer);
+	test_dsg_check(!LWLockHeldByMe(&DSBCtrl->access_lock), "outer guard leaked lock");
+	PG_RETURN_BOOL(true);
 }
 
 Datum

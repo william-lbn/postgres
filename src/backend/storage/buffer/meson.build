@@ -4,6 +4,7 @@ backend_sources += files(
   'buf_init.c',
   'buf_table.c',
   'bufmgr.c',
+  'dynamic_shared_buffers.c',
   'freelist.c',
   'localbuf.c',
 )

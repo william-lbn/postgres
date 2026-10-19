@@ -15,6 +15,7 @@
 #include <sys/mman.h>
 #endif
 
+#include "miscadmin.h"
 #include "storage/dsg_region.h"
 #include "utils/injection_point.h"
 
@@ -104,7 +105,13 @@ DsgRegionPopulate(DsgRegion *region, Size offset, Size bytes)
 	DsgRegionCheckRange(region, offset, bytes);
 	if (bytes == 0)
 		return result;
-	INJECTION_POINT("dsg-region-before-populate");
+
+	/*
+	 * 启动 Buffer Pool 时注入点共享目录尚未初始化，只在
+	 * Backend 运行钩子。
+	 */
+	if (IsUnderPostmaster)
+		INJECTION_POINT("dsg-region-before-populate");
 
 #if defined(__linux__) && defined(MADV_POPULATE_WRITE)
 	{
@@ -175,7 +182,8 @@ DsgRegionRelease(DsgRegion *region, Size offset, Size bytes)
 		result.status = DSG_MEMORY_NOOP;
 		return result;
 	}
-	INJECTION_POINT("dsg-region-before-release");
+	if (IsUnderPostmaster)
+		INJECTION_POINT("dsg-region-before-release");
 
 #if defined(__linux__) && defined(MADV_REMOVE)
 	if (madvise(region->address + start, end - start, MADV_REMOVE) != 0)

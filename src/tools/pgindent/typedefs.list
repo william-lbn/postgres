@@ -636,6 +636,9 @@ DropSubscriptionStmt
 DropTableSpaceStmt
 DropUserMappingStmt
 DropdbStmt
+DsgBufferAccess
+DsgBufferArray
+DsgBufferArrayId
 DsgMemoryResult
 DsgMemoryStatus
 DsgRegion
@@ -648,6 +651,7 @@ DumpableObject
 DumpableObjectType
 DumpableObjectWithAcl
 DynamicFileList
+DynamicSharedBuffersControl
 DynamicZoneAbbrev
 EC_KEY
 EDGE

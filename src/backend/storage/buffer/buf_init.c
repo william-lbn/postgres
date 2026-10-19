@@ -16,6 +16,8 @@
 
 #include "storage/buf_internals.h"
 #include "storage/bufmgr.h"
+#include "storage/dynamic_shared_buffers.h"
+#include "storage/ipc.h"
 #include "storage/proc.h"
 
 BufferDescPadded *BufferDescriptors;
@@ -32,6 +34,47 @@ CkptSortItem *CkptBufferIds;
  */
 Buffer		wal_redo_buffer;
 bool		am_wal_redo_postgres = false;
+
+/*-
+ * Postmaster 在子进程全部退出后调用 shmem_exit 重建共享内存。此回调在
+ * 主共享内存解除映射前执行，先销毁额外映射并清空目录指针，避免同一
+ * Postmaster 多次 crash recovery 累积旧映射或沿用旧 boot 身份。
+ * fork 子进程的退出回调列表会由 PG 重置，不会销毁其他进程的映射。
+ */
+static void
+DestroyDynamicBufferRegions(int code, Datum arg)
+{
+	int			i;
+
+	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
+		DsgRegionDestroy(&DSBCtrl->arrays[i].region);
+	DSBCtrl = NULL;
+}
+
+static void *
+ReserveDynamicBufferArray(DsgBufferArrayId id, Size element_bytes)
+{
+	DsgBufferArray *array = &DSBCtrl->arrays[id];
+	Size		initial_bytes = mul_size(NBuffers, element_bytes);
+	DsgMemoryResult result;
+
+	array->element_bytes = element_bytes;
+	DsgRegionReserve(&array->region, mul_size(DSBCtrl->maximum, element_bytes));
+	result = DsgRegionPopulate(&array->region, 0, initial_bytes);
+	if (result.status != DSG_MEMORY_OK)
+	{
+		errno = result.system_errno;
+		ereport(FATAL,
+				(errcode(ERRCODE_OUT_OF_MEMORY),
+				 errmsg("could not populate initial DSGA buffer array: %m")));
+	}
+
+	/*
+	 * 仅记录触页区间的页对齐保守预算；不把预留的全部 M 当作已提交。
+	 */
+	array->committed_upper_bytes = TYPEALIGN(array->region.page_bytes, initial_bytes);
+	return array->region.address;
+}
 
 /*
  * Data Structures:
@@ -75,40 +118,64 @@ bool		am_wal_redo_postgres = false;
 void
 InitBufferPool(void)
 {
-	bool		foundBufs,
-				foundDescs,
-				foundIOCV,
-				foundBufCkpt;
+	bool		foundBufs = false,
+				foundDescs = false,
+				foundIOCV = false,
+				foundBufCkpt = false;
 
-	/* Align descriptors to a cacheline boundary. */
-	BufferDescriptors = (BufferDescPadded *)
-		ShmemInitStruct("Buffer Descriptors",
-						NBuffers * sizeof(BufferDescPadded),
-						&foundDescs);
+	if (enable_dynamic_shared_buffers)
+	{
+		DynamicSharedBuffersInit();
 
-	/* Align buffer pool on IO page size boundary. */
-	BufferBlocks = (char *)
-		TYPEALIGN(PG_IO_ALIGN_SIZE,
-				  ShmemInitStruct("Buffer Blocks",
-								  NBuffers * (Size) BLCKSZ + PG_IO_ALIGN_SIZE,
-								  &foundBufs));
+		/*
+		 * 先注册清理，后面的任何预留/提交失败均不会漏掉已建立的映射。
+		 */
+		on_shmem_exit(DestroyDynamicBufferRegions, (Datum) 0);
+		BufferDescriptors = ReserveDynamicBufferArray(DSG_BUFFER_DESCRIPTORS,
+													  sizeof(BufferDescPadded));
+		BufferBlocks = ReserveDynamicBufferArray(DSG_BUFFER_BLOCKS, BLCKSZ);
+		BufferIOCVArray = ReserveDynamicBufferArray(DSG_BUFFER_IOCV,
+													sizeof(ConditionVariableMinimallyPadded));
+		CkptBufferIds = ReserveDynamicBufferArray(DSG_BUFFER_CHECKPOINT,
+												  sizeof(CkptSortItem));
+		if ((uintptr_t) BufferBlocks % PG_IO_ALIGN_SIZE != 0)
+			ereport(FATAL,
+					(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+					 errmsg("DSGA provider cannot satisfy buffer I/O alignment")));
+	}
+	else
+	{
 
-	/* Align condition variables to cacheline boundary. */
-	BufferIOCVArray = (ConditionVariableMinimallyPadded *)
-		ShmemInitStruct("Buffer IO Condition Variables",
-						NBuffers * sizeof(ConditionVariableMinimallyPadded),
-						&foundIOCV);
+		/* Align descriptors to a cacheline boundary. */
+		BufferDescriptors = (BufferDescPadded *)
+			ShmemInitStruct("Buffer Descriptors",
+							NBuffers * sizeof(BufferDescPadded),
+							&foundDescs);
 
-	/*
-	 * The array used to sort to-be-checkpointed buffer ids is located in
-	 * shared memory, to avoid having to allocate significant amounts of
-	 * memory at runtime. As that'd be in the middle of a checkpoint, or when
-	 * the checkpointer is restarted, memory allocation failures would be
-	 * painful.
-	 */
-	CkptBufferIds = (CkptSortItem *)
-		ShmemInitStruct("Checkpoint BufferIds",
-						NBuffers * sizeof(CkptSortItem), &foundBufCkpt);
+		/* Align buffer pool on IO page size boundary. */
+		BufferBlocks = (char *)
+			TYPEALIGN(PG_IO_ALIGN_SIZE,
+					  ShmemInitStruct("Buffer Blocks",
+									  NBuffers * (Size) BLCKSZ + PG_IO_ALIGN_SIZE,
+									  &foundBufs));
+
+		/* Align condition variables to cacheline boundary. */
+		BufferIOCVArray = (ConditionVariableMinimallyPadded *)
+			ShmemInitStruct("Buffer IO Condition Variables",
+							NBuffers * sizeof(ConditionVariableMinimallyPadded),
+							&foundIOCV);
+
+		/*
+		 * The array used to sort to-be-checkpointed buffer ids is located in
+		 * shared memory, to avoid having to allocate significant amounts of
+		 * memory at runtime. As that'd be in the middle of a checkpoint, or
+		 * when the checkpointer is restarted, memory allocation failures
+		 * would be painful.
+		 */
+		CkptBufferIds = (CkptSortItem *)
+			ShmemInitStruct("Checkpoint BufferIds",
+							NBuffers * sizeof(CkptSortItem), &foundBufCkpt);
+	}
 
 	if (foundDescs || foundBufs || foundIOCV || foundBufCkpt)
 	{
@@ -168,6 +235,15 @@ Size
 BufferShmemSize(void)
 {
 	Size		size = 0;
+
+	/*-
+	 * 动态数组在主共享内存之外各自 reserve，不能在主段再分配一份 M。
+	 * Hash 按 M 固定预算，目录及锁不随尾部回收。shared_memory_size 仍
+	 * 表示主共享段；DSGA 的独立占用须通过数组目录单独核算。
+	 */
+	(void) GetMaxNBuffers();
+	if (enable_dynamic_shared_buffers)
+		return add_size(DynamicSharedBuffersShmemSize(), StrategyShmemSize());
 
 	/* size of buffer descriptors */
 	size = add_size(size, mul_size(NBuffers, sizeof(BufferDescPadded)));

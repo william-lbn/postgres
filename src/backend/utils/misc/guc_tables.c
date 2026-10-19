@@ -74,6 +74,7 @@
 #include "replication/syncrep.h"
 #include "replication/walreceiver.h"
 #include "storage/bufmgr.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/fd.h"
 #include "storage/large_object.h"
 #include "storage/pg_shmem.h"
@@ -783,6 +784,16 @@ StaticAssertDecl(lengthof(config_type_names) == (PGC_ENUM + 1),
 
 struct config_bool ConfigureNamesBool[] =
 {
+	{
+		{"enable_dynamic_shared_buffers", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Enables the experimental dynamic shared buffer pool."),
+			NULL,
+			GUC_NOT_IN_SAMPLE
+		},
+		&enable_dynamic_shared_buffers,
+		false,
+		NULL, NULL, NULL
+	},
 	{
 		{"enable_seqscan_prefetch", PGC_USERSET, RESOURCES_ASYNCHRONOUS,
 			gettext_noop("Enables prefetching of next pages in sequential scans."),
@@ -2308,6 +2319,17 @@ struct config_int ConfigureNamesInt[] =
 		},
 		&NBuffers,
 		16384, 16, INT_MAX / 2,
+		NULL, NULL, NULL
+	},
+
+	{
+		{"max_shared_buffers", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Sets the reserved maximum size of the dynamic buffer pool."),
+			gettext_noop("Zero uses the startup shared_buffers value."),
+			GUC_UNIT_BLOCKS | GUC_NOT_IN_SAMPLE
+		},
+		&max_shared_buffers,
+		0, 0, INT_MAX / 2,
 		NULL, NULL, NULL
 	},
 

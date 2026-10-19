@@ -12,6 +12,8 @@
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/latch.h"
+#include "storage/proclist.h"
+#include "storage/smgr.h"
 #include "utils/builtins.h"
 #include "utils/injection_point.h"
 #include "utils/rel.h"
@@ -36,6 +38,8 @@ PG_FUNCTION_INFO_V1(test_dsg_pin_control);
 PG_FUNCTION_INFO_V1(test_dsg_unpin_probe);
 PG_FUNCTION_INFO_V1(test_dsg_mapping_free);
 PG_FUNCTION_INFO_V1(test_dsg_checkpoint_control);
+PG_FUNCTION_INFO_V1(test_dsg_io);
+PG_FUNCTION_INFO_V1(test_dsg_io_control);
 
 void		_PG_init(void);
 
@@ -50,6 +54,11 @@ typedef struct DsgTestSharedState
 	pg_atomic_uint32 value;
 	pg_atomic_uint32 pin_gate;	/* 0=未持有，1=真实持 pin，2=请求释放 */
 	pg_atomic_uint32 checkpoint_gate;
+	pg_atomic_uint32 io_writer_gate;
+	pg_atomic_uint32 io_waiter_gate;
+	pg_atomic_uint32 io_buffer;
+	pg_atomic_uint32 io_audit;
+	pg_atomic_uint32 fast_drop_found;
 } DsgTestSharedState;
 
 static void test_dsg_wait_gate(pg_atomic_uint32 *gate, const char *event_name);
@@ -64,6 +73,10 @@ static bool probe_protected;
 
 extern PGDLLEXPORT void test_dsg_checkpoint_pause(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_checkpoint_fail(const char *name, const void *private_data);
+extern PGDLLEXPORT void test_dsg_io_pause(const char *name, const void *private_data);
+extern PGDLLEXPORT void test_dsg_fast_drop(const char *name, const void *private_data);
+static bool io_writer_armed;
+static bool io_waiter_armed;
 
 /*-
  * 只改本测试 Backend 的页表，不改共享 backing 和其他 Backend 的访问权。
@@ -98,6 +111,37 @@ test_dsg_checkpoint_fail(const char *name, const void *private_data)
 	Assert(!LWLockHeldByMe(&DSBCtrl->access_lock));
 	ereport(ERROR, (errmsg("DSGA test checkpoint failure")));
 }
+
+/* 全局注入点仅暂停本地已武装的测试会话，不影响 checkpointer 等进程。 */
+void
+test_dsg_io_pause(const char *name, const void *private_data)
+{
+	DsgTestSharedState *state = (DsgTestSharedState *) inherited_region.address;
+
+	if (strcmp(name, "dsg-buffer-before-write") == 0)
+	{
+		if (io_writer_armed)
+			test_dsg_wait_gate(&state->io_writer_gate, "DsgTestIOWriter");
+	}
+	else if (io_waiter_armed)
+	{
+		Buffer		buffer = (Buffer) pg_atomic_read_u32(&state->io_buffer);
+
+		Assert(DSBCtrl != NULL && LWLockHeldByMe(&DSBCtrl->access_lock));
+		CheckBufferIsPinnedOnce(buffer);
+		test_dsg_wait_gate(&state->io_waiter_gate, "DsgTestIOWaiter");
+	}
+}
+
+/* 真实 WAL 恢复快速路径必须在访问 Descriptor 前已持数组保护。 */
+void
+test_dsg_fast_drop(const char *name, const void *private_data)
+{
+	DsgTestSharedState *state = (DsgTestSharedState *) inherited_region.address;
+
+	Assert(DSBCtrl != NULL && LWLockHeldByMe(&DSBCtrl->access_lock));
+	pg_atomic_fetch_add_u32(&state->fast_drop_found, 1);
+}
 #endif
 
 /*-
@@ -117,6 +161,11 @@ _PG_init(void)
 		pg_atomic_init_u32(&state->value, 0);
 		pg_atomic_init_u32(&state->pin_gate, 0);
 		pg_atomic_init_u32(&state->checkpoint_gate, 0);
+		pg_atomic_init_u32(&state->io_writer_gate, 0);
+		pg_atomic_init_u32(&state->io_waiter_gate, 0);
+		pg_atomic_init_u32(&state->io_buffer, 0);
+		pg_atomic_init_u32(&state->io_audit, 0);
+		pg_atomic_init_u32(&state->fast_drop_found, 0);
 	}
 }
 
@@ -517,6 +566,174 @@ test_dsg_checkpoint_control(PG_FUNCTION_ARGS)
 #else
 	ereport(ERROR, (errmsg("DSGA checkpoint tests require injection points")));
 	PG_RETURN_BOOL(false);
+#endif
+}
+
+/*-
+ * 审核回调在 Drop 前登记；WaitIO 的清理后登记、先执行。ERROR 时应
+ * 仍持 Guard，FATAL 时 shmem_exit 已放下 Guard，但两者均须仍持自身
+ * pin 且不再挂在 CV 队列。此回调只观察，不替被测代码补清理。
+ */
+#ifdef USE_INJECTION_POINTS
+static void
+test_dsg_io_audit(int code, Datum arg)
+{
+	DsgTestSharedState *state = (DsgTestSharedState *) inherited_region.address;
+	Buffer		buffer = (Buffer) pg_atomic_read_u32(&state->io_buffer);
+	uint32		result = 0;
+
+	CheckBufferIsPinnedOnce(buffer);
+	{
+		ConditionVariable *cv = BufferDescriptorGetIOCV(GetBufferDescriptor(buffer - 1));
+
+		result |= 1;
+		SpinLockAcquire(&cv->mutex);
+		if (!proclist_contains(&cv->wakeup, MyProcNumber, cvWaitLink))
+			result |= 2;
+		SpinLockRelease(&cv->mutex);
+	}
+	if (LWLockHeldByMe(&DSBCtrl->access_lock))
+		result |= 4;
+	pg_atomic_write_u32(&state->io_audit, result);
+	io_waiter_armed = false;
+}
+#endif
+
+/*-
+ * writer 使用真实 pin/content lock/StartBufferIO/写回；invalidate 持关系
+ * 排他锁调用原生 Drop，不删文件、不改数据。仅把同一页面再次标脏以制造
+ * 真实写回，测试不直接改 refcount、IO 位或 CV 队列。
+ */
+Datum
+test_dsg_io(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	DsgTestSharedState *state = (DsgTestSharedState *) inherited_region.address;
+	char	   *mode = text_to_cstring(PG_GETARG_TEXT_PP(1));
+	Relation	rel;
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	if (strcmp(mode, "writer") == 0)
+	{
+		Buffer		buffer;
+
+		rel = table_open(PG_GETARG_OID(0), AccessShareLock);
+		buffer = ReadBuffer(rel, 0);
+		test_dsg_check(!BufferIsLocal(buffer), "IO tests require a shared relation");
+		LockBuffer(buffer, BUFFER_LOCK_EXCLUSIVE);
+		MarkBufferDirty(buffer);
+		pg_atomic_write_u32(&state->io_buffer, (uint32) buffer);
+
+		/*
+		 * 原生写回不需要关系锁；让 invalidator 能像
+		 * checkpointer 并发写时一样进入。
+		 */
+		table_close(rel, AccessShareLock);
+		io_writer_armed = true;
+		PG_TRY();
+		{
+			FlushOneBuffer(buffer);
+		}
+		PG_FINALLY();
+		{
+			io_writer_armed = false;
+		}
+		PG_END_TRY();
+		UnlockReleaseBuffer(buffer);
+	}
+	else if (strcmp(mode, "invalidate") == 0)
+	{
+		ForkNumber	forknum = MAIN_FORKNUM;
+		BlockNumber first = 0;
+
+		rel = table_open(PG_GETARG_OID(0), AccessExclusiveLock);
+		test_dsg_check(rel->rd_rel->relpersistence != RELPERSISTENCE_TEMP,
+					   "IO tests require a shared relation");
+		io_waiter_armed = true;
+		PG_ENSURE_ERROR_CLEANUP(test_dsg_io_audit, (Datum) 0);
+		{
+			DropRelationBuffers(RelationGetSmgr(rel), &forknum, 1, &first);
+		}
+		PG_END_ENSURE_ERROR_CLEANUP(test_dsg_io_audit, (Datum) 0);
+		io_waiter_armed = false;
+
+		/*
+		 * 若 WaitIO 遗留自身 pin，InvalidateBuffer 的原生检查已报错。
+		 */
+		table_close(rel, AccessExclusiveLock);
+	}
+	else
+		ereport(ERROR, (errmsg("invalid DSGA IO test mode")));
+	pfree(mode);
+	PG_RETURN_BOOL(true);
+#else
+	ereport(ERROR, (errmsg("DSGA IO tests require injection points")));
+	PG_RETURN_BOOL(false);
+#endif
+}
+
+Datum
+test_dsg_io_control(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	DsgTestSharedState *state = (DsgTestSharedState *) inherited_region.address;
+	char	   *action = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	uint32		result = 1;
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	if (strcmp(action, "attach") == 0)
+	{
+		InjectionPointAttach("dsg-buffer-before-write", "test_dsg_region",
+							 "test_dsg_io_pause", NULL, 0);
+		InjectionPointAttach("dsg-buffer-io-wait-prepared", "test_dsg_region",
+							 "test_dsg_io_pause", NULL, 0);
+	}
+	else if (strcmp(action, "writer_waiting") == 0)
+		result = pg_atomic_read_u32(&state->io_writer_gate) == 1;
+	else if (strcmp(action, "waiter_waiting") == 0)
+		result = pg_atomic_read_u32(&state->io_waiter_gate) == 1;
+	else if (strcmp(action, "release_writer") == 0)
+		pg_atomic_write_u32(&state->io_writer_gate, 2);
+	else if (strcmp(action, "release_waiter") == 0)
+		pg_atomic_write_u32(&state->io_waiter_gate, 2);
+	else if (strcmp(action, "audit") == 0)
+		result = pg_atomic_read_u32(&state->io_audit);
+	else if (strcmp(action, "waiter_alone") == 0)
+	{
+		DsgBufferAccess access = DsgBufferAccessBegin();
+		Buffer		buffer = (Buffer) pg_atomic_read_u32(&state->io_buffer);
+
+		result = 0;
+		if (buffer > 0 && buffer <= access.count)
+		{
+			BufferDesc *buf = GetBufferDescriptor(buffer - 1);
+			uint32		buf_state = LockBufHdr(buf);
+
+			result = BUF_STATE_GET_REFCOUNT(buf_state) == 1 && !(buf_state & BM_IO_IN_PROGRESS);
+			UnlockBufHdr(buf, buf_state);
+		}
+		DsgBufferAccessEnd(&access);
+	}
+	else if (strcmp(action, "attach_fast_drop") == 0)
+		InjectionPointAttach("dsg-buffer-fast-drop-found", "test_dsg_region",
+							 "test_dsg_fast_drop", NULL, 0);
+	else if (strcmp(action, "fast_drop_found") == 0)
+		result = pg_atomic_read_u32(&state->fast_drop_found);
+	else if (strcmp(action, "detach") == 0)
+	{
+		InjectionPointDetach("dsg-buffer-before-write");
+		InjectionPointDetach("dsg-buffer-io-wait-prepared");
+		InjectionPointDetach("dsg-buffer-fast-drop-found");
+	}
+	else
+		ereport(ERROR, (errmsg("invalid DSGA IO test action")));
+	pfree(action);
+	PG_RETURN_INT32((int32) result);
+#else
+	ereport(ERROR, (errmsg("DSGA IO tests require injection points")));
+	PG_RETURN_INT32(0);
 #endif
 }
 

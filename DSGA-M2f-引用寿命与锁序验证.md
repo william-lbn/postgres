@@ -32,7 +32,7 @@ Neon PG17 稳定头与社区 `63de1f8fa42060e10326d2d9a0d48e559594ab86`。
 | PrintBufferDescs / PrintPinnedBufs / EvictUnpinnedBuffer | 受保护扫描/边界验证 | 不能凭 H 快照持有悬空地址 |
 | CheckPointBuffers / workspace | 现有全程 Guard，仍有 V3 R04 活性缺口 | 本批不删除保护；下一切片分离工作区寿命 |
 | StartBufferIO / TerminateBufferIO | 原生 pin 覆盖 IO 状态、ResourceOwner IO 登记及 CV broadcast | IO 完成不等于可以在通知前放弃 pin |
-| AbortBufferIO / WaitIO | IO 异常清理仍有 pin；非 pin 的 InvalidateBuffer 等调用由外层 Guard 保护 | CV 退队必须在该寿命保护内结束 |
+| AbortBufferIO / WaitIO | M2f 时依赖 pin/外层 Guard；后续审查发现 ERROR/FATAL 先放 Guard 的窗口，已由 R05 子片增加临时原生 pin 与 CV 清理 | 见 `DSGA-R05-IO等待与恢复快速路径验证.md`，不能仅凭 Guard 覆盖退出路径 |
 
 保持 `access→mapping/header` 的现有访问规则，消除归还路径的反向边；不在持 mapping
 锁的热路径增加 access 获取。协调器 `resize→access→strategy→status`，status 只做

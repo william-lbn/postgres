@@ -526,6 +526,8 @@ static uint32 WaitBufHdrUnlocked(BufferDesc *buf);
 static int	SyncOneBuffer(int buf_id, bool skip_recently_used,
 						  WritebackContext *wb_context, uint32 required_flags);
 static void WaitIO(BufferDesc *buf);
+static void WaitIOImpl(BufferDesc *buf);
+static void WaitIOCancelSleep(int code, Datum arg);
 static bool StartBufferIO(BufferDesc *buf, bool forInput, bool nowait);
 static void TerminateBufferIO(BufferDesc *buf, bool clear_dirty,
 							  uint32 set_flag_bits, bool forget_owner);
@@ -4039,6 +4041,12 @@ FlushBuffer(BufferDesc *buf, SMgrRelation reln, IOObject io_object,
 	if (!StartBufferIO(buf, false, false))
 		return;
 
+	/*
+	 * 仅测试真实 IO 已登记、尚未写出的交错；不改变 IO 标志或完成语义。
+	 */
+	if (DSBCtrl != NULL)
+		INJECTION_POINT("dsg-buffer-before-write");
+
 	/* Setup error traceback support for ereport() */
 	errcallback.callback = shared_buffer_write_error_callback;
 	errcallback.arg = (void *) buf;
@@ -4580,6 +4588,15 @@ FindAndDropRelationBuffers(RelFileLocator rlocator, ForkNumber forkNum,
 						   BlockNumber firstDelBlock)
 {
 	BlockNumber curBlock;
+	DsgBufferAccess access;
+
+	/*-
+	 * 小表/恢复快速路径不经过全池扫描的 Guard。mapping 锁只保护 tag
+	 * 关联，释放后不能保证 Descriptor backing 仍在；InvalidateBuffer
+	 * 还会放下 header/mapping 等待 IO。因此先取得数组保护，再查 hash，
+	 * 并保持到失效处理结束，锁序始终为 access -> mapping -> header。
+	 */
+	access = DsgBufferAccessBegin();
 
 	for (curBlock = firstDelBlock; curBlock < nForkBlock; curBlock++)
 	{
@@ -4604,6 +4621,9 @@ FindAndDropRelationBuffers(RelFileLocator rlocator, ForkNumber forkNum,
 
 		if (buf_id < 0)
 			continue;
+		Assert(buf_id < access.count);
+		if (DSBCtrl != NULL)
+			INJECTION_POINT("dsg-buffer-fast-drop-found");
 
 		bufHdr = GetBufferDescriptor(buf_id);
 
@@ -4622,6 +4642,7 @@ FindAndDropRelationBuffers(RelFileLocator rlocator, ForkNumber forkNum,
 		else
 			UnlockBufHdr(bufHdr, buf_state);
 	}
+	DsgBufferAccessEnd(&access);
 }
 
 /* ---------------------------------------------------------------------
@@ -5784,9 +5805,64 @@ IsBufferCleanupOK(Buffer buffer)
 static void
 WaitIO(BufferDesc *buf)
 {
+	Buffer		wait_pin = InvalidBuffer;
+
+	/*
+	 * 关闭时保持原生路径，不为静态数组引入额外 pin 或退出回调。
+	 */
+	if (DSBCtrl == NULL)
+	{
+		WaitIOImpl(buf);
+		return;
+	}
+
+	/*-
+	 * StartBufferIO 的调用者已有自身 pin；InvalidateBuffer 则明确没有。
+	 * 后者只靠数组 Guard，ERROR/FATAL 的 LWLockReleaseAll 会先放下它，
+	 * 原生 CV 清理却在稍后才访问 IOCV。尤其 shmem_exit 在任何退出回调
+	 * 之前已放下所有 LWLock，仅注册回调不能延长 backing 寿命。
+	 *
+	 * 无自身 pin 时，在 Guard 内取得一个正常的 ResourceOwner pin，
+	 * 不修改 usage_count、不自行伪造 refcount。成功返回时先退出 CV 再放
+	 * 此 pin，InvalidateBuffer 可继续原来的零引用检查；异常时 pin 留给
+	 * 原生资源清理，退出回调先撤销 CV，之后才能释放最后引用。
+	 */
+	if (GetPrivateRefCount(BufferDescriptorGetBuffer(buf)) == 0)
+	{
+		Assert(LWLockHeldByMe(&DSBCtrl->access_lock));
+		ReservePrivateRefCountEntry();
+		ResourceOwnerEnlarge(CurrentResourceOwner);
+		(void) LockBufHdr(buf);
+		PinBuffer_Locked(buf);
+		wait_pin = BufferDescriptorGetBuffer(buf);
+	}
+
+	PG_ENSURE_ERROR_CLEANUP(WaitIOCancelSleep, (Datum) 0);
+	{
+		WaitIOImpl(buf);
+	}
+	PG_END_ENSURE_ERROR_CLEANUP(WaitIOCancelSleep, (Datum) 0);
+
+	if (BufferIsValid(wait_pin))
+		UnpinBuffer(buf);
+}
+
+/* ERROR 在本地展开、FATAL 在资源清理前执行；两者均仍有原生 pin。 */
+static void
+WaitIOCancelSleep(int code, Datum arg)
+{
+	ConditionVariableCancelSleep();
+}
+
+/* 保留原生的先登记、再检查谓词、最后退出 CV 的等待顺序。 */
+static void
+WaitIOImpl(BufferDesc *buf)
+{
 	ConditionVariable *cv = BufferDescriptorGetIOCV(buf);
 
 	ConditionVariablePrepareToSleep(cv);
+	if (DSBCtrl != NULL)
+		INJECTION_POINT("dsg-buffer-io-wait-prepared");
 	for (;;)
 	{
 		uint32		buf_state;

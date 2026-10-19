@@ -41,6 +41,7 @@
 #include "storage/bufmgr.h"
 #include "storage/dsm.h"
 #include "storage/dsm_registry.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/pg_shmem.h"
 #include "storage/pmsignal.h"
@@ -161,6 +162,7 @@ CalculateShmemSize(int *num_semaphores)
 
 	/* might as well round it off to a multiple of a typical page size */
 	size = add_size(size, 8192 - (size % 8192));
+	DsgBufferCheckStartupBudget(size);
 
 	return size;
 }

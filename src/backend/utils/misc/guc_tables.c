@@ -785,6 +785,15 @@ StaticAssertDecl(lengthof(config_type_names) == (PGC_ENUM + 1),
 struct config_bool ConfigureNamesBool[] =
 {
 	{
+		{"dynamic_shared_buffers_require_admission", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Closes application admission on every dynamic buffer boot."),
+			NULL, GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_require_admission,
+		false,
+		NULL, NULL, NULL
+	},
+	{
 		{"enable_dynamic_shared_buffers", PGC_POSTMASTER, RESOURCES_MEM,
 			gettext_noop("Enables the experimental dynamic shared buffer pool."),
 			NULL,
@@ -2323,6 +2332,16 @@ struct config_int ConfigureNamesInt[] =
 	},
 
 	{
+		{"dynamic_shared_buffers_startup_budget", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Limits the main shared segment plus dynamic bootstrap arrays."),
+			NULL, GUC_UNIT_KB | GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_startup_budget,
+		0, 0, INT_MAX,
+		NULL, NULL, NULL
+	},
+
+	{
 		{"max_shared_buffers", PGC_POSTMASTER, RESOURCES_MEM,
 			gettext_noop("Sets the reserved maximum size of the dynamic buffer pool."),
 			gettext_noop("Zero uses the startup shared_buffers value."),
@@ -3025,7 +3044,8 @@ struct config_int ConfigureNamesInt[] =
 			GUC_UNIT_MB,
 		},
 		&max_replication_apply_lag,
-		-1, -1, INT_MAX, /* it should not be smaller than maximal size of WAL record */
+		-1, -1, INT_MAX,		/* it should not be smaller than maximal size
+								 * of WAL record */
 		NULL, NULL, NULL
 	},
 
@@ -3037,7 +3057,8 @@ struct config_int ConfigureNamesInt[] =
 			GUC_UNIT_MB,
 		},
 		&max_replication_flush_lag,
-		-1, -1, INT_MAX, /* it should not be smaller than maximal size of WAL record */
+		-1, -1, INT_MAX,		/* it should not be smaller than maximal size
+								 * of WAL record */
 		NULL, NULL, NULL
 	},
 
@@ -3049,7 +3070,8 @@ struct config_int ConfigureNamesInt[] =
 			GUC_UNIT_MB,
 		},
 		&max_replication_write_lag,
-		-1, -1, INT_MAX, /* it should not be smaller than maximal size of WAL record */
+		-1, -1, INT_MAX,		/* it should not be smaller than maximal size
+								 * of WAL record */
 		NULL, NULL, NULL
 	},
 

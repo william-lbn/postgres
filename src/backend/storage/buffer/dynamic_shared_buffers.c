@@ -7,14 +7,129 @@
  */
 #include "postgres.h"
 
+#include <unistd.h>
+
 #include "miscadmin.h"
+#include "storage/buf_internals.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/pg_shmem.h"
 #include "storage/shmem.h"
+#include "utils/guc.h"
 
 bool		enable_dynamic_shared_buffers = false;
 int			max_shared_buffers = 0;
+bool		dynamic_shared_buffers_require_admission = false;
+int			dynamic_shared_buffers_startup_budget = 0;
 DynamicSharedBuffersControl *DSBCtrl = NULL;
+static Size startup_shared_upper_bytes;
+
+/*-
+ * 在主共享段及 preload 扩展请求全部计入后，额外计入四个独立数组的
+ * bootstrap页对齐成本。按M固定的hash/目录已在主段，不能重复计费。
+ * 这是PG共享内存预算上界，不是Guest总量/RSS或私有查询内存的硬上限。
+ */
+void
+DsgBufferCheckStartupBudget(Size main_segment_bytes)
+{
+	Size		bytes = main_segment_bytes;
+	Size		main_page_bytes;
+	long		page_bytes;
+	Size		elements[] = {sizeof(BufferDescPadded), BLCKSZ,
+	sizeof(ConditionVariableMinimallyPadded), sizeof(CkptSortItem)};
+	int			i;
+
+	if (!enable_dynamic_shared_buffers)
+	{
+		if (dynamic_shared_buffers_require_admission || dynamic_shared_buffers_startup_budget != 0)
+			ereport(FATAL, (errmsg("managed dynamic buffer settings require dynamic shared buffers")));
+		return;
+	}
+	if (dynamic_shared_buffers_require_admission && dynamic_shared_buffers_startup_budget == 0)
+		ereport(FATAL, (errmsg("managed dynamic buffers require an explicit startup shared-memory budget")));
+	page_bytes = sysconf(_SC_PAGESIZE);
+	if (page_bytes <= 0)
+		ereport(FATAL, (errmsg("could not determine dynamic buffer page size")));
+	main_page_bytes = page_bytes;
+	/*-
+	 * Linux上huge_pages=try仍可能把主共享段向巨页取整。四个可伸缩数组
+	 * 使用普通页不代表主共享段也一定是普通页；启动前按两种分配的较大
+	 * 页界计费，失败回退只会使预算更保守。mmap模式另有一个SysV身份页。
+	 */
+	if (shared_memory_type == SHMEM_TYPE_MMAP)
+	{
+		Size		huge_bytes = 0;
+
+		if (huge_pages != HUGE_PAGES_OFF)
+			GetHugePageSize(&huge_bytes, NULL);
+		main_page_bytes = Max(main_page_bytes, huge_bytes);
+		bytes = add_size(bytes, (Size) page_bytes);
+	}
+	if (main_segment_bytes % main_page_bytes != 0)
+		bytes = add_size(bytes, main_page_bytes - main_segment_bytes % main_page_bytes);
+	for (i = 0; i < lengthof(elements); i++)
+	{
+		Size		array_bytes = mul_size(NBuffers, elements[i]);
+
+		/*-
+		 * 加法先检查溢出，再向下对齐已加padding的长度，得到安全ceil。
+		 */
+		bytes = add_size(bytes, TYPEALIGN_DOWN((Size) page_bytes,
+											   add_size(array_bytes, (Size) page_bytes - 1)));
+	}
+	startup_shared_upper_bytes = bytes;
+	if (dynamic_shared_buffers_startup_budget > 0 &&
+		bytes > mul_size(dynamic_shared_buffers_startup_budget, 1024))
+		ereport(FATAL,
+				(errcode(ERRCODE_CONFIGURATION_LIMIT_EXCEEDED),
+				 errmsg("dynamic buffer startup layout exceeds the shared-memory budget"),
+				 errdetail("Layout requires %zu bytes; budget is %d kB.", bytes,
+						   dynamic_shared_buffers_startup_budget)));
+}
+
+/*-
+ * 新boot在普通命令执行/解析前拒绝准入，而非等待Monitor发现重启后再关门。
+ * 返回正常SQL ERROR，不主动终止连接；内部PG超级用户保留恢复/管理通道。
+ * 此处是启动门禁，不替代运行时私有预算、所有后台工作排空和VM执行栅栏。
+ */
+void
+DsgBufferCheckAdmission(void)
+{
+	/*
+	 * 消息入口尚未开始事务；使用PG随SET ROLE维护的只读权限标志，不查系统表。
+	 */
+	if (DSBCtrl != NULL && pg_atomic_read_u32(&DSBCtrl->admission_open) == 0 &&
+		!current_role_is_superuser)
+		ereport(ERROR,
+				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+				 errmsg("dynamic shared buffer admission is closed for this boot")));
+}
+
+void
+DsgBufferSetAdmission(uint64 boot_id, uint64 revision, uint64 expected_generation, bool open)
+{
+	bool		valid;
+
+	if (!superuser())
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("dynamic buffer admission requires internal management privileges")));
+	if (DSBCtrl == NULL)
+		ereport(ERROR, (errmsg("dynamic shared buffers are disabled")));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	valid = boot_id == DSBCtrl->boot_id && revision > 0 &&
+		expected_generation == pg_atomic_read_u64(&DSBCtrl->generation) &&
+		(revision > DSBCtrl->admission_revision ||
+		 (revision == DSBCtrl->admission_revision &&
+		  open == (pg_atomic_read_u32(&DSBCtrl->admission_open) != 0)));
+	if (valid)
+	{
+		DSBCtrl->admission_revision = revision;
+		pg_atomic_write_u32(&DSBCtrl->admission_open, open ? 1 : 0);
+	}
+	SpinLockRelease(&DSBCtrl->status_lock);
+	if (!valid)
+		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+						errmsg("invalid or stale dynamic buffer admission request")));
+}
 
 /*-
  * 新 GUC 只在 Postmaster 启动时生效。开关关闭时完全保留原布局；未指定 M
@@ -97,6 +212,8 @@ DynamicSharedBuffersInit(void)
 	MemSet(DSBCtrl, 0, size);
 	pg_atomic_init_u32(&DSBCtrl->low, NBuffers);
 	pg_atomic_init_u32(&DSBCtrl->high, NBuffers);
+	pg_atomic_init_u32(&DSBCtrl->admission_open, dynamic_shared_buffers_require_admission ? 0 : 1);
+	DSBCtrl->startup_shared_upper_bytes = startup_shared_upper_bytes;
 	DSBCtrl->maximum = maximum;
 	if (!pg_strong_random(&DSBCtrl->boot_id, sizeof(DSBCtrl->boot_id)))
 		ereport(FATAL,

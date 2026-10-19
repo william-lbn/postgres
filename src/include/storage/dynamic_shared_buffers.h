@@ -14,7 +14,7 @@
 #include "storage/spin.h"
 
 /* Neon 扩展按能力宏适配，不能由 PG 大版本号推断本 fork 的内核接口。 */
-#define NEON_DSG_BUFFER_API_VERSION 2
+#define NEON_DSG_BUFFER_API_VERSION 3
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
 
 typedef enum DsgBufferArrayId
@@ -112,6 +112,9 @@ typedef struct DsgBufferSnapshot
 	Size		committed_upper_bytes[DSG_BUFFER_ARRAY_COUNT];
 	bool		allocation_unknown[DSG_BUFFER_ARRAY_COUNT];
 	bool		replayed;
+	bool		admission_open;
+	uint64		admission_revision;
+	Size		startup_shared_upper_bytes;
 } DsgBufferSnapshot;
 
 typedef struct DynamicSharedBuffersControl
@@ -125,6 +128,13 @@ typedef struct DynamicSharedBuffersControl
 	 * crash recovery。
 	 */
 	uint64		boot_id;
+
+	/*
+	 * 新 boot 不继承旧许可；受管模式必须经管理链核对预算后重新开放。
+	 */
+	pg_atomic_uint32 admission_open;
+	uint64		admission_revision;
+	Size		startup_shared_upper_bytes;
 	LWLock		access_lock;
 	/*-
 	 * checkpoint 只长期持此共享租约，保护排序工作区，不阻塞容量发布。
@@ -166,6 +176,8 @@ typedef struct DsgBufferAccess
 
 extern PGDLLIMPORT bool enable_dynamic_shared_buffers;
 extern PGDLLIMPORT int max_shared_buffers;
+extern PGDLLIMPORT bool dynamic_shared_buffers_require_admission;
+extern PGDLLIMPORT int dynamic_shared_buffers_startup_budget;
 extern PGDLLIMPORT DynamicSharedBuffersControl *DSBCtrl;
 
 extern int	GetMaxNBuffers(void);
@@ -176,6 +188,10 @@ extern void DynamicSharedBuffersInit(void);
 extern DsgBufferAccess DsgBufferAccessBegin(void);
 extern void DsgBufferAccessEnd(DsgBufferAccess *access);
 extern void DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot);
+extern void DsgBufferCheckStartupBudget(Size main_segment_bytes);
+extern void DsgBufferCheckAdmission(void);
+extern void DsgBufferSetAdmission(uint64 boot_id, uint64 revision,
+								  uint64 expected_generation, bool open);
 
 /* 内核协调接口；调用者须先完成权限/外层资源预算检查，尚无用户 SQL 入口。 */
 extern bool DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms,

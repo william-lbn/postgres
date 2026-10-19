@@ -63,6 +63,7 @@
 #include "replication/walsender.h"
 #include "rewrite/rewriteHandler.h"
 #include "storage/bufmgr.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/pmsignal.h"
 #include "storage/proc.h"
@@ -1115,6 +1116,10 @@ exec_simple_query(const char *query_string)
 		const char *cmdtagname;
 		size_t		cmdtaglen;
 
+		/*
+		 * 同一简单Query可含多条语句，SET ROLE后也必须重新检查身份。
+		 */
+		DsgBufferCheckAdmission();
 		pgstat_report_query_id(0, true);
 
 		/*
@@ -4775,6 +4780,22 @@ PostgresMain(const char *dbname, const char *username)
 		 */
 		if (ignore_till_sync && firstchar != EOF)
 			continue;
+
+		/*-
+		 * 同时覆盖简单/扩展协议及FastPath，不能只在ExecutorStart拦截，
+		 * 否则Parse/Bind、utility或C函数仍可在新boot预算确认前执行。
+		 * Sync/Close/Terminate等协议清理消息仍可正常消费。
+		 */
+		switch (firstchar)
+		{
+			case PqMsg_Query:
+			case PqMsg_Parse:
+			case PqMsg_Bind:
+			case PqMsg_Execute:
+			case PqMsg_FunctionCall:
+				DsgBufferCheckAdmission();
+				break;
+		}
 
 		switch (firstchar)
 		{

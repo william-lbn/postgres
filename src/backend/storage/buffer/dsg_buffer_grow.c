@@ -47,6 +47,9 @@ DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot)
 	snapshot->low = GetLowNBuffers();
 	snapshot->high = GetHighNBuffers();
 	snapshot->maximum = DSBCtrl->maximum;
+	snapshot->admission_open = pg_atomic_read_u32(&DSBCtrl->admission_open) != 0;
+	snapshot->admission_revision = DSBCtrl->admission_revision;
+	snapshot->startup_shared_upper_bytes = DSBCtrl->startup_shared_upper_bytes;
 	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
 	{
 		snapshot->committed_upper_bytes[i] = DSBCtrl->arrays[i].committed_upper_bytes;

@@ -41,6 +41,8 @@ PG_FUNCTION_INFO_V1(test_dsg_checkpoint_control);
 PG_FUNCTION_INFO_V1(test_dsg_io);
 PG_FUNCTION_INFO_V1(test_dsg_io_control);
 PG_FUNCTION_INFO_V1(test_dsg_grow_control);
+PG_FUNCTION_INFO_V1(test_dsg_admission);
+PG_FUNCTION_INFO_V1(test_dsg_admission_snapshot);
 
 void		_PG_init(void);
 
@@ -280,6 +282,29 @@ test_dsg_boot_id(PG_FUNCTION_ARGS)
 	if (DSBCtrl == NULL)
 		PG_RETURN_NULL();
 	PG_RETURN_INT64((int64) DSBCtrl->boot_id);
+}
+
+/* 使用真实boot及单调revision测试门禁，生产入口还须由Neon管理接口包装。 */
+Datum
+test_dsg_admission(PG_FUNCTION_ARGS)
+{
+	DsgBufferSetAdmission((uint64) PG_GETARG_INT64(0),
+						  (uint64) PG_GETARG_INT64(1),
+						  (uint64) PG_GETARG_INT64(2), PG_GETARG_BOOL(3));
+	PG_RETURN_BOOL(true);
+}
+
+Datum
+test_dsg_admission_snapshot(PG_FUNCTION_ARGS)
+{
+	DsgBufferSnapshot snapshot;
+
+	(void) test_dsg_shared_value();
+	DsgBufferGetSnapshot(&snapshot);
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf("open=%s revision=" UINT64_FORMAT " high=%d shared=%zu",
+											  snapshot.admission_open ? "yes" : "no",
+											  snapshot.admission_revision, snapshot.high,
+											  snapshot.startup_shared_upper_bytes)));
 }
 
 /*-

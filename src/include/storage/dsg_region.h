@@ -35,6 +35,7 @@ typedef struct DsgMemoryResult
 	Size		affected_bytes;
 	bool		physical_release_verified;
 	bool		allocation_may_be_partial;
+	bool		release_may_be_partial;
 } DsgMemoryResult;
 
 /* Region 必须先清零；maximum_bytes 是可访问上限，映射按系统页向上对齐。 */
@@ -42,6 +43,13 @@ extern void DsgRegionReserve(DsgRegion *region, Size maximum_bytes);
 extern void DsgRegionDestroy(DsgRegion *region);
 extern DsgMemoryResult DsgRegionPopulate(DsgRegion *region, Size offset, Size bytes);
 extern DsgMemoryResult DsgRegionRelease(DsgRegion *region, Size offset, Size bytes);
+
+/*-
+ * 调用者必须已排水 [offset, maximum_bytes) 的全部对象。与普通 Release
+ * 不同，此接口还释放 Region 独占的末页 padding；保留起始共享边界页。
+ * requested 是逻辑尾部，affected 可包含不可放置对象的末页填充空间。
+ */
+extern DsgMemoryResult DsgRegionReleaseTail(DsgRegion *region, Size offset);
 extern bool DsgRegionCanRelease(void);
 
 #endif							/* DSG_REGION_H */

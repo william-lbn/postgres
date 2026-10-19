@@ -37,6 +37,22 @@ SELECT test_dsg_region('release_preserves_boundary_pages');
  t
 (1 row)
 
+SELECT test_dsg_region('tail_terminal_padding');
+ test_dsg_region 
+-----------------
+ t
+(1 row)
+
+SELECT test_dsg_region('tail_at_end_noop');
+ test_dsg_region 
+-----------------
+ t
+(1 row)
+
+SELECT test_dsg_region('tail_past_end');
+ERROR:  DSGA memory range is outside the reserved region
+SELECT test_dsg_region('tail_unmapped');
+ERROR:  DSGA memory range is outside the reserved region
 SELECT test_dsg_region('partial_page_noop');
  test_dsg_region 
 -----------------

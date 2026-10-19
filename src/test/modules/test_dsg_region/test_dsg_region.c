@@ -326,6 +326,68 @@ test_dsg_region(PG_FUNCTION_ARGS)
 					test_dsg_check(region->address[i] == 0x5a, "unsupported release modified memory");
 			}
 		}
+		else if (strcmp(scenario, "tail_terminal_padding") == 0)
+		{
+			Size		offset = page + 17;
+			Size		i;
+
+			DsgRegionDestroy(region);
+			DsgRegionReserve(region, 3 * page + 1);
+			result = DsgRegionPopulate(region, 0, region->maximum_bytes);
+			test_dsg_check(result.status == DSG_MEMORY_OK, "tail test populate failed");
+			memset(region->address, 0x5a, region->maximum_bytes);
+			/*-
+			 * 普通区间不能释放末页；随后整段尾部才可以涵盖该页 padding。
+			 * 检查真实共享内容，只读 maximum 内的合法地址，不靠越界访问
+			 * padding 来验证。Mac 两次均必须保留原内容且不给物理证明。
+			 */
+			result = DsgRegionRelease(region, offset, region->maximum_bytes - offset);
+			test_dsg_check(region->address[3 * page] == 0x5a,
+						   "ordinary release discarded terminal boundary page");
+			if (DsgRegionCanRelease())
+				test_dsg_check(result.physical_release_verified &&
+							   result.affected_offset == 2 * page && result.affected_bytes == page,
+							   "ordinary release expanded to terminal padding");
+			result = DsgRegionReleaseTail(region, offset);
+			test_dsg_check(result.requested_offset == offset &&
+						   result.requested_bytes == region->maximum_bytes - offset,
+						   "tail logical request changed");
+			for (i = 0; i < 2 * page; i++)
+				test_dsg_check(region->address[i] == 0x5a, "tail release damaged live boundary page");
+			if (DsgRegionCanRelease())
+			{
+				test_dsg_check(result.status == DSG_MEMORY_OK && result.physical_release_verified &&
+							   result.affected_offset == 2 * page && result.affected_bytes == 2 * page,
+							   "tail release did not include owned terminal padding");
+				for (i = 2 * page; i < region->maximum_bytes; i++)
+					test_dsg_check(region->address[i] == 0, "tail shared bytes were not reclaimed");
+			}
+			else
+			{
+				test_dsg_check(result.status == DSG_MEMORY_UNSUPPORTED &&
+							   !result.physical_release_verified && result.affected_bytes == 0 &&
+							   !result.release_may_be_partial, "unsupported tail release invented evidence");
+				for (i = 2 * page; i < region->maximum_bytes; i++)
+					test_dsg_check(region->address[i] == 0x5a, "unsupported tail release changed contents");
+			}
+		}
+		else if (strcmp(scenario, "tail_at_end_noop") == 0)
+		{
+			DsgRegionDestroy(region);
+			DsgRegionReserve(region, 3 * page + 1);
+			region->address[3 * page] = 0x5a;
+			result = DsgRegionReleaseTail(region, region->maximum_bytes);
+			test_dsg_check(result.status == DSG_MEMORY_NOOP && result.affected_bytes == 0 &&
+						   !result.physical_release_verified && region->address[3 * page] == 0x5a,
+						   "empty tail discarded a live partial terminal page");
+		}
+		else if (strcmp(scenario, "tail_past_end") == 0)
+			(void) DsgRegionReleaseTail(region, SIZE_MAX);
+		else if (strcmp(scenario, "tail_unmapped") == 0)
+		{
+			DsgRegionDestroy(region);
+			(void) DsgRegionReleaseTail(region, 0);
+		}
 		else if (strcmp(scenario, "partial_page_noop") == 0)
 		{
 			result = DsgRegionRelease(region, page + 1, page - 2);

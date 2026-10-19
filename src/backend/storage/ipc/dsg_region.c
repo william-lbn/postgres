@@ -159,24 +159,12 @@ DsgRegionCanRelease(void)
 #endif
 }
 
-DsgMemoryResult
-DsgRegionRelease(DsgRegion *region, Size offset, Size bytes)
+/* 调用者已检查 Region 和范围；此处只执行对齐后的真实回收并记录回执。 */
+static DsgMemoryResult
+DsgRegionReleasePages(DsgRegion *region, DsgMemoryResult result, Size start, Size end)
 {
-	DsgMemoryResult result = DsgRegionResult(offset, bytes);
-	Size		start;
-	Size		end;
-
-	DsgRegionCheckRange(region, offset, bytes);
-	if (bytes == 0)
-		return result;
-
-	/*-
-	 * 只回收完整落在已排水逻辑区间内的页。两端的半页保留原值，防止将
-	 * 同页的活跃 Descriptor 或控制结构一并丢弃。回执记录真实完整页范围，
-	 * 不能直接把请求字节数当成已经释放的物理字节数。
-	 */
-	start = TYPEALIGN(region->page_bytes, offset);
-	end = TYPEALIGN_DOWN(region->page_bytes, offset + bytes);
+	Assert(start % region->page_bytes == 0 && end % region->page_bytes == 0);
+	Assert(start <= region->mapped_bytes && end <= region->mapped_bytes);
 	if (start >= end)
 	{
 		result.status = DSG_MEMORY_NOOP;
@@ -190,6 +178,11 @@ DsgRegionRelease(DsgRegion *region, Size offset, Size bytes)
 	{
 		result.status = DSG_MEMORY_FAILED;
 		result.system_errno = errno;
+
+		/*
+		 * 系统调用失败不能证明整段未变；上层必须保留原预算并对账。
+		 */
+		result.release_may_be_partial = true;
 		return result;
 	}
 	result.affected_offset = start;
@@ -204,4 +197,44 @@ DsgRegionRelease(DsgRegion *region, Size offset, Size bytes)
 	result.system_errno = ENOSYS;
 #endif
 	return result;
+}
+
+DsgMemoryResult
+DsgRegionRelease(DsgRegion *region, Size offset, Size bytes)
+{
+	DsgMemoryResult result = DsgRegionResult(offset, bytes);
+	Size		start;
+	Size		end;
+
+	DsgRegionCheckRange(region, offset, bytes);
+	if (bytes == 0)
+		return result;
+	/*-
+	 * 普通区间继续严格向内对齐：两端半页可能包含其他活跃对象，不能
+	 * 因复用尾部回收代码而扩大范围。回执记录实际完整页，不推算 RSS。
+	 */
+	start = TYPEALIGN(region->page_bytes, offset);
+	end = TYPEALIGN_DOWN(region->page_bytes, offset + bytes);
+	return DsgRegionReleasePages(region, result, start, end);
+}
+
+DsgMemoryResult
+DsgRegionReleaseTail(DsgRegion *region, Size offset)
+{
+	DsgMemoryResult result;
+	Size		start;
+
+	/*
+	 * 先检查再做减法，offset 越界时不能绕回成巨大合法请求。
+	 */
+	DsgRegionCheckRange(region, offset, 0);
+	result = DsgRegionResult(offset, region->maximum_bytes - offset);
+	start = TYPEALIGN(region->page_bytes, offset);
+	/*-
+	 * Region 单独拥有整个 mmap；maximum_bytes 后的 padding 不能存放
+	 * 任何对象。因此，完整尾部已排水后可回收到 mapped_bytes，包括
+	 * M 的最后一个不满页；起始仍向上对齐，保护与 H 共页的活跃前缀。
+	 * 该契约仅用于整段尾部，不能套用到普通 Release 或中间空洞。
+	 */
+	return DsgRegionReleasePages(region, result, start, region->mapped_bytes);
 }

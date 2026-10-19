@@ -18,7 +18,7 @@ subdir = src/test/modules/test_dsg_region
 top_builddir = ../../../..
 include $(top_builddir)/src/Makefile.global
 ifeq ($(enable_injection_points),yes)
-ISOLATION += test_dsg_buffer_access test_dsg_buffer_grow
+ISOLATION += test_dsg_buffer_access test_dsg_buffer_grow test_dsg_buffer_fence
 EXTRA_INSTALL = src/test/modules/injection_points contrib/pg_buffercache
 endif
 include $(top_srcdir)/contrib/contrib-global.mk

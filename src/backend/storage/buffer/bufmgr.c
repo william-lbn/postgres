@@ -60,6 +60,7 @@
 #include "storage/smgr.h"
 #include "storage/standby.h"
 #include "replication/walsender.h"
+#include "utils/injection_point.h"
 #include "utils/memdebug.h"
 #include "utils/ps_status.h"
 #include "utils/rel.h"
@@ -2885,6 +2886,34 @@ UnpinBuffer(BufferDesc *buf)
 {
 	Buffer		b = BufferDescriptorGetBuffer(buf);
 
+	/*-
+	 * Neon 测试驱逐必须在自己的 pin 与 ResourceOwner 登记仍有效时完成。
+	 * 先 unpin 再锁 Descriptor 会与尾部回收竞态；重新 pin 还会引入递归
+	 * unpin 和中途分配。仅尝试本 Backend 最后一个私有 pin，别人仍在
+	 * 使用时保持原来的 best-effort 语义。异常时原 pin 仍可由资源清理释放。
+	 * NoOwner 的 ERROR 清理路径不执行此测试 IO。
+	 */
+	if (neon_test_evict && !InRecovery && GetPrivateRefCount(b) == 1)
+	{
+		uint32		state = pg_atomic_read_u32(&buf->state);
+
+		Assert(!LWLockHeldByMe(BufferDescriptorGetContentLock(buf)));
+		if ((state & BM_VALID) && BUF_STATE_GET_REFCOUNT(state) == 1)
+		{
+			if ((state & BM_DIRTY) &&
+				LWLockConditionalAcquire(BufferDescriptorGetContentLock(buf), LW_SHARED))
+			{
+				FlushOneBuffer(b);
+				LWLockRelease(BufferDescriptorGetContentLock(buf));
+			}
+
+			/*-
+			 * 原 mapping/header/refcount 协议再次检查并发 pin 与脏页状态。
+			 */
+			(void) InvalidateVictimBuffer(buf);
+		}
+	}
+
 	ResourceOwnerForgetBuffer(CurrentResourceOwner, b);
 	UnpinBufferNoOwner(buf);
 }
@@ -2906,6 +2935,7 @@ UnpinBufferNoOwner(BufferDesc *buf)
 	{
 		uint32		buf_state;
 		uint32		old_buf_state;
+		ProcNumber	wait_backend = INVALID_PROC_NUMBER;
 
 		/*
 		 * Mark buffer non-accessible to Valgrind.
@@ -2931,6 +2961,26 @@ UnpinBufferNoOwner(BufferDesc *buf)
 			if (old_buf_state & BM_LOCKED)
 				old_buf_state = WaitBufHdrUnlocked(buf);
 
+			/*-
+			 * waiter 可能在我们放下 pin 后取消并释放自己的最后 pin。
+			 * 不能依赖别人的 pin 再访问 Descriptor；自己的共享引用仍在时
+			 * 先锁 header，一并减引用、清 waiter 位并复制通知目标。
+			 * CAS 失败重试会重新检查 flag，覆盖并发新加入的等待者。
+			 */
+			if (old_buf_state & BM_PIN_COUNT_WAITER)
+			{
+				buf_state = LockBufHdr(buf);
+				buf_state -= BUF_REFCOUNT_ONE;
+				if ((buf_state & BM_PIN_COUNT_WAITER) &&
+					BUF_STATE_GET_REFCOUNT(buf_state) == 1)
+				{
+					wait_backend = buf->wait_backend_pgprocno;
+					buf_state &= ~BM_PIN_COUNT_WAITER;
+				}
+				UnlockBufHdr(buf, buf_state);
+				break;
+			}
+
 			buf_state = old_buf_state;
 
 			buf_state -= BUF_REFCOUNT_ONE;
@@ -2940,60 +2990,15 @@ UnpinBufferNoOwner(BufferDesc *buf)
 				break;
 		}
 
-		/* Support LockBufferForCleanup() */
-		if (buf_state & BM_PIN_COUNT_WAITER)
-		{
-			/*
-			 * Acquire the buffer header lock, re-check that there's a waiter.
-			 * Another backend could have unpinned this buffer, and already
-			 * woken up the waiter.  There's no danger of the buffer being
-			 * replaced after we unpinned it above, as it's pinned by the
-			 * waiter.
-			 */
-			buf_state = LockBufHdr(buf);
-
-			if ((buf_state & BM_PIN_COUNT_WAITER) &&
-				BUF_STATE_GET_REFCOUNT(buf_state) == 1)
-			{
-				/* we just released the last pin other than the waiter's */
-				int			wait_backend_pgprocno = buf->wait_backend_pgprocno;
-
-				buf_state &= ~BM_PIN_COUNT_WAITER;
-				UnlockBufHdr(buf, buf_state);
-				ProcSendSignal(wait_backend_pgprocno);
-			}
-			else
-				UnlockBufHdr(buf, buf_state);
-		}
+		/*-
+		 * 从此仅访问私有 entry 和保存的 procno，不能再解引用 buf。
+		 * 必要通知必须先于任何可 ERROR/FATAL 的注入点，避免丢失唤醒。
+		 */
 		ForgetPrivateRefCountEntry(ref);
-
-		if (neon_test_evict && !InRecovery)
-		{
-			buf_state = LockBufHdr(buf);
-			if ((buf_state & BM_VALID) && BUF_STATE_GET_REFCOUNT(buf_state) == 0)
-			{
-				ReservePrivateRefCountEntry();
-				PinBuffer_Locked(buf);
-				if (buf_state & BM_DIRTY)
-				{
-					if (LWLockConditionalAcquire(BufferDescriptorGetContentLock(buf),
-												 LW_SHARED))
-					{
-						FlushOneBuffer(b);
-						LWLockRelease(BufferDescriptorGetContentLock(buf));
-					}
-				}
-
-				/*
-				 * Try to invalidate the page. This can fail if the page is
-				 * concurrently modified; we'll let it be in that case
-				 */
-				(void) InvalidateVictimBuffer(buf);
-				UnpinBuffer(buf);
-			}
-			else
-				UnlockBufHdr(buf, buf_state);
-		}
+		if (wait_backend != INVALID_PROC_NUMBER)
+			ProcSendSignal(wait_backend);
+		if (DSBCtrl != NULL && (neon_test_evict || wait_backend != INVALID_PROC_NUMBER))
+			INJECTION_POINT("dsg-buffer-after-unpin");
 	}
 }
 

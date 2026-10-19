@@ -1,7 +1,9 @@
 #include "postgres.h"
 
 #include <unistd.h>
+#include <sys/mman.h>
 
+#include "access/table.h"
 #include "fmgr.h"
 #include "miscadmin.h"
 #include "port/atomics.h"
@@ -9,7 +11,11 @@
 #include "storage/dsg_region.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
+#include "storage/latch.h"
 #include "utils/builtins.h"
+#include "utils/injection_point.h"
+#include "utils/rel.h"
+#include "utils/wait_event.h"
 
 PG_MODULE_MAGIC;
 PG_FUNCTION_INFO_V1(test_dsg_region);
@@ -23,10 +29,51 @@ PG_FUNCTION_INFO_V1(test_dsg_stale_hint);
 PG_FUNCTION_INFO_V1(test_dsg_grow);
 PG_FUNCTION_INFO_V1(test_dsg_grow_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_grow_verify);
+PG_FUNCTION_INFO_V1(test_dsg_allocation_limit);
+PG_FUNCTION_INFO_V1(test_dsg_relation_below);
+PG_FUNCTION_INFO_V1(test_dsg_pin);
+PG_FUNCTION_INFO_V1(test_dsg_pin_control);
+PG_FUNCTION_INFO_V1(test_dsg_unpin_probe);
+PG_FUNCTION_INFO_V1(test_dsg_mapping_free);
 
 void		_PG_init(void);
 
 static DsgRegion inherited_region;
+
+/*-
+ * 测试值与 pin 门禁使用不同原子字段。门禁仅供临时集群确定性调度，
+ * 不改 Buffer refcount/flags，也不伪造原生 cleanup waiter 的等待。
+ */
+typedef struct DsgTestSharedState
+{
+	pg_atomic_uint32 value;
+	pg_atomic_uint32 pin_gate;	/* 0=未持有，1=真实持 pin，2=请求释放 */
+} DsgTestSharedState;
+
+#ifdef USE_INJECTION_POINTS
+extern PGDLLEXPORT void test_dsg_protect_descriptor(const char *name,
+													const void *private_data);
+static void *probe_page;
+static Size probe_bytes;
+static bool probe_armed;
+static bool probe_protected;
+
+/*-
+ * 只改本测试 Backend 的页表，不改共享 backing 和其他 Backend 的访问权。
+ * 回调后直到 ReleaseBuffer 返回并恢复权限期间禁止再读 Descriptor。
+ * 全局注入点在其他 Backend 的回调因本地 probe_armed=false 而无副作用。
+ */
+void
+test_dsg_protect_descriptor(const char *name, const void *private_data)
+{
+	if (!probe_armed)
+		return;
+	probe_armed = false;
+	if (mprotect(probe_page, probe_bytes, PROT_NONE) != 0)
+		ereport(ERROR, (errmsg("could not protect DSGA test descriptor: %m")));
+	probe_protected = true;
+}
+#endif
 
 /*-
  * 测试映射在 Postmaster preload 阶段创建，两个隔离测试会话由 Postmaster
@@ -38,8 +85,12 @@ _PG_init(void)
 {
 	if (process_shared_preload_libraries_in_progress && !IsUnderPostmaster)
 	{
+		DsgTestSharedState *state;
+
 		DsgRegionReserve(&inherited_region, (Size) sysconf(_SC_PAGESIZE));
-		pg_atomic_init_u32((pg_atomic_uint32 *) inherited_region.address, 0);
+		state = (DsgTestSharedState *) inherited_region.address;
+		pg_atomic_init_u32(&state->value, 0);
+		pg_atomic_init_u32(&state->pin_gate, 0);
 	}
 }
 
@@ -54,7 +105,7 @@ test_dsg_shared_value(void)
 		ereport(ERROR,
 				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
 				 errmsg("test_dsg_region must be loaded via shared_preload_libraries")));
-	return (pg_atomic_uint32 *) inherited_region.address;
+	return &((DsgTestSharedState *) inherited_region.address)->value;
 }
 
 Datum
@@ -92,16 +143,31 @@ test_dsg_boot_id(PG_FUNCTION_ARGS)
 	PG_RETURN_INT64((int64) DSBCtrl->boot_id);
 }
 
-/* 只试锁，不发布容量；用于跨 Backend 证明真实遍历与回收者互斥。 */
+/*-
+ * 有界试锁，不发布容量；用于跨 Backend 验证遍历与回收互斥。
+ * 单次失败可能只是 BG writer 的短扫描，不能当作本会话泄锁的证明。
+ * 因此先检查本会话没有遗留锁，再短暂重试；被注入点固定暂停的读者
+ * 仍必须返回 false，不采用阻塞 LWLockAcquire 掩盖实际互斥状态。
+ */
 Datum
 test_dsg_exclusive_available(PG_FUNCTION_ARGS)
 {
+	int			attempt;
+
 	(void) test_dsg_shared_value();
 	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
-	if (!LWLockConditionalAcquire(&DSBCtrl->access_lock, LW_EXCLUSIVE))
-		PG_RETURN_BOOL(false);
-	LWLockRelease(&DSBCtrl->access_lock);
-	PG_RETURN_BOOL(true);
+	test_dsg_check(!LWLockHeldByMe(&DSBCtrl->access_lock), "caller leaked a buffer access lock");
+	for (attempt = 0; attempt < 1000; attempt++)
+	{
+		if (LWLockConditionalAcquire(&DSBCtrl->access_lock, LW_EXCLUSIVE))
+		{
+			LWLockRelease(&DSBCtrl->access_lock);
+			PG_RETURN_BOOL(true);
+		}
+		CHECK_FOR_INTERRUPTS();
+		pg_usleep(1000L);
+	}
+	PG_RETURN_BOOL(false);
 }
 
 Datum
@@ -218,6 +284,232 @@ test_dsg_grow_verify(PG_FUNCTION_ARGS)
 	LWLockRelease(&DSBCtrl->resize_lock);
 	test_dsg_check(used_tail, "ordinary buffer allocation never used the grown range");
 	PG_RETURN_BOOL(true);
+}
+
+/*-
+ * 此测试入口只操作分配栅栏，H、代次与物理预算均保持不变。它不能被当作
+ * Shrink 的控制入口。与生产协调器约定一样先串行 resize，再取得 accessX。
+ */
+Datum
+test_dsg_allocation_limit(PG_FUNCTION_ARGS)
+{
+	int			limit = PG_GETARG_INT32(0);
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	LWLockAcquire(&DSBCtrl->resize_lock, LW_EXCLUSIVE);
+	LWLockAcquire(&DSBCtrl->access_lock, LW_EXCLUSIVE);
+	test_dsg_check(limit >= NBuffers && limit <= GetHighNBuffers(), "invalid allocation limit");
+	INJECTION_POINT("dsg-test-fence-before-publish");
+	StrategySetAllocationLimit(limit);
+	LWLockRelease(&DSBCtrl->access_lock);
+	LWLockRelease(&DSBCtrl->resize_lock);
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf("low=%d high=%d", GetLowNBuffers(), GetHighNBuffers())));
+}
+
+/* 检查普通 SQL 为新关系分配的真实 Buffer ID，而非只读取 L 数字。 */
+Datum
+test_dsg_relation_below(PG_FUNCTION_ARGS)
+{
+	Relation	rel;
+	DsgBufferAccess access;
+	int			limit = PG_GETARG_INT32(1);
+	bool		found = false;
+	bool		below = true;
+	int			i;
+
+	(void) test_dsg_shared_value();
+	rel = table_open(PG_GETARG_OID(0), AccessShareLock);
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; i++)
+	{
+		BufferDesc *buf = GetBufferDescriptor(i);
+		uint32		state = LockBufHdr(buf);
+
+		if ((state & BM_TAG_VALID) &&
+			RelFileLocatorEquals(BufTagGetRelFileLocator(&buf->tag), rel->rd_locator))
+		{
+			found = true;
+			below &= i < limit;
+		}
+		UnlockBufHdr(buf, state);
+	}
+	DsgBufferAccessEnd(&access);
+	table_close(rel, AccessShareLock);
+	PG_RETURN_BOOL(found && below);
+}
+
+/*-
+ * 复现 BufferAlloc hash 碰撞归还路径的锁上下文：持真实 mappingX 调用
+ * StrategyFreeBuffer。另一个 Backend 可同时持 accessX；此处不得再取
+ * access 锁，否则与持 accessX 等待 mapping 的回收者形成反向锁序。
+ * 测试自身保留正常 pin，不修改 tag，也不伪造 Descriptor 的共享状态。
+ */
+Datum
+test_dsg_mapping_free(PG_FUNCTION_ARGS)
+{
+	Relation	rel;
+	Buffer		buffer;
+	BufferDesc *buf;
+	LWLock	   *mapping;
+
+	(void) test_dsg_shared_value();
+	rel = table_open(PG_GETARG_OID(0), AccessShareLock);
+	buffer = ReadBuffer(rel, 0);
+	test_dsg_check(!BufferIsLocal(buffer), "mapping tests require a shared relation");
+	buf = GetBufferDescriptor(buffer - 1);
+	mapping = BufMappingPartitionLock(BufTableHashCode(&buf->tag));
+	LWLockAcquire(mapping, LW_EXCLUSIVE);
+	INJECTION_POINT("dsg-test-mapping-before-free");
+	StrategyFreeBuffer(buf);
+	LWLockRelease(mapping);
+	ReleaseBuffer(buffer);
+	table_close(rel, AccessShareLock);
+	PG_RETURN_BOOL(true);
+}
+
+/*-
+ * 使用真实 ReadBuffer/LockBufferForCleanup，不伪造共享 refcount 或 waiter 位。
+ * holder 仅持 pin、没有 content/header 锁；原生清理等待可以被取消或终止，
+ * 由 PG 自身 UnlockBuffers/ResourceOwner 清理其 waiter 和 pin。
+ */
+Datum
+test_dsg_pin(PG_FUNCTION_ARGS)
+{
+	Relation	rel;
+	Buffer		buffer;
+	char	   *mode = text_to_cstring(PG_GETARG_TEXT_PP(2));
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(strcmp(mode, "hold") == 0 || strcmp(mode, "cleanup") == 0 ||
+				   strcmp(mode, "read") == 0, "invalid pin test mode");
+	rel = table_open(PG_GETARG_OID(0), AccessShareLock);
+	buffer = ReadBuffer(rel, PG_GETARG_INT32(1));
+	test_dsg_check(!BufferIsLocal(buffer), "pin tests require a shared relation");
+	if (strcmp(mode, "hold") == 0)
+	{
+		pg_atomic_uint32 *gate = &((DsgTestSharedState *) inherited_region.address)->pin_gate;
+		uint32		wait_event = WaitEventExtensionNew("DsgTestPinHolder");
+
+		/*-
+		 * 外部测试先观察真实 pin 已建立，再启动 cleanup waiter；只有看到
+		 * 原生 BufferPin 等待后才释放门禁。期限由调用方 statement_timeout
+		 * 保证，循环显式处理取消，异常后也清除测试状态。
+		 */
+		PG_TRY();
+		{
+			pg_atomic_write_u32(gate, 1);
+			while (pg_atomic_read_u32(gate) != 2)
+			{
+				CHECK_FOR_INTERRUPTS();
+				(void) WaitLatch(MyLatch, WL_LATCH_SET | WL_TIMEOUT | WL_EXIT_ON_PM_DEATH,
+								 10L, wait_event);
+				ResetLatch(MyLatch);
+			}
+		}
+		PG_FINALLY();
+		{
+			pg_atomic_write_u32(gate, 0);
+		}
+		PG_END_TRY();
+	}
+	else if (strcmp(mode, "cleanup") == 0)
+	{
+		LockBufferForCleanup(buffer);
+		LockBuffer(buffer, BUFFER_LOCK_UNLOCK);
+	}
+	ReleaseBuffer(buffer);
+	table_close(rel, AccessShareLock);
+	PG_RETURN_BOOL(true);
+}
+
+/* 只操作测试门禁；false 观察 holder，true 请求放 pin，实际释放仍走 PG 原生路径。 */
+Datum
+test_dsg_pin_control(PG_FUNCTION_ARGS)
+{
+	pg_atomic_uint32 *gate;
+
+	(void) test_dsg_shared_value();
+	gate = &((DsgTestSharedState *) inherited_region.address)->pin_gate;
+	if (PG_GETARG_BOOL(0))
+	{
+		pg_atomic_write_u32(gate, 2);
+		PG_RETURN_BOOL(true);
+	}
+	PG_RETURN_BOOL(pg_atomic_read_u32(gate) == 1);
+}
+
+/*-
+ * 选取扩容后普通 SQL 已使用的干净尾部页，正常 pin 后开启 Neon test evict。
+ * 最后 unpin 的注入点将整张 Descriptor 页设为不可访问；ReleaseBuffer
+ * 返回后立即恢复。若释放后路径仍碰 Descriptor，真实进程会触发访问错误。
+ * 该探针验证访问寿命，不代表 Provider 或 Linux/VM 已完成物理释放。
+ */
+Datum
+test_dsg_unpin_probe(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	DsgBufferAccess access;
+	Buffer		buffer = InvalidBuffer;
+	bool		old_evict = neon_test_evict;
+	volatile bool attached = false;
+	int			i;
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	probe_bytes = DSBCtrl->arrays[DSG_BUFFER_DESCRIPTORS].region.page_bytes;
+	access = DsgBufferAccessBegin();
+	for (i = NBuffers; i < access.count; i++)
+	{
+		BufferDesc *buf = GetBufferDescriptor(i);
+		uint32		state = LockBufHdr(buf);
+		BufferTag	tag = buf->tag;
+		bool		eligible = (state & (BM_VALID | BM_TAG_VALID | BM_DIRTY | BM_IO_IN_PROGRESS)) ==
+			(BM_VALID | BM_TAG_VALID) && BUF_STATE_GET_REFCOUNT(state) == 0 &&
+			((char *) buf - (char *) BufferDescriptors) >=
+			TYPEALIGN(probe_bytes, mul_size(NBuffers, sizeof(BufferDescPadded)));
+
+		UnlockBufHdr(buf, state);
+		if (eligible && ReadRecentBuffer(BufTagGetRelFileLocator(&tag), tag.forkNum,
+										 tag.blockNum, i + 1))
+		{
+			buffer = i + 1;
+			probe_page = (void *) ((uintptr_t) buf & ~(uintptr_t) (probe_bytes - 1));
+			break;
+		}
+	}
+	DsgBufferAccessEnd(&access);
+	test_dsg_check(BufferIsValid(buffer), "no clean grown descriptor available for probe");
+	PG_TRY();
+	{
+		InjectionPointAttach("dsg-buffer-after-unpin", "test_dsg_region",
+							 "test_dsg_protect_descriptor", NULL, 0);
+		attached = true;
+		probe_protected = false;
+		probe_armed = true;
+		neon_test_evict = true;
+		ReleaseBuffer(buffer);
+	}
+	PG_FINALLY();
+	{
+		/*
+		 * 恢复权限必须在任何进一步的 PG 资源/目录操作之前完成。
+		 */
+		probe_armed = false;
+		if (probe_protected && mprotect(probe_page, probe_bytes, PROT_READ | PROT_WRITE) != 0)
+			ereport(FATAL, (errmsg("could not restore DSGA test descriptor: %m")));
+		neon_test_evict = old_evict;
+		if (attached)
+			InjectionPointDetach("dsg-buffer-after-unpin");
+	}
+	PG_END_TRY();
+	test_dsg_check(probe_protected, "after-unpin probe was not reached");
+	probe_protected = false;
+	PG_RETURN_BOOL(true);
+#else
+	ereport(ERROR, (errmsg("DSGA unpin probe requires injection points")));
+	PG_RETURN_BOOL(false);
+#endif
 }
 
 /*-

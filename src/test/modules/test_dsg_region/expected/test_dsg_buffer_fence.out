@@ -1,0 +1,42 @@
+Parsed test spec with 3 sessions
+
+starting permutation: return_buffer fence wake_returner wake_fence verify
+injection_points_attach
+-----------------------
+                       
+(1 row)
+
+step return_buffer: EXECUTE return_buffer; <waiting ...>
+step fence: EXECUTE fence; <waiting ...>
+step wake_returner: EXECUTE wake_returner; <waiting ...>
+step return_buffer: <... completed>
+test_dsg_mapping_free
+---------------------
+t                    
+(1 row)
+
+step wake_returner: <... completed>
+injection_points_wakeup
+-----------------------
+                       
+(1 row)
+
+step wake_fence: EXECUTE wake_fence; <waiting ...>
+step fence: <... completed>
+fenced
+------
+t     
+(1 row)
+
+step wake_fence: <... completed>
+injection_points_wakeup
+-----------------------
+                       
+(1 row)
+
+step verify: SELECT count(*), sum(i) FROM dsg_fence_data;
+count| sum
+-----+----
+  100|5050
+(1 row)
+

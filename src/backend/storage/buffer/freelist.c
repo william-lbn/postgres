@@ -377,20 +377,21 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 void
 StrategyFreeBuffer(BufferDesc *buf)
 {
-	DsgBufferAccess access = DsgBufferAccessBegin();
 	Size		index = ((char *) buf - (char *) BufferDescriptors) / sizeof(BufferDescPadded);
 
 	/*-
-	 * 调用者可能刚释放最后一个 pin，尾部 backing 已被回收。先用稳定
-	 * 地址计算索引并在 Guard 内校验，不能为了读取 buf_id 就先解引用。
-	 * 已进入 DRAINING 的描述符也不再放回 freelist。
+	 * 调用者可能已放下最后 pin，也可能仍持 mapping 锁；这里不能再取
+	 * access 锁。先按稳定 VA 算索引，在 strategy 锁内检查 L 再解引用。
+	 * 所有 L 下降必须由下方 helper 在同一锁内发布并过滤，H 始终不小于 L。
 	 */
-	if (index >= (Size) access.count || index >= (Size) GetLowNBuffers())
+	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	if (index >= (Size) GetLowNBuffers())
 	{
-		DsgBufferAccessEnd(&access);
+		SpinLockRelease(&StrategyControl->buffer_strategy_lock);
 		return;
 	}
-	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	/* 与 Grow 初始化完成后、发布 L 之前的写屏障配对。 */
+	pg_read_barrier();
 
 	/*
 	 * It is possible that we are told to put something in the freelist that
@@ -405,7 +406,61 @@ StrategyFreeBuffer(BufferDesc *buf)
 	}
 
 	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
-	DsgBufferAccessEnd(&access);
+}
+
+/*-
+ * 内部协调器的分配栅栏：只降低或恢复 L<=H，不发布 H，也不回收物理页。
+ * 调用者持 resize + access 独占锁，禁止携带 mapping/header 锁；锁序为
+ * access -> strategy -> status。status 只覆盖短发布，不包住链表遍历。
+ * L 下降必须与 freelist 过滤同锁，防止过滤后再次插入待回收尾部。
+ */
+void
+StrategySetAllocationLimit(int limit)
+{
+	int			current;
+
+	/*
+	 * 启动 NBuffers 是本 boot 的回退容量，下界不得被在线分配栅栏突破。
+	 */
+	Assert(DSBCtrl != NULL && limit >= NBuffers && limit <= GetHighNBuffers());
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->access_lock, LW_EXCLUSIVE));
+	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	pg_atomic_write_u32(&DSBCtrl->low, limit);
+	SpinLockRelease(&DSBCtrl->status_lock);
+	current = StrategyControl->firstFreeBuffer;
+	StrategyControl->firstFreeBuffer = FREENEXT_END_OF_LIST;
+	StrategyControl->lastFreeBuffer = FREENEXT_END_OF_LIST;
+	pg_atomic_write_u32(&StrategyControl->nextVictimBuffer, 0);
+	StrategyControl->completePasses++;
+	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+
+	/*-
+	 * 整条旧链先原子摘下，再逐项短取 strategy 锁重接，避免大容量时长持
+	 * spinlock。accessX 阻止新 victim，但允许已持 mapping 锁的归还者完成。
+	 * 尚未处理节点保留非 NOT_IN_LIST 标记，归还者不会重复插入或改写 next；
+	 * 每个节点取到 next 后才在锁内解除该标记。低于 L 的并发新归还也能接入
+	 * 新链，尾部节点则被 StrategyFreeBuffer 的同锁 L 校验拒绝。
+	 */
+	while (current >= 0)
+	{
+		BufferDesc *buf = GetBufferDescriptor(current);
+		int			next;
+
+		SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+		next = buf->freeNext;
+		buf->freeNext = FREENEXT_NOT_IN_LIST;
+		if (current < limit)
+		{
+			buf->freeNext = StrategyControl->firstFreeBuffer;
+			if (buf->freeNext < 0)
+				StrategyControl->lastFreeBuffer = current;
+			StrategyControl->firstFreeBuffer = current;
+		}
+		SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+		current = next;
+	}
 }
 
 /*

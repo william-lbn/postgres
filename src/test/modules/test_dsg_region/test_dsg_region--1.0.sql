@@ -37,3 +37,24 @@ CREATE FUNCTION test_dsg_grow_verify() RETURNS boolean AS 'MODULE_PATHNAME' LANG
 REVOKE ALL ON FUNCTION test_dsg_grow(bigint, bigint, bigint, integer, integer, boolean) FROM PUBLIC;
 REVOKE ALL ON FUNCTION test_dsg_grow_snapshot() FROM PUBLIC;
 REVOKE ALL ON FUNCTION test_dsg_grow_verify() FROM PUBLIC;
+
+-- 仅供独立临时集群验证分配栅栏、真实 pin 等待和释放后的访问边界。
+CREATE FUNCTION test_dsg_allocation_limit(integer) RETURNS text
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_relation_below(regclass, integer) RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_pin(regclass, integer, text) RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_pin_control(boolean) RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_unpin_probe() RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C;
+REVOKE ALL ON FUNCTION test_dsg_allocation_limit(integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_relation_below(regclass, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_pin(regclass, integer, text) FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_pin_control(boolean) FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_unpin_probe() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_mapping_free(regclass) RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_mapping_free(regclass) FROM PUBLIC;

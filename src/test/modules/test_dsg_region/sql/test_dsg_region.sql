@@ -1,6 +1,9 @@
 CREATE EXTENSION test_dsg_region;
 SELECT test_dsg_buffer_layout();
 SELECT test_dsg_stale_hint();
+CREATE TEMP TABLE dsg_local_data AS SELECT 1 AS i;
+SELECT test_dsg_mapping_free('dsg_local_data');
+DROP TABLE dsg_local_data;
 SELECT test_dsg_exclusive_available();
 SELECT test_dsg_access_error();
 SELECT test_dsg_exclusive_available();
@@ -21,6 +24,15 @@ SELECT test_dsg_region('unmapped_populate');
 SELECT test_dsg_region('rounded_mapping_limit');
 SELECT test_dsg_region('destroy_twice');
 SELECT test_dsg_grow(1, 1, 1, 512);
+SELECT test_dsg_allocation_limit(255);
+SELECT test_dsg_allocation_limit(513);
+SELECT test_dsg_allocation_limit(256);
+CREATE TABLE dsg_fenced_data AS SELECT i, repeat(md5(i::text), 32) AS payload
+FROM generate_series(1, 1200) i;
+SELECT count(*), sum(length(payload)) FROM dsg_fenced_data;
+SELECT test_dsg_relation_below('dsg_fenced_data', 256);
+DROP TABLE dsg_fenced_data;
+SELECT test_dsg_allocation_limit(512);
 SELECT test_dsg_grow(1, 1, 1, 512);
 SELECT test_dsg_grow(1, 1, 1, 513);
 SELECT test_dsg_grow(1, 2, 2, 512);

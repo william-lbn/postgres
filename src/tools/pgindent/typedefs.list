@@ -649,6 +649,7 @@ DsgBufferSnapshot
 DsgMemoryResult
 DsgMemoryStatus
 DsgRegion
+DsgTestSharedState
 DumpComponents
 DumpId
 DumpOptions

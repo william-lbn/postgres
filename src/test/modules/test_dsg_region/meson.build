@@ -13,6 +13,7 @@ test_install_data += files('test_dsg_region.control', 'test_dsg_region--1.0.sql'
 dsg_isolation_specs = ['test_dsg_region_shared']
 if get_option('injection_points')
   dsg_isolation_specs += 'test_dsg_buffer_access'
+  dsg_isolation_specs += 'test_dsg_buffer_grow'
 endif
 
 tests += {

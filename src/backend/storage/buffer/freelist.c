@@ -472,6 +472,25 @@ StrategyNotifyBgWriter(int bgwprocno)
 }
 
 
+/*-
+ * 只在 resize 串行锁及数组独占锁内，把已初始化、尚未发布的新前缀
+ * 追加到 freelist。锁序是 access -> strategy；不允许调用者持 header
+ * 或 mapping 锁。H/L 发布在调用后完成，读侧选择器此时无法进入。
+ */
+void
+StrategyAddBufferRange(int first, int count)
+{
+	Assert(DSBCtrl != NULL && LWLockHeldByMeInMode(&DSBCtrl->access_lock, LW_EXCLUSIVE));
+	Assert(first == GetHighNBuffers() && count > 0 && count <= GetMaxNBuffers() - first);
+	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	if (StrategyControl->firstFreeBuffer < 0)
+		StrategyControl->firstFreeBuffer = first;
+	else
+		GetBufferDescriptor(StrategyControl->lastFreeBuffer)->freeNext = first;
+	StrategyControl->lastFreeBuffer = first + count - 1;
+	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+}
+
 /*
  * StrategyShmemSize
  *

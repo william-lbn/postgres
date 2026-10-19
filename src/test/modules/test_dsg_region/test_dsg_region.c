@@ -20,6 +20,9 @@ PG_FUNCTION_INFO_V1(test_dsg_boot_id);
 PG_FUNCTION_INFO_V1(test_dsg_exclusive_available);
 PG_FUNCTION_INFO_V1(test_dsg_access_error);
 PG_FUNCTION_INFO_V1(test_dsg_stale_hint);
+PG_FUNCTION_INFO_V1(test_dsg_grow);
+PG_FUNCTION_INFO_V1(test_dsg_grow_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_grow_verify);
 
 void		_PG_init(void);
 
@@ -130,6 +133,90 @@ test_dsg_stale_hint(PG_FUNCTION_ARGS)
 				   "inactive tail hint was accepted");
 	test_dsg_check(!ReadRecentBuffer(locator, MAIN_FORKNUM, 0, INT_MAX),
 				   "out-of-reservation hint was accepted");
+	PG_RETURN_BOOL(true);
+}
+
+/* 调用真实协调器；不直接改 H/L，也不伪造 Provider 或成功状态。 */
+Datum
+test_dsg_grow(PG_FUNCTION_ARGS)
+{
+	DsgBufferGrowRequest request;
+	DsgBufferSnapshot snapshot;
+	bool		committed;
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	MemSet(&request, 0, sizeof(request));
+	request.boot_id = DSBCtrl->boot_id;
+	request.revision = (uint64) PG_GETARG_INT64(0);
+	request.operation_id_low = (uint64) PG_GETARG_INT64(1);
+	request.expected_generation = (uint64) PG_GETARG_INT64(2);
+	request.target_buffers = PG_GETARG_INT32(3);
+	if (PG_GETARG_BOOL(5))
+		request.boot_id ^= UINT64CONST(1);
+	committed = DsgBufferGrow(&request, PG_GETARG_INT32(4), &snapshot);
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf("%s high=%d generation=" UINT64_FORMAT " replay=%s",
+											  committed ? "committed" : "denied", snapshot.high,
+											  snapshot.generation, snapshot.replayed ? "true" : "false")));
+}
+
+Datum
+test_dsg_grow_snapshot(PG_FUNCTION_ARGS)
+{
+	DsgBufferSnapshot snapshot;
+	int			unknown = 0;
+	int			charged_tail = 0;
+	int			i;
+
+	(void) test_dsg_shared_value();
+	DsgBufferGetSnapshot(&snapshot);
+	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
+	{
+		DsgBufferArray *array = &DSBCtrl->arrays[i];
+
+		unknown += snapshot.allocation_unknown[i] ? 1 : 0;
+		charged_tail += snapshot.committed_upper_bytes[i] >
+			TYPEALIGN(array->region.page_bytes, mul_size(snapshot.high, array->element_bytes)) ? 1 : 0;
+	}
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf("phase=%d reason=%d high=%d generation=" UINT64_FORMAT " unknown=%d charged_tail=%d",
+											  snapshot.operation.phase, snapshot.operation.reason, snapshot.high,
+											  snapshot.generation, unknown, charged_tail)));
+}
+
+/*-
+ * SQL 数据读写后检查新增 ID 的实际描述符及永久 Granule 目录；至少一个
+ * 新增 Buffer 必须已被普通 BufferAlloc 使用，避免只验证 H 的数字变化。
+ * 仅扫描实际 Guard 允许的前缀，不用测试自身触摸预留尾部来冒充扩容。
+ */
+Datum
+test_dsg_grow_verify(PG_FUNCTION_ARGS)
+{
+	DsgBufferAccess access;
+	bool		used_tail = false;
+	int			i;
+	int			active = 0;
+
+	(void) test_dsg_shared_value();
+	LWLockAcquire(&DSBCtrl->resize_lock, LW_SHARED);
+	access = DsgBufferAccessBegin();
+	for (i = NBuffers; i < access.count; i++)
+	{
+		BufferDesc *buf = GetBufferDescriptor(i);
+		uint32		state = LockBufHdr(buf);
+
+		bool		correct_id = buf->buf_id == i;
+
+		if ((state & (BM_VALID | BM_TAG_VALID)) == (BM_VALID | BM_TAG_VALID))
+			used_tail = true;
+		UnlockBufHdr(buf, state);
+		test_dsg_check(correct_id, "grown descriptor has wrong ID");
+	}
+	for (i = 0; i < DSBCtrl->granule_count; i++)
+		active += DSBCtrl->granules[i].active_buffers;
+	test_dsg_check(active == access.count, "granule active count differs from protected capacity");
+	DsgBufferAccessEnd(&access);
+	LWLockRelease(&DSBCtrl->resize_lock);
+	test_dsg_check(used_tail, "ordinary buffer allocation never used the grown range");
 	PG_RETURN_BOOL(true);
 }
 

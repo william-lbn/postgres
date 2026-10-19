@@ -639,6 +639,13 @@ DropdbStmt
 DsgBufferAccess
 DsgBufferArray
 DsgBufferArrayId
+DsgBufferGranule
+DsgBufferGranuleState
+DsgBufferGrowRequest
+DsgBufferOperation
+DsgBufferOperationPhase
+DsgBufferOperationReason
+DsgBufferSnapshot
 DsgMemoryResult
 DsgMemoryStatus
 DsgRegion

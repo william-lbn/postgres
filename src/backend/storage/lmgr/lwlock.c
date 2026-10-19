@@ -171,6 +171,7 @@ static const char *const BuiltinTrancheNames[] = {
 	[LWTRANCHE_XACT_SLRU] = "XactSLRU",
 	[LWTRANCHE_PARALLEL_VACUUM_DSA] = "ParallelVacuumDSA",
 	[LWTRANCHE_DSG_BUFFER_ACCESS] = "DsgBufferAccess",
+	[LWTRANCHE_DSG_BUFFER_RESIZE] = "DsgBufferResize",
 };
 
 StaticAssertDecl(lengthof(BuiltinTrancheNames) ==
@@ -231,7 +232,8 @@ int			NamedLWLockTrancheRequests = 0;
 /* points to data in shared memory: */
 NamedLWLockTranche *NamedLWLockTrancheArray = NULL;
 
-bool           startupProcessLockPriority = false; /* NEON: GUC is defined in neon extension */
+bool		startupProcessLockPriority = false; /* NEON: GUC is defined in
+												 * neon extension */
 
 static void InitializeLWLocks(void);
 static inline void LWLockReportWaitStart(LWLock *lock);

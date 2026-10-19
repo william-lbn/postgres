@@ -69,4 +69,69 @@ SELECT test_dsg_region('destroy_twice');
  t
 (1 row)
 
+SELECT test_dsg_grow(1, 1, 1, 512);
+                test_dsg_grow                 
+----------------------------------------------
+ committed high=512 generation=2 replay=false
+(1 row)
+
+SELECT test_dsg_grow(1, 1, 1, 512);
+                test_dsg_grow                
+---------------------------------------------
+ committed high=512 generation=2 replay=true
+(1 row)
+
+SELECT test_dsg_grow(1, 1, 1, 513);
+ERROR:  DSGA operation identity was reused with a different request
+SELECT test_dsg_grow(1, 2, 2, 512);
+ERROR:  DSGA grow request conflicts with current capacity or revision
+SELECT test_dsg_grow(2, 2, 1, 512);
+ERROR:  DSGA grow request conflicts with current capacity or revision
+SELECT test_dsg_grow(2, 2, 2, 8193);
+ERROR:  invalid or stale DSGA grow request
+SELECT test_dsg_grow(2, 2, 2, 512, 1000, true);
+ERROR:  invalid or stale DSGA grow request
+SELECT test_dsg_grow(2, 2, 2, 511);
+ERROR:  DSGA grow request conflicts with current capacity or revision
+SELECT test_dsg_grow(2, 2, 2, 512);
+                test_dsg_grow                 
+----------------------------------------------
+ committed high=512 generation=2 replay=false
+(1 row)
+
+SELECT test_dsg_grow(3, 3, 2, 2304);
+                 test_dsg_grow                 
+-----------------------------------------------
+ committed high=2304 generation=3 replay=false
+(1 row)
+
+CREATE TABLE dsg_grown_data AS SELECT i, repeat(md5(i::text), 32) AS payload
+FROM generate_series(1, 3000) i;
+SELECT count(*), sum(length(payload)) FROM dsg_grown_data;
+ count |   sum   
+-------+---------
+  3000 | 3072000
+(1 row)
+
+SELECT test_dsg_grow_verify();
+ test_dsg_grow_verify 
+----------------------
+ t
+(1 row)
+
+DROP TABLE dsg_grown_data;
+BEGIN;
+SELECT test_dsg_grow(4, 4, 3, 2560);
+                 test_dsg_grow                 
+-----------------------------------------------
+ committed high=2560 generation=4 replay=false
+(1 row)
+
+ROLLBACK;
+SELECT test_dsg_grow(4, 4, 3, 2560);
+                test_dsg_grow                 
+----------------------------------------------
+ committed high=2560 generation=4 replay=true
+(1 row)
+
 DROP EXTENSION test_dsg_region;

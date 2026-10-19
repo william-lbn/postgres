@@ -29,3 +29,11 @@ AS 'MODULE_PATHNAME' LANGUAGE C;
 REVOKE ALL ON FUNCTION test_dsg_exclusive_available() FROM PUBLIC;
 REVOKE ALL ON FUNCTION test_dsg_access_error() FROM PUBLIC;
 REVOKE ALL ON FUNCTION test_dsg_stale_hint() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_grow(bigint, bigint, bigint, integer, integer DEFAULT 1000, boolean DEFAULT false)
+RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_grow_snapshot() RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C;
+CREATE FUNCTION test_dsg_grow_verify() RETURNS boolean AS 'MODULE_PATHNAME' LANGUAGE C;
+REVOKE ALL ON FUNCTION test_dsg_grow(bigint, bigint, bigint, integer, integer, boolean) FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_grow_snapshot() FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_grow_verify() FROM PUBLIC;

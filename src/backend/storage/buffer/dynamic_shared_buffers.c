@@ -65,8 +65,15 @@ GetHighNBuffers(void)
 Size
 DynamicSharedBuffersShmemSize(void)
 {
-	return enable_dynamic_shared_buffers ?
-		add_size(MAXALIGN(sizeof(*DSBCtrl)), PG_CACHE_LINE_SIZE) : 0;
+	Size		size;
+	int			count;
+
+	if (!enable_dynamic_shared_buffers)
+		return 0;
+	count = 1 + (GetMaxNBuffers() - 1) / DSG_BUFFER_GRANULE_BUFFERS;
+	size = add_size(offsetof(DynamicSharedBuffersControl, granules),
+					mul_size(count, sizeof(DsgBufferGranule)));
+	return add_size(MAXALIGN(size), PG_CACHE_LINE_SIZE);
 }
 
 void
@@ -74,17 +81,20 @@ DynamicSharedBuffersInit(void)
 {
 	bool		found;
 	int			maximum;
+	int			i;
+	Size		size;
 
 	if (!enable_dynamic_shared_buffers)
 		return;
 	maximum = GetMaxNBuffers();
-	DSBCtrl = ShmemInitStruct("DSGA Buffer Directory", sizeof(*DSBCtrl), &found);
+	size = DynamicSharedBuffersShmemSize();
+	DSBCtrl = ShmemInitStruct("DSGA Buffer Directory", size, &found);
 
 	/*-
 	 * EXEC_BACKEND 已拒绝；fork 子进程继承地址，无需二次 attach。
 	 */
 	Assert(!found);
-	MemSet(DSBCtrl, 0, sizeof(*DSBCtrl));
+	MemSet(DSBCtrl, 0, size);
 	pg_atomic_init_u32(&DSBCtrl->low, NBuffers);
 	pg_atomic_init_u32(&DSBCtrl->high, NBuffers);
 	DSBCtrl->maximum = maximum;
@@ -93,6 +103,23 @@ DynamicSharedBuffersInit(void)
 				(errcode(ERRCODE_INTERNAL_ERROR),
 				 errmsg("could not generate DSGA shared memory boot identity")));
 	LWLockInitialize(&DSBCtrl->access_lock, LWTRANCHE_DSG_BUFFER_ACCESS);
+	LWLockInitialize(&DSBCtrl->resize_lock, LWTRANCHE_DSG_BUFFER_RESIZE);
+	SpinLockInit(&DSBCtrl->status_lock);
+	pg_atomic_init_u64(&DSBCtrl->generation, 1);
+	DSBCtrl->granule_count = 1 + (maximum - 1) / DSG_BUFFER_GRANULE_BUFFERS;
+	for (i = 0; i < DSBCtrl->granule_count; i++)
+	{
+		DsgBufferGranule *granule = &DSBCtrl->granules[i];
+
+		granule->first_buffer = i * DSG_BUFFER_GRANULE_BUFFERS;
+		granule->maximum_buffers = Min(DSG_BUFFER_GRANULE_BUFFERS,
+									   maximum - granule->first_buffer);
+		granule->active_buffers = Min(granule->maximum_buffers,
+									  Max(0, NBuffers - granule->first_buffer));
+		granule->prepared_buffers = granule->active_buffers;
+		granule->generation = 1;
+		granule->state = granule->active_buffers > 0 ? DSG_GRANULE_ACTIVE : DSG_GRANULE_RESERVED;
+	}
 }
 
 DsgBufferAccess

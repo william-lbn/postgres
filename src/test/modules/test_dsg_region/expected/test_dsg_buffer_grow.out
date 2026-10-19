@@ -1,0 +1,200 @@
+Parsed test spec with 4 sessions
+
+starting permutation: grow preparing competing cancel_grow denied replay_denied detach scan blocked_publish publish_denied wake_scan detach_scan retry inject_error failed unknown detach_error smaller_retry still_unknown reconciled known inject_response_error response_error committed_without_response detach_response_error replay_committed pause_response grow_response terminate_grower committed_after_exit replay_after_exit detach_response_pause
+injection_points_attach
+-----------------------
+                       
+(1 row)
+
+step grow: SELECT test_dsg_grow(1, 1, 1, 512, 60000); <waiting ...>
+step preparing: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                         
+---------------------------------------------------------------
+phase=1 reason=0 high=256 generation=1 unknown=0 charged_tail=2
+(1 row)
+
+step competing: SELECT test_dsg_grow(2, 2, 1, 512, 20);
+test_dsg_grow                            
+-----------------------------------------
+denied high=256 generation=1 replay=false
+(1 row)
+
+step cancel_grow: 
+    SELECT pg_cancel_backend(pid) FROM pg_stat_activity
+    WHERE application_name = 'dsg-grow-test';
+ <waiting ...>
+step grow: <... completed>
+ERROR:  canceling statement due to user request
+step cancel_grow: <... completed>
+pg_cancel_backend
+-----------------
+t                
+(1 row)
+
+step denied: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                         
+---------------------------------------------------------------
+phase=3 reason=3 high=256 generation=1 unknown=0 charged_tail=2
+(1 row)
+
+step replay_denied: SELECT test_dsg_grow(1, 1, 1, 512);
+test_dsg_grow                           
+----------------------------------------
+denied high=256 generation=1 replay=true
+(1 row)
+
+step detach: SELECT injection_points_detach('dsg-buffer-grow-before-publish');
+injection_points_detach
+-----------------------
+                       
+(1 row)
+
+step scan: SELECT count(*) > 0 AS scanned FROM pg_buffercache; <waiting ...>
+step blocked_publish: SELECT test_dsg_grow(2, 2, 1, 512, 100);
+test_dsg_grow                            
+-----------------------------------------
+denied high=256 generation=1 replay=false
+(1 row)
+
+step publish_denied: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                         
+---------------------------------------------------------------
+phase=3 reason=1 high=256 generation=1 unknown=0 charged_tail=2
+(1 row)
+
+step wake_scan: SELECT injection_points_wakeup('dsg-buffercache-before-scan'); <waiting ...>
+step scan: <... completed>
+scanned
+-------
+t      
+(1 row)
+
+step wake_scan: <... completed>
+injection_points_wakeup
+-----------------------
+                       
+(1 row)
+
+step detach_scan: SELECT injection_points_detach('dsg-buffercache-before-scan');
+injection_points_detach
+-----------------------
+                       
+(1 row)
+
+step retry: SELECT test_dsg_grow(3, 3, 1, 512);
+test_dsg_grow                               
+--------------------------------------------
+committed high=512 generation=2 replay=false
+(1 row)
+
+step inject_error: SELECT injection_points_attach('dsg-region-before-populate', 'error');
+injection_points_attach
+-----------------------
+                       
+(1 row)
+
+step failed: SELECT test_dsg_grow(4, 4, 2, 1024);
+ERROR:  error triggered for injection point dsg-region-before-populate
+step unknown: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                         
+---------------------------------------------------------------
+phase=3 reason=3 high=512 generation=2 unknown=1 charged_tail=1
+(1 row)
+
+step detach_error: SELECT injection_points_detach('dsg-region-before-populate');
+injection_points_detach
+-----------------------
+                       
+(1 row)
+
+step smaller_retry: SELECT test_dsg_grow(5, 5, 2, 768);
+test_dsg_grow                               
+--------------------------------------------
+committed high=768 generation=3 replay=false
+(1 row)
+
+step still_unknown: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                         
+---------------------------------------------------------------
+phase=2 reason=0 high=768 generation=3 unknown=1 charged_tail=1
+(1 row)
+
+step reconciled: SELECT test_dsg_grow(6, 6, 3, 1024);
+test_dsg_grow                                
+---------------------------------------------
+committed high=1024 generation=4 replay=false
+(1 row)
+
+step known: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                          
+----------------------------------------------------------------
+phase=2 reason=0 high=1024 generation=4 unknown=0 charged_tail=0
+(1 row)
+
+step inject_response_error: SELECT injection_points_attach('dsg-buffer-grow-after-publish', 'error');
+injection_points_attach
+-----------------------
+                       
+(1 row)
+
+step response_error: SELECT test_dsg_grow(7, 7, 4, 1280);
+ERROR:  error triggered for injection point dsg-buffer-grow-after-publish
+step committed_without_response: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                          
+----------------------------------------------------------------
+phase=2 reason=0 high=1280 generation=5 unknown=0 charged_tail=0
+(1 row)
+
+step detach_response_error: SELECT injection_points_detach('dsg-buffer-grow-after-publish');
+injection_points_detach
+-----------------------
+                       
+(1 row)
+
+step replay_committed: SELECT test_dsg_grow(7, 7, 4, 1280);
+test_dsg_grow                               
+--------------------------------------------
+committed high=1280 generation=5 replay=true
+(1 row)
+
+step pause_response: SELECT injection_points_attach('dsg-buffer-grow-after-publish', 'wait');
+injection_points_attach
+-----------------------
+                       
+(1 row)
+
+step grow_response: SELECT test_dsg_grow(8, 8, 5, 1536, 60000); <waiting ...>
+step terminate_grower: 
+    SELECT pg_terminate_backend(pid) FROM pg_stat_activity
+    WHERE application_name = 'dsg-grow-response-test';
+ <waiting ...>
+step grow_response: <... completed>
+FATAL:  terminating connection due to administrator command
+server closed the connection unexpectedly
+	This probably means the server terminated abnormally
+	before or while processing the request.
+
+step terminate_grower: <... completed>
+pg_terminate_backend
+--------------------
+t                   
+(1 row)
+
+step committed_after_exit: SELECT test_dsg_grow_snapshot();
+test_dsg_grow_snapshot                                          
+----------------------------------------------------------------
+phase=2 reason=0 high=1536 generation=6 unknown=0 charged_tail=0
+(1 row)
+
+step replay_after_exit: SELECT test_dsg_grow(8, 8, 5, 1536);
+test_dsg_grow                               
+--------------------------------------------
+committed high=1536 generation=6 replay=true
+(1 row)
+
+step detach_response_pause: SELECT injection_points_detach('dsg-buffer-grow-after-publish');
+injection_points_detach
+-----------------------
+                       
+(1 row)
+

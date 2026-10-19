@@ -80,9 +80,8 @@ DynamicSharedBuffersInit(void)
 	maximum = GetMaxNBuffers();
 	DSBCtrl = ShmemInitStruct("DSGA Buffer Directory", sizeof(*DSBCtrl), &found);
 
-	/*
-	 * EXEC_BACKEND 已拒绝；fork 子进程继承地址，无需二次
-	 * attach。
+	/*-
+	 * EXEC_BACKEND 已拒绝；fork 子进程继承地址，无需二次 attach。
 	 */
 	Assert(!found);
 	MemSet(DSBCtrl, 0, sizeof(*DSBCtrl));
@@ -103,7 +102,17 @@ DsgBufferAccessBegin(void)
 
 	access.acquired = DSBCtrl != NULL && !LWLockHeldByMe(&DSBCtrl->access_lock);
 	if (access.acquired)
+	{
 		LWLockAcquire(&DSBCtrl->access_lock, LW_SHARED);
+		/*-
+		 * 普通 LWLock 会一直 HOLD_INTERRUPTS，但数组遍历可能很长，不能
+		 * 因只读生命周期保护而屏蔽查询取消。仅抵消本锁增加的 holdoff，
+		 * 原有 header/mapping/其他锁的中断保护不受影响。ERROR/FATAL
+		 * 仍由 PG 的 LWLockReleaseAll 释放；它自身会平衡每次 release，
+		 * 不依赖当前 holdoff 必须与已持锁数量相等。
+		 */
+		RESUME_INTERRUPTS();
+	}
 	access.count = GetHighNBuffers();
 	return access;
 }
@@ -113,6 +122,10 @@ DsgBufferAccessEnd(DsgBufferAccess *access)
 {
 	if (access->acquired)
 	{
+		/*-
+		 * 与 Begin 抵消成对，恢复原生 LWLockRelease 所需的 holdoff。
+		 */
+		HOLD_INTERRUPTS();
 		LWLockRelease(&DSBCtrl->access_lock);
 		access->acquired = false;
 	}

@@ -608,6 +608,7 @@ apw_dump_now(bool is_bgworker, bool dump_unlogged)
 	int			i;
 	int			ret;
 	BlockInfoRecord *block_info_array;
+	DsgBufferAccess access;
 	BufferDesc *bufHdr;
 	FILE	   *file;
 	char		transient_dump_file_path[MAXPGPATH];
@@ -639,10 +640,15 @@ apw_dump_now(bool is_bgworker, bool dump_unlogged)
 	 * (In the future, it might be a good idea to redesign this to use a more
 	 * memory-efficient data structure.)
 	 */
-	block_info_array = (BlockInfoRecord *)
-		palloc_extended((sizeof(BlockInfoRecord) * NBuffers), MCXT_ALLOC_HUGE);
 
-	for (num_blocks = 0, i = 0; i < NBuffers; i++)
+	/*
+	 * 只在拷贝共享 tag 时持 Guard；后续文件 IO 使用私有快照。
+	 */
+	access = DsgBufferAccessBegin();
+	block_info_array = (BlockInfoRecord *)
+		palloc_extended((sizeof(BlockInfoRecord) * access.count), MCXT_ALLOC_HUGE);
+
+	for (num_blocks = 0, i = 0; i < access.count; i++)
 	{
 		uint32		buf_state;
 
@@ -674,6 +680,7 @@ apw_dump_now(bool is_bgworker, bool dump_unlogged)
 		UnlockBufHdr(bufHdr, buf_state);
 	}
 
+	DsgBufferAccessEnd(&access);
 	snprintf(transient_dump_file_path, MAXPGPATH, "%s.tmp", AUTOPREWARM_FILE);
 	file = AllocateFile(transient_dump_file_path, "w");
 	if (!file)

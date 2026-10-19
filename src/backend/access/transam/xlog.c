@@ -3577,7 +3577,7 @@ InstallXLogFileSegment(XLogSegNo *segno, char *tmppath,
 	XLogFilePath(path, tli, *segno, wal_segment_size);
 
 	if (XLogCtl)
- 	{
+	{
 		/* Neon: in case of sync-safekeepers shared memory is not inialized */
 		LWLockAcquire(ControlFileLock, LW_EXCLUSIVE);
 		if (!XLogCtl->InstallXLogFileSegmentActive)
@@ -4929,7 +4929,7 @@ XLOGShmemInit(void)
 
 
 	XLogCtl = (XLogCtlData *)
-	    ShmemInitStruct("XLOG Ctl", XLOGShmemSize(), &foundXLog);
+		ShmemInitStruct("XLOG Ctl", XLOGShmemSize(), &foundXLog);
 
 	localControlFile = ControlFile;
 	ControlFile = (ControlFileData *)
@@ -5893,8 +5893,8 @@ StartupXLOG(void)
 			 * additional standby state for prepared transactions.
 			 *
 			 * Neon: We also use a similar mechanism to start up sooner at
-			 * replica startup, by scanning the CLOG and faking a running-xacts
-			 * record based on that.
+			 * replica startup, by scanning the CLOG and faking a
+			 * running-xacts record based on that.
 			 */
 			if (wasShutdown)
 			{
@@ -5905,8 +5905,8 @@ StartupXLOG(void)
 			else if (restore_running_xacts_callback)
 			{
 				/*
-				 * Update pg_subtrans entries for any prepared transactions before
-				 * calling the extension hook.
+				 * Update pg_subtrans entries for any prepared transactions
+				 * before calling the extension hook.
 				 */
 				StandbyRecoverPreparedTransactions();
 				apply_running_xacts = restore_running_xacts_callback(&checkPoint, &xids, &nxids);
@@ -5917,7 +5917,10 @@ StartupXLOG(void)
 				RunningTransactionsData running;
 				TransactionId latestCompletedXid;
 
-				/* Neon: called StandbyRecoverPreparedTransactions() above already */
+				/*
+				 * Neon: called StandbyRecoverPreparedTransactions() above
+				 * already
+				 */
 
 				/*
 				 * Construct a RunningTransactions snapshot representing a
@@ -6635,8 +6638,8 @@ GetRedoStartLsn(void)
 XLogRecPtr
 GetFlushRecPtr(TimeLineID *insertTLI)
 {
-	// NEON
-	//Assert(XLogCtl->SharedRecoveryState == RECOVERY_STATE_DONE);
+	/* NEON */
+	/* Assert(XLogCtl->SharedRecoveryState == RECOVERY_STATE_DONE); */
 
 	RefreshXLogWriteResult(LogwrtResult);
 
@@ -6873,7 +6876,7 @@ LogCheckpointEnd(bool restartpoint)
 						"distance=%d kB, estimate=%d kB; "
 						"lsn=%X/%X, redo lsn=%X/%X",
 						CheckpointStats.ckpt_bufs_written,
-						(double) CheckpointStats.ckpt_bufs_written * 100 / NBuffers,
+						(double) CheckpointStats.ckpt_bufs_written * 100 / GetHighNBuffers(),
 						CheckpointStats.ckpt_segs_added,
 						CheckpointStats.ckpt_segs_removed,
 						CheckpointStats.ckpt_segs_recycled,
@@ -6896,7 +6899,7 @@ LogCheckpointEnd(bool restartpoint)
 						"distance=%d kB, estimate=%d kB; "
 						"lsn=%X/%X, redo lsn=%X/%X",
 						CheckpointStats.ckpt_bufs_written,
-						(double) CheckpointStats.ckpt_bufs_written * 100 / NBuffers,
+						(double) CheckpointStats.ckpt_bufs_written * 100 / GetHighNBuffers(),
 						CheckpointStats.ckpt_segs_added,
 						CheckpointStats.ckpt_segs_removed,
 						CheckpointStats.ckpt_segs_recycled,
@@ -7066,7 +7069,8 @@ CreateCheckPoint(int flags)
 	SyncPreCheckpoint();
 
 	/*
-	 * NEON: perform checkpoint action requiring write to the WAL before we determine the REDO pointer.
+	 * NEON: perform checkpoint action requiring write to the WAL before we
+	 * determine the REDO pointer.
 	 */
 	PreCheckPointGuts(flags);
 
@@ -7526,7 +7530,7 @@ CreateCheckPoint(int flags)
 	update_checkpoint_display(flags, false, true);
 
 	TRACE_POSTGRESQL_CHECKPOINT_DONE(CheckpointStats.ckpt_bufs_written,
-									 NBuffers,
+									 GetHighNBuffers(),
 									 CheckpointStats.ckpt_segs_added,
 									 CheckpointStats.ckpt_segs_removed,
 									 CheckpointStats.ckpt_segs_recycled);
@@ -7688,15 +7692,17 @@ CheckPointReplicationState(int flags)
 static void
 PreCheckPointGuts(int flags)
 {
-	if (flags & (CHECKPOINT_IS_SHUTDOWN|CHECKPOINT_END_OF_RECOVERY))
+	if (flags & (CHECKPOINT_IS_SHUTDOWN | CHECKPOINT_END_OF_RECOVERY))
 	{
 		CheckPointReplicationState(flags);
 		CheckPointBuffers(flags);
 
 		/*
-		 * pgstat_write_statsfile will be called later by before_shmem_exit() hook, but by then it's too late
-		 * to write WAL records. In Neon, pgstat_write_statsfile() writes the pgstats file to the WAL, so we have
-		 * to call it earlier. (The call that happens later is useless, but it doesn't do any harm either)
+		 * pgstat_write_statsfile will be called later by before_shmem_exit()
+		 * hook, but by then it's too late to write WAL records. In Neon,
+		 * pgstat_write_statsfile() writes the pgstats file to the WAL, so we
+		 * have to call it earlier. (The call that happens later is useless,
+		 * but it doesn't do any harm either)
 		 */
 		pgstat_write_statsfile();
 	}
@@ -7711,7 +7717,7 @@ PreCheckPointGuts(int flags)
 static void
 CheckPointGuts(XLogRecPtr checkPointRedo, int flags)
 {
-	if (!(flags & (CHECKPOINT_IS_SHUTDOWN|CHECKPOINT_END_OF_RECOVERY)))
+	if (!(flags & (CHECKPOINT_IS_SHUTDOWN | CHECKPOINT_END_OF_RECOVERY)))
 		CheckPointReplicationState(flags);
 
 	/* Write out all dirty data in SLRUs and the main buffer pool */
@@ -7722,13 +7728,14 @@ CheckPointGuts(XLogRecPtr checkPointRedo, int flags)
 	CheckPointSUBTRANS();
 	CheckPointMultiXact();
 	CheckPointPredicate();
+
 	/*
-	 * NEON: Checkpoint buffer will write dirty pages to the disk and Neon SMGR
-	 * wallog FSM/VM pages to persist them at page server.
-	 * Writing to the WAL during shutdown checkpoint cause Postgres panic.
-	 * So do it before in PreCheckPointGuts.
+	 * NEON: Checkpoint buffer will write dirty pages to the disk and Neon
+	 * SMGR wallog FSM/VM pages to persist them at page server. Writing to the
+	 * WAL during shutdown checkpoint cause Postgres panic. So do it before in
+	 * PreCheckPointGuts.
 	 */
-	if (!(flags & (CHECKPOINT_IS_SHUTDOWN|CHECKPOINT_END_OF_RECOVERY)))
+	if (!(flags & (CHECKPOINT_IS_SHUTDOWN | CHECKPOINT_END_OF_RECOVERY)))
 		CheckPointBuffers(flags);
 
 	/* Perform all queued up fsyncs */
@@ -8748,11 +8755,11 @@ xlog_redo(XLogReaderState *record)
 			if (result == BLK_DONE && (!IsUnderPostmaster || StandbyMode))
 			{
 				/*
-				 * NEON: In the special WAL redo process, blocks that are being
-				 * ignored return BLK_DONE. Accept that.
-				 * Additionally, in standby mode, blocks that are not present
-				 * in shared buffers are ignored during replay, so we also
-				 * ignore those blocks.
+				 * NEON: In the special WAL redo process, blocks that are
+				 * being ignored return BLK_DONE. Accept that. Additionally,
+				 * in standby mode, blocks that are not present in shared
+				 * buffers are ignored during replay, so we also ignore those
+				 * blocks.
 				 */
 			}
 			else if (result != BLK_RESTORED)
@@ -9805,11 +9812,11 @@ SetWalWriterSleeping(bool sleeping)
 }
 
 void
-XLogUpdateWalBuffers(char* data, XLogRecPtr start, size_t len)
+XLogUpdateWalBuffers(char *data, XLogRecPtr start, size_t len)
 {
-	XLogRecPtr end;
-	int idx;
-	XLogRecPtr pagebegptr;
+	XLogRecPtr	end;
+	int			idx;
+	XLogRecPtr	pagebegptr;
 
 	end = start + len;
 	Assert(len + (start & (XLOG_BLCKSZ - 1)) <= XLOG_BLCKSZ);
@@ -9821,8 +9828,9 @@ XLogUpdateWalBuffers(char* data, XLogRecPtr start, size_t len)
 	if (pagebegptr + XLOG_BLCKSZ >= end && pagebegptr < end)
 	{
 		/* Last page of the segment is present in WAL buffers */
-		char* page = &XLogCtl->pages[idx * XLOG_BLCKSZ];
-		size_t overlap = end - pagebegptr;
+		char	   *page = &XLogCtl->pages[idx * XLOG_BLCKSZ];
+		size_t		overlap = end - pagebegptr;
+
 		if (overlap <= len)
 			memcpy(page, data + len - overlap, overlap);
 		else

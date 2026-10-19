@@ -173,7 +173,7 @@ extern PGDLLIMPORT int checkpoint_flush_after;
 extern PGDLLIMPORT int backend_flush_after;
 extern PGDLLIMPORT int bgwriter_flush_after;
 
-extern bool	neon_test_evict;
+extern bool neon_test_evict;
 
 /* in buf_init.c */
 extern PGDLLIMPORT char *BufferBlocks;
@@ -325,7 +325,7 @@ extern int	GetAccessStrategyPinLimit(BufferAccessStrategy strategy);
 
 extern void FreeAccessStrategy(BufferAccessStrategy strategy);
 
-extern uint32 (*get_pin_limit_hook)(void);
+extern uint32 (*get_pin_limit_hook) (void);
 
 /* inline functions */
 
@@ -337,6 +337,8 @@ extern uint32 (*get_pin_limit_hook)(void);
  */
 
 #ifndef FRONTEND
+
+#include "storage/dynamic_shared_buffers.h"
 
 /*
  * BufferIsValid
@@ -360,7 +362,7 @@ extern uint32 (*get_pin_limit_hook)(void);
 static inline bool
 BufferIsValid(Buffer bufnum)
 {
-	Assert(bufnum <= NBuffers);
+	Assert(bufnum <= GetHighNBuffers());
 	Assert(bufnum >= -NLocBuffer);
 
 	return bufnum != InvalidBuffer;

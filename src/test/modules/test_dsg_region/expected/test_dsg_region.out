@@ -5,6 +5,26 @@ SELECT test_dsg_buffer_layout();
  t
 (1 row)
 
+SELECT test_dsg_stale_hint();
+ test_dsg_stale_hint 
+---------------------
+ t
+(1 row)
+
+SELECT test_dsg_exclusive_available();
+ test_dsg_exclusive_available 
+------------------------------
+ t
+(1 row)
+
+SELECT test_dsg_access_error();
+ERROR:  DSGA test error while protecting buffer arrays
+SELECT test_dsg_exclusive_available();
+ test_dsg_exclusive_available 
+------------------------------
+ t
+(1 row)
+
 SELECT test_dsg_region('populate_preserves_prefix');
  test_dsg_region 
 -----------------

@@ -157,7 +157,7 @@ hashbuild(Relation heap, Relation index, IndexInfo *indexInfo)
 	 */
 	sort_threshold = (maintenance_work_mem * 1024L) / BLCKSZ;
 	if (index->rd_rel->relpersistence != RELPERSISTENCE_TEMP)
-		sort_threshold = Min(sort_threshold, NBuffers);
+		sort_threshold = Min(sort_threshold, GetHighNBuffers());
 	else
 		sort_threshold = Min(sort_threshold, NLocBuffer);
 
@@ -500,7 +500,7 @@ hashbulkdelete(IndexVacuumInfo *info, IndexBulkDeleteResult *stats,
 
 loop_top:
 	for (; prf_bucket <= cur_maxbucket &&
-		   prf_bucket < cur_bucket + io_concurrency; prf_bucket++)
+		 prf_bucket < cur_bucket + io_concurrency; prf_bucket++)
 		PrefetchBuffer(rel, MAIN_FORKNUM, BUCKET_TO_BLKNO(cachedmetap, prf_bucket));
 
 	while (cur_bucket <= cur_maxbucket)

@@ -19,3 +19,13 @@ CREATE FUNCTION test_dsg_boot_id() RETURNS bigint
 AS 'MODULE_PATHNAME' LANGUAGE C;
 REVOKE ALL ON FUNCTION test_dsg_buffer_layout() FROM PUBLIC;
 REVOKE ALL ON FUNCTION test_dsg_boot_id() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_exclusive_available() RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C;
+CREATE FUNCTION test_dsg_access_error() RETURNS void
+AS 'MODULE_PATHNAME' LANGUAGE C;
+CREATE FUNCTION test_dsg_stale_hint() RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C;
+REVOKE ALL ON FUNCTION test_dsg_exclusive_available() FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_access_error() FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_stale_hint() FROM PUBLIC;

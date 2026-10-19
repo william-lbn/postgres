@@ -17,6 +17,9 @@ PG_FUNCTION_INFO_V1(test_dsg_shared_write);
 PG_FUNCTION_INFO_V1(test_dsg_shared_read);
 PG_FUNCTION_INFO_V1(test_dsg_buffer_layout);
 PG_FUNCTION_INFO_V1(test_dsg_boot_id);
+PG_FUNCTION_INFO_V1(test_dsg_exclusive_available);
+PG_FUNCTION_INFO_V1(test_dsg_access_error);
+PG_FUNCTION_INFO_V1(test_dsg_stale_hint);
 
 void		_PG_init(void);
 
@@ -84,6 +87,50 @@ test_dsg_boot_id(PG_FUNCTION_ARGS)
 	if (DSBCtrl == NULL)
 		PG_RETURN_NULL();
 	PG_RETURN_INT64((int64) DSBCtrl->boot_id);
+}
+
+/* 只试锁，不发布容量；用于跨 Backend 证明真实遍历与回收者互斥。 */
+Datum
+test_dsg_exclusive_available(PG_FUNCTION_ARGS)
+{
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	if (!LWLockConditionalAcquire(&DSBCtrl->access_lock, LW_EXCLUSIVE))
+		PG_RETURN_BOOL(false);
+	LWLockRelease(&DSBCtrl->access_lock);
+	PG_RETURN_BOOL(true);
+}
+
+Datum
+test_dsg_access_error(PG_FUNCTION_ARGS)
+{
+	(void) test_dsg_shared_value();
+
+	/*
+	 * 故意不调用 End，验证 SQL ERROR 的 PG 原生 LWLock 清理路径。
+	 */
+	(void) DsgBufferAccessBegin();
+	ereport(ERROR,
+			(errcode(ERRCODE_INTERNAL_ERROR),
+			 errmsg("DSGA test error while protecting buffer arrays")));
+	PG_RETURN_VOID();
+}
+
+Datum
+test_dsg_stale_hint(PG_FUNCTION_ARGS)
+{
+	RelFileLocator locator = {1, 1, 1};
+
+	(void) test_dsg_shared_value();
+	/*-
+	 * 先测仍在预留 M 内、但超出当前 H 的提示，再测远超 M 的提示。
+	 * 两者都必须在解引用 Descriptor 前正常拒绝，不能触发断言/触页。
+	 */
+	test_dsg_check(!ReadRecentBuffer(locator, MAIN_FORKNUM, 0, GetHighNBuffers() + 1),
+				   "inactive tail hint was accepted");
+	test_dsg_check(!ReadRecentBuffer(locator, MAIN_FORKNUM, 0, INT_MAX),
+				   "out-of-reservation hint was accepted");
+	PG_RETURN_BOOL(true);
 }
 
 /*-

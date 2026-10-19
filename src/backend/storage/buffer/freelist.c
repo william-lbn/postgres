@@ -36,7 +36,8 @@ typedef struct
 	/*
 	 * Clock sweep hand: index of next buffer to consider grabbing. Note that
 	 * this isn't a concrete buffer - we only ever increase the value. So, to
-	 * get an actual buffer, it needs to be used modulo NBuffers.
+	 * get an actual buffer, it needs to be used modulo the live allocation
+	 * limit.
 	 */
 	pg_atomic_uint32 nextVictimBuffer;
 
@@ -109,6 +110,12 @@ static inline uint32
 ClockSweepTick(void)
 {
 	uint32		victim;
+	uint32		low = GetLowNBuffers();
+
+	/*
+	 * L 只在数组独占保护下改变；此处读侧 Guard 保证整个选择过程边界稳定。
+	 */
+	Assert(DSBCtrl == NULL || LWLockHeldByMe(&DSBCtrl->access_lock));
 
 	/*
 	 * Atomically move hand ahead one buffer - if there's several processes
@@ -118,12 +125,12 @@ ClockSweepTick(void)
 	victim =
 		pg_atomic_fetch_add_u32(&StrategyControl->nextVictimBuffer, 1);
 
-	if (victim >= NBuffers)
+	if (victim >= low)
 	{
 		uint32		originalVictim = victim;
 
 		/* always wrap what we look up in BufferDescriptors */
-		victim = victim % NBuffers;
+		victim = victim % low;
 
 		/*
 		 * If we're the one that just caused a wraparound, force
@@ -151,7 +158,7 @@ ClockSweepTick(void)
 				 */
 				SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
 
-				wrapped = expected % NBuffers;
+				wrapped = expected % low;
 
 				success = pg_atomic_compare_exchange_u32(&StrategyControl->nextVictimBuffer,
 														 &expected, wrapped);
@@ -299,6 +306,13 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 			 * it before we got to it.  It's probably impossible altogether as
 			 * of 8.3, but we'd better check anyway.)
 			 */
+
+			/*
+			 * DRAINING 尾部不再分配；读取 freeNext 的阶段仍由外层
+			 * Guard 保护。
+			 */
+			if (buf->buf_id >= GetLowNBuffers())
+				continue;
 			local_buf_state = LockBufHdr(buf);
 			if (BUF_STATE_GET_REFCOUNT(local_buf_state) == 0
 				&& BUF_STATE_GET_USAGECOUNT(local_buf_state) == 0)
@@ -313,7 +327,7 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 	}
 
 	/* Nothing on the freelist, so run the "clock sweep" algorithm */
-	trycounter = NBuffers;
+	trycounter = GetLowNBuffers();
 	for (;;)
 	{
 		buf = GetBufferDescriptor(ClockSweepTick());
@@ -330,7 +344,7 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 			{
 				local_buf_state -= BUF_USAGECOUNT_ONE;
 
-				trycounter = NBuffers;
+				trycounter = GetLowNBuffers();
 			}
 			else
 			{
@@ -363,6 +377,19 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 void
 StrategyFreeBuffer(BufferDesc *buf)
 {
+	DsgBufferAccess access = DsgBufferAccessBegin();
+	Size		index = ((char *) buf - (char *) BufferDescriptors) / sizeof(BufferDescPadded);
+
+	/*-
+	 * 调用者可能刚释放最后一个 pin，尾部 backing 已被回收。先用稳定
+	 * 地址计算索引并在 Guard 内校验，不能为了读取 buf_id 就先解引用。
+	 * 已进入 DRAINING 的描述符也不再放回 freelist。
+	 */
+	if (index >= (Size) access.count || index >= (Size) GetLowNBuffers())
+	{
+		DsgBufferAccessEnd(&access);
+		return;
+	}
 	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
 
 	/*
@@ -378,6 +405,7 @@ StrategyFreeBuffer(BufferDesc *buf)
 	}
 
 	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+	DsgBufferAccessEnd(&access);
 }
 
 /*
@@ -396,10 +424,12 @@ StrategySyncStart(uint32 *complete_passes, uint32 *num_buf_alloc)
 {
 	uint32		nextVictimBuffer;
 	int			result;
+	uint32		low;
 
 	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
 	nextVictimBuffer = pg_atomic_read_u32(&StrategyControl->nextVictimBuffer);
-	result = nextVictimBuffer % NBuffers;
+	low = GetLowNBuffers();
+	result = nextVictimBuffer % low;
 
 	if (complete_passes)
 	{
@@ -409,7 +439,7 @@ StrategySyncStart(uint32 *complete_passes, uint32 *num_buf_alloc)
 		 * Additionally add the number of wraparounds that happened before
 		 * completePasses could be incremented. C.f. ClockSweepTick().
 		 */
-		*complete_passes += nextVictimBuffer / NBuffers;
+		*complete_passes += nextVictimBuffer / low;
 	}
 
 	if (num_buf_alloc)
@@ -456,7 +486,10 @@ StrategyShmemSize(void)
 	Size		size = 0;
 
 	/* size of lookup hash table ... see comment in StrategyInitialize */
-	/* Hash 上限固定为 M；在线扩容不得超出启动时的条目预算。 */
+
+	/*
+	 * Hash 上限固定为 M；在线扩容不得超出启动时的条目预算。
+	 */
 	size = add_size(size, BufTableShmemSize(GetMaxNBuffers() + NUM_BUFFER_PARTITIONS));
 
 	/* size of the shared replacement strategy control block */
@@ -598,7 +631,7 @@ GetAccessStrategyWithSize(BufferAccessStrategyType btype, int ring_size_kb)
 		return NULL;
 
 	/* Cap to 1/8th of shared_buffers */
-	ring_buffers = Min(NBuffers / 8, ring_buffers);
+	ring_buffers = Min(GetLowNBuffers() / 8, ring_buffers);
 
 	/* NBuffers should never be less than 16, so this shouldn't happen */
 	Assert(ring_buffers > 0);
@@ -649,7 +682,7 @@ int
 GetAccessStrategyPinLimit(BufferAccessStrategy strategy)
 {
 	if (strategy == NULL)
-		return NBuffers;
+		return GetLowNBuffers();
 
 	switch (strategy->btype)
 	{
@@ -711,8 +744,15 @@ GetBufferFromRing(BufferAccessStrategy strategy, uint32 *buf_state)
 	 * slot by calling AddBufferToRing with the new buffer.
 	 */
 	bufnum = strategy->buffers[strategy->current];
-	if (bufnum == InvalidBuffer)
+
+	/*
+	 * 先拒绝旧环中的尾部 ID，再读取描述符；grow 后允许重新填充该槽。
+	 */
+	if (bufnum == InvalidBuffer || bufnum > GetLowNBuffers())
+	{
+		strategy->buffers[strategy->current] = InvalidBuffer;
 		return NULL;
+	}
 
 	/*
 	 * If the buffer is pinned we cannot use it under any circumstances.

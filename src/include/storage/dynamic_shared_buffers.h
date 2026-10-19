@@ -51,7 +51,8 @@ typedef struct DynamicSharedBuffersControl
 /*-
  * Guard 持有期间 H 及其数组 backing 不会被缩容回收。嵌套调用复用本进程
  * 已持有的锁；每个 Guard 只释放自己取得的锁，避免重复共享加锁遇到排队
- * writer 时自锁。ERROR 路径由 PG 的 LWLockReleaseAll 负责清理。
+ * writer 时自锁。Guard 不阻止查询取消；ERROR/FATAL 路径由 PG 的
+ * LWLockReleaseAll 清理。Begin/End 对原生 holdoff 的调整必须严格成对。
  */
 typedef struct DsgBufferAccess
 {

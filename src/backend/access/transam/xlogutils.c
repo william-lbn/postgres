@@ -30,7 +30,7 @@
 #include "utils/rel.h"
 
 
-bool	(*redo_read_buffer_filter) (XLogReaderState *record, uint8 block_id);
+bool		(*redo_read_buffer_filter) (XLogReaderState *record, uint8 block_id);
 
 /* GUC variable */
 bool		ignore_invalid_pages = false;
@@ -352,7 +352,10 @@ XLogFlushBufferForRedoIfInit(XLogReaderState *record, uint8 block_id,
 	Assert(BufferIsValid(buffer));
 
 	XLogRecGetBlockTag(record, block_id, NULL, &forknum, NULL);
-	/* Neon 单页重放不维护本地 init fork，不能触发普通恢复的刷盘路径。 */
+
+	/*
+	 * Neon 单页重放不维护本地 init fork，不能触发普通恢复的刷盘路径。
+	 */
 	if (forknum == INIT_FORKNUM && !am_wal_redo_postgres)
 		FlushOneBuffer(buffer);
 }
@@ -521,7 +524,12 @@ XLogReadBufferExtended(RelFileLocator rlocator, ForkNumber forknum,
 	Assert(blkno != P_NEW);
 
 	/* Do we have a clue where the buffer might be already? */
-	if (BufferIsValid(recent_buffer) &&
+
+	/*-
+	 * recent_buffer 是可过期的提示，H 范围检查由 ReadRecentBuffer
+	 * 在保护下执行，不能在这里先做当前容量的有效性断言。
+	 */
+	if (!BufferIsInvalid(recent_buffer) &&
 		mode == RBM_NORMAL &&
 		ReadRecentBuffer(rlocator, forknum, blkno, recent_buffer))
 	{

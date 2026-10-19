@@ -13,6 +13,7 @@
 #include "funcapi.h"
 #include "storage/buf_internals.h"
 #include "storage/bufmgr.h"
+#include "utils/injection_point.h"
 
 
 #define NUM_BUFFERCACHE_PAGES_MIN_ELEM	8
@@ -75,6 +76,7 @@ pg_buffercache_pages(PG_FUNCTION_ARGS)
 	TupleDesc	tupledesc;
 	TupleDesc	expected_tupledesc;
 	HeapTuple	tuple;
+	DsgBufferAccess access;
 
 	if (SRF_IS_FIRSTCALL())
 	{
@@ -128,13 +130,19 @@ pg_buffercache_pages(PG_FUNCTION_ARGS)
 
 		fctx->tupdesc = BlessTupleDesc(tupledesc);
 
-		/* Allocate NBuffers worth of BufferCachePagesRec records. */
+		/*-
+		 * 从确定 H、分配私有快照到扫描结束一直保护共享数组。结果已复制
+		 * 到私有内存后立即释放，不把读侧锁带入 SRF 的逐行返回阶段。
+		 */
+		access = DsgBufferAccessBegin();
+		INJECTION_POINT("dsg-buffercache-before-scan");
+		/* Allocate access.count worth of BufferCachePagesRec records. */
 		fctx->record = (BufferCachePagesRec *)
 			MemoryContextAllocHuge(CurrentMemoryContext,
-								   sizeof(BufferCachePagesRec) * NBuffers);
+								   sizeof(BufferCachePagesRec) * access.count);
 
 		/* Set max calls and remember the user function context. */
-		funcctx->max_calls = NBuffers;
+		funcctx->max_calls = access.count;
 		funcctx->user_fctx = fctx;
 
 		/* Return to original context when allocating transient memory */
@@ -148,7 +156,7 @@ pg_buffercache_pages(PG_FUNCTION_ARGS)
 		 * snapshot across all buffers, but we do grab the buffer header
 		 * locks, so the information of each buffer is self-consistent.
 		 */
-		for (i = 0; i < NBuffers; i++)
+		for (i = 0; i < access.count; i++)
 		{
 			BufferDesc *bufHdr;
 			uint32		buf_state;
@@ -181,6 +189,7 @@ pg_buffercache_pages(PG_FUNCTION_ARGS)
 
 			UnlockBufHdr(bufHdr, buf_state);
 		}
+		DsgBufferAccessEnd(&access);
 	}
 
 	funcctx = SRF_PERCALL_SETUP();
@@ -259,11 +268,16 @@ pg_buffercache_summary(PG_FUNCTION_ARGS)
 	int32		buffers_dirty = 0;
 	int32		buffers_pinned = 0;
 	int64		usagecount_total = 0;
+	DsgBufferAccess access;
 
 	if (get_call_result_type(fcinfo, NULL, &tupledesc) != TYPEFUNC_COMPOSITE)
 		elog(ERROR, "return type must be a row type");
 
-	for (int i = 0; i < NBuffers; i++)
+	/*
+	 * header 状态仍可变化；Guard 仅保证整个 H 区间的 backing 存活。
+	 */
+	access = DsgBufferAccessBegin();
+	for (int i = 0; i < access.count; i++)
 	{
 		BufferDesc *bufHdr;
 		uint32		buf_state;
@@ -294,6 +308,7 @@ pg_buffercache_summary(PG_FUNCTION_ARGS)
 			buffers_pinned++;
 	}
 
+	DsgBufferAccessEnd(&access);
 	memset(nulls, 0, sizeof(nulls));
 	values[0] = Int32GetDatum(buffers_used);
 	values[1] = Int32GetDatum(buffers_unused);
@@ -321,10 +336,12 @@ pg_buffercache_usage_counts(PG_FUNCTION_ARGS)
 	int			pinned[BM_MAX_USAGE_COUNT + 1] = {0};
 	Datum		values[NUM_BUFFERCACHE_USAGE_COUNTS_ELEM];
 	bool		nulls[NUM_BUFFERCACHE_USAGE_COUNTS_ELEM] = {0};
+	DsgBufferAccess access;
 
 	InitMaterializedSRF(fcinfo, 0);
 
-	for (int i = 0; i < NBuffers; i++)
+	access = DsgBufferAccessBegin();
+	for (int i = 0; i < access.count; i++)
 	{
 		BufferDesc *bufHdr = GetBufferDescriptor(i);
 		uint32		buf_state = pg_atomic_read_u32(&bufHdr->state);
@@ -342,6 +359,7 @@ pg_buffercache_usage_counts(PG_FUNCTION_ARGS)
 			pinned[usage_count]++;
 	}
 
+	DsgBufferAccessEnd(&access);
 	for (int i = 0; i < BM_MAX_USAGE_COUNT + 1; i++)
 	{
 		values[0] = Int32GetDatum(i);
@@ -362,14 +380,19 @@ Datum
 pg_buffercache_evict(PG_FUNCTION_ARGS)
 {
 	Buffer		buf = PG_GETARG_INT32(0);
+	DsgBufferAccess access;
+	bool		result;
 
 	if (!superuser())
 		ereport(ERROR,
 				(errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
 				 errmsg("must be superuser to use pg_buffercache_evict function")));
 
-	if (buf < 1 || buf > NBuffers)
+	access = DsgBufferAccessBegin();
+	if (buf < 1 || buf > access.count)
 		elog(ERROR, "bad buffer ID: %d", buf);
 
-	PG_RETURN_BOOL(EvictUnpinnedBuffer(buf));
+	result = EvictUnpinnedBuffer(buf);
+	DsgBufferAccessEnd(&access);
+	PG_RETURN_BOOL(result);
 }

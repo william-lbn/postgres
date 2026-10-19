@@ -445,7 +445,7 @@ initscan(HeapScanDesc scan, ScanKey key, bool keep_startblock)
 	 * if you change this, consider changing that one, too.
 	 */
 	if (!RelationUsesLocalBuffers(scan->rs_base.rs_rd) &&
-		scan->rs_nblocks > NBuffers / 4)
+		scan->rs_nblocks > GetHighNBuffers() / 4)
 	{
 		allow_strat = (scan->rs_base.rs_flags & SO_ALLOW_STRAT) != 0;
 		allow_sync = (scan->rs_base.rs_flags & SO_ALLOW_SYNC) != 0;
@@ -501,8 +501,8 @@ initscan(HeapScanDesc scan, ScanKey key, bool keep_startblock)
 	{
 		/*
 		 * Do not use tablespace setting for catalog scans, as we might have
-		 * the tablespace settings in the catalogs locked already, which
-		 * might result in a deadlock.
+		 * the tablespace settings in the catalogs locked already, which might
+		 * result in a deadlock.
 		 */
 		if (IsCatalogRelation(scan->rs_base.rs_rd))
 			scan->rs_prefetch_maximum = effective_io_concurrency;
@@ -2309,9 +2309,10 @@ heap_insert(Relation relation, HeapTuple tup, CommandId cid,
 	if (options & HEAP_INSERT_SPECULATIVE)
 	{
 		/*
-		 * NEON: speculative token is not stored in WAL, so if the page is evicted
-		 * from the buffer cache, the token will be lost. To prevent that, we keep the
-		 * buffer pinned. It will be unpinned in heapam_tuple_finish/abort_speculative.
+		 * NEON: speculative token is not stored in WAL, so if the page is
+		 * evicted from the buffer cache, the token will be lost. To prevent
+		 * that, we keep the buffer pinned. It will be unpinned in
+		 * heapam_tuple_finish/abort_speculative.
 		 */
 		LockBuffer(buffer, BUFFER_LOCK_UNLOCK);
 	}
@@ -6490,7 +6491,7 @@ heap_finish_speculative(Relation relation, ItemPointer tid)
 
 	END_CRIT_SECTION();
 
-	ReleaseBuffer(buffer); /* NEON: release buffer pinned by heap_insert */
+	ReleaseBuffer(buffer);		/* NEON: release buffer pinned by heap_insert */
 	UnlockReleaseBuffer(buffer);
 }
 
@@ -6565,12 +6566,12 @@ heap_abort_speculative(Relation relation, ItemPointer tid)
 	/*
 	 * NEON: release buffer pinned by heap_insert
 	 *
-	 * This function is also used on the toast tuples of an aborted speculative
-	 * insertion. For those, there is no token on the tuple, and we didn' t keep
-	 * the pin. 
+	 * This function is also used on the toast tuples of an aborted
+	 * speculative insertion. For those, there is no token on the tuple, and
+	 * we didn' t keep the pin.
 	 */
 	if (HeapTupleHeaderIsSpeculative(tp.t_data))
-		ReleaseBuffer(buffer);  
+		ReleaseBuffer(buffer);
 
 	/*
 	 * No need to check for serializable conflicts here.  There is never a
@@ -9911,11 +9912,14 @@ heap_xlog_visible(XLogReaderState *record)
 
 		/*
 		 * NEON: despite to the comment above we need to update page LSN here.
-		 * See discussion at hackers: https://www.postgresql.org/message-id/flat/039076d4f6cdd871691686361f83cb8a6913a86a.camel%40j-davis.com#101ba42b004f9988e3d54fce26fb3462
-		 * For Neon this assignment is critical because otherwise last written LSN tracked at compute doesn't
-		 * match with page LSN assignee by WAL-redo and as a result, prefetched page is rejected.
+		 * See discussion at hackers:
+		 * https://www.postgresql.org/message-id/flat/039076d4f6cdd871691686361f83cb8a6913a86a.camel%40j-davis.com#101ba42b004f9988e3d54fce26fb3462
+		 * For Neon this assignment is critical because otherwise last written
+		 * LSN tracked at compute doesn't match with page LSN assignee by
+		 * WAL-redo and as a result, prefetched page is rejected.
 		 *
-		 * It is fixed in upstream in https://github.com/neondatabase/postgres/commit/7bf713dd2d0739fbcd4103971ed69c17ebe677ea
+		 * It is fixed in upstream in
+		 * https://github.com/neondatabase/postgres/commit/7bf713dd2d0739fbcd4103971ed69c17ebe677ea
 		 * but until it is merged we still need to carry a patch here.
 		 */
 		if (true || XLogHintBitIsNeeded())

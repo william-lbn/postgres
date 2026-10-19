@@ -1,5 +1,9 @@
 CREATE EXTENSION test_dsg_region;
 SELECT test_dsg_buffer_layout();
+SELECT test_dsg_stale_hint();
+SELECT test_dsg_exclusive_available();
+SELECT test_dsg_access_error();
+SELECT test_dsg_exclusive_available();
 SELECT test_dsg_region('populate_preserves_prefix');
 SELECT test_dsg_region('release_preserves_boundary_pages');
 SELECT test_dsg_region('partial_page_noop');

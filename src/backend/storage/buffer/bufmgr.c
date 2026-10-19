@@ -66,7 +66,7 @@
 #include "utils/resowner.h"
 #include "utils/timestamp.h"
 
-uint32 (*get_pin_limit_hook)(void);
+uint32		(*get_pin_limit_hook) (void);
 
 /* Note: these two macros only work on shared buffers, not local ones! */
 #define BufHdrGetBlock(bufHdr)	((Block) (BufferBlocks + ((Size) (bufHdr)->buf_id) * BLCKSZ))
@@ -88,7 +88,7 @@ uint32 (*get_pin_limit_hook)(void);
  * being dropped. For the relations with size below this threshold, we find
  * the buffers by doing lookups in BufMapping table.
  */
-#define BUF_DROP_FULL_SCAN_THRESHOLD		(uint64) (NBuffers / 32)
+#define BUF_DROP_FULL_SCAN_THRESHOLD		(uint64) (GetHighNBuffers() / 32)
 
 typedef struct PrivateRefCountEntry
 {
@@ -352,7 +352,12 @@ GetPrivateRefCountEntry(Buffer buffer, bool do_move)
 	PrivateRefCountEntry *res;
 	int			i;
 
-	Assert(BufferIsValid(buffer));
+	/*-
+	 * 这里仅查进程私有键，不访问共享 Descriptor。recent-buffer 提示可能
+	 * 已超出当前 H，但仍在固定 M 内；不能在确认是否已有私有 pin 之前
+	 * 用 H 断言。真正共享访问仍由 pin 或数组 Guard 保证当前 H 合法。
+	 */
+	Assert(buffer > 0 && buffer <= GetMaxNBuffers());
 	Assert(!BufferIsLocal(buffer));
 
 	/*
@@ -515,7 +520,7 @@ static bool PinBuffer(BufferDesc *buf, BufferAccessStrategy strategy);
 static void PinBuffer_Locked(BufferDesc *buf);
 static void UnpinBuffer(BufferDesc *buf);
 static void UnpinBufferNoOwner(BufferDesc *buf);
-static void BufferSync(int flags);
+static void BufferSync(int flags, int nbufs);
 static uint32 WaitBufHdrUnlocked(BufferDesc *buf);
 static int	SyncOneBuffer(int buf_id, bool skip_recently_used,
 						  WritebackContext *wb_context);
@@ -686,8 +691,13 @@ ReadRecentBuffer(RelFileLocator rlocator, ForkNumber forkNum, BlockNumber blockN
 	BufferTag	tag;
 	uint32		buf_state;
 	bool		have_private_ref;
+	DsgBufferAccess access = {0};
+	PrivateRefCountEntry *ref;
 
-	Assert(BufferIsValid(recent_buffer));
+	/*
+	 * recent_buffer 是可过期提示，不能先用当前 H 做断言而跳过拒绝路径。
+	 */
+	Assert(recent_buffer != InvalidBuffer);
 
 	ResourceOwnerEnlarge(CurrentResourceOwner);
 	ReservePrivateRefCountEntry();
@@ -697,6 +707,7 @@ ReadRecentBuffer(RelFileLocator rlocator, ForkNumber forkNum, BlockNumber blockN
 	{
 		int			b = -recent_buffer - 1;
 
+		Assert(BufferIsValid(recent_buffer));
 		bufHdr = GetLocalBufferDescriptor(b);
 		buf_state = pg_atomic_read_u32(&bufHdr->state);
 
@@ -712,8 +723,24 @@ ReadRecentBuffer(RelFileLocator rlocator, ForkNumber forkNum, BlockNumber blockN
 	}
 	else
 	{
+		if (recent_buffer > GetMaxNBuffers())
+			return false;
+		ref = GetPrivateRefCountEntry(recent_buffer, false);
+		have_private_ref = ref != NULL && ref->refcount > 0;
+		/*-
+		 * 已有私有 pin 保护原对象；无 pin 的旧提示必须先锁定 H，再检查范围，
+		 * 并在取得 header/pin 前保持保护，防止 shrink/regrow 回收同一地址。
+		 */
+		if (!have_private_ref)
+		{
+			access = DsgBufferAccessBegin();
+			if (recent_buffer > access.count)
+			{
+				DsgBufferAccessEnd(&access);
+				return false;
+			}
+		}
 		bufHdr = GetBufferDescriptor(recent_buffer - 1);
-		have_private_ref = GetPrivateRefCount(recent_buffer) > 0;
 
 		/*
 		 * Do we already have this buffer pinned with a private reference?  If
@@ -737,6 +764,7 @@ ReadRecentBuffer(RelFileLocator rlocator, ForkNumber forkNum, BlockNumber blockN
 			else
 				PinBuffer_Locked(bufHdr);	/* pin for first time */
 
+			DsgBufferAccessEnd(&access);
 			pgBufferUsage.shared_blks_hit++;
 
 			return true;
@@ -745,6 +773,7 @@ ReadRecentBuffer(RelFileLocator rlocator, ForkNumber forkNum, BlockNumber blockN
 		/* If we locked the header above, now unlock. */
 		if (!have_private_ref)
 			UnlockBufHdr(bufHdr, buf_state);
+		DsgBufferAccessEnd(&access);
 	}
 
 	return false;
@@ -1024,11 +1053,12 @@ ZeroAndLockBuffer(Buffer buffer, ReadBufferMode mode, bool already_valid)
 {
 	BufferDesc *bufHdr;
 	bool		need_to_zero;
+
 	/*
 	 * wal_redo postgres is working in single user mode, we do not need to
-	 * synchronize access to shared buffer, so let's use local buffers instead.
-	 * Note that this implies that when am_wal_redo_postgres is set, we always
-	 * use local buffers.
+	 * synchronize access to shared buffer, so let's use local buffers
+	 * instead. Note that this implies that when am_wal_redo_postgres is set,
+	 * we always use local buffers.
 	 */
 	bool		isLocalBuf = BufferIsLocal(buffer) || am_wal_redo_postgres;
 
@@ -1044,7 +1074,10 @@ ZeroAndLockBuffer(Buffer buffer, ReadBufferMode mode, bool already_valid)
 	}
 	else if (isLocalBuf)
 	{
-		// TODO : Fix the logic around wal_redo + local buffers in other places too
+		/*
+		 * TODO : Fix the logic around wal_redo + local buffers in other
+		 * places too
+		 */
 		Assert(BufferIsLocal(buffer) || am_wal_redo_postgres);
 		/* Simple case for non-shared buffers. */
 		bufHdr = GetLocalBufferDescriptor(-buffer - 1);
@@ -1972,6 +2005,7 @@ GetVictimBuffer(BufferAccessStrategy strategy, IOContext io_context)
 	Buffer		buf;
 	uint32		buf_state;
 	bool		from_ring;
+	DsgBufferAccess access;
 
 	/*
 	 * Ensure, while the spinlock's not yet held, that there's a free refcount
@@ -1987,6 +2021,11 @@ again:
 	 * Select a victim buffer.  The buffer is returned with its header
 	 * spinlock still held!
 	 */
+
+	/*
+	 * 仅 victim 选择到取得 pin 之间持读侧锁，普通 hash 命中不加此锁。
+	 */
+	access = DsgBufferAccessBegin();
 	buf_hdr = StrategyGetBuffer(strategy, &buf_state, &from_ring);
 	buf = BufferDescriptorGetBuffer(buf_hdr);
 
@@ -1994,6 +2033,11 @@ again:
 
 	/* Pin the buffer and then release the buffer spinlock */
 	PinBuffer_Locked(buf_hdr);
+
+	/*
+	 * pin 接替 backing 保护；后续慢 IO 不占用整个数组的读侧锁。
+	 */
+	DsgBufferAccessEnd(&access);
 
 	/*
 	 * We shouldn't have any other pins for this buffer.
@@ -2141,7 +2185,7 @@ LimitAdditionalPins(uint32 *additional_pins)
 		return;
 
 	max_backends = MaxBackends + NUM_AUXILIARY_PROCS;
-	max_proportional_pins = get_pin_limit_hook ? get_pin_limit_hook() : NBuffers / max_backends;
+	max_proportional_pins = get_pin_limit_hook ? get_pin_limit_hook() : GetLowNBuffers() / max_backends;
 
 	/*
 	 * Subtract the approximate number of buffers already pinned by this
@@ -2971,7 +3015,7 @@ UnpinBufferNoOwner(BufferDesc *buf)
  * currently have no effect here.
  */
 static void
-BufferSync(int flags)
+BufferSync(int flags, int nbufs)
 {
 	uint32		buf_state;
 	int			buf_id;
@@ -3012,7 +3056,7 @@ BufferSync(int flags)
 	 * certainly need to be written for the next checkpoint attempt, too.
 	 */
 	num_to_scan = 0;
-	for (buf_id = 0; buf_id < NBuffers; buf_id++)
+	for (buf_id = 0; buf_id < nbufs; buf_id++)
 	{
 		BufferDesc *bufHdr = GetBufferDescriptor(buf_id);
 
@@ -3038,7 +3082,7 @@ BufferSync(int flags)
 
 		UnlockBufHdr(bufHdr, buf_state);
 
-		/* Check for barrier events in case NBuffers is large. */
+		/* Check for barrier events in case nbufs is large. */
 		if (ProcSignalBarrierPending)
 			ProcessProcSignalBarrier();
 	}
@@ -3048,7 +3092,7 @@ BufferSync(int flags)
 
 	WritebackContextInit(&wb_context, &checkpoint_flush_after);
 
-	TRACE_POSTGRESQL_BUFFER_SYNC_START(NBuffers, num_to_scan);
+	TRACE_POSTGRESQL_BUFFER_SYNC_START(nbufs, num_to_scan);
 
 	/*
 	 * Sort buffers that need to be written to reduce the likelihood of random
@@ -3232,7 +3276,7 @@ BufferSync(int flags)
 	 */
 	CheckpointStats.ckpt_bufs_written += num_written;
 
-	TRACE_POSTGRESQL_BUFFER_SYNC_DONE(NBuffers, num_written, num_to_scan);
+	TRACE_POSTGRESQL_BUFFER_SYNC_DONE(nbufs, num_written, num_to_scan);
 }
 
 /*
@@ -3289,11 +3333,29 @@ BgBufferSync(WritebackContext *wb_context)
 	/* Variables for final smoothed_density update */
 	long		new_strategy_delta;
 	uint32		new_recent_alloc;
+	DsgBufferAccess access;
+	int			nbufs;
+	static int	saved_capacity = 0;
 
 	/*
 	 * Find out where the freelist clock sweep currently is, and how many
 	 * buffer allocations have happened since our last call.
 	 */
+
+	/*
+	 * 容量改变后，旧 clock 位置与平滑统计不再属于当前区间。
+	 */
+	access = DsgBufferAccessBegin();
+
+	/*-
+	 * BG writer 跟随分配边界 L 扫描；尾部排水由协调者/Checkpoint 负责。
+	 */
+	nbufs = GetLowNBuffers();
+	if (saved_capacity != nbufs)
+	{
+		saved_info_valid = false;
+		saved_capacity = nbufs;
+	}
 	strategy_buf_id = StrategySyncStart(&strategy_passes, &recent_alloc);
 
 	/* Report buffer alloc counts to pgstat */
@@ -3307,6 +3369,7 @@ BgBufferSync(WritebackContext *wb_context)
 	if (bgwriter_lru_maxpages <= 0)
 	{
 		saved_info_valid = false;
+		DsgBufferAccessEnd(&access);
 		return true;
 	}
 
@@ -3323,7 +3386,7 @@ BgBufferSync(WritebackContext *wb_context)
 		int32		passes_delta = strategy_passes - prev_strategy_passes;
 
 		strategy_delta = strategy_buf_id - prev_strategy_buf_id;
-		strategy_delta += (long) passes_delta * NBuffers;
+		strategy_delta += (long) passes_delta * nbufs;
 
 		Assert(strategy_delta >= 0);
 
@@ -3342,7 +3405,7 @@ BgBufferSync(WritebackContext *wb_context)
 				 next_to_clean >= strategy_buf_id)
 		{
 			/* on same pass, but ahead or at least not behind */
-			bufs_to_lap = NBuffers - (next_to_clean - strategy_buf_id);
+			bufs_to_lap = nbufs - (next_to_clean - strategy_buf_id);
 #ifdef BGW_DEBUG
 			elog(DEBUG2, "bgwriter ahead: bgw %u-%u strategy %u-%u delta=%ld lap=%d",
 				 next_passes, next_to_clean,
@@ -3364,7 +3427,7 @@ BgBufferSync(WritebackContext *wb_context)
 #endif
 			next_to_clean = strategy_buf_id;
 			next_passes = strategy_passes;
-			bufs_to_lap = NBuffers;
+			bufs_to_lap = nbufs;
 		}
 	}
 	else
@@ -3380,7 +3443,7 @@ BgBufferSync(WritebackContext *wb_context)
 		strategy_delta = 0;
 		next_to_clean = strategy_buf_id;
 		next_passes = strategy_passes;
-		bufs_to_lap = NBuffers;
+		bufs_to_lap = nbufs;
 	}
 
 	/* Update saved info for next time */
@@ -3406,7 +3469,7 @@ BgBufferSync(WritebackContext *wb_context)
 	 * strategy point and where we've scanned ahead to, based on the smoothed
 	 * density estimate.
 	 */
-	bufs_ahead = NBuffers - bufs_to_lap;
+	bufs_ahead = nbufs - bufs_to_lap;
 	reusable_buffers_est = (float) bufs_ahead / smoothed_density;
 
 	/*
@@ -3444,7 +3507,7 @@ BgBufferSync(WritebackContext *wb_context)
 	 * the BGW will be called during the scan_whole_pool time; slice the
 	 * buffer pool into that many sections.
 	 */
-	min_scan_buffers = (int) (NBuffers / (scan_whole_pool_milliseconds / BgWriterDelay));
+	min_scan_buffers = (int) (nbufs / (scan_whole_pool_milliseconds / BgWriterDelay));
 
 	if (upcoming_alloc_est < (min_scan_buffers + reusable_buffers_est))
 	{
@@ -3472,7 +3535,7 @@ BgBufferSync(WritebackContext *wb_context)
 		int			sync_state = SyncOneBuffer(next_to_clean, true,
 											   wb_context);
 
-		if (++next_to_clean >= NBuffers)
+		if (++next_to_clean >= nbufs)
 		{
 			next_to_clean = 0;
 			next_passes++;
@@ -3527,6 +3590,7 @@ BgBufferSync(WritebackContext *wb_context)
 	}
 
 	/* Return true if OK to hibernate */
+	DsgBufferAccessEnd(&access);
 	return (bufs_to_lap == 0 && recent_alloc == 0);
 }
 
@@ -3756,7 +3820,7 @@ AssertNotCatalogBufferLock(LWLock *lock, LWLockMode mode,
 		return;
 
 	if (!((BufferDescPadded *) lock > BufferDescriptors &&
-		  (BufferDescPadded *) lock < BufferDescriptors + NBuffers))
+		  (BufferDescPadded *) lock < BufferDescriptors + GetMaxNBuffers()))
 		return;					/* not a buffer lock */
 
 	bufHdr = (BufferDesc *)
@@ -3831,7 +3895,11 @@ DebugPrintBufferRefcount(Buffer buffer)
 void
 CheckPointBuffers(int flags)
 {
-	BufferSync(flags);
+	/* 全程保护 checkpoint workspace 及其中保存的旧 Buffer ID。 */
+	DsgBufferAccess access = DsgBufferAccessBegin();
+
+	BufferSync(flags, access.count);
+	DsgBufferAccessEnd(&access);
 }
 
 /*
@@ -4155,6 +4223,7 @@ DropRelationBuffers(SMgrRelation smgr_reln, ForkNumber *forkNum,
 					int nforks, BlockNumber *firstDelBlock)
 {
 	int			i;
+	DsgBufferAccess access;
 	int			j;
 	RelFileLocatorBackend rlocator;
 	BlockNumber nForkBlock[MAX_FORKNUM];
@@ -4224,7 +4293,11 @@ DropRelationBuffers(SMgrRelation smgr_reln, ForkNumber *forkNum,
 		return;
 	}
 
-	for (i = 0; i < NBuffers; i++)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; i++)
 	{
 		BufferDesc *bufHdr = GetBufferDescriptor(i);
 		uint32		buf_state;
@@ -4263,6 +4336,7 @@ DropRelationBuffers(SMgrRelation smgr_reln, ForkNumber *forkNum,
 		if (j >= nforks)
 			UnlockBufHdr(bufHdr, buf_state);
 	}
+	DsgBufferAccessEnd(&access);
 }
 
 /* ---------------------------------------------------------------------
@@ -4277,6 +4351,7 @@ void
 DropRelationsAllBuffers(SMgrRelation *smgr_reln, int nlocators)
 {
 	int			i;
+	DsgBufferAccess access;
 	int			n = 0;
 	SMgrRelation *rels;
 	BlockNumber (*block)[MAX_FORKNUM + 1];
@@ -4386,7 +4461,11 @@ DropRelationsAllBuffers(SMgrRelation *smgr_reln, int nlocators)
 	if (use_bsearch)
 		qsort(locators, n, sizeof(RelFileLocator), rlocator_comparator);
 
-	for (i = 0; i < NBuffers; i++)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; i++)
 	{
 		RelFileLocator *rlocator = NULL;
 		BufferDesc *bufHdr = GetBufferDescriptor(i);
@@ -4430,6 +4509,7 @@ DropRelationsAllBuffers(SMgrRelation *smgr_reln, int nlocators)
 		else
 			UnlockBufHdr(bufHdr, buf_state);
 	}
+	DsgBufferAccessEnd(&access);
 
 	pfree(locators);
 	pfree(rels);
@@ -4509,13 +4589,18 @@ void
 DropDatabaseBuffers(Oid dbid)
 {
 	int			i;
+	DsgBufferAccess access;
 
 	/*
 	 * We needn't consider local buffers, since by assumption the target
 	 * database isn't our own.
 	 */
 
-	for (i = 0; i < NBuffers; i++)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; i++)
 	{
 		BufferDesc *bufHdr = GetBufferDescriptor(i);
 		uint32		buf_state;
@@ -4533,6 +4618,7 @@ DropDatabaseBuffers(Oid dbid)
 		else
 			UnlockBufHdr(bufHdr, buf_state);
 	}
+	DsgBufferAccessEnd(&access);
 }
 
 /* -----------------------------------------------------------------
@@ -4547,8 +4633,13 @@ void
 PrintBufferDescs(void)
 {
 	int			i;
+	DsgBufferAccess access;
 
-	for (i = 0; i < NBuffers; ++i)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; ++i)
 	{
 		BufferDesc *buf = GetBufferDescriptor(i);
 		Buffer		b = BufferDescriptorGetBuffer(buf);
@@ -4563,6 +4654,7 @@ PrintBufferDescs(void)
 			 buf->tag.blockNum, buf->flags,
 			 buf->refcount, GetPrivateRefCount(b));
 	}
+	DsgBufferAccessEnd(&access);
 }
 #endif
 
@@ -4571,8 +4663,13 @@ void
 PrintPinnedBufs(void)
 {
 	int			i;
+	DsgBufferAccess access;
 
-	for (i = 0; i < NBuffers; ++i)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; ++i)
 	{
 		BufferDesc *buf = GetBufferDescriptor(i);
 		Buffer		b = BufferDescriptorGetBuffer(buf);
@@ -4590,6 +4687,7 @@ PrintPinnedBufs(void)
 				 buf->refcount, GetPrivateRefCount(b));
 		}
 	}
+	DsgBufferAccessEnd(&access);
 }
 #endif
 
@@ -4615,6 +4713,7 @@ void
 FlushRelationBuffers(Relation rel)
 {
 	int			i;
+	DsgBufferAccess access;
 	BufferDesc *bufHdr;
 	SMgrRelation srel = RelationGetSmgr(rel);
 
@@ -4668,7 +4767,11 @@ FlushRelationBuffers(Relation rel)
 		return;
 	}
 
-	for (i = 0; i < NBuffers; i++)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; i++)
 	{
 		uint32		buf_state;
 
@@ -4698,6 +4801,7 @@ FlushRelationBuffers(Relation rel)
 		else
 			UnlockBufHdr(bufHdr, buf_state);
 	}
+	DsgBufferAccessEnd(&access);
 }
 
 /* ---------------------------------------------------------------------
@@ -4713,6 +4817,7 @@ void
 FlushRelationsAllBuffers(SMgrRelation *smgrs, int nrels)
 {
 	int			i;
+	DsgBufferAccess access;
 	SMgrSortArray *srels;
 	bool		use_bsearch;
 
@@ -4740,7 +4845,11 @@ FlushRelationsAllBuffers(SMgrRelation *smgrs, int nrels)
 	if (use_bsearch)
 		qsort(srels, nrels, sizeof(SMgrSortArray), rlocator_comparator);
 
-	for (i = 0; i < NBuffers; i++)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; i++)
 	{
 		SMgrSortArray *srelent = NULL;
 		BufferDesc *bufHdr = GetBufferDescriptor(i);
@@ -4795,6 +4904,7 @@ FlushRelationsAllBuffers(SMgrRelation *smgrs, int nrels)
 		else
 			UnlockBufHdr(bufHdr, buf_state);
 	}
+	DsgBufferAccessEnd(&access);
 
 	pfree(srels);
 }
@@ -4971,9 +5081,14 @@ void
 FlushDatabaseBuffers(Oid dbid)
 {
 	int			i;
+	DsgBufferAccess access;
 	BufferDesc *bufHdr;
 
-	for (i = 0; i < NBuffers; i++)
+	/*
+	 * Guard 排除 backing 回收；原有 tag/header 锁仍负责页面语义。
+	 */
+	access = DsgBufferAccessBegin();
+	for (i = 0; i < access.count; i++)
 	{
 		uint32		buf_state;
 
@@ -5003,6 +5118,7 @@ FlushDatabaseBuffers(Oid dbid)
 		else
 			UnlockBufHdr(bufHdr, buf_state);
 	}
+	DsgBufferAccessEnd(&access);
 }
 
 /*
@@ -6208,11 +6324,21 @@ EvictUnpinnedBuffer(Buffer buf)
 	BufferDesc *desc;
 	uint32		buf_state;
 	bool		result;
+	DsgBufferAccess access;
 
 	/* Make sure we can pin the buffer. */
 	ResourceOwnerEnlarge(CurrentResourceOwner);
 	ReservePrivateRefCountEntry();
 
+	/*
+	 * 无 pin 的外部 ID 需要在保护 H 的同时校验，不能先解引用描述符。
+	 */
+	access = DsgBufferAccessBegin();
+	if (buf < 1 || buf > access.count)
+	{
+		DsgBufferAccessEnd(&access);
+		return false;
+	}
 	Assert(!BufferIsLocal(buf));
 	desc = GetBufferDescriptor(buf - 1);
 
@@ -6221,6 +6347,7 @@ EvictUnpinnedBuffer(Buffer buf)
 	if ((buf_state & BM_VALID) == 0)
 	{
 		UnlockBufHdr(desc, buf_state);
+		DsgBufferAccessEnd(&access);
 		return false;
 	}
 
@@ -6228,6 +6355,7 @@ EvictUnpinnedBuffer(Buffer buf)
 	if (BUF_STATE_GET_REFCOUNT(buf_state) > 0)
 	{
 		UnlockBufHdr(desc, buf_state);
+		DsgBufferAccessEnd(&access);
 		return false;
 	}
 
@@ -6246,5 +6374,6 @@ EvictUnpinnedBuffer(Buffer buf)
 
 	UnpinBuffer(desc);
 
+	DsgBufferAccessEnd(&access);
 	return result;
 }

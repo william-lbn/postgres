@@ -103,6 +103,8 @@ DynamicSharedBuffersInit(void)
 				(errcode(ERRCODE_INTERNAL_ERROR),
 				 errmsg("could not generate DSGA shared memory boot identity")));
 	LWLockInitialize(&DSBCtrl->access_lock, LWTRANCHE_DSG_BUFFER_ACCESS);
+	LWLockInitialize(&DSBCtrl->checkpoint_lock, LWTRANCHE_DSG_BUFFER_CHECKPOINT);
+	pg_atomic_init_u32(&DSBCtrl->checkpoint_prepared_buffers, NBuffers);
 	LWLockInitialize(&DSBCtrl->resize_lock, LWTRANCHE_DSG_BUFFER_RESIZE);
 	SpinLockInit(&DSBCtrl->status_lock);
 	pg_atomic_init_u64(&DSBCtrl->generation, 1);

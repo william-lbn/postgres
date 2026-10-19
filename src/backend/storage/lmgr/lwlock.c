@@ -172,6 +172,7 @@ static const char *const BuiltinTrancheNames[] = {
 	[LWTRANCHE_PARALLEL_VACUUM_DSA] = "ParallelVacuumDSA",
 	[LWTRANCHE_DSG_BUFFER_ACCESS] = "DsgBufferAccess",
 	[LWTRANCHE_DSG_BUFFER_RESIZE] = "DsgBufferResize",
+	[LWTRANCHE_DSG_BUFFER_CHECKPOINT] = "DsgBufferCheckpoint",
 };
 
 StaticAssertDecl(lengthof(BuiltinTrancheNames) ==

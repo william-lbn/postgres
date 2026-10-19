@@ -35,6 +35,7 @@ PG_FUNCTION_INFO_V1(test_dsg_pin);
 PG_FUNCTION_INFO_V1(test_dsg_pin_control);
 PG_FUNCTION_INFO_V1(test_dsg_unpin_probe);
 PG_FUNCTION_INFO_V1(test_dsg_mapping_free);
+PG_FUNCTION_INFO_V1(test_dsg_checkpoint_control);
 
 void		_PG_init(void);
 
@@ -48,7 +49,10 @@ typedef struct DsgTestSharedState
 {
 	pg_atomic_uint32 value;
 	pg_atomic_uint32 pin_gate;	/* 0=未持有，1=真实持 pin，2=请求释放 */
+	pg_atomic_uint32 checkpoint_gate;
 } DsgTestSharedState;
+
+static void test_dsg_wait_gate(pg_atomic_uint32 *gate, const char *event_name);
 
 #ifdef USE_INJECTION_POINTS
 extern PGDLLEXPORT void test_dsg_protect_descriptor(const char *name,
@@ -57,6 +61,9 @@ static void *probe_page;
 static Size probe_bytes;
 static bool probe_armed;
 static bool probe_protected;
+
+extern PGDLLEXPORT void test_dsg_checkpoint_pause(const char *name, const void *private_data);
+extern PGDLLEXPORT void test_dsg_checkpoint_fail(const char *name, const void *private_data);
 
 /*-
  * 只改本测试 Backend 的页表，不改共享 backing 和其他 Backend 的访问权。
@@ -72,6 +79,24 @@ test_dsg_protect_descriptor(const char *name, const void *private_data)
 	if (mprotect(probe_page, probe_bytes, PROT_NONE) != 0)
 		ereport(ERROR, (errmsg("could not protect DSGA test descriptor: %m")));
 	probe_protected = true;
+}
+
+void
+test_dsg_checkpoint_pause(const char *name, const void *private_data)
+{
+	Assert(DSBCtrl != NULL);
+	Assert(LWLockHeldByMe(&DSBCtrl->checkpoint_lock));
+	Assert(!LWLockHeldByMe(&DSBCtrl->access_lock));
+	test_dsg_wait_gate(&((DsgTestSharedState *) inherited_region.address)->checkpoint_gate,
+					   "DsgTestCheckpoint");
+}
+
+void
+test_dsg_checkpoint_fail(const char *name, const void *private_data)
+{
+	Assert(DSBCtrl != NULL && LWLockHeldByMe(&DSBCtrl->checkpoint_lock));
+	Assert(!LWLockHeldByMe(&DSBCtrl->access_lock));
+	ereport(ERROR, (errmsg("DSGA test checkpoint failure")));
 }
 #endif
 
@@ -91,6 +116,7 @@ _PG_init(void)
 		state = (DsgTestSharedState *) inherited_region.address;
 		pg_atomic_init_u32(&state->value, 0);
 		pg_atomic_init_u32(&state->pin_gate, 0);
+		pg_atomic_init_u32(&state->checkpoint_gate, 0);
 	}
 }
 
@@ -132,6 +158,30 @@ test_dsg_check(bool condition, const char *message)
 {
 	if (!condition)
 		elog(ERROR, "DSGA provider test failed: %s", message);
+}
+
+/* 测试门禁只决定正常流程何时继续，不改原生 pin、checkpoint 或 IO 状态。 */
+static void
+test_dsg_wait_gate(pg_atomic_uint32 *gate, const char *event_name)
+{
+	uint32		wait_event = WaitEventExtensionNew(event_name);
+
+	PG_TRY();
+	{
+		pg_atomic_write_u32(gate, 1);
+		while (pg_atomic_read_u32(gate) != 2)
+		{
+			CHECK_FOR_INTERRUPTS();
+			(void) WaitLatch(MyLatch, WL_LATCH_SET | WL_TIMEOUT | WL_EXIT_ON_PM_DEATH,
+							 10L, wait_event);
+			ResetLatch(MyLatch);
+		}
+	}
+	PG_FINALLY();
+	{
+		pg_atomic_write_u32(gate, 0);
+	}
+	PG_END_TRY();
 }
 
 Datum
@@ -389,29 +439,13 @@ test_dsg_pin(PG_FUNCTION_ARGS)
 	if (strcmp(mode, "hold") == 0)
 	{
 		pg_atomic_uint32 *gate = &((DsgTestSharedState *) inherited_region.address)->pin_gate;
-		uint32		wait_event = WaitEventExtensionNew("DsgTestPinHolder");
 
 		/*-
 		 * 外部测试先观察真实 pin 已建立，再启动 cleanup waiter；只有看到
 		 * 原生 BufferPin 等待后才释放门禁。期限由调用方 statement_timeout
 		 * 保证，循环显式处理取消，异常后也清除测试状态。
 		 */
-		PG_TRY();
-		{
-			pg_atomic_write_u32(gate, 1);
-			while (pg_atomic_read_u32(gate) != 2)
-			{
-				CHECK_FOR_INTERRUPTS();
-				(void) WaitLatch(MyLatch, WL_LATCH_SET | WL_TIMEOUT | WL_EXIT_ON_PM_DEATH,
-								 10L, wait_event);
-				ResetLatch(MyLatch);
-			}
-		}
-		PG_FINALLY();
-		{
-			pg_atomic_write_u32(gate, 0);
-		}
-		PG_END_TRY();
+		test_dsg_wait_gate(gate, "DsgTestPinHolder");
 	}
 	else if (strcmp(mode, "cleanup") == 0)
 	{
@@ -437,6 +471,53 @@ test_dsg_pin_control(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(true);
 	}
 	PG_RETURN_BOOL(pg_atomic_read_u32(gate) == 1);
+}
+
+/* 仅供真实 checkpointer 的暂停/错误及独立工作区租约验证。 */
+Datum
+test_dsg_checkpoint_control(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	char	   *action = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	pg_atomic_uint32 *gate;
+	bool		result = true;
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	gate = &((DsgTestSharedState *) inherited_region.address)->checkpoint_gate;
+	if (strcmp(action, "attach") == 0 || strcmp(action, "attach_error") == 0 ||
+		strcmp(action, "attach_write_error") == 0)
+	{
+		bool		write_error = strcmp(action, "attach_write_error") == 0;
+
+		InjectionPointAttach(write_error ? "dsg-checkpoint-before-write" : "dsg-checkpoint-after-scan",
+							 "test_dsg_region",
+							 strcmp(action, "attach") == 0 ?
+							 "test_dsg_checkpoint_pause" : "test_dsg_checkpoint_fail", NULL, 0);
+	}
+	else if (strcmp(action, "release") == 0)
+		pg_atomic_write_u32(gate, 2);
+	else if (strcmp(action, "waiting") == 0)
+		result = pg_atomic_read_u32(gate) == 1;
+	else if (strcmp(action, "detach") == 0)
+	{
+		result = InjectionPointDetach("dsg-checkpoint-after-scan");
+		result = InjectionPointDetach("dsg-checkpoint-before-write") || result;
+	}
+	else if (strcmp(action, "available") == 0)
+	{
+		result = LWLockConditionalAcquire(&DSBCtrl->checkpoint_lock, LW_EXCLUSIVE);
+		if (result)
+			LWLockRelease(&DSBCtrl->checkpoint_lock);
+	}
+	else
+		ereport(ERROR, (errmsg("invalid DSGA checkpoint test action")));
+	pfree(action);
+	PG_RETURN_BOOL(result);
+#else
+	ereport(ERROR, (errmsg("DSGA checkpoint tests require injection points")));
+	PG_RETURN_BOOL(false);
+#endif
 }
 
 /*-

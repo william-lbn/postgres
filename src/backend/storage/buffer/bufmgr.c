@@ -524,7 +524,7 @@ static void UnpinBufferNoOwner(BufferDesc *buf);
 static void BufferSync(int flags, int nbufs);
 static uint32 WaitBufHdrUnlocked(BufferDesc *buf);
 static int	SyncOneBuffer(int buf_id, bool skip_recently_used,
-						  WritebackContext *wb_context);
+						  WritebackContext *wb_context, uint32 required_flags);
 static void WaitIO(BufferDesc *buf);
 static bool StartBufferIO(BufferDesc *buf, bool forInput, bool nowait);
 static void TerminateBufferIO(BufferDesc *buf, bool clear_dirty,
@@ -3061,31 +3061,45 @@ BufferSync(int flags, int nbufs)
 	 * certainly need to be written for the next checkpoint attempt, too.
 	 */
 	num_to_scan = 0;
-	for (buf_id = 0; buf_id < nbufs; buf_id++)
+	for (buf_id = 0; buf_id < nbufs;)
 	{
-		BufferDesc *bufHdr = GetBufferDescriptor(buf_id);
+		DsgBufferAccess access = DsgBufferAccessBegin();
+		int			end = Min(nbufs, access.count);
 
-		/*
-		 * Header spinlock is enough to examine BM_DIRTY, see comment in
-		 * SyncOneBuffer.
+		/*-
+		 * 工作区由独立租约保护；Descriptor 只在有界批次内受 Guard
+		 * 保护。若 H 已缩小，尾部在回收前必须已按原协议写净，不能为
+		 * 继续旧扫描去访问已经回收的对象。Grow 后新增对象不属于本次
+		 * checkpoint 的启动快照，其旧脏页在替换前已正常持久化。
 		 */
-		buf_state = LockBufHdr(bufHdr);
-
-		if ((buf_state & mask) == mask)
+		if (buf_id >= end)
 		{
-			CkptSortItem *item;
-
-			buf_state |= BM_CHECKPOINT_NEEDED;
-
-			item = &CkptBufferIds[num_to_scan++];
-			item->buf_id = buf_id;
-			item->tsId = bufHdr->tag.spcOid;
-			item->relNumber = BufTagGetRelNumber(&bufHdr->tag);
-			item->forkNum = BufTagGetForkNum(&bufHdr->tag);
-			item->blockNum = bufHdr->tag.blockNum;
+			DsgBufferAccessEnd(&access);
+			break;
 		}
+		end = buf_id + Min(end - buf_id, 128);
+		for (; buf_id < end; buf_id++)
+		{
+			BufferDesc *bufHdr = GetBufferDescriptor(buf_id);
 
-		UnlockBufHdr(bufHdr, buf_state);
+			/* Header spinlock is enough to examine BM_DIRTY. */
+			buf_state = LockBufHdr(bufHdr);
+			if ((buf_state & mask) == mask)
+			{
+				CkptSortItem *item;
+
+				buf_state |= BM_CHECKPOINT_NEEDED;
+
+				item = &CkptBufferIds[num_to_scan++];
+				item->buf_id = buf_id;
+				item->tsId = bufHdr->tag.spcOid;
+				item->relNumber = BufTagGetRelNumber(&bufHdr->tag);
+				item->forkNum = BufTagGetForkNum(&bufHdr->tag);
+				item->blockNum = bufHdr->tag.blockNum;
+			}
+			UnlockBufHdr(bufHdr, buf_state);
+		}
+		DsgBufferAccessEnd(&access);
 
 		/* Check for barrier events in case nbufs is large. */
 		if (ProcSignalBarrierPending)
@@ -3094,6 +3108,8 @@ BufferSync(int flags, int nbufs)
 
 	if (num_to_scan == 0)
 		return;					/* nothing to do */
+	if (DSBCtrl != NULL)
+		INJECTION_POINT("dsg-checkpoint-after-scan");
 
 	WritebackContextInit(&wb_context, &checkpoint_flush_after);
 
@@ -3205,37 +3221,25 @@ BufferSync(int flags, int nbufs)
 	num_written = 0;
 	while (!binaryheap_empty(ts_heap))
 	{
-		BufferDesc *bufHdr = NULL;
 		CkptTsStatus *ts_stat = (CkptTsStatus *)
 			DatumGetPointer(binaryheap_first(ts_heap));
 
 		buf_id = CkptBufferIds[ts_stat->index].buf_id;
 		Assert(buf_id != -1);
 
-		bufHdr = GetBufferDescriptor(buf_id);
-
 		num_processed++;
 
 		/*
-		 * We don't need to acquire the lock here, because we're only looking
-		 * at a single bit. It's possible that someone else writes the buffer
-		 * and clears the flag right after we check, but that doesn't matter
-		 * since SyncOneBuffer will then do nothing.  However, there is a
-		 * further race condition: it's conceivable that between the time we
-		 * examine the bit here and the time SyncOneBuffer acquires the lock,
-		 * someone else not only wrote the buffer but replaced it with another
-		 * page and dirtied it.  In that improbable case, SyncOneBuffer will
-		 * write the buffer though we didn't need to.  It doesn't seem worth
-		 * guarding against this, though.
+		 * SyncOneBuffer 在当前 H 的短保护内重新验证候选及
+		 * checkpoint 标志，再取得正常 pin。旧 ID 可能已经越过
+		 * H 或被 regrow 复用； 不能先解引用 Descriptor 再判断边界，也不能把排序工作区租约 当作
+		 * Buffer 对象的保护。IO/节流期间不持数组 Guard。
 		 */
-		if (pg_atomic_read_u32(&bufHdr->state) & BM_CHECKPOINT_NEEDED)
+		if (SyncOneBuffer(buf_id, false, &wb_context, BM_CHECKPOINT_NEEDED) & BUF_WRITTEN)
 		{
-			if (SyncOneBuffer(buf_id, false, &wb_context) & BUF_WRITTEN)
-			{
-				TRACE_POSTGRESQL_BUFFER_SYNC_WRITTEN(buf_id);
-				PendingCheckpointerStats.buffers_written++;
-				num_written++;
-			}
+			TRACE_POSTGRESQL_BUFFER_SYNC_WRITTEN(buf_id);
+			PendingCheckpointerStats.buffers_written++;
+			num_written++;
 		}
 
 		/*
@@ -3538,7 +3542,7 @@ BgBufferSync(WritebackContext *wb_context)
 	while (num_to_scan > 0 && reusable_buffers < upcoming_alloc_est)
 	{
 		int			sync_state = SyncOneBuffer(next_to_clean, true,
-											   wb_context);
+											   wb_context, 0);
 
 		if (++next_to_clean >= nbufs)
 		{
@@ -3614,9 +3618,11 @@ BgBufferSync(WritebackContext *wb_context)
  * after locking it, but we don't care all that much.)
  */
 static int
-SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
+SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context,
+			  uint32 required_flags)
 {
-	BufferDesc *bufHdr = GetBufferDescriptor(buf_id);
+	BufferDesc *bufHdr;
+	DsgBufferAccess access;
 	int			result = 0;
 	uint32		buf_state;
 	BufferTag	tag;
@@ -3624,6 +3630,13 @@ SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
 	/* Make sure we can handle the pin */
 	ReservePrivateRefCountEntry();
 	ResourceOwnerEnlarge(CurrentResourceOwner);
+	access = DsgBufferAccessBegin();
+	if (buf_id < 0 || buf_id >= access.count)
+	{
+		DsgBufferAccessEnd(&access);
+		return 0;
+	}
+	bufHdr = GetBufferDescriptor(buf_id);
 
 	/*
 	 * Check whether buffer needs writing.
@@ -3645,13 +3658,16 @@ SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
 	{
 		/* Caller told us not to write recently-used buffers */
 		UnlockBufHdr(bufHdr, buf_state);
+		DsgBufferAccessEnd(&access);
 		return result;
 	}
 
-	if (!(buf_state & BM_VALID) || !(buf_state & BM_DIRTY))
+	if (!(buf_state & BM_VALID) || !(buf_state & BM_DIRTY) ||
+		(buf_state & required_flags) != required_flags)
 	{
 		/* It's clean, so nothing to do */
 		UnlockBufHdr(bufHdr, buf_state);
+		DsgBufferAccessEnd(&access);
 		return result;
 	}
 
@@ -3660,7 +3676,10 @@ SyncOneBuffer(int buf_id, bool skip_recently_used, WritebackContext *wb_context)
 	 * buffer is clean by the time we've locked it.)
 	 */
 	PinBuffer_Locked(bufHdr);
+	DsgBufferAccessEnd(&access);
 	LWLockAcquire(BufferDescriptorGetContentLock(bufHdr), LW_SHARED);
+	if (DSBCtrl != NULL && required_flags == BM_CHECKPOINT_NEEDED)
+		INJECTION_POINT("dsg-checkpoint-before-write");
 
 	FlushBuffer(bufHdr, NULL, IOOBJECT_RELATION, IOCONTEXT_NORMAL);
 
@@ -3900,11 +3919,37 @@ DebugPrintBufferRefcount(Buffer buffer)
 void
 CheckPointBuffers(int flags)
 {
-	/* 全程保护 checkpoint workspace 及其中保存的旧 Buffer ID。 */
-	DsgBufferAccess access = DsgBufferAccessBegin();
+	bool		lease = DSBCtrl != NULL;
 
-	BufferSync(flags, access.count);
-	DsgBufferAccessEnd(&access);
+	/*-
+	 * 长 checkpoint 只持工作区共享租约，不能阻塞 Grow 的数组发布锁。
+	 * 与 Guard 同样仅抵消本锁的 holdoff；正常/ERROR/FATAL 的释放均
+	 * 保留 PG 原生清理语义。未来 Shrink 若不能条件取得独占租约，
+	 * 必须保留工作区 backing 和预算，不能持 accessX 等待。
+	 */
+	if (lease)
+	{
+		LWLockAcquire(&DSBCtrl->checkpoint_lock, LW_SHARED);
+		RESUME_INTERRUPTS();
+	}
+	PG_TRY();
+	{
+		DsgBufferAccess access = DsgBufferAccessBegin();
+		int			nbufs = access.count;
+
+		Assert(!lease || nbufs <= pg_atomic_read_u32(&DSBCtrl->checkpoint_prepared_buffers));
+		DsgBufferAccessEnd(&access);
+		BufferSync(flags, nbufs);
+	}
+	PG_FINALLY();
+	{
+		if (lease)
+		{
+			HOLD_INTERRUPTS();
+			LWLockRelease(&DSBCtrl->checkpoint_lock);
+		}
+	}
+	PG_END_TRY();
 }
 
 /*

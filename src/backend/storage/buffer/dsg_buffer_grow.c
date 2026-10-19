@@ -152,6 +152,14 @@ DsgGrowPrepareAndPublish(const DsgBufferGrowRequest *request,
 		DsgBufferArray *array = &DSBCtrl->arrays[i];
 		int			first = old_high;
 
+		/*-
+		 * 缩容可因旧 checkpoint 的租约而保留较大的排序工作区。该前缀
+		 * 已准备且可能正在排序/读取，不能从较小 H 起再次 memset。只为
+		 * 尚未证明准备的连续尾部调用 Provider，保留其原有预算与内容。
+		 */
+		if (i == DSG_BUFFER_CHECKPOINT)
+			first = Max(first, (int) pg_atomic_read_u32(&DSBCtrl->checkpoint_prepared_buffers));
+
 		/*
 		 * 按 Granule 分批，避免大请求在一次预触页中消耗全部等待预算。
 		 */
@@ -190,6 +198,8 @@ DsgGrowPrepareAndPublish(const DsgBufferGrowRequest *request,
 			SpinLockAcquire(&DSBCtrl->status_lock);
 			if (upper >= previous_upper)
 				array->allocation_unknown = false;
+			if (i == DSG_BUFFER_CHECKPOINT)
+				pg_atomic_write_u32(&DSBCtrl->checkpoint_prepared_buffers, first + count);
 			SpinLockRelease(&DSBCtrl->status_lock);
 			first += count;
 		}

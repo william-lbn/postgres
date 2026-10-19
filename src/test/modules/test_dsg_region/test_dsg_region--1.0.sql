@@ -58,3 +58,7 @@ REVOKE ALL ON FUNCTION test_dsg_unpin_probe() FROM PUBLIC;
 CREATE FUNCTION test_dsg_mapping_free(regclass) RETURNS boolean
 AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
 REVOKE ALL ON FUNCTION test_dsg_mapping_free(regclass) FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_checkpoint_control(text) RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_checkpoint_control(text) FROM PUBLIC;

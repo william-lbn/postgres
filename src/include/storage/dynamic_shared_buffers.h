@@ -14,7 +14,7 @@
 #include "storage/spin.h"
 
 /* Neon 扩展按能力宏适配，不能由 PG 大版本号推断本 fork 的内核接口。 */
-#define NEON_DSG_BUFFER_API_VERSION 1
+#define NEON_DSG_BUFFER_API_VERSION 2
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
 
 typedef enum DsgBufferArrayId
@@ -127,6 +127,14 @@ typedef struct DynamicSharedBuffersControl
 	uint64		boot_id;
 	LWLock		access_lock;
 	/*-
+	 * checkpoint 只长期持此共享租约，保护排序工作区，不阻塞容量发布。
+	 * 回收工作区只能条件取得独占租约；失败则保留 backing/预算，禁止
+	 * 持 accessX 等待该锁。prepared 是已真实准备的连续对象前缀；Grow
+	 * 不得重新清零其中可能仍被旧 checkpoint 使用的内容。
+	 */
+	LWLock		checkpoint_lock;
+	pg_atomic_uint32 checkpoint_prepared_buffers;
+	/*-
 	 * resize_lock 只串行协调者。status_lock 仅保护短的状态复制，
 	 * 禁止在 spinlock 内分配、调用 Provider、等待或报告 ERROR。
 	 * 锁序：resize -> access -> status；普通观察者只取 status。
@@ -146,8 +154,8 @@ typedef struct DynamicSharedBuffersControl
 
 /*-
  * Guard 持有期间 H 及其数组 backing 不会被缩容回收。嵌套调用复用本进程
- * 已持有的锁；每个 Guard 只释放自己取得的锁，避免重复共享加锁遇到排队
- * writer 时自锁。Guard 不阻止查询取消；ERROR/FATAL 路径由 PG 的
+ * 已持有的锁；每个 Guard 只释放自己取得的锁，避免重复登记和错误释放，
+ * 也允许独占协调者复用已取得的保护。Guard 不阻止查询取消；ERROR/FATAL 路径由 PG 的
  * LWLockReleaseAll 清理。Begin/End 对原生 holdoff 的调整必须严格成对。
  */
 typedef struct DsgBufferAccess

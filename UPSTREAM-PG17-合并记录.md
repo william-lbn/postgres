@@ -59,3 +59,33 @@ VM block reference 会使“UPDATE 最后一个 block 总是旧 heap 页”的�
 - Linux、Neon Pageserver 端到端、NeonVM/HugeTLB 实机：未验证。
 
 完成本批次的本地验证后再形成提交；下一批次才加入动态 Buffer 代码。
+
+
+## 2026-10-19 追加社区维护修复
+
+持续 fetch 时发现社区 PG17 新增维护头
+`94035972af3f10cdaf9ff2b5d232ad5f45463469`，前次头为
+`65e944d92b082cc16e2265a91bab8b73934a0e74`。Neon 官方 PG17 对应稳定头仍是
+`56692dfb680281a963c7470fc7f0fec7f65ecfd4`。
+
+该修复阻止错误移除嵌套 PlaceHolderVar 仍需要的 RTE_RESULT，避免外连接/分组集合
+配合 LATERAL 导致关系自依赖和 create_lateral_join_info 断言失败。完整合入官方
+1 项提交、3 个文件及回归用例，无冲突；保留官方作者、注释和实际实现，三个文件与
+官方新头逐文件一致。没有混入 DSGA 业务功能，也没有合入自有稳定主分支。
+
+维护候选使用同一 PG Git 仓库的隔离 worktree 构建，不改变 Neon 标准子模块中
+正在开发的业务代码。Mac 新建断言/依赖跟踪构建，真实 neon_rmgr 用该候选头文件
+重新编译。完整 check-world **79 组、660 项报告检查通过**，包含核心 regress225、
+isolation123 以及新增嵌套 PHV 场景（计入 join 组）；TAP 未启用。
+日志：工作区 build/pg17-upstream-latest-build.log 与
+build/check-world-pg17-upstream-latest.log。Linux、存储端到端和性能未新增验收。
+
+本维护提交先独立验证；功能分支随后合入维护头并验证受影响核心，业务模块再基于
+新维护头完成最终开/关配置回归，不重写已推送历史。
+
+
+功能分支合入上述维护头时，先暂存未提交的 M2e 尾部回收改动，在纯 M2d 功能代码
+加新官方优化器修复的候选上重建，重编配套 neon_rmgr；动态布局开启配置下，核心
+regress 225/225、isolation 123/123 通过。日志 build/dsg-feature-upstream-build.log、
+build/dsg-feature-upstream-core.log、build/dsg-feature-upstream-isolation.log。
+维护同步与随后恢复的 M2e 业务模块独立提交，最终组合另跑完整开/关回归。

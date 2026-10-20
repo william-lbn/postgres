@@ -338,6 +338,11 @@
 #wal_keep_size = 0		# in megabytes; 0 disables
 #max_slot_wal_keep_size = -1	# in megabytes; -1 disables
 #wal_sender_timeout = 60s	# in milliseconds; 0 disables
+# Neon发送端按副本LSN限制WAL积压；-1禁用。单位MB，均需重启。
+# 不与上面的网络超时混用；apply/flush/write分别表示不同的复制进度事实。
+#max_replication_apply_lag = -1
+#max_replication_flush_lag = -1
+#max_replication_write_lag = -1
 #track_commit_timestamp = off	# collect timestamp of transaction commit
 				# (change requires restart)
 
@@ -415,6 +420,10 @@
 #enable_partitionwise_aggregate = off
 #enable_presorted_aggregate = on
 #enable_seqscan = on
+# Neon远端存储预取开关；只控制页面预取，不改变访问方法或查询可见性。
+#enable_seqscan_prefetch = on
+#enable_indexscan_prefetch = on
+#enable_indexonlyscan_prefetch = on
 #enable_sort = on
 #enable_tidscan = on
 #enable_group_by_reordering = on

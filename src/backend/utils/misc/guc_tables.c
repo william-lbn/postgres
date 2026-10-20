@@ -2092,6 +2092,8 @@ struct config_bool ConfigureNamesBool[] =
 	{
 		{"neon_test_evict", PGC_POSTMASTER, UNGROUPED,
 			gettext_noop("Evict unpinned pages (for better test coverage)"),
+			/* 测试强制驱逐开关不进入生产配置样例；SHOW/既有测试仍可使用。 */
+			NULL, GUC_NOT_IN_SAMPLE
 		},
 		&neon_test_evict,
 		false,

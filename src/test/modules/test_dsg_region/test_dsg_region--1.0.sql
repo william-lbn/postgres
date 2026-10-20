@@ -6,6 +6,19 @@ AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
 -- 测试函数能触及真实地址空间，只允许显式安装扩展的管理员调用。
 REVOKE ALL ON FUNCTION test_dsg_region(text) FROM PUBLIC;
 
+-- 此桥只调用真实内核控制器；仍在C入口核验会话身份，不能靠GRANT绕过。
+CREATE FUNCTION test_dsg_control(text, text, text, text, text, text, text,
+                              integer, integer, integer, integer) RETURNS jsonb
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_control_parse(text) RETURNS text
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_control(text, text, text, text, text, text, text,
+                                     integer, integer, integer, integer) FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_control_parse(text) FROM PUBLIC;
+CREATE FUNCTION test_dsg_control_hold_guard() RETURNS boolean
+AS 'MODULE_PATHNAME' LANGUAGE C;
+REVOKE ALL ON FUNCTION test_dsg_control_hold_guard() FROM PUBLIC;
+
 CREATE FUNCTION test_dsg_shared_write(integer) RETURNS void
 AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
 CREATE FUNCTION test_dsg_shared_read() RETURNS integer

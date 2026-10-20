@@ -31,16 +31,11 @@ typedef struct DsgGrowCleanup
 } DsgGrowCleanup;
 
 void
-DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot)
+DsgBufferCopySnapshotLocked(DsgBufferSnapshot *snapshot)
 {
 	int			i;
 
-	if (DSBCtrl == NULL)
-		ereport(ERROR,
-				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
-				 errmsg("dynamic shared buffers are disabled")));
 	MemSet(snapshot, 0, sizeof(*snapshot));
-	SpinLockAcquire(&DSBCtrl->status_lock);
 	snapshot->operation = DSBCtrl->operation;
 	snapshot->boot_id = DSBCtrl->boot_id;
 	snapshot->generation = pg_atomic_read_u64(&DSBCtrl->generation);
@@ -48,6 +43,8 @@ DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot)
 	snapshot->high = GetHighNBuffers();
 	snapshot->maximum = DSBCtrl->maximum;
 	snapshot->admission_open = pg_atomic_read_u32(&DSBCtrl->admission_open) != 0;
+	snapshot->cancel_requested = DSBCtrl->cancel_requested;
+	snapshot->cancel_closed = DSBCtrl->cancel_closed;
 	snapshot->admission_revision = DSBCtrl->admission_revision;
 	snapshot->startup_shared_upper_bytes = DSBCtrl->startup_shared_upper_bytes;
 	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
@@ -55,10 +52,23 @@ DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot)
 		snapshot->committed_upper_bytes[i] = DSBCtrl->arrays[i].committed_upper_bytes;
 		snapshot->allocation_unknown[i] = DSBCtrl->arrays[i].allocation_unknown;
 		snapshot->release_state[i] = DSBCtrl->arrays[i].release_state;
+		snapshot->release_issuer_epoch[i] = DSBCtrl->arrays[i].release_issuer_epoch;
 		snapshot->release_revision[i] = DSBCtrl->arrays[i].release_revision;
+		snapshot->release_operation_id_high[i] = DSBCtrl->arrays[i].release_operation_id_high;
+		snapshot->release_operation_id_low[i] = DSBCtrl->arrays[i].release_operation_id_low;
 		snapshot->release_generation[i] = DSBCtrl->arrays[i].release_generation;
 		snapshot->release_result[i] = DSBCtrl->arrays[i].release_result;
 	}
+}
+
+void
+DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot)
+{
+	if (DSBCtrl == NULL)
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("dynamic shared buffers are disabled")));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferCopySnapshotLocked(snapshot);
 	SpinLockRelease(&DSBCtrl->status_lock);
 }
 
@@ -78,11 +88,18 @@ DsgGrowExpired(instr_time started, int timeout_ms)
 }
 
 static bool
-DsgGrowAcquire(LWLock *lock, instr_time started, int timeout_ms)
+DsgGrowAcquire(LWLock *lock, instr_time started, int timeout_ms,
+			   const DsgBufferResizeRequest *request)
 {
 	for (;;)
 	{
 		CHECK_FOR_INTERRUPTS();
+		/*-
+		 * 尚未接受的resize串行等待没有自己的可取消操作；只有已经持
+		 * resizeX的发布锁等待才传request，避免读取另一操作的取消标志。
+		 */
+		if (request != NULL && DsgBufferCancelRequested(request))
+			return false;
 		if (DsgGrowExpired(started, timeout_ms))
 			return false;
 		if (LWLockConditionalAcquire(lock, LW_EXCLUSIVE))
@@ -162,9 +179,7 @@ DsgGrowInterrupted(int code, Datum arg)
 static bool
 DsgGrowSameRequest(const DsgBufferGrowRequest *a, const DsgBufferGrowRequest *b)
 {
-	return a->boot_id == b->boot_id && a->revision == b->revision &&
-		a->operation_id_high == b->operation_id_high && a->operation_id_low == b->operation_id_low &&
-		a->expected_generation == b->expected_generation && a->target_buffers == b->target_buffers;
+	return DsgBufferSameRequest(a, b);
 }
 
 static void
@@ -177,6 +192,21 @@ DsgGrowDeny(DsgBufferOperationReason reason)
 	DSBCtrl->operation.phase = DSG_OP_DENIED;
 	DSBCtrl->operation.reason = reason;
 	SpinLockRelease(&DSBCtrl->status_lock);
+}
+
+/* 串行锁已无旧执行者；归档前先收敛FATAL遗留，保留已计入的未知backing。 */
+void
+DsgBufferReconcileInterruptedGrow(void)
+{
+	bool		abandoned;
+
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	abandoned = DSBCtrl->operation.kind == DSG_OP_GROW &&
+		DSBCtrl->operation.phase == DSG_OP_PREPARING;
+	SpinLockRelease(&DSBCtrl->status_lock);
+	if (abandoned)
+		DsgGrowDeny(DSG_REASON_INTERRUPTED);
 }
 
 /*-
@@ -220,6 +250,11 @@ DsgGrowPrepareAndPublish(const DsgBufferGrowRequest *request,
 			DsgMemoryResult result;
 
 			CHECK_FOR_INTERRUPTS();
+			if (DsgBufferCancelRequested(request))
+			{
+				DsgGrowDeny(DSG_REASON_CANCELLED);
+				return false;
+			}
 			if (DsgGrowExpired(started, timeout_ms))
 			{
 				DsgGrowDeny(DSG_REASON_TIMEOUT);
@@ -256,6 +291,11 @@ DsgGrowPrepareAndPublish(const DsgBufferGrowRequest *request,
 		BufferDesc *buf = GetBufferDescriptor(i);
 
 		CHECK_FOR_INTERRUPTS();
+		if (i % 128 == 0 && DsgBufferCancelRequested(request))
+		{
+			DsgGrowDeny(DSG_REASON_CANCELLED);
+			return false;
+		}
 		if (i % 128 == 0 && DsgGrowExpired(started, timeout_ms))
 		{
 			DsgGrowDeny(DSG_REASON_TIMEOUT);
@@ -271,12 +311,18 @@ DsgGrowPrepareAndPublish(const DsgBufferGrowRequest *request,
 	}
 	DsgGrowGranules(old_high, target, DSG_GRANULE_READY, generation);
 	INJECTION_POINT("dsg-buffer-grow-before-publish");
-	if (!DsgGrowAcquire(&DSBCtrl->access_lock, started, timeout_ms))
+	if (!DsgGrowAcquire(&DSBCtrl->access_lock, started, timeout_ms, request))
 	{
-		DsgGrowDeny(DSG_REASON_TIMEOUT);
+		DsgGrowDeny(DsgBufferCancelRequested(request) ? DSG_REASON_CANCELLED : DSG_REASON_TIMEOUT);
 		return false;
 	}
 
+	if (!DsgBufferBeginCommit(request))
+	{
+		LWLockRelease(&DSBCtrl->access_lock);
+		DsgGrowDeny(DSG_REASON_CANCELLED);
+		return false;
+	}
 	StrategyAddBufferRange(old_high, target - old_high);
 	DsgGrowGranules(target, target, DSG_GRANULE_ACTIVE, generation + 1);
 	SpinLockAcquire(&DSBCtrl->status_lock);
@@ -300,7 +346,8 @@ DsgGrowPrepareAndPublish(const DsgBufferGrowRequest *request,
 }
 
 bool
-DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnapshot *snapshot)
+DsgBufferGrowWithReceipt(const DsgBufferGrowRequest *request, int timeout_ms,
+						 DsgBufferSnapshot *snapshot, DsgBufferReceipt *receipt)
 {
 	instr_time	started;
 	DsgBufferOperation previous;
@@ -308,27 +355,34 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 	uint64		generation;
 	bool		committed = false;
 	bool		replayed = false;
+	int			replay_match;
 
 	if (DSBCtrl == NULL || !IsUnderPostmaster)
-		ereport(ERROR,
-				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
-				 errmsg("dynamic buffer growth requires an enabled running server")));
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("dynamic buffer growth requires an enabled running server")));
 	if (request->boot_id != DSBCtrl->boot_id || request->revision == 0 ||
 		(request->operation_id_high == 0 && request->operation_id_low == 0) ||
 		request->target_buffers < 16 || request->target_buffers > GetMaxNBuffers() ||
 		timeout_ms < 1 || timeout_ms > 60000)
-		ereport(ERROR,
-				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-				 errmsg("invalid or stale DSGA grow request")));
-
-	/*
-	 * 不允许读侧锁升级，也不能由已经持有本协调锁的路径递归调用。
-	 */
+	{
+		if (receipt != NULL)
+		{
+			receipt->disposition = request->boot_id != DSBCtrl->boot_id ?
+				DSG_RECEIPT_STALE : DSG_RECEIPT_REJECTED;
+			DsgBufferGetSnapshot(snapshot);
+			return false;
+		}
+		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+						errmsg("invalid or stale DSGA grow request")));
+	}
+	/* 不允许调用方持数组锁升级，或递归取得串行权。 */
 	if (LWLockHeldByMe(&DSBCtrl->access_lock) || LWLockHeldByMe(&DSBCtrl->resize_lock))
 		elog(ERROR, "DSGA grow cannot run while holding buffer coordination locks");
 	INSTR_TIME_SET_CURRENT(started);
-	if (!DsgGrowAcquire(&DSBCtrl->resize_lock, started, timeout_ms))
+	if (!DsgGrowAcquire(&DSBCtrl->resize_lock, started, timeout_ms, NULL))
 	{
+		if (receipt != NULL)
+			receipt->disposition = DSG_RECEIPT_BUSY;
 		DsgBufferGetSnapshot(snapshot);
 		return false;
 	}
@@ -339,60 +393,91 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 	RESUME_INTERRUPTS();
 	PG_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, PointerGetDatum(cleanup));
 	{
-		/*
-		 *
-		 * FATAL可能在原生放锁后才清理；先对账已失去执行者的Shrink栅栏。
-		 */
 		DsgBufferReconcileInterruptedShrink();
 		SpinLockAcquire(&DSBCtrl->status_lock);
 		previous = DSBCtrl->operation;
 		generation = pg_atomic_read_u64(&DSBCtrl->generation);
 		SpinLockRelease(&DSBCtrl->status_lock);
-		if (previous.phase != DSG_OP_IDLE &&
-			previous.request.operation_id_high == request->operation_id_high &&
-			previous.request.operation_id_low == request->operation_id_low)
+		replay_match = DsgBufferFindReplay(request, DSG_OP_GROW, snapshot);
+		if (replay_match != 0)
 		{
-			if (previous.kind != DSG_OP_GROW || !DsgGrowSameRequest(&previous.request, request))
-				ereport(ERROR,
-						(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-						 errmsg("DSGA operation identity was reused with a different request")));
-			replayed = true;
-			committed = previous.phase == DSG_OP_COMMITTED;
+			if (replay_match < 0)
+			{
+				if (receipt != NULL)
+					receipt->disposition = DSG_RECEIPT_CONFLICT;
+				else
+					ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+									errmsg("DSGA operation identity was reused with a different request")));
+			}
+			else
+			{
+				replayed = true;
+				committed = snapshot->operation.phase == DSG_OP_COMMITTED;
+			}
+		}
+		else if (!DsgBufferRequestNewer(request, &previous.request) ||
+				 request->expected_generation != generation || generation == PG_UINT64_MAX ||
+				 request->target_buffers < GetHighNBuffers() || GetLowNBuffers() != GetHighNBuffers())
+		{
+			if (receipt != NULL)
+				receipt->disposition = DSG_RECEIPT_STALE;
+			else
+				ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+								errmsg("DSGA grow request conflicts with current capacity or revision")));
 		}
 		else
 		{
-			if (request->revision <= previous.request.revision ||
-				request->expected_generation != generation || generation == PG_UINT64_MAX ||
-				request->target_buffers < GetHighNBuffers() || GetLowNBuffers() != GetHighNBuffers())
-				ereport(ERROR,
-						(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-						 errmsg("DSGA grow request conflicts with current capacity or revision")));
+			/*-
+			 * 新意图通过全部校验后才接管旧Grow遗留；被拒绝的请求没有
+			 * 清理另一操作的权限。Shrink的L恢复必须先做，才能核验L/H。
+			 */
+			DsgBufferReconcileInterruptedGrow();
+			DsgBufferArchiveOperation();
 			SpinLockAcquire(&DSBCtrl->status_lock);
 			MemSet(&DSBCtrl->operation, 0, sizeof(DSBCtrl->operation));
 			DSBCtrl->operation.request = *request;
 			DSBCtrl->operation.kind = DSG_OP_GROW;
 			DSBCtrl->operation.original_buffers = GetHighNBuffers();
 			DSBCtrl->operation.phase = DSG_OP_PREPARING;
-			DSBCtrl->operation.reason = DSG_REASON_NONE;
+			DSBCtrl->cancel_requested = false;
+			DSBCtrl->cancel_closed = false;
 			cleanup->operation_started = true;
 			SpinLockRelease(&DSBCtrl->status_lock);
 			DsgGrowGranules(GetHighNBuffers(), request->target_buffers, DSG_GRANULE_PREPARING, generation);
 			if (request->target_buffers == GetHighNBuffers())
 			{
-				SpinLockAcquire(&DSBCtrl->status_lock);
-				DSBCtrl->operation.phase = DSG_OP_COMMITTED;
-				SpinLockRelease(&DSBCtrl->status_lock);
-				committed = true;
+				if (DsgBufferBeginCommit(request))
+				{
+					SpinLockAcquire(&DSBCtrl->status_lock);
+					DSBCtrl->operation.phase = DSG_OP_COMMITTED;
+					SpinLockRelease(&DSBCtrl->status_lock);
+					committed = true;
+				}
+				else
+					DsgGrowDeny(DSG_REASON_CANCELLED);
 			}
 			else
 				committed = DsgGrowPrepareAndPublish(request, started, timeout_ms);
 		}
 	}
 	PG_END_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, PointerGetDatum(cleanup));
-	pfree(cleanup);
-	DsgBufferGetSnapshot(snapshot);
+	if (!replayed)
+		DsgBufferGetSnapshot(snapshot);
 	snapshot->replayed = replayed;
+	if (receipt != NULL && (cleanup->operation_started || replayed))
+	{
+		receipt->disposition = replayed ? DSG_RECEIPT_REPLAYED : DSG_RECEIPT_ACCEPTED;
+		receipt->has_result = true;
+		receipt->result = *snapshot;
+	}
+	pfree(cleanup);
 	HOLD_INTERRUPTS();
 	LWLockRelease(&DSBCtrl->resize_lock);
 	return committed;
+}
+
+bool
+DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnapshot *snapshot)
+{
+	return DsgBufferGrowWithReceipt(request, timeout_ms, snapshot, NULL);
 }

@@ -1,6 +1,6 @@
 # DSGA 普通页 Provider 的真实映射和边界测试。
 MODULE_big = test_dsg_region
-OBJS = $(WIN32RES) test_dsg_region.o
+OBJS = $(WIN32RES) test_dsg_region.o test_dsg_control.o
 EXTENSION = test_dsg_region
 DATA = test_dsg_region--1.0.sql
 REGRESS = test_dsg_region

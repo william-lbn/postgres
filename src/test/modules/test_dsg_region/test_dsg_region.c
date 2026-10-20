@@ -121,7 +121,14 @@ test_dsg_grow_pause(const char *name, const void *private_data)
 	}
 	else if (mode == 2)
 	{
-		Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+		/*-
+		 * 新Guard夹具暂停的是实际读者，持accessSH；原有Grow/Shrink
+		 * 注入点仍必须持resizeX。按注入点核验，不能放宽原有锁断言。
+		 */
+		if (strcmp(name, "dsg-test-control-guard-held") == 0)
+			Assert(LWLockHeldByMeInMode(&DSBCtrl->access_lock, LW_SHARED));
+		else
+			Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
 		test_dsg_wait_gate(&((DsgTestSharedState *) inherited_region.address)->grow_prepare_gate,
 						   "DsgTestGrowPrepare");
 	}
@@ -654,7 +661,10 @@ test_dsg_grow_control(PG_FUNCTION_ARGS)
 	(void) test_dsg_shared_value();
 	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
 	state = (DsgTestSharedState *) inherited_region.address;
-	if (strcmp(action, "attach") == 0 || strcmp(action, "attach_after_publish") == 0)
+	if (strcmp(action, "attach_guard") == 0)
+		InjectionPointAttach("dsg-test-control-guard-held",
+							 "test_dsg_region", "test_dsg_grow_pause", NULL, 0);
+	else if (strcmp(action, "attach") == 0 || strcmp(action, "attach_after_publish") == 0)
 		InjectionPointAttach(strcmp(action, "attach") == 0 ?
 							 "dsg-buffer-grow-before-publish" : "dsg-buffer-grow-after-publish",
 							 "test_dsg_region", "test_dsg_grow_pause", NULL, 0);

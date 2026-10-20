@@ -25,9 +25,7 @@ typedef struct DsgShrinkCleanup
 static bool
 DsgShrinkSameRequest(const DsgBufferResizeRequest *a, const DsgBufferResizeRequest *b)
 {
-	return a->boot_id == b->boot_id && a->revision == b->revision &&
-		a->operation_id_high == b->operation_id_high && a->operation_id_low == b->operation_id_low &&
-		a->expected_generation == b->expected_generation && a->target_buffers == b->target_buffers;
+	return DsgBufferSameRequest(a, b);
 }
 
 static bool
@@ -42,11 +40,18 @@ DsgShrinkExpired(instr_time started, int timeout_ms)
 
 /* 条件取锁+可中断Latch，不为等待串行权/长Guard吞掉取消或期限。 */
 static bool
-DsgShrinkAcquire(LWLock *lock, instr_time started, int timeout_ms)
+DsgShrinkAcquire(LWLock *lock, instr_time started, int timeout_ms,
+				 const DsgBufferResizeRequest *request)
 {
 	for (;;)
 	{
 		CHECK_FOR_INTERRUPTS();
+
+		/*
+		 * resize串行等待尚未接受；发布等待已绑定本操作，可以响应业务取消。
+		 */
+		if (request != NULL && DsgBufferCancelRequested(request))
+			return false;
 		if (DsgShrinkExpired(started, timeout_ms))
 			return false;
 		if (LWLockConditionalAcquire(lock, LW_EXCLUSIVE))
@@ -148,7 +153,7 @@ DsgShrinkInterrupted(int code, Datum arg)
  * 本轮的分类计数是进度，不是未来工作/私有内存的预算证明。
  */
 static bool
-DsgShrinkDrain(int target, int original, instr_time started, int timeout_ms)
+DsgShrinkDrain(const DsgBufferResizeRequest *request, int target, int original, instr_time started, int timeout_ms)
 {
 	for (;;)
 	{
@@ -160,6 +165,8 @@ DsgShrinkDrain(int target, int original, instr_time started, int timeout_ms)
 			DsgBufferDrainResult result;
 
 			CHECK_FOR_INTERRUPTS();
+			if (i % 128 == 0 && DsgBufferCancelRequested(request))
+				return false;
 			if (i % 128 == 0 && DsgShrinkExpired(started, timeout_ms))
 				return false;
 			result = DsgBufferDrainOne(i);
@@ -258,24 +265,31 @@ DsgShrinkPrepareAndPublish(const DsgBufferResizeRequest *request,
 	uint64		generation = pg_atomic_read_u64(&DSBCtrl->generation);
 	int			i;
 
-	if (!DsgShrinkAcquire(&DSBCtrl->access_lock, started, timeout_ms))
+	if (!DsgShrinkAcquire(&DSBCtrl->access_lock, started, timeout_ms, request))
 		return false;
 	StrategyBeginAllocationFence(request->target_buffers);
 	LWLockRelease(&DSBCtrl->access_lock);
 	while (!StrategyFilterAllocationFence(128))
 	{
 		CHECK_FOR_INTERRUPTS();
+		if (DsgBufferCancelRequested(request))
+			return false;
 		if (DsgShrinkExpired(started, timeout_ms))
 			return false;
 		INJECTION_POINT("dsg-buffer-shrink-filter-batch");
 	}
 	INJECTION_POINT("dsg-buffer-shrink-after-fence");
-	if (!DsgShrinkDrain(request->target_buffers, original, started, timeout_ms))
+	if (!DsgShrinkDrain(request, request->target_buffers, original, started, timeout_ms))
 		return false;
 	INJECTION_POINT("dsg-buffer-shrink-before-publish");
-	if (!DsgShrinkAcquire(&DSBCtrl->access_lock, started, timeout_ms))
+	if (!DsgShrinkAcquire(&DSBCtrl->access_lock, started, timeout_ms, request))
 		return false;
 
+	if (!DsgBufferBeginCommit(request))
+	{
+		LWLockRelease(&DSBCtrl->access_lock);
+		return false;
+	}
 	if (original != request->target_buffers)
 		generation++;
 	SpinLockAcquire(&DSBCtrl->status_lock);
@@ -287,7 +301,10 @@ DsgShrinkPrepareAndPublish(const DsgBufferResizeRequest *request,
 		DsgBufferArray *array = &DSBCtrl->arrays[i];
 
 		array->release_state = DSG_RELEASE_PENDING;
+		array->release_issuer_epoch = request->issuer_epoch;
 		array->release_revision = request->revision;
+		array->release_operation_id_high = request->operation_id_high;
+		array->release_operation_id_low = request->operation_id_low;
 		array->release_generation = generation;
 		MemSet(&array->release_result, 0, sizeof(array->release_result));
 		array->release_result.release_may_be_partial = true;
@@ -301,13 +318,15 @@ DsgShrinkPrepareAndPublish(const DsgBufferResizeRequest *request,
 }
 
 bool
-DsgBufferShrink(const DsgBufferResizeRequest *request, int timeout_ms, DsgBufferSnapshot *snapshot)
+DsgBufferShrinkWithReceipt(const DsgBufferResizeRequest *request, int timeout_ms,
+						   DsgBufferSnapshot *snapshot, DsgBufferReceipt *receipt)
 {
 	instr_time	started;
 	DsgBufferOperation previous;
 	DsgShrinkCleanup *cleanup;
 	uint64		generation;
 	int			original;
+	int			replay_match;
 	bool		committed = false;
 	bool		replayed = false;
 
@@ -318,13 +337,24 @@ DsgBufferShrink(const DsgBufferResizeRequest *request, int timeout_ms, DsgBuffer
 		(request->operation_id_high == 0 && request->operation_id_low == 0) ||
 		request->target_buffers < NBuffers || request->target_buffers > GetMaxNBuffers() ||
 		timeout_ms < 1 || timeout_ms > 60000)
+	{
+		if (receipt != NULL)
+		{
+			receipt->disposition = request->boot_id != DSBCtrl->boot_id ?
+				DSG_RECEIPT_STALE : DSG_RECEIPT_REJECTED;
+			DsgBufferGetSnapshot(snapshot);
+			return false;
+		}
 		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 						errmsg("invalid or stale DSGA shrink request")));
+	}
 	if (LWLockHeldByMe(&DSBCtrl->access_lock) || LWLockHeldByMe(&DSBCtrl->resize_lock))
 		elog(ERROR, "DSGA shrink cannot run while holding buffer coordination locks");
 	INSTR_TIME_SET_CURRENT(started);
-	if (!DsgShrinkAcquire(&DSBCtrl->resize_lock, started, timeout_ms))
+	if (!DsgShrinkAcquire(&DSBCtrl->resize_lock, started, timeout_ms, NULL))
 	{
+		if (receipt != NULL)
+			receipt->disposition = DSG_RECEIPT_BUSY;
 		DsgBufferGetSnapshot(snapshot);
 		return false;
 	}
@@ -339,43 +369,75 @@ DsgBufferShrink(const DsgBufferResizeRequest *request, int timeout_ms, DsgBuffer
 		generation = pg_atomic_read_u64(&DSBCtrl->generation);
 		original = GetHighNBuffers();
 		SpinLockRelease(&DSBCtrl->status_lock);
-		if (previous.phase != DSG_OP_IDLE &&
-			previous.request.operation_id_high == request->operation_id_high &&
-			previous.request.operation_id_low == request->operation_id_low)
+		replay_match = DsgBufferFindReplay(request, DSG_OP_SHRINK, snapshot);
+		if (replay_match != 0)
 		{
-			if (previous.kind != DSG_OP_SHRINK || !DsgShrinkSameRequest(&previous.request, request))
+			if (replay_match < 0)
+			{
+				if (receipt != NULL)
+					receipt->disposition = DSG_RECEIPT_CONFLICT;
+				else
+					ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+									errmsg("DSGA operation identity was reused with a different request")));
+			}
+			else
+			{
+				replayed = true;
+				committed = snapshot->operation.phase == DSG_OP_COMMITTED;
+			}
+		}
+		else if (!DsgBufferRequestNewer(request, &previous.request) ||
+				 request->expected_generation != generation || GetLowNBuffers() != original ||
+				 request->target_buffers > original ||
+				 (generation == PG_UINT64_MAX && request->target_buffers != original))
+		{
+			if (receipt != NULL)
+				receipt->disposition = DSG_RECEIPT_STALE;
+			else
 				ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-								errmsg("DSGA operation identity was reused with a different request")));
-			replayed = true;
-			committed = previous.phase == DSG_OP_COMMITTED;
+								errmsg("DSGA shrink request conflicts with current capacity or revision")));
 		}
 		else
 		{
-			if (request->revision <= previous.request.revision ||
-				request->expected_generation != generation || GetLowNBuffers() != original ||
-				request->target_buffers > original ||
-				(generation == PG_UINT64_MAX && request->target_buffers != original))
-				ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
-								errmsg("DSGA shrink request conflicts with current capacity or revision")));
+			/*
+			 * 新请求校验成功后才归档旧Grow，拒绝不能改变另一操作的状态。
+			 */
+			DsgBufferReconcileInterruptedGrow();
+			DsgBufferArchiveOperation();
 			SpinLockAcquire(&DSBCtrl->status_lock);
 			MemSet(&DSBCtrl->operation, 0, sizeof(DSBCtrl->operation));
 			DSBCtrl->operation.request = *request;
 			DSBCtrl->operation.kind = DSG_OP_SHRINK;
 			DSBCtrl->operation.original_buffers = original;
 			DSBCtrl->operation.phase = DSG_OP_PREPARING;
+			DSBCtrl->cancel_requested = false;
+			DSBCtrl->cancel_closed = false;
 			cleanup->operation_started = true;
 			SpinLockRelease(&DSBCtrl->status_lock);
 			DsgShrinkGranules(original, DSG_GRANULE_DRAINING, generation);
 			committed = DsgShrinkPrepareAndPublish(request, started, timeout_ms);
 			if (!committed)
-				DsgShrinkDeny(DSG_REASON_TIMEOUT);
+				DsgShrinkDeny(DsgBufferCancelRequested(request) ? DSG_REASON_CANCELLED : DSG_REASON_TIMEOUT);
 		}
 	}
 	PG_END_ENSURE_ERROR_CLEANUP(DsgShrinkInterrupted, PointerGetDatum(cleanup));
-	pfree(cleanup);
-	DsgBufferGetSnapshot(snapshot);
+	if (!replayed)
+		DsgBufferGetSnapshot(snapshot);
 	snapshot->replayed = replayed;
+	if (receipt != NULL && (cleanup->operation_started || replayed))
+	{
+		receipt->disposition = replayed ? DSG_RECEIPT_REPLAYED : DSG_RECEIPT_ACCEPTED;
+		receipt->has_result = true;
+		receipt->result = *snapshot;
+	}
+	pfree(cleanup);
 	HOLD_INTERRUPTS();
 	LWLockRelease(&DSBCtrl->resize_lock);
 	return committed;
+}
+
+bool
+DsgBufferShrink(const DsgBufferResizeRequest *request, int timeout_ms, DsgBufferSnapshot *snapshot)
+{
+	return DsgBufferShrinkWithReceipt(request, timeout_ms, snapshot, NULL);
 }

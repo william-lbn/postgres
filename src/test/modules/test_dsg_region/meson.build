@@ -4,7 +4,7 @@ if host_system == 'windows'
 endif
 
 test_dsg_region = shared_module('test_dsg_region',
-  files('test_dsg_region.c'),
+  files('test_dsg_region.c', 'test_dsg_control.c'),
   kwargs: pg_test_mod_args,
 )
 test_install_libs += test_dsg_region

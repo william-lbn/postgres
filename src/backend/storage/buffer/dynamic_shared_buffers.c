@@ -215,10 +215,18 @@ DynamicSharedBuffersInit(void)
 	pg_atomic_init_u32(&DSBCtrl->admission_open, dynamic_shared_buffers_require_admission ? 0 : 1);
 	DSBCtrl->startup_shared_upper_bytes = startup_shared_upper_bytes;
 	DSBCtrl->maximum = maximum;
-	if (!pg_strong_random(&DSBCtrl->boot_id, sizeof(DSBCtrl->boot_id)))
-		ereport(FATAL,
-				(errcode(ERRCODE_INTERNAL_ERROR),
-				 errmsg("could not generate DSGA shared memory boot identity")));
+
+	/*
+	 *
+	 * 0在跨语言控制契约中表示未绑定，不能把极低概率的0随机值当作合法boot。
+	 */
+	do
+	{
+		if (!pg_strong_random(&DSBCtrl->boot_id, sizeof(DSBCtrl->boot_id)))
+			ereport(FATAL,
+					(errcode(ERRCODE_INTERNAL_ERROR),
+					 errmsg("could not generate DSGA shared memory boot identity")));
+	} while (DSBCtrl->boot_id == 0);
 	LWLockInitialize(&DSBCtrl->access_lock, LWTRANCHE_DSG_BUFFER_ACCESS);
 	LWLockInitialize(&DSBCtrl->checkpoint_lock, LWTRANCHE_DSG_BUFFER_CHECKPOINT);
 	pg_atomic_init_u32(&DSBCtrl->checkpoint_prepared_buffers, NBuffers);

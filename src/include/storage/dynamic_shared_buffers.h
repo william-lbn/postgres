@@ -14,8 +14,10 @@
 #include "storage/spin.h"
 
 /* Neon 扩展按能力宏适配，不能由 PG 大版本号推断本 fork 的内核接口。 */
-#define NEON_DSG_BUFFER_API_VERSION 4
+#define NEON_DSG_BUFFER_API_VERSION 5
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
+#define DSG_BUFFER_HISTORY_SIZE 16
+#define DSG_BUFFER_CONTEXT_BYTES 32
 
 /* 回收事实独立于逻辑H；pending/unsupported/failed都不能据此扣除VM预算。 */
 typedef enum DsgBufferReleaseState
@@ -48,7 +50,14 @@ typedef struct DsgBufferArray
 	Size		committed_upper_bytes;
 	bool		allocation_unknown;
 	DsgBufferReleaseState release_state;
+
+	/*-
+	 * 完整绑定释放意图，不能只用换epoch后可重复的revision/generation。
+	 */
+	uint64		release_issuer_epoch;
 	uint64		release_revision;
+	uint64		release_operation_id_high;
+	uint64		release_operation_id_low;
 	uint64		release_generation;
 	DsgMemoryResult release_result;
 } DsgBufferArray;
@@ -91,7 +100,8 @@ typedef enum DsgBufferOperationReason
 	DSG_REASON_NONE,
 	DSG_REASON_TIMEOUT,
 	DSG_REASON_POPULATE_FAILED,
-	DSG_REASON_INTERRUPTED
+	DSG_REASON_INTERRUPTED,
+	DSG_REASON_CANCELLED
 } DsgBufferOperationReason;
 
 /*-
@@ -102,11 +112,21 @@ typedef enum DsgBufferOperationReason
 typedef struct DsgBufferResizeRequest
 {
 	uint64		boot_id;
+
+	/*
+	 * epoch允许外层领导权换代后重新开始revision；0仅保留内部旧调用兼容。
+	 */
+	uint64		issuer_epoch;
 	uint64		revision;
 	uint64		operation_id_high;
 	uint64		operation_id_low;
 	uint64		expected_generation;
 	int			target_buffers;
+
+	/*
+	 * 全部外层意图的规范化SHA-256绑定；不是认证或资源承诺本身。
+	 */
+	unsigned char context_hash[DSG_BUFFER_CONTEXT_BYTES];
 } DsgBufferResizeRequest;
 
 /* 保留已有Grow调用点的源代码兼容；两种操作共享身份/范围格式，由kind区分。 */
@@ -151,14 +171,61 @@ typedef struct DsgBufferSnapshot
 	Size		committed_upper_bytes[DSG_BUFFER_ARRAY_COUNT];
 	bool		allocation_unknown[DSG_BUFFER_ARRAY_COUNT];
 	DsgBufferReleaseState release_state[DSG_BUFFER_ARRAY_COUNT];
+	uint64		release_issuer_epoch[DSG_BUFFER_ARRAY_COUNT];
 	uint64		release_revision[DSG_BUFFER_ARRAY_COUNT];
+	uint64		release_operation_id_high[DSG_BUFFER_ARRAY_COUNT];
+	uint64		release_operation_id_low[DSG_BUFFER_ARRAY_COUNT];
 	uint64		release_generation[DSG_BUFFER_ARRAY_COUNT];
 	DsgMemoryResult release_result[DSG_BUFFER_ARRAY_COUNT];
 	bool		replayed;
 	bool		admission_open;
+	bool		cancel_requested;
+	bool		cancel_closed;
 	uint64		admission_revision;
 	Size		startup_shared_upper_bytes;
 } DsgBufferSnapshot;
+
+/*-
+ * 回执属于本请求；result只有has_result时有效，是该操作的历史事实。
+ * observed另取当前快照，二者不得混用，尤其不能把别人的COMMITTED当本次结果。
+ * 历史只在本boot有界保留，淘汰后拒绝重新执行，外层负责持久历史。
+ */
+typedef struct DsgBufferRequestKey
+{
+	uint64		boot_id;
+	uint64		issuer_epoch;
+	uint64		revision;
+	uint64		operation_id_high;
+	uint64		operation_id_low;
+} DsgBufferRequestKey;
+
+typedef enum DsgBufferReceiptDisposition
+{
+	DSG_RECEIPT_ACCEPTED,
+	DSG_RECEIPT_REPLAYED,
+	DSG_RECEIPT_BUSY,
+	DSG_RECEIPT_STALE,
+	DSG_RECEIPT_CONFLICT,
+	DSG_RECEIPT_RESULT_EXPIRED,
+	DSG_RECEIPT_NOT_FOUND,
+	DSG_RECEIPT_CANCEL_REQUESTED,
+	DSG_RECEIPT_TOO_LATE,
+	DSG_RECEIPT_REJECTED
+} DsgBufferReceiptDisposition;
+
+typedef struct DsgBufferReceipt
+{
+	DsgBufferRequestKey key;
+	DsgBufferReceiptDisposition disposition;
+	bool		has_result;
+	DsgBufferSnapshot result;
+} DsgBufferReceipt;
+
+typedef struct DsgBufferControlResponse
+{
+	DsgBufferReceipt receipt;
+	DsgBufferSnapshot observed;
+} DsgBufferControlResponse;
 
 typedef struct DynamicSharedBuffersControl
 {
@@ -196,6 +263,16 @@ typedef struct DynamicSharedBuffersControl
 	slock_t		status_lock;
 	pg_atomic_uint64 generation;
 	DsgBufferOperation operation;
+
+	/*
+	 *
+	 * status_lock仅做固定上限16个键扫描/单条快照复制，不分配/IO/报错。
+	 */
+	bool		cancel_requested;
+	bool		cancel_closed;
+	int			history_count;
+	int			history_next;
+	DsgBufferSnapshot history[DSG_BUFFER_HISTORY_SIZE];
 	DsgBufferArray arrays[DSG_BUFFER_ARRAY_COUNT];
 
 	/*
@@ -231,6 +308,7 @@ extern void DynamicSharedBuffersInit(void);
 extern DsgBufferAccess DsgBufferAccessBegin(void);
 extern void DsgBufferAccessEnd(DsgBufferAccess *access);
 extern void DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot);
+extern bool DsgBufferParseUint64(const char *value, Size length, uint64 *result);
 extern void DsgBufferCheckStartupBudget(Size main_segment_bytes);
 extern void DsgBufferCheckAdmission(void);
 extern void DsgBufferSetAdmission(uint64 boot_id, uint64 revision,
@@ -241,6 +319,32 @@ extern bool DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms,
 						  DsgBufferSnapshot *snapshot);
 extern bool DsgBufferShrink(const DsgBufferResizeRequest *request, int timeout_ms,
 							DsgBufferSnapshot *snapshot);
+
+/* 受管C入口；外层必须另做认证、实例/意图绑定与预算核验，不发放VM许可。 */
+extern void DsgBufferControlResize(const DsgBufferResizeRequest *request,
+								   DsgBufferOperationKind kind, int timeout_ms,
+								   DsgBufferControlResponse *response);
+extern void DsgBufferControlStatus(const DsgBufferRequestKey *key,
+								   DsgBufferControlResponse *response);
+extern void DsgBufferControlCancel(const DsgBufferRequestKey *key,
+								   DsgBufferControlResponse *response);
+
+/* 以下为协调器内部接口，不能由扩展绕开上述受管入口。 */
+extern bool DsgBufferSameRequest(const DsgBufferResizeRequest *a,
+								 const DsgBufferResizeRequest *b);
+extern bool DsgBufferRequestNewer(const DsgBufferResizeRequest *a,
+								  const DsgBufferResizeRequest *b);
+extern void DsgBufferCopySnapshotLocked(DsgBufferSnapshot *snapshot);
+extern void DsgBufferArchiveOperation(void);
+extern int	DsgBufferFindReplay(const DsgBufferResizeRequest *request,
+								DsgBufferOperationKind kind, DsgBufferSnapshot *snapshot);
+extern bool DsgBufferCancelRequested(const DsgBufferResizeRequest *request);
+extern bool DsgBufferBeginCommit(const DsgBufferResizeRequest *request);
+extern void DsgBufferReconcileInterruptedGrow(void);
+extern bool DsgBufferGrowWithReceipt(const DsgBufferResizeRequest *request, int timeout_ms,
+									 DsgBufferSnapshot *snapshot, DsgBufferReceipt *receipt);
+extern bool DsgBufferShrinkWithReceipt(const DsgBufferResizeRequest *request, int timeout_ms,
+									   DsgBufferSnapshot *snapshot, DsgBufferReceipt *receipt);
 
 /* 以下内部原语只允许持resize独占锁的协调者调用。 */
 extern DsgBufferDrainResult DsgBufferDrainOne(int buffer_index);

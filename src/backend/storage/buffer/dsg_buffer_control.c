@@ -101,11 +101,10 @@ DsgFindHistory(const DsgBufferRequestKey *key)
  * 旧终态必须在新操作覆盖共享operation之前保存。只归档终态；异常退出遗留
  * PREPARING先由resize所有者对账，不能把无执行者的状态伪装成永久RUNNING。
  */
-void
-DsgBufferArchiveOperation(void)
+static void
+DsgArchiveOperationLocked(void)
 {
 	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
-	SpinLockAcquire(&DSBCtrl->status_lock);
 	Assert(DSBCtrl->operation.phase != DSG_OP_PREPARING);
 	if (DSBCtrl->operation.phase != DSG_OP_IDLE)
 	{
@@ -113,7 +112,38 @@ DsgBufferArchiveOperation(void)
 		DSBCtrl->history_next = (DSBCtrl->history_next + 1) % DSG_BUFFER_HISTORY_SIZE;
 		DSBCtrl->history_count = Min(DSBCtrl->history_count + 1, DSG_BUFFER_HISTORY_SIZE);
 	}
+}
+
+/*-
+ * 调用方持resize独占锁，但接管只需status短锁就能推进floor。因此floor比较、
+ * 旧终态归档、新操作登记必须同一次status锁内完成，不能先检查再无条件覆盖。
+ * 若接管先到，拒绝不消耗历史槽、不改另一操作/预算；若登记先到，接管会保留
+ * 原意图并请求其取消，且在resize/Provider退出前只能返回PENDING。旧内部epoch0
+ * 只在从未见过非零epoch的boot兼容；正式操作亦单调推进floor，不能被旧接口绕过。
+ */
+bool
+DsgBufferStartOperation(const DsgBufferResizeRequest *request,
+						DsgBufferOperationKind kind, int original_buffers)
+{
+	bool		allowed;
+
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	allowed = request->issuer_epoch >= DSBCtrl->issuer_floor_epoch;
+	if (allowed)
+	{
+		DsgArchiveOperationLocked();
+		DSBCtrl->issuer_floor_epoch = request->issuer_epoch;
+		MemSet(&DSBCtrl->operation, 0, sizeof(DSBCtrl->operation));
+		DSBCtrl->operation.request = *request;
+		DSBCtrl->operation.kind = kind;
+		DSBCtrl->operation.original_buffers = original_buffers;
+		DSBCtrl->operation.phase = DSG_OP_PREPARING;
+		DSBCtrl->cancel_requested = false;
+		DSBCtrl->cancel_closed = false;
+	}
 	SpinLockRelease(&DSBCtrl->status_lock);
+	return allowed;
 }
 
 /* 0无此ID、1同一完整意图、-1 ID被改参数；只有1会填写本操作的结果。 */
@@ -176,7 +206,7 @@ DsgBufferBeginCommit(const DsgBufferResizeRequest *request)
 	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
 	SpinLockAcquire(&DSBCtrl->status_lock);
 	Assert(DsgBufferSameRequest(request, &DSBCtrl->operation.request));
-	allowed = !DSBCtrl->cancel_requested;
+	allowed = !DSBCtrl->cancel_requested && request->issuer_epoch >= DSBCtrl->issuer_floor_epoch;
 	if (allowed)
 		DSBCtrl->cancel_closed = true;
 	SpinLockRelease(&DSBCtrl->status_lock);
@@ -269,7 +299,8 @@ DsgStatusLocked(const DsgBufferRequestKey *key, DsgBufferControlResponse *respon
 		 *
 		 * RESULT_EXPIRED表示本boot无法确证旧结果，不证明这个ID曾被接受。
 		 */
-		response->receipt.disposition =
+		response->receipt.disposition = key->issuer_epoch < DSBCtrl->issuer_floor_epoch ?
+			DSG_RECEIPT_STALE :
 			(key->issuer_epoch < current->issuer_epoch ||
 			 (key->issuer_epoch == current->issuer_epoch && key->revision <= current->revision)) ?
 			DSG_RECEIPT_RESULT_EXPIRED : DSG_RECEIPT_NOT_FOUND;
@@ -307,6 +338,61 @@ void
 DsgBufferControlCancel(const DsgBufferRequestKey *key, DsgBufferControlResponse *response)
 {
 	DsgControlLookup(key, response, true);
+}
+
+/*-
+ * 接管先用status短锁推进floor并请求尚未封闭窗口的旧操作取消，不等待正在IO的
+ * 执行者。绝不反向持status等待resize；之后仅条件取得resize，失败即PENDING。
+ * COMMITTED仍可能在同步Provider中，不能按phase推断旧执行者退出。取得串行权
+ * 后收敛FATAL遗留，再核验floor未被更高代次取代，才返回FENCED。整个过程中不
+ * 清旧意图/预算、不回滚已提交H、不发放VM许可。调用者另须认证真实issuer权属。
+ */
+void
+DsgBufferFenceIssuer(uint64 boot_id, uint64 issuer_epoch, DsgBufferIssuerFenceResponse *response)
+{
+	if (DSBCtrl == NULL || !IsUnderPostmaster)
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("DSGA issuer fencing requires an enabled running server")));
+	if (boot_id == 0 || issuer_epoch == 0)
+		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE), errmsg("invalid DSGA issuer fence identity")));
+	if (LWLockHeldByMe(&DSBCtrl->access_lock) || LWLockHeldByMe(&DSBCtrl->resize_lock))
+		elog(ERROR, "DSGA issuer fencing cannot run while holding buffer coordination locks");
+	MemSet(response, 0, sizeof(*response));
+	response->requested_boot_id = boot_id;
+	response->requested_epoch = issuer_epoch;
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	if (boot_id != DSBCtrl->boot_id || issuer_epoch < DSBCtrl->issuer_floor_epoch)
+		response->disposition = DSG_ISSUER_STALE;
+	else
+	{
+		DSBCtrl->issuer_floor_epoch = issuer_epoch;
+		if (DSBCtrl->operation.phase == DSG_OP_PREPARING &&
+			DSBCtrl->operation.request.issuer_epoch < issuer_epoch && !DSBCtrl->cancel_closed)
+			DSBCtrl->cancel_requested = true;
+		response->disposition = DSG_ISSUER_PENDING;
+	}
+	DsgBufferCopySnapshotLocked(&response->observed);
+	SpinLockRelease(&DSBCtrl->status_lock);
+	if (response->disposition == DSG_ISSUER_STALE ||
+		!LWLockConditionalAcquire(&DSBCtrl->resize_lock, LW_EXCLUSIVE))
+		return;
+	RESUME_INTERRUPTS();
+	PG_TRY();
+	{
+		DsgBufferReconcileInterruptedShrink();
+		DsgBufferReconcileInterruptedGrow();
+		SpinLockAcquire(&DSBCtrl->status_lock);
+		response->disposition = issuer_epoch == DSBCtrl->issuer_floor_epoch ?
+			DSG_ISSUER_FENCED : DSG_ISSUER_STALE;
+		DsgBufferCopySnapshotLocked(&response->observed);
+		SpinLockRelease(&DSBCtrl->status_lock);
+	}
+	PG_FINALLY();
+	{
+		HOLD_INTERRUPTS();
+		LWLockRelease(&DSBCtrl->resize_lock);
+	}
+	PG_END_TRY();
 }
 
 void

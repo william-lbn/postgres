@@ -403,21 +403,23 @@ DsgBufferShrinkWithReceipt(const DsgBufferResizeRequest *request, int timeout_ms
 			 * 新请求校验成功后才归档旧Grow，拒绝不能改变另一操作的状态。
 			 */
 			DsgBufferReconcileInterruptedGrow();
-			DsgBufferArchiveOperation();
-			SpinLockAcquire(&DSBCtrl->status_lock);
-			MemSet(&DSBCtrl->operation, 0, sizeof(DSBCtrl->operation));
-			DSBCtrl->operation.request = *request;
-			DSBCtrl->operation.kind = DSG_OP_SHRINK;
-			DSBCtrl->operation.original_buffers = original;
-			DSBCtrl->operation.phase = DSG_OP_PREPARING;
-			DSBCtrl->cancel_requested = false;
-			DSBCtrl->cancel_closed = false;
-			cleanup->operation_started = true;
-			SpinLockRelease(&DSBCtrl->status_lock);
-			DsgShrinkGranules(original, DSG_GRANULE_DRAINING, generation);
-			committed = DsgShrinkPrepareAndPublish(request, started, timeout_ms);
-			if (!committed)
-				DsgShrinkDeny(DsgBufferCancelRequested(request) ? DSG_REASON_CANCELLED : DSG_REASON_TIMEOUT);
+			INJECTION_POINT("dsg-buffer-before-operation-register");
+			if (!DsgBufferStartOperation(request, DSG_OP_SHRINK, original))
+			{
+				if (receipt != NULL)
+					receipt->disposition = DSG_RECEIPT_STALE;
+				else
+					ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+									errmsg("DSGA issuer epoch was fenced before operation registration")));
+			}
+			else
+			{
+				cleanup->operation_started = true;
+				DsgShrinkGranules(original, DSG_GRANULE_DRAINING, generation);
+				committed = DsgShrinkPrepareAndPublish(request, started, timeout_ms);
+				if (!committed)
+					DsgShrinkDeny(DsgBufferCancelRequested(request) ? DSG_REASON_CANCELLED : DSG_REASON_TIMEOUT);
+			}
 		}
 	}
 	PG_END_ENSURE_ERROR_CLEANUP(DsgShrinkInterrupted, PointerGetDatum(cleanup));

@@ -18,6 +18,9 @@ REVOKE ALL ON FUNCTION test_dsg_control_parse(text) FROM PUBLIC;
 CREATE FUNCTION test_dsg_control_hold_guard() RETURNS boolean
 AS 'MODULE_PATHNAME' LANGUAGE C;
 REVOKE ALL ON FUNCTION test_dsg_control_hold_guard() FROM PUBLIC;
+CREATE FUNCTION test_dsg_fence_issuer(text, text, boolean DEFAULT false) RETURNS jsonb
+AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_fence_issuer(text, text, boolean) FROM PUBLIC;
 
 CREATE FUNCTION test_dsg_shared_write(integer) RETURNS void
 AS 'MODULE_PATHNAME' LANGUAGE C STRICT;

@@ -19,6 +19,7 @@
 PG_FUNCTION_INFO_V1(test_dsg_control);
 PG_FUNCTION_INFO_V1(test_dsg_control_parse);
 PG_FUNCTION_INFO_V1(test_dsg_control_hold_guard);
+PG_FUNCTION_INFO_V1(test_dsg_fence_issuer);
 
 static void
 DsgTestControlCheck(void)
@@ -52,10 +53,12 @@ DsgTestControlSnapshot(StringInfo output, const DsgBufferSnapshot *snapshot)
 					 "{\"boot\":\"" UINT64_FORMAT "\",\"epoch\":\"" UINT64_FORMAT
 					 "\",\"revision\":\"" UINT64_FORMAT "\",\"hi\":\"" UINT64_FORMAT
 					 "\",\"lo\":\"" UINT64_FORMAT "\",\"generation\":\"" UINT64_FORMAT
+					 "\",\"issuer_floor\":\"" UINT64_FORMAT
 					 "\",\"low\":%d,\"high\":%d,\"phase\":%d,\"reason\":%d,\"kind\":%d,"
 					 "\"cancel_requested\":%s,\"cancel_closed\":%s,\"replayed\":%s,\"arrays\":[",
 					 snapshot->boot_id, request->issuer_epoch, request->revision,
 					 request->operation_id_high, request->operation_id_low, snapshot->generation,
+					 snapshot->issuer_floor_epoch,
 					 snapshot->low, snapshot->high, snapshot->operation.phase, snapshot->operation.reason,
 					 snapshot->operation.kind, snapshot->cancel_requested ? "true" : "false",
 					 snapshot->cancel_closed ? "true" : "false", snapshot->replayed ? "true" : "false");
@@ -84,6 +87,35 @@ test_dsg_control_parse(PG_FUNCTION_ARGS)
 	DsgTestControlCheck();
 	value = DsgTestControlUint64(PG_GETARG_TEXT_PP(0));
 	PG_RETURN_TEXT_P(cstring_to_text(psprintf(UINT64_FORMAT, value)));
+}
+
+/* 只转换真实内核接管事实，不改锁/状态；guarded负例必须触发原生锁序拒绝。 */
+Datum
+test_dsg_fence_issuer(PG_FUNCTION_ARGS)
+{
+	DsgBufferIssuerFenceResponse response;
+	DsgBufferAccess access;
+	StringInfoData output;
+	uint64		boot;
+	uint64		epoch;
+	bool		guarded;
+
+	DsgTestControlCheck();
+	boot = DsgTestControlUint64(PG_GETARG_TEXT_PP(0));
+	epoch = DsgTestControlUint64(PG_GETARG_TEXT_PP(1));
+	guarded = PG_GETARG_BOOL(2);
+	if (guarded)
+		access = DsgBufferAccessBegin();
+	DsgBufferFenceIssuer(boot, epoch, &response);
+	if (guarded)
+		DsgBufferAccessEnd(&access);
+	initStringInfo(&output);
+	appendStringInfo(&output, "{\"requested_boot\":\"" UINT64_FORMAT
+					 "\",\"requested_epoch\":\"" UINT64_FORMAT "\",\"disposition\":%d,\"observed\":",
+					 response.requested_boot_id, response.requested_epoch, response.disposition);
+	DsgTestControlSnapshot(&output, &response.observed);
+	appendStringInfoChar(&output, '}');
+	PG_RETURN_DATUM(DirectFunctionCall1(jsonb_in, CStringGetDatum(output.data)));
 }
 
 /* 真实读侧Guard阻挡发布；注入点只暂停，不伪造LWLock或占用状态。 */

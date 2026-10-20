@@ -14,7 +14,7 @@
 #include "storage/spin.h"
 
 /* Neon 扩展按能力宏适配，不能由 PG 大版本号推断本 fork 的内核接口。 */
-#define NEON_DSG_BUFFER_API_VERSION 5
+#define NEON_DSG_BUFFER_API_VERSION 6
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
 #define DSG_BUFFER_HISTORY_SIZE 16
 #define DSG_BUFFER_CONTEXT_BYTES 32
@@ -165,6 +165,7 @@ typedef struct DsgBufferSnapshot
 	DsgBufferOperation operation;
 	uint64		boot_id;
 	uint64		generation;
+	uint64		issuer_floor_epoch;
 	int			low;
 	int			high;
 	int			maximum;
@@ -227,6 +228,26 @@ typedef struct DsgBufferControlResponse
 	DsgBufferSnapshot observed;
 } DsgBufferControlResponse;
 
+/*-
+ * 接管事实独立于resize回执。PENDING已推进最低代次，但旧执行者/Provider
+ * 尚未全部退出；只有FENCED表示本次条件取得串行锁时已无旧副作用。此事实
+ * 不认证领导权，不替代外层持久意图、预算、Guest或最终VM执行许可。
+ */
+typedef enum DsgBufferIssuerFenceDisposition
+{
+	DSG_ISSUER_FENCED,
+	DSG_ISSUER_PENDING,
+	DSG_ISSUER_STALE
+} DsgBufferIssuerFenceDisposition;
+
+typedef struct DsgBufferIssuerFenceResponse
+{
+	uint64		requested_boot_id;
+	uint64		requested_epoch;
+	DsgBufferIssuerFenceDisposition disposition;
+	DsgBufferSnapshot observed;
+} DsgBufferIssuerFenceResponse;
+
 typedef struct DynamicSharedBuffersControl
 {
 	pg_atomic_uint32 low;
@@ -262,6 +283,11 @@ typedef struct DynamicSharedBuffersControl
 	LWLock		resize_lock;
 	slock_t		status_lock;
 	pg_atomic_uint64 generation;
+
+	/*
+	 * status_lock保护；与新操作登记原子比较/提升，本boot只增不减，绝不绕回0。
+	 */
+	uint64		issuer_floor_epoch;
 	DsgBufferOperation operation;
 
 	/*
@@ -328,6 +354,8 @@ extern void DsgBufferControlStatus(const DsgBufferRequestKey *key,
 								   DsgBufferControlResponse *response);
 extern void DsgBufferControlCancel(const DsgBufferRequestKey *key,
 								   DsgBufferControlResponse *response);
+extern void DsgBufferFenceIssuer(uint64 boot_id, uint64 issuer_epoch,
+								 DsgBufferIssuerFenceResponse *response);
 
 /* 以下为协调器内部接口，不能由扩展绕开上述受管入口。 */
 extern bool DsgBufferSameRequest(const DsgBufferResizeRequest *a,
@@ -335,7 +363,8 @@ extern bool DsgBufferSameRequest(const DsgBufferResizeRequest *a,
 extern bool DsgBufferRequestNewer(const DsgBufferResizeRequest *a,
 								  const DsgBufferResizeRequest *b);
 extern void DsgBufferCopySnapshotLocked(DsgBufferSnapshot *snapshot);
-extern void DsgBufferArchiveOperation(void);
+extern bool DsgBufferStartOperation(const DsgBufferResizeRequest *request,
+									DsgBufferOperationKind kind, int original_buffers);
 extern int	DsgBufferFindReplay(const DsgBufferResizeRequest *request,
 								DsgBufferOperationKind kind, DsgBufferSnapshot *snapshot);
 extern bool DsgBufferCancelRequested(const DsgBufferResizeRequest *request);

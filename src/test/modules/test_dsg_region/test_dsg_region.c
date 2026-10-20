@@ -685,6 +685,9 @@ test_dsg_grow_control(PG_FUNCTION_ARGS)
 		InjectionPointAttach(strcmp(action, "attach_shrink_filter") == 0 ?
 							 "dsg-buffer-shrink-filter-batch" : "dsg-region-before-release",
 							 "test_dsg_region", "test_dsg_grow_pause", NULL, 0);
+	else if (strcmp(action, "attach_issuer_register") == 0)
+		InjectionPointAttach("dsg-buffer-before-operation-register",
+							 "test_dsg_region", "test_dsg_grow_pause", NULL, 0);
 	else if (strcmp(action, "attach_shrink_fence") == 0 ||
 			 strcmp(action, "attach_shrink_prepare") == 0 ||
 			 strcmp(action, "attach_shrink_publish") == 0)

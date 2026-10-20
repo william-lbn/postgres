@@ -39,6 +39,7 @@ DsgBufferCopySnapshotLocked(DsgBufferSnapshot *snapshot)
 	snapshot->operation = DSBCtrl->operation;
 	snapshot->boot_id = DSBCtrl->boot_id;
 	snapshot->generation = pg_atomic_read_u64(&DSBCtrl->generation);
+	snapshot->issuer_floor_epoch = DSBCtrl->issuer_floor_epoch;
 	snapshot->low = GetLowNBuffers();
 	snapshot->high = GetHighNBuffers();
 	snapshot->maximum = DSBCtrl->maximum;
@@ -432,32 +433,34 @@ DsgBufferGrowWithReceipt(const DsgBufferGrowRequest *request, int timeout_ms,
 			 * 清理另一操作的权限。Shrink的L恢复必须先做，才能核验L/H。
 			 */
 			DsgBufferReconcileInterruptedGrow();
-			DsgBufferArchiveOperation();
-			SpinLockAcquire(&DSBCtrl->status_lock);
-			MemSet(&DSBCtrl->operation, 0, sizeof(DSBCtrl->operation));
-			DSBCtrl->operation.request = *request;
-			DSBCtrl->operation.kind = DSG_OP_GROW;
-			DSBCtrl->operation.original_buffers = GetHighNBuffers();
-			DSBCtrl->operation.phase = DSG_OP_PREPARING;
-			DSBCtrl->cancel_requested = false;
-			DSBCtrl->cancel_closed = false;
-			cleanup->operation_started = true;
-			SpinLockRelease(&DSBCtrl->status_lock);
-			DsgGrowGranules(GetHighNBuffers(), request->target_buffers, DSG_GRANULE_PREPARING, generation);
-			if (request->target_buffers == GetHighNBuffers())
+			INJECTION_POINT("dsg-buffer-before-operation-register");
+			if (!DsgBufferStartOperation(request, DSG_OP_GROW, GetHighNBuffers()))
 			{
-				if (DsgBufferBeginCommit(request))
-				{
-					SpinLockAcquire(&DSBCtrl->status_lock);
-					DSBCtrl->operation.phase = DSG_OP_COMMITTED;
-					SpinLockRelease(&DSBCtrl->status_lock);
-					committed = true;
-				}
+				if (receipt != NULL)
+					receipt->disposition = DSG_RECEIPT_STALE;
 				else
-					DsgGrowDeny(DSG_REASON_CANCELLED);
+					ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+									errmsg("DSGA issuer epoch was fenced before operation registration")));
 			}
 			else
-				committed = DsgGrowPrepareAndPublish(request, started, timeout_ms);
+			{
+				cleanup->operation_started = true;
+				DsgGrowGranules(GetHighNBuffers(), request->target_buffers, DSG_GRANULE_PREPARING, generation);
+				if (request->target_buffers == GetHighNBuffers())
+				{
+					if (DsgBufferBeginCommit(request))
+					{
+						SpinLockAcquire(&DSBCtrl->status_lock);
+						DSBCtrl->operation.phase = DSG_OP_COMMITTED;
+						SpinLockRelease(&DSBCtrl->status_lock);
+						committed = true;
+					}
+					else
+						DsgGrowDeny(DSG_REASON_CANCELLED);
+				}
+				else
+					committed = DsgGrowPrepareAndPublish(request, started, timeout_ms);
+			}
 		}
 	}
 	PG_END_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, PointerGetDatum(cleanup));

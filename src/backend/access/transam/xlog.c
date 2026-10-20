@@ -693,7 +693,7 @@ static XLogRecPtr CreateOverwriteContrecordRecord(XLogRecPtr aborted_lsn,
 												  XLogRecPtr pagePtr,
 												  TimeLineID newTLI);
 static void PreCheckPointGuts(int flags);
-static void CheckPointGuts(XLogRecPtr checkPointRedo, int flags);
+static void CheckPointGuts(XLogRecPtr checkPointRedo, int flags, bool is_restartpoint);
 static void KeepLogSeg(XLogRecPtr recptr, XLogRecPtr slotsMinLSN,
 					   XLogSegNo *logSegNo);
 
@@ -7338,7 +7338,7 @@ CreateCheckPoint(int flags)
 	}
 	pfree(vxids);
 
-	CheckPointGuts(checkPoint.redo, flags);
+	CheckPointGuts(checkPoint.redo, flags, false);
 
 	vxids = GetVirtualXIDsDelayingChkpt(&nvxids, DELAY_CHKPT_COMPLETE);
 	if (nvxids > 0)
@@ -7715,9 +7715,19 @@ PreCheckPointGuts(int flags)
  * recovery restartpoints.
  */
 static void
-CheckPointGuts(XLogRecPtr checkPointRedo, int flags)
+CheckPointGuts(XLogRecPtr checkPointRedo, int flags, bool is_restartpoint)
 {
-	if (!(flags & (CHECKPOINT_IS_SHUTDOWN | CHECKPOINT_END_OF_RECOVERY)))
+	/*-
+	 * 只有CreateCheckPoint经过Neon的PreCheckPointGuts提前刷盘阶段。
+	 * CreateRestartPoint即使带SHUTDOWN也未预刷；若仅按flags跳过，这里会
+	 * 在脏catalog/heap仍只在缓存时推进pg_control redo，重启后越过必要WAL，
+	 * 导致缺表/丢数据。显式传入调用路径，避免用可能随promotion改变的全局
+	 * RecoveryInProgress推断；恢复端继续遵守原生刷盘/复制元数据/fsync顺序。
+	 */
+	bool		pre_flushed = !is_restartpoint &&
+		(flags & (CHECKPOINT_IS_SHUTDOWN | CHECKPOINT_END_OF_RECOVERY));
+
+	if (!pre_flushed)
 		CheckPointReplicationState(flags);
 
 	/* Write out all dirty data in SLRUs and the main buffer pool */
@@ -7735,7 +7745,7 @@ CheckPointGuts(XLogRecPtr checkPointRedo, int flags)
 	 * WAL during shutdown checkpoint cause Postgres panic. So do it before in
 	 * PreCheckPointGuts.
 	 */
-	if (!(flags & (CHECKPOINT_IS_SHUTDOWN | CHECKPOINT_END_OF_RECOVERY)))
+	if (!pre_flushed)
 		CheckPointBuffers(flags);
 
 	/* Perform all queued up fsyncs */
@@ -7919,7 +7929,7 @@ CreateRestartPoint(int flags)
 	/* Update the process title */
 	update_checkpoint_display(flags, true, false);
 
-	CheckPointGuts(lastCheckPoint.redo, flags);
+	CheckPointGuts(lastCheckPoint.redo, flags, true);
 
 	/*
 	 * This location needs to be after CheckPointGuts() to ensure that some

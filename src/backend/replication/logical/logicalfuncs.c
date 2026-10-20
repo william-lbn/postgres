@@ -376,6 +376,17 @@ pg_logical_emit_message_bytea(PG_FUNCTION_ARGS)
 	bool		flush = PG_GETARG_BOOL(3);
 	XLogRecPtr	lsn;
 
+	/*-
+	 * 原有输出路径已过滤整个neon-file空间。SQL显式拒绝它，防止调用者
+	 * 误以为消息会交付，也不允许通过伪装内部文件消息绕过升级pending
+	 * 保护。内核持久化仍直接调用LogLogicalMessage；不改变WAL格式、
+	 * 关机顺序或普通消息权限。text重载复用此bytea入口，不能漏掉其中之一。
+	 */
+	if (IsNeonFileMessage(prefix))
+		ereport(ERROR,
+				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				 errmsg("logical message prefix is reserved for Neon internal files")));
+
 	lsn = LogLogicalMessage(prefix, VARDATA_ANY(data), VARSIZE_ANY_EXHDR(data),
 							transactional, flush);
 	PG_RETURN_LSN(lsn);

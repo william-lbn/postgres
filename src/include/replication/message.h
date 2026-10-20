@@ -29,6 +29,19 @@ typedef struct xl_logical_message
 
 #define SizeOfLogicalMessage	(offsetof(xl_logical_message, message))
 
+/*-
+ * Neon AUX文件快照复用逻辑消息WAL，但从来不属于逻辑订阅的应用数据。
+ * 保留原有neon-file前缀空间（包括没有冒号的历史名称），让普通/流式
+ * 输出、fast-forward检查和SQL准入共享同一判定，避免升级检查永远追不上
+ * 自己写出的slot状态。只比较固定前缀；neon-fil等相似应用名称仍须交付。
+ * 此函数不赋予写内部WAL的权限；SQL入口必须明确拒绝该保留空间。
+ */
+static inline bool
+IsNeonFileMessage(const char *prefix)
+{
+	return strncmp(prefix, "neon-file", sizeof("neon-file") - 1) == 0;
+}
+
 extern XLogRecPtr LogLogicalMessage(const char *prefix, const char *message,
 									size_t size, bool transactional,
 									bool flush);

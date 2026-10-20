@@ -60,10 +60,50 @@ chdir ${PostgreSQL::Test::Utils::tmp_check};
 # Preparations for the subsequent test:
 # 1. Create two slots on the old cluster
 $oldpub->start;
+
+# Neon内部文件前缀原本已被普通/流式输出隐藏；SQL须明确拒绝，而不能
+# 让应用以为消息已交付。两个重载、事务/非事务都应在写入WAL之前拒绝。
+for my $prefix ('neon-file', 'neon-file:pg_replslot/fake/state', 'neon-file-user')
+{
+	for my $transactional ('true', 'false')
+	{
+		for my $type ('text', 'bytea')
+		{
+			my ($stdout, $stderr);
+			my $result = $oldpub->psql('postgres',
+				"SELECT pg_logical_emit_message($transactional, '$prefix', 'payload'::$type, true)",
+				stdout => \$stdout, stderr => \$stderr);
+			is($result, 3, "reject reserved prefix $prefix ($transactional, $type)");
+			like($stderr, qr/logical message prefix is reserved for Neon internal files/,
+				'rejection identifies the reserved namespace');
+		}
+	}
+}
+
 $oldpub->safe_psql(
 	'postgres', qq[
 	SELECT pg_create_logical_replication_slot('test_slot1', 'pgoutput');
 	SELECT pg_create_logical_replication_slot('test_slot2', 'test_decoding');
+]);
+
+# 相似但不属于保留空间的应用消息必须仍然实际交付，不能因为修复pending
+# 误判就扩大过滤范围。明确flush并从真实test_decoding消费，再推进两个槽，
+# 保证后面的配置/插件检查只遇到Neon自身的slot快照WAL，不掩盖业务pending。
+for my $prefix ('neon-fil', 'Neon-file', 'xneon-file')
+{
+	$oldpub->safe_psql('postgres',
+		"SELECT pg_logical_emit_message(false, '$prefix', 'real-application', true)");
+}
+my $messages = $oldpub->safe_psql('postgres',
+	"SELECT data FROM pg_logical_slot_get_changes('test_slot2', NULL, NULL)");
+for my $prefix ('neon-fil', 'Neon-file', 'xneon-file')
+{
+	like($messages, qr/prefix: \Q$prefix\E, sz: 16 content:real-application/,
+		"similar application prefix $prefix is delivered");
+}
+$oldpub->safe_psql('postgres', qq[
+	SELECT pg_replication_slot_advance('test_slot1', pg_current_wal_insert_lsn());
+	SELECT pg_replication_slot_advance('test_slot2', pg_current_wal_insert_lsn());
 ]);
 $oldpub->stop();
 

@@ -635,7 +635,13 @@ logicalmsg_decode(LogicalDecodingContext *ctx, XLogRecordBuffer *buf)
 		 * here because the non-transactional logical message is decoded
 		 * without waiting for these records.
 		 */
-		if (!message->transactional)
+		/*-
+		 * 普通和流式输出均过滤Neon内部文件消息。升级的pending判断必须
+		 * 使用同一规则，否则slot创建/关机持久化自身产生的WAL就足以
+		 * 永久拒绝升级。应用非事务消息仍设置pending；事务提交/中止的
+		 * 原生判定不变，不能按payload、插件名或当前H放宽业务数据保护。
+		 */
+		if (!message->transactional && !IsNeonFileMessage(message->message))
 			ctx->processing_required = true;
 
 		return;

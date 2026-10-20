@@ -36,6 +36,7 @@
 #include "pgstat.h"
 #include "replication/decode.h"
 #include "replication/logical.h"
+#include "replication/message.h"
 #include "replication/reorderbuffer.h"
 #include "replication/slotsync.h"
 #include "replication/snapbuild.h"
@@ -1337,7 +1338,7 @@ message_cb_wrapper(ReorderBuffer *cache, ReorderBufferTXN *txn,
 
 	if (ctx->callbacks.message_cb == NULL)
 		return;
-	if (strncmp(prefix, "neon-file", strlen("neon-file")) == 0)
+	if (IsNeonFileMessage(prefix))
 		return;
 
 	/* Push callback + info on the error context stack */
@@ -1654,7 +1655,7 @@ stream_message_cb_wrapper(ReorderBuffer *cache, ReorderBufferTXN *txn,
 	/* this callback is optional */
 	if (ctx->callbacks.stream_message_cb == NULL)
 		return;
-	if (strncmp(prefix, "neon-file", strlen("neon-file")) == 0)
+	if (IsNeonFileMessage(prefix))
 		return;
 
 	/* Push callback + info on the error context stack */

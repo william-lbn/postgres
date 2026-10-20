@@ -140,6 +140,12 @@ extern void smgr_init_standard(void);
 extern void smgr_shutdown_standard(void);
 
 /* NEON: Hook for reading an SLRU segment from e.g. remote storage */
+/*-
+ * 扩展按接口能力适配，不能用社区PG大版本推断Neon维护接口。
+ * v2：独立hook，扩展负责将完整segment落盘后返回bool，核心随后重新打开。
+ * 未声明此能力的旧发行仍使用f_smgr内的buffer/页数接口。
+ */
+#define NEON_SLRU_DOWNLOAD_API_VERSION 2
 typedef bool (*read_slru_segment_hook_type) (const char *path, int segno);
 extern read_slru_segment_hook_type read_slru_segment_hook;
 

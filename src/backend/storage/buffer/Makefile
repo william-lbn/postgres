@@ -18,6 +18,7 @@ OBJS = \
 	bufmgr.o \
 	dynamic_shared_buffers.o \
 	dsg_buffer_grow.o \
+	dsg_buffer_shrink.o \
 	freelist.o \
 	localbuf.o
 

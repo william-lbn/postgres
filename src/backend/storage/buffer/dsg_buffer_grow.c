@@ -54,6 +54,10 @@ DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot)
 	{
 		snapshot->committed_upper_bytes[i] = DSBCtrl->arrays[i].committed_upper_bytes;
 		snapshot->allocation_unknown[i] = DSBCtrl->arrays[i].allocation_unknown;
+		snapshot->release_state[i] = DSBCtrl->arrays[i].release_state;
+		snapshot->release_revision[i] = DSBCtrl->arrays[i].release_revision;
+		snapshot->release_generation[i] = DSBCtrl->arrays[i].release_generation;
+		snapshot->release_result[i] = DSBCtrl->arrays[i].release_result;
 	}
 	SpinLockRelease(&DSBCtrl->status_lock);
 }
@@ -145,7 +149,8 @@ DsgGrowInterrupted(int code, Datum arg)
 		acquired = true;
 	}
 	SpinLockAcquire(&DSBCtrl->status_lock);
-	own_preparing = DSBCtrl->operation.phase == DSG_OP_PREPARING &&
+	own_preparing = DSBCtrl->operation.kind == DSG_OP_GROW &&
+		DSBCtrl->operation.phase == DSG_OP_PREPARING &&
 		DsgGrowSameRequest(&DSBCtrl->operation.request, &cleanup->request);
 	SpinLockRelease(&DSBCtrl->status_lock);
 	if (own_preparing)
@@ -334,6 +339,11 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 	RESUME_INTERRUPTS();
 	PG_ENSURE_ERROR_CLEANUP(DsgGrowInterrupted, PointerGetDatum(cleanup));
 	{
+		/*
+		 *
+		 * FATAL可能在原生放锁后才清理；先对账已失去执行者的Shrink栅栏。
+		 */
+		DsgBufferReconcileInterruptedShrink();
 		SpinLockAcquire(&DSBCtrl->status_lock);
 		previous = DSBCtrl->operation;
 		generation = pg_atomic_read_u64(&DSBCtrl->generation);
@@ -342,7 +352,7 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 			previous.request.operation_id_high == request->operation_id_high &&
 			previous.request.operation_id_low == request->operation_id_low)
 		{
-			if (!DsgGrowSameRequest(&previous.request, request))
+			if (previous.kind != DSG_OP_GROW || !DsgGrowSameRequest(&previous.request, request))
 				ereport(ERROR,
 						(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 						 errmsg("DSGA operation identity was reused with a different request")));
@@ -358,7 +368,9 @@ DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms, DsgBufferSnap
 						(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 						 errmsg("DSGA grow request conflicts with current capacity or revision")));
 			SpinLockAcquire(&DSBCtrl->status_lock);
+			MemSet(&DSBCtrl->operation, 0, sizeof(DSBCtrl->operation));
 			DSBCtrl->operation.request = *request;
+			DSBCtrl->operation.kind = DSG_OP_GROW;
 			DSBCtrl->operation.original_buffers = GetHighNBuffers();
 			DSBCtrl->operation.phase = DSG_OP_PREPARING;
 			DSBCtrl->operation.reason = DSG_REASON_NONE;

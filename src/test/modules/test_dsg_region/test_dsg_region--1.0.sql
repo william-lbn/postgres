@@ -38,6 +38,18 @@ REVOKE ALL ON FUNCTION test_dsg_grow(bigint, bigint, bigint, integer, integer, b
 REVOKE ALL ON FUNCTION test_dsg_grow_snapshot() FROM PUBLIC;
 REVOKE ALL ON FUNCTION test_dsg_grow_verify() FROM PUBLIC;
 
+CREATE FUNCTION test_dsg_shrink(bigint, bigint, bigint, integer, integer DEFAULT 1000, boolean DEFAULT false)
+RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_shrink_snapshot() RETURNS text AS 'MODULE_PATHNAME' LANGUAGE C;
+CREATE FUNCTION test_dsg_tail_block(regclass, integer) RETURNS bigint AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_shrink(bigint, bigint, bigint, integer, integer, boolean) FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_shrink_snapshot() FROM PUBLIC;
+REVOKE ALL ON FUNCTION test_dsg_tail_block(regclass, integer) FROM PUBLIC;
+CREATE FUNCTION test_dsg_invalid_tail(regclass, integer) RETURNS integer AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_invalid_tail(regclass, integer) FROM PUBLIC;
+CREATE FUNCTION test_dsg_collision_unpin(regclass) RETURNS boolean AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_collision_unpin(regclass) FROM PUBLIC;
+
 -- 仅供独立临时集群验证分配栅栏、真实 pin 等待和释放后的访问边界。
 CREATE FUNCTION test_dsg_allocation_limit(integer) RETURNS text
 AS 'MODULE_PATHNAME' LANGUAGE C STRICT;

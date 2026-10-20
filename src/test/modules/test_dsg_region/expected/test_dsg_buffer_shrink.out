@@ -1,0 +1,75 @@
+Parsed test spec with 2 sessions
+
+starting permutation: shrink fenced competing wake shrunk data detach regrow
+injection_points_attach
+-----------------------
+                       
+(1 row)
+
+step shrink: 
+    SELECT test_dsg_shrink(revision+1, revision+1, generation, 256, 60000)
+        LIKE 'committed high=256 generation=% replay=false' AS shrink_ok FROM shrink_baseline;
+ <waiting ...>
+step fenced: 
+    SELECT (s->>'low')::integer = 256 AND (s->>'high')::integer = b.original
+        AND (s->>'phase')::integer = 1 AS fenced
+    FROM (SELECT test_dsg_shrink_snapshot()::json AS s) q CROSS JOIN shrink_baseline b;
+
+fenced
+------
+t     
+(1 row)
+
+step competing: 
+    SELECT test_dsg_grow(revision+2, revision+2, generation, original, 20)
+        LIKE 'denied high=% replay=false' AS busy FROM shrink_baseline;
+
+busy
+----
+t   
+(1 row)
+
+step wake: SELECT injection_points_wakeup('dsg-buffer-shrink-after-fence'); <waiting ...>
+step shrink: <... completed>
+shrink_ok
+---------
+t        
+(1 row)
+
+step wake: <... completed>
+injection_points_wakeup
+-----------------------
+                       
+(1 row)
+
+step shrunk: 
+    SELECT (s->>'low')::integer = 256 AND (s->>'high')::integer = 256
+        AND (s->>'generation')::bigint = b.generation+1 AND (s->>'phase')::integer = 2 AS shrunk
+    FROM (SELECT test_dsg_shrink_snapshot()::json AS s) q CROSS JOIN shrink_baseline b;
+
+shrunk
+------
+t     
+(1 row)
+
+step data: SELECT count(*) = 400 AND sum(i) = 80200 AS data_ok FROM shrink_data;
+data_ok
+-------
+t      
+(1 row)
+
+step detach: SELECT injection_points_detach('dsg-buffer-shrink-after-fence');
+injection_points_detach
+-----------------------
+                       
+(1 row)
+
+step regrow: 
+    SELECT test_dsg_grow(revision+2, revision+2, generation+1, 768)
+        LIKE 'committed high=768 generation=% replay=false' AS regrow_ok FROM shrink_baseline;
+
+regrow_ok
+---------
+t        
+(1 row)
+

@@ -5,6 +5,7 @@
 
 #include "access/table.h"
 #include "fmgr.h"
+#include "lib/stringinfo.h"
 #include "miscadmin.h"
 #include "port/atomics.h"
 #include "storage/buf_internals.h"
@@ -29,6 +30,11 @@ PG_FUNCTION_INFO_V1(test_dsg_exclusive_available);
 PG_FUNCTION_INFO_V1(test_dsg_access_error);
 PG_FUNCTION_INFO_V1(test_dsg_stale_hint);
 PG_FUNCTION_INFO_V1(test_dsg_grow);
+PG_FUNCTION_INFO_V1(test_dsg_shrink);
+PG_FUNCTION_INFO_V1(test_dsg_shrink_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_tail_block);
+PG_FUNCTION_INFO_V1(test_dsg_invalid_tail);
+PG_FUNCTION_INFO_V1(test_dsg_collision_unpin);
 PG_FUNCTION_INFO_V1(test_dsg_grow_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_grow_verify);
 PG_FUNCTION_INFO_V1(test_dsg_allocation_limit);
@@ -75,6 +81,8 @@ static void *probe_page;
 static Size probe_bytes;
 static bool probe_armed;
 static bool probe_protected;
+static bool collision_armed;
+extern PGDLLEXPORT void test_dsg_collision_pause(const char *name, const void *private_data);
 
 extern PGDLLEXPORT void test_dsg_checkpoint_pause(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_checkpoint_fail(const char *name, const void *private_data);
@@ -84,6 +92,7 @@ extern PGDLLEXPORT void test_dsg_grow_pause(const char *name, const void *privat
 static bool io_writer_armed;
 static bool io_waiter_armed;
 static int	grow_mode;
+static int	release_probe_calls;
 
 /*-
  * 此回调后登记、先执行，恰好暂停在 PG 原生已放锁、内核 Grow 清理之前。
@@ -116,6 +125,17 @@ test_dsg_grow_pause(const char *name, const void *private_data)
 	}
 	else if (mode == 3)
 		ereport(FATAL, (errmsg("DSGA test Grow FATAL")));
+	else if (mode == 4)
+		ereport(ERROR, (errmsg("DSGA test resize ERROR")));
+	else if (mode == 5)
+	{
+		/*
+		 * 第一数组真实调用Provider；第二数组调用前报错，不伪造前次回执。
+		 */
+		if (++release_probe_calls == 2)
+			ereport(ERROR, (errmsg("DSGA test second array release ERROR")));
+		grow_mode = 5;
+	}
 }
 
 /*-
@@ -132,6 +152,44 @@ test_dsg_protect_descriptor(const char *name, const void *private_data)
 	if (mprotect(probe_page, probe_bytes, PROT_NONE) != 0)
 		ereport(ERROR, (errmsg("could not protect DSGA test descriptor: %m")));
 	probe_protected = true;
+}
+
+/*-
+ * 原生BufferAlloc取得victim后暂停。测试集群无其他未赋tag的并发分配，
+ * 扫描仍核验唯一性，避免误选；不写header、hash、refcount或IO状态。
+ * 另一会话随后在L以下加载同页，真实制造BufTableInsert冲突。
+ */
+void
+test_dsg_collision_pause(const char *name, const void *private_data)
+{
+	DsgBufferAccess access;
+	int			i;
+	int			found = 0;
+	Size		page = (Size) sysconf(_SC_PAGESIZE);
+
+	if (!collision_armed)
+		return;
+	collision_armed = false;
+	access = DsgBufferAccessBegin();
+	for (i = NBuffers; i < access.count; i++)
+	{
+		BufferDesc *buf = GetBufferDescriptor(i);
+		uint32		state = LockBufHdr(buf);
+
+		if (!(state & BM_TAG_VALID) && BUF_STATE_GET_REFCOUNT(state) == 1)
+		{
+			found++;
+			probe_page = (void *) TYPEALIGN_DOWN(page, (uintptr_t) buf);
+			probe_bytes = page;
+		}
+		UnlockBufHdr(buf, state);
+	}
+	DsgBufferAccessEnd(&access);
+	if (found != 1)
+		ereport(ERROR, (errmsg("DSGA collision probe requires one real tail victim, found %d", found)));
+	probe_armed = true;
+	test_dsg_wait_gate(&((DsgTestSharedState *) inherited_region.address)->grow_prepare_gate,
+					   "DsgTestCollisionVictim");
 }
 
 void
@@ -390,6 +448,175 @@ test_dsg_grow(PG_FUNCTION_ARGS)
 											  snapshot.generation, snapshot.replayed ? "true" : "false")));
 }
 
+/* 测试始终调用真实Shrink，不能通过测试接口直接写H/L或伪造物理完成。 */
+Datum
+test_dsg_shrink(PG_FUNCTION_ARGS)
+{
+	DsgBufferResizeRequest request;
+	DsgBufferSnapshot snapshot;
+	bool		committed;
+
+	(void) test_dsg_shared_value();
+	test_dsg_check(DSBCtrl != NULL, "dynamic buffers are disabled");
+	MemSet(&request, 0, sizeof(request));
+	request.boot_id = DSBCtrl->boot_id;
+	request.revision = (uint64) PG_GETARG_INT64(0);
+	request.operation_id_low = (uint64) PG_GETARG_INT64(1);
+	request.expected_generation = (uint64) PG_GETARG_INT64(2);
+	request.target_buffers = PG_GETARG_INT32(3);
+	if (PG_GETARG_BOOL(5))
+		request.boot_id ^= UINT64CONST(1);
+	committed = DsgBufferShrink(&request, PG_GETARG_INT32(4), &snapshot);
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf("%s high=%d generation=" UINT64_FORMAT " replay=%s",
+											  committed ? "committed" : "denied", snapshot.high,
+											  snapshot.generation, snapshot.replayed ? "true" : "false")));
+}
+
+/* 只读真实账本；Python可精确读取u64，不将SQL响应当作物理回收证据。 */
+Datum
+test_dsg_shrink_snapshot(PG_FUNCTION_ARGS)
+{
+	DsgBufferSnapshot snapshot;
+	StringInfoData output;
+	int			i;
+
+	(void) test_dsg_shared_value();
+	DsgBufferGetSnapshot(&snapshot);
+	initStringInfo(&output);
+	appendStringInfo(&output,
+					 "{\"low\":%d,\"high\":%d,\"generation\":" UINT64_FORMAT
+					 ",\"revision\":" UINT64_FORMAT ",\"kind\":%d,\"phase\":%d,\"reason\":%d,\"drain\":[",
+					 snapshot.low, snapshot.high, snapshot.generation,
+					 snapshot.operation.request.revision, snapshot.operation.kind,
+					 snapshot.operation.phase, snapshot.operation.reason);
+	for (i = 0; i < DSG_DRAIN_RESULT_COUNT; i++)
+		appendStringInfo(&output, "%s%u", i ? "," : "", snapshot.operation.drain_counts[i]);
+	appendStringInfoString(&output, "],\"arrays\":[");
+	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
+		appendStringInfo(&output,
+						 "%s{\"upper\":%zu,\"unknown\":%s,\"state\":%d,\"revision\":" UINT64_FORMAT
+						 ",\"generation\":" UINT64_FORMAT ",\"verified\":%s,\"partial\":%s}",
+						 i ? "," : "", snapshot.committed_upper_bytes[i],
+						 snapshot.allocation_unknown[i] ? "true" : "false", snapshot.release_state[i],
+						 snapshot.release_revision[i], snapshot.release_generation[i],
+						 snapshot.release_result[i].physical_release_verified ? "true" : "false",
+						 snapshot.release_result[i].release_may_be_partial ? "true" : "false");
+	appendStringInfoString(&output, "]}");
+	PG_RETURN_TEXT_P(cstring_to_text(output.data));
+}
+
+/* 找到真实驻留在待排水尾部的关系页，后续pin也必须走ReadBuffer，而非改refcount。 */
+Datum
+test_dsg_tail_block(PG_FUNCTION_ARGS)
+{
+	Relation	rel;
+	DsgBufferAccess access;
+	int			i;
+	BlockNumber block = InvalidBlockNumber;
+
+	(void) test_dsg_shared_value();
+	rel = table_open(PG_GETARG_OID(0), AccessShareLock);
+	access = DsgBufferAccessBegin();
+	for (i = Max(0, PG_GETARG_INT32(1)); i < access.count; i++)
+	{
+		BufferDesc *buf = GetBufferDescriptor(i);
+		uint32		state = LockBufHdr(buf);
+
+		if ((state & (BM_VALID | BM_TAG_VALID)) == (BM_VALID | BM_TAG_VALID) &&
+			BufTagMatchesRelFileLocator(&buf->tag, &rel->rd_locator) &&
+			BufTagGetForkNum(&buf->tag) == MAIN_FORKNUM)
+			block = buf->tag.blockNum;
+		UnlockBufHdr(buf, state);
+		if (block != InvalidBlockNumber)
+			break;
+	}
+	DsgBufferAccessEnd(&access);
+	table_close(rel, AccessShareLock);
+	if (block == InvalidBlockNumber)
+		PG_RETURN_NULL();
+	PG_RETURN_INT64((int64) block);
+}
+
+/* 观察真实读失败留下的tagged-invalid尾部，不写header、hash、IO或refcount。 */
+Datum
+test_dsg_invalid_tail(PG_FUNCTION_ARGS)
+{
+	Relation	rel;
+	DsgBufferAccess access;
+	int			i;
+	int			count = 0;
+
+	(void) test_dsg_shared_value();
+	rel = table_open(PG_GETARG_OID(0), AccessShareLock);
+	access = DsgBufferAccessBegin();
+	for (i = Max(0, PG_GETARG_INT32(1)); i < access.count; i++)
+	{
+		BufferDesc *buf = GetBufferDescriptor(i);
+		uint32		state = LockBufHdr(buf);
+
+		if ((state & (BM_TAG_VALID | BM_VALID | BM_IO_IN_PROGRESS)) == BM_TAG_VALID &&
+			BUF_STATE_GET_REFCOUNT(state) == 0 &&
+			BufTagMatchesRelFileLocator(&buf->tag, &rel->rd_locator))
+			count++;
+		UnlockBufHdr(buf, state);
+	}
+	DsgBufferAccessEnd(&access);
+	table_close(rel, AccessShareLock);
+	PG_RETURN_INT32(count);
+}
+
+/*-
+ * 使用真实两会话hash冲突，在原victim最后unpin后保护其Descriptor页。
+ * 胜者被分配在bootstrap前缀的另一页；ReadBuffer返回前若仍访问旧victim
+ * 就会触发本Backend访问错误。正常返回后立即恢复权限，再释放胜者pin。
+ */
+Datum
+test_dsg_collision_unpin(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	Relation	rel;
+	bool		old_evict = neon_test_evict;
+
+	(void) test_dsg_shared_value();
+	rel = table_open(PG_GETARG_OID(0), AccessShareLock);
+	InjectionPointAttach("dsg-buffer-alloc-before-insert", "test_dsg_region",
+						 "test_dsg_collision_pause", NULL, 0);
+	InjectionPointAttach("dsg-buffer-after-unpin", "test_dsg_region",
+						 "test_dsg_protect_descriptor", NULL, 0);
+	collision_armed = true;
+	probe_protected = false;
+	neon_test_evict = true;
+	PG_TRY();
+	{
+		Buffer		buffer = ReadBuffer(rel, 0);
+
+		test_dsg_check(probe_protected, "native collision did not release its original victim");
+		if (mprotect(probe_page, probe_bytes, PROT_READ | PROT_WRITE) != 0)
+			ereport(FATAL, (errmsg("could not restore collision Descriptor probe: %m")));
+		probe_protected = false;
+		neon_test_evict = old_evict;
+		ReleaseBuffer(buffer);
+	}
+	PG_FINALLY();
+	{
+		collision_armed = false;
+		probe_armed = false;
+		if (probe_protected && mprotect(probe_page, probe_bytes, PROT_READ | PROT_WRITE) != 0)
+			ereport(FATAL, (errmsg("could not restore collision Descriptor probe: %m")));
+		probe_protected = false;
+		neon_test_evict = old_evict;
+		InjectionPointDetach("dsg-buffer-alloc-before-insert");
+		InjectionPointDetach("dsg-buffer-after-unpin");
+	}
+	PG_END_TRY();
+	table_close(rel, AccessShareLock);
+	PG_RETURN_BOOL(true);
+#else
+	ereport(ERROR, (errmsg("DSGA collision test requires injection points")));
+	PG_RETURN_NULL();
+#endif
+}
+
 Datum
 test_dsg_grow_snapshot(PG_FUNCTION_ARGS)
 {
@@ -435,6 +662,33 @@ test_dsg_grow_control(PG_FUNCTION_ARGS)
 		grow_mode = 2;
 	else if (strcmp(action, "arm_fatal_unpaused") == 0)
 		grow_mode = 3;
+	else if (strcmp(action, "arm_error") == 0)
+		grow_mode = 4;
+	else if (strcmp(action, "arm_second_release_error") == 0)
+	{
+		grow_mode = 5;
+		release_probe_calls = 0;
+	}
+	else if (strcmp(action, "attach_shrink_filter") == 0 || strcmp(action, "attach_release") == 0)
+		InjectionPointAttach(strcmp(action, "attach_shrink_filter") == 0 ?
+							 "dsg-buffer-shrink-filter-batch" : "dsg-region-before-release",
+							 "test_dsg_region", "test_dsg_grow_pause", NULL, 0);
+	else if (strcmp(action, "attach_shrink_fence") == 0 ||
+			 strcmp(action, "attach_shrink_prepare") == 0 ||
+			 strcmp(action, "attach_shrink_publish") == 0)
+		InjectionPointAttach(strcmp(action, "attach_shrink_fence") == 0 ?
+							 "dsg-buffer-shrink-after-fence" :
+							 (strcmp(action, "attach_shrink_prepare") == 0 ?
+							  "dsg-buffer-shrink-before-publish" : "dsg-buffer-shrink-after-publish"),
+							 "test_dsg_region", "test_dsg_grow_pause", NULL, 0);
+	else if (strcmp(action, "detach_shrink") == 0)
+	{
+		InjectionPointDetach("dsg-buffer-shrink-after-fence");
+		InjectionPointDetach("dsg-buffer-shrink-before-publish");
+		InjectionPointDetach("dsg-buffer-shrink-after-publish");
+		InjectionPointDetach("dsg-buffer-shrink-filter-batch");
+		InjectionPointDetach("dsg-region-before-release");
+	}
 	else if (strcmp(action, "exit_waiting") == 0)
 		result = pg_atomic_read_u32(&state->grow_exit_gate) == 1 ? "yes" : "no";
 	else if (strcmp(action, "prepare_waiting") == 0)
@@ -600,14 +854,17 @@ test_dsg_pin(PG_FUNCTION_ARGS)
 	char	   *mode = text_to_cstring(PG_GETARG_TEXT_PP(2));
 
 	(void) test_dsg_shared_value();
-	test_dsg_check(strcmp(mode, "hold") == 0 || strcmp(mode, "cleanup") == 0 ||
+	test_dsg_check(strcmp(mode, "hold") == 0 || strcmp(mode, "tail_hold") == 0 || strcmp(mode, "cleanup") == 0 ||
 				   strcmp(mode, "read") == 0, "invalid pin test mode");
 	rel = table_open(PG_GETARG_OID(0), AccessShareLock);
 	buffer = ReadBuffer(rel, PG_GETARG_INT32(1));
 	test_dsg_check(!BufferIsLocal(buffer), "pin tests require a shared relation");
-	if (strcmp(mode, "hold") == 0)
+	if (strcmp(mode, "hold") == 0 || strcmp(mode, "tail_hold") == 0)
 	{
 		pg_atomic_uint32 *gate = &((DsgTestSharedState *) inherited_region.address)->pin_gate;
+
+		if (strcmp(mode, "tail_hold") == 0)
+			test_dsg_check(buffer > NBuffers, "test pin did not reach the shrink tail");
 
 		/*-
 		 * 外部测试先观察真实 pin 已建立，再启动 cleanup waiter；只有看到
@@ -739,7 +996,7 @@ test_dsg_io(PG_FUNCTION_ARGS)
 		Buffer		buffer;
 
 		rel = table_open(PG_GETARG_OID(0), AccessShareLock);
-		buffer = ReadBuffer(rel, 0);
+		buffer = ReadBuffer(rel, PG_NARGS() >= 3 ? PG_GETARG_INT32(2) : 0);
 		test_dsg_check(!BufferIsLocal(buffer), "IO tests require a shared relation");
 		LockBuffer(buffer, BUFFER_LOCK_EXCLUSIVE);
 		MarkBufferDirty(buffer);

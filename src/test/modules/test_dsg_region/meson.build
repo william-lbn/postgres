@@ -15,6 +15,7 @@ if get_option('injection_points')
   dsg_isolation_specs += 'test_dsg_buffer_access'
   dsg_isolation_specs += 'test_dsg_buffer_grow'
   dsg_isolation_specs += 'test_dsg_buffer_fence'
+  dsg_isolation_specs += 'test_dsg_buffer_shrink'
 endif
 
 tests += {

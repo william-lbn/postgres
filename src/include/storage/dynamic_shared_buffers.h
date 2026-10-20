@@ -14,8 +14,19 @@
 #include "storage/spin.h"
 
 /* Neon 扩展按能力宏适配，不能由 PG 大版本号推断本 fork 的内核接口。 */
-#define NEON_DSG_BUFFER_API_VERSION 3
+#define NEON_DSG_BUFFER_API_VERSION 4
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
+
+/* 回收事实独立于逻辑H；pending/unsupported/failed都不能据此扣除VM预算。 */
+typedef enum DsgBufferReleaseState
+{
+	DSG_RELEASE_NONE,
+	DSG_RELEASE_PENDING,
+	DSG_RELEASE_WAIT_CHECKPOINT,
+	DSG_RELEASE_VERIFIED,
+	DSG_RELEASE_UNSUPPORTED,
+	DSG_RELEASE_FAILED
+} DsgBufferReleaseState;
 
 typedef enum DsgBufferArrayId
 {
@@ -36,6 +47,10 @@ typedef struct DsgBufferArray
 	 */
 	Size		committed_upper_bytes;
 	bool		allocation_unknown;
+	DsgBufferReleaseState release_state;
+	uint64		release_revision;
+	uint64		release_generation;
+	DsgMemoryResult release_result;
 } DsgBufferArray;
 
 /*-
@@ -49,7 +64,8 @@ typedef enum DsgBufferGranuleState
 	DSG_GRANULE_RESERVED,
 	DSG_GRANULE_PREPARING,
 	DSG_GRANULE_READY,
-	DSG_GRANULE_ACTIVE
+	DSG_GRANULE_ACTIVE,
+	DSG_GRANULE_DRAINING
 } DsgBufferGranuleState;
 
 typedef struct DsgBufferGranule
@@ -83,7 +99,7 @@ typedef enum DsgBufferOperationReason
  * 用于同一请求重试，expected_generation 防止据过期容量执行新请求。
  * 外层 VM/Compute 身份仍须由 Neon/Agent 栅栏核验，本结构不能替代它。
  */
-typedef struct DsgBufferGrowRequest
+typedef struct DsgBufferResizeRequest
 {
 	uint64		boot_id;
 	uint64		revision;
@@ -91,14 +107,37 @@ typedef struct DsgBufferGrowRequest
 	uint64		operation_id_low;
 	uint64		expected_generation;
 	int			target_buffers;
-} DsgBufferGrowRequest;
+} DsgBufferResizeRequest;
+
+/* 保留已有Grow调用点的源代码兼容；两种操作共享身份/范围格式，由kind区分。 */
+typedef DsgBufferResizeRequest DsgBufferGrowRequest;
+
+typedef enum DsgBufferOperationKind
+{
+	DSG_OP_GROW,
+	DSG_OP_SHRINK
+} DsgBufferOperationKind;
+
+/* 每轮真实排水的分类计数。不是当前仍被pin的全库采样，也不授权VM动作。 */
+typedef enum DsgBufferDrainResult
+{
+	DSG_DRAINED,
+	DSG_DRAIN_PINNED,
+	DSG_DRAIN_IO,
+	DSG_DRAIN_DIRTY,
+	DSG_DRAIN_CONTENT_LOCK,
+	DSG_DRAIN_MAPPING_LOCK,
+	DSG_DRAIN_RESULT_COUNT
+} DsgBufferDrainResult;
 
 typedef struct DsgBufferOperation
 {
-	DsgBufferGrowRequest request;
+	DsgBufferResizeRequest request;
+	DsgBufferOperationKind kind;
 	int			original_buffers;
 	DsgBufferOperationPhase phase;
 	DsgBufferOperationReason reason;
+	uint32		drain_counts[DSG_DRAIN_RESULT_COUNT];
 } DsgBufferOperation;
 
 typedef struct DsgBufferSnapshot
@@ -111,6 +150,10 @@ typedef struct DsgBufferSnapshot
 	int			maximum;
 	Size		committed_upper_bytes[DSG_BUFFER_ARRAY_COUNT];
 	bool		allocation_unknown[DSG_BUFFER_ARRAY_COUNT];
+	DsgBufferReleaseState release_state[DSG_BUFFER_ARRAY_COUNT];
+	uint64		release_revision[DSG_BUFFER_ARRAY_COUNT];
+	uint64		release_generation[DSG_BUFFER_ARRAY_COUNT];
+	DsgMemoryResult release_result[DSG_BUFFER_ARRAY_COUNT];
 	bool		replayed;
 	bool		admission_open;
 	uint64		admission_revision;
@@ -196,5 +239,12 @@ extern void DsgBufferSetAdmission(uint64 boot_id, uint64 revision,
 /* 内核协调接口；调用者须先完成权限/外层资源预算检查，尚无用户 SQL 入口。 */
 extern bool DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms,
 						  DsgBufferSnapshot *snapshot);
+extern bool DsgBufferShrink(const DsgBufferResizeRequest *request, int timeout_ms,
+							DsgBufferSnapshot *snapshot);
+
+/* 以下内部原语只允许持resize独占锁的协调者调用。 */
+extern DsgBufferDrainResult DsgBufferDrainOne(int buffer_index);
+extern void DsgBufferReconcileInterruptedShrink(void);
+extern void StrategyRestoreAllocationLimit(void);
 
 #endif							/* DYNAMIC_SHARED_BUFFERS_H */

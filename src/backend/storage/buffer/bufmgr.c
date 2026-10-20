@@ -543,6 +543,9 @@ static inline BufferDesc *BufferAlloc(SMgrRelation smgr,
 static Buffer GetVictimBuffer(BufferAccessStrategy strategy, IOContext io_context);
 static void FlushBuffer(BufferDesc *buf, SMgrRelation reln,
 						IOObject io_object, IOContext io_context);
+static void FlushBufferExtended(BufferDesc *buf, SMgrRelation reln,
+								IOObject io_object, IOContext io_context, bool nowait);
+static bool InvalidateVictimBufferExtended(BufferDesc *buf_hdr, bool nowait);
 static void FindAndDropRelationBuffers(RelFileLocator rlocator,
 									   ForkNumber forkNum,
 									   BlockNumber nForkBlock,
@@ -1730,6 +1733,8 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
 	 */
 	victim_buffer = GetVictimBuffer(strategy, io_context);
 	victim_buf_hdr = GetBufferDescriptor(victim_buffer - 1);
+	if (DSBCtrl != NULL)
+		INJECTION_POINT("dsg-buffer-alloc-before-insert");
 
 	/*
 	 * Try to make a hashtable entry for the buffer under its new tag. If
@@ -1753,13 +1758,18 @@ BufferAlloc(SMgrRelation smgr, char relpersistence, ForkNumber forkNum,
 		 * have to call ResourceOwnerEnlarge() & ReservePrivateRefCountEntry()
 		 * before acquiring the lock, for the rare case of such a collision.
 		 */
-		UnpinBuffer(victim_buf_hdr);
 
 		/*
 		 * The victim buffer we acquired previously is clean and unused, let
 		 * it be found again quickly
 		 */
 		StrategyFreeBuffer(victim_buf_hdr);
+		/*-
+		 * 在自己的最后pin之前完成策略归还，统一此处与扩展路径的引用边界。
+		 * StrategyFreeBuffer已有稳定VA索引和L检查，可保护旧的unpin后调用；
+		 * 此顺序仍避免让调用者依赖该特殊保护。最后unpin后不再使用victim。
+		 */
+		UnpinBuffer(victim_buf_hdr);
 
 		/* remaining code should match code at top of routine */
 
@@ -1936,6 +1946,13 @@ retry:
 static bool
 InvalidateVictimBuffer(BufferDesc *buf_hdr)
 {
+	return InvalidateVictimBufferExtended(buf_hdr, false);
+}
+
+/* Shrinker只条件取得mapping锁；原生victim调用继续保持原来的等待语义。 */
+static bool
+InvalidateVictimBufferExtended(BufferDesc *buf_hdr, bool nowait)
+{
 	uint32		buf_state;
 	uint32		hash;
 	LWLock	   *partition_lock;
@@ -1949,7 +1966,13 @@ InvalidateVictimBuffer(BufferDesc *buf_hdr)
 	hash = BufTableHashCode(&tag);
 	partition_lock = BufMappingPartitionLock(hash);
 
-	LWLockAcquire(partition_lock, LW_EXCLUSIVE);
+	if (nowait)
+	{
+		if (!LWLockConditionalAcquire(partition_lock, LW_EXCLUSIVE))
+			return false;
+	}
+	else
+		LWLockAcquire(partition_lock, LW_EXCLUSIVE);
 
 	/* lock the buffer header */
 	buf_state = LockBufHdr(buf_hdr);
@@ -1966,7 +1989,7 @@ InvalidateVictimBuffer(BufferDesc *buf_hdr)
 	 * If somebody else pinned the buffer since, or even worse, dirtied it,
 	 * give up on this buffer: It's clearly in use.
 	 */
-	if (BUF_STATE_GET_REFCOUNT(buf_state) != 1 || (buf_state & BM_DIRTY))
+	if (BUF_STATE_GET_REFCOUNT(buf_state) != 1 || (buf_state & (BM_DIRTY | BM_IO_IN_PROGRESS)))
 	{
 		Assert(BUF_STATE_GET_REFCOUNT(buf_state) > 0);
 
@@ -4026,6 +4049,17 @@ static void
 FlushBuffer(BufferDesc *buf, SMgrRelation reln, IOObject io_object,
 			IOContext io_context)
 {
+	FlushBufferExtended(buf, reln, io_object, io_context, false);
+}
+
+/*-
+ * nowait只避免等待另一个IO owner，不改变本次实际写回的WAL/smgr/校验和语义。
+ * 自己成功取得IO权后的同步存储写仍可能耗时；协调者在页间检查软期限/取消。
+ */
+static void
+FlushBufferExtended(BufferDesc *buf, SMgrRelation reln, IOObject io_object,
+					IOContext io_context, bool nowait)
+{
 	XLogRecPtr	recptr;
 	ErrorContextCallback errcallback;
 	instr_time	io_start;
@@ -4038,7 +4072,7 @@ FlushBuffer(BufferDesc *buf, SMgrRelation reln, IOObject io_object,
 	 * someone else flushed the buffer before we could, so we need not do
 	 * anything.
 	 */
-	if (!StartBufferIO(buf, false, false))
+	if (!StartBufferIO(buf, false, nowait))
 		return;
 
 	/*
@@ -6501,5 +6535,78 @@ EvictUnpinnedBuffer(Buffer buf)
 	UnpinBuffer(desc);
 
 	DsgBufferAccessEnd(&access);
+	return result;
+}
+
+/*-
+ * 真正缩容的单对象排水。resizeX串行所有容量变更，L已排除本对象的新victim。
+ * 不能用仅供开发的EvictUnpinnedBuffer代替：这里要处理tagged-invalid读失败
+ * 残留、跳过竞争pin/IO/锁，并保证返回DRAINED后没有新tag能再进入这个ID。
+ *
+ * 无pin阶段用短Guard保护Descriptor；有tag后在header锁下取真实pin，再放Guard。
+ * 写回遵守原生content/WAL/smgr/IO协议。撤销tag按mapping->header重新核验，
+ * 绝不持header等待mapping。最后unpin之后不再读Descriptor或IOCV。
+ */
+DsgBufferDrainResult
+DsgBufferDrainOne(int buffer_index)
+{
+	DsgBufferAccess access;
+	BufferDesc *buf;
+	uint32		state;
+	DsgBufferDrainResult result;
+
+	Assert(DSBCtrl != NULL && LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+	Assert(buffer_index >= GetLowNBuffers() && buffer_index < GetHighNBuffers());
+	ResourceOwnerEnlarge(CurrentResourceOwner);
+	ReservePrivateRefCountEntry();
+	access = DsgBufferAccessBegin();
+	buf = GetBufferDescriptor(buffer_index);
+	state = LockBufHdr(buf);
+	if (BUF_STATE_GET_REFCOUNT(state) != 0 || (state & BM_IO_IN_PROGRESS))
+	{
+		result = (state & BM_IO_IN_PROGRESS) ? DSG_DRAIN_IO : DSG_DRAIN_PINNED;
+		UnlockBufHdr(buf, state);
+		DsgBufferAccessEnd(&access);
+		return result;
+	}
+	if (!(state & BM_TAG_VALID))
+	{
+		Assert(!(state & (BM_VALID | BM_DIRTY)));
+		UnlockBufHdr(buf, state);
+		DsgBufferAccessEnd(&access);
+		return DSG_DRAINED;
+	}
+	PinBuffer_Locked(buf);
+	DsgBufferAccessEnd(&access);
+	if (state & BM_DIRTY)
+	{
+		if (!LWLockConditionalAcquire(BufferDescriptorGetContentLock(buf), LW_SHARED))
+		{
+			UnpinBuffer(buf);
+			return DSG_DRAIN_CONTENT_LOCK;
+		}
+		FlushBufferExtended(buf, NULL, IOOBJECT_RELATION, IOCONTEXT_NORMAL, true);
+		LWLockRelease(BufferDescriptorGetContentLock(buf));
+	}
+
+	/*
+	 *
+	 * 原生pin阻止别人清tag，即使BM_VALID未设置也可安全撤销失败读留下的hash项。
+	 */
+	if (InvalidateVictimBufferExtended(buf, true))
+		result = DSG_DRAINED;
+	else
+	{
+		state = pg_atomic_read_u32(&buf->state);
+		if (state & BM_IO_IN_PROGRESS)
+			result = DSG_DRAIN_IO;
+		else if (BUF_STATE_GET_REFCOUNT(state) > 1)
+			result = DSG_DRAIN_PINNED;
+		else if (state & BM_DIRTY)
+			result = DSG_DRAIN_DIRTY;
+		else
+			result = DSG_DRAIN_MAPPING_LOCK;
+	}
+	UnpinBuffer(buf);
 	return result;
 }

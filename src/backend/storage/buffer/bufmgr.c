@@ -5836,10 +5836,19 @@ IsBufferCleanupOK(Buffer buffer)
 /*
  * WaitIO -- Block until the IO_IN_PROGRESS flag on 'buf' is cleared.
  */
+typedef struct DsgWaitIOCleanup
+{
+	ResourceOwner pin_owner;
+	ResourceOwner saved_owner;
+	Buffer		buffer;
+	bool		pinned;
+	bool		audit_pending;
+} DsgWaitIOCleanup;
+
 static void
 WaitIO(BufferDesc *buf)
 {
-	Buffer		wait_pin = InvalidBuffer;
+	DsgWaitIOCleanup *cleanup = NULL;
 
 	/*
 	 * 关闭时保持原生路径，不为静态数组引入额外 pin 或退出回调。
@@ -5858,34 +5867,84 @@ WaitIO(BufferDesc *buf)
 	 *
 	 * 无自身 pin 时，在 Guard 内取得一个正常的 ResourceOwner pin，
 	 * 不修改 usage_count、不自行伪造 refcount。成功返回时先退出 CV 再放
-	 * 此 pin，InvalidateBuffer 可继续原来的零引用检查；异常时 pin 留给
-	 * 原生资源清理，退出回调先撤销 CV，之后才能释放最后引用。
+	 * 此 pin，InvalidateBuffer 可继续原来的零引用检查。
+	 *
+	 * DropRelationBuffers也会从事务回滚的ResourceOwner清理进入；此时
+	 * CurrentResourceOwner可能已releasing，不能向它Enlarge/Remember。
+	 * 临时pin使用无父节点的专属owner，不能在正在遍历的释放树中增加子项；
+	 * 由本次ERROR/FATAL清理先撤CV、再按原生pin释放原语放pin并删除owner。
+	 * 堆上上下文避免longjmp自动变量不确定性，正常已有pin的路径不增加分配。
 	 */
 	if (GetPrivateRefCount(BufferDescriptorGetBuffer(buf)) == 0)
 	{
 		Assert(LWLockHeldByMe(&DSBCtrl->access_lock));
-		ReservePrivateRefCountEntry();
-		ResourceOwnerEnlarge(CurrentResourceOwner);
-		(void) LockBufHdr(buf);
-		PinBuffer_Locked(buf);
-		wait_pin = BufferDescriptorGetBuffer(buf);
+		cleanup = palloc0(sizeof(*cleanup));
+		cleanup->saved_owner = CurrentResourceOwner;
+		cleanup->buffer = BufferDescriptorGetBuffer(buf);
 	}
 
-	PG_ENSURE_ERROR_CLEANUP(WaitIOCancelSleep, (Datum) 0);
+	PG_ENSURE_ERROR_CLEANUP(WaitIOCancelSleep, PointerGetDatum(cleanup));
 	{
+		if (cleanup != NULL)
+		{
+			cleanup->pin_owner = ResourceOwnerCreate(NULL, "DSGA IO wait pin");
+			ReservePrivateRefCountEntry();
+			ResourceOwnerEnlarge(cleanup->pin_owner);
+			CurrentResourceOwner = cleanup->pin_owner;
+			(void) LockBufHdr(buf);
+			PinBuffer_Locked(buf);
+			cleanup->pinned = true;
+			cleanup->audit_pending = true;
+			CurrentResourceOwner = cleanup->saved_owner;
+		}
 		WaitIOImpl(buf);
+		WaitIOCancelSleep(0, PointerGetDatum(cleanup));
 	}
-	PG_END_ENSURE_ERROR_CLEANUP(WaitIOCancelSleep, (Datum) 0);
+	PG_END_ENSURE_ERROR_CLEANUP(WaitIOCancelSleep, PointerGetDatum(cleanup));
 
-	if (BufferIsValid(wait_pin))
-		UnpinBuffer(buf);
+	if (cleanup != NULL)
+		pfree(cleanup);
 }
 
-/* ERROR 在本地展开、FATAL 在资源清理前执行；两者均仍有原生 pin。 */
+/*-
+ * ERROR在本地展开、FATAL在shmem退出前执行；Guard即使已放，专属owner的
+ * 真正pin仍保护Descriptor/IOCV。先撤CV再释放pin，不能向正在清理的事务owner
+ * 添加资源，也不能完整调用ResourceOwnerRelease递归触发扩展的全局清理回调。
+ */
 static void
 WaitIOCancelSleep(int code, Datum arg)
 {
+	DsgWaitIOCleanup *cleanup = (DsgWaitIOCleanup *) DatumGetPointer(arg);
+
 	ConditionVariableCancelSleep();
+	if (cleanup != NULL && cleanup->pin_owner != NULL)
+	{
+		/*-
+		 * PinBuffer_Locked内部无可恢复错误；仍覆盖未来错误路径的owner恢复。
+		 */
+		if (CurrentResourceOwner == cleanup->pin_owner)
+			CurrentResourceOwner = cleanup->saved_owner;
+		if (cleanup->audit_pending)
+		{
+			cleanup->audit_pending = false;
+			INJECTION_POINT("dsg-buffer-io-wait-cleaned");
+		}
+		/*-
+		 * 仅持有本次的一个pin。先从专属owner中移除登记并删除空owner，
+		 * 再以原生NoOwner路径放真实pin；不触发全局ResourceOwner回调。
+		 * 先清本地归属标记，覆盖最后unpin探针报错的重入，避免重复释放。
+		 * 从登记移除到真实unpin之间无可中断等待，pin本身仍保护Descriptor。
+		 */
+		if (cleanup->pinned)
+			ResourceOwnerForgetBuffer(cleanup->pin_owner, cleanup->buffer);
+		ResourceOwnerDelete(cleanup->pin_owner);
+		cleanup->pin_owner = NULL;
+		if (cleanup->pinned)
+		{
+			cleanup->pinned = false;
+			UnpinBufferNoOwner(GetBufferDescriptor(cleanup->buffer - 1));
+		}
+	}
 }
 
 /* 保留原生的先登记、再检查谓词、最后退出 CV 的等待顺序。 */

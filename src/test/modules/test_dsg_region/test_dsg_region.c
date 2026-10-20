@@ -18,6 +18,7 @@
 #include "utils/builtins.h"
 #include "utils/injection_point.h"
 #include "utils/rel.h"
+#include "utils/resowner.h"
 #include "utils/wait_event.h"
 
 PG_MODULE_MAGIC;
@@ -87,6 +88,7 @@ extern PGDLLEXPORT void test_dsg_collision_pause(const char *name, const void *p
 extern PGDLLEXPORT void test_dsg_checkpoint_pause(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_checkpoint_fail(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_io_pause(const char *name, const void *private_data);
+extern PGDLLEXPORT void test_dsg_io_audit(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_fast_drop(const char *name, const void *private_data);
 extern PGDLLEXPORT void test_dsg_grow_pause(const char *name, const void *private_data);
 static bool io_writer_armed;
@@ -947,18 +949,20 @@ test_dsg_checkpoint_control(PG_FUNCTION_ARGS)
 }
 
 /*-
- * 审核回调在 Drop 前登记；WaitIO 的清理后登记、先执行。ERROR 时应
- * 仍持 Guard，FATAL 时 shmem_exit 已放下 Guard，但两者均须仍持自身
- * pin 且不再挂在 CV 队列。此回调只观察，不替被测代码补清理。
+ * 在生产WaitIO已经撤CV、尚未放专属owner的pin时观察。ERROR时应仍持Guard，
+ * FATAL时shmem_exit已放下Guard；两者均须真实持pin且不在CV队列。不能在
+ * 外层清理已经放pin后再读Descriptor，也不替被测代码撤CV或释放资源。
  */
 #ifdef USE_INJECTION_POINTS
-static void
-test_dsg_io_audit(int code, Datum arg)
+void
+test_dsg_io_audit(const char *name, const void *private_data)
 {
 	DsgTestSharedState *state = (DsgTestSharedState *) inherited_region.address;
 	Buffer		buffer = (Buffer) pg_atomic_read_u32(&state->io_buffer);
 	uint32		result = 0;
 
+	if (!io_waiter_armed)
+		return;
 	CheckBufferIsPinnedOnce(buffer);
 	{
 		ConditionVariable *cv = BufferDescriptorGetIOCV(GetBufferDescriptor(buffer - 1));
@@ -973,6 +977,35 @@ test_dsg_io_audit(int code, Datum arg)
 		result |= 4;
 	pg_atomic_write_u32(&state->io_audit, result);
 	io_waiter_armed = false;
+}
+
+typedef struct DsgReleasingIOTest
+{
+	ResourceOwner owner;
+	SMgrRelation smgr;
+	bool		pending;
+} DsgReleasingIOTest;
+
+/*-
+ * 由原生ResourceOwnerRelease设置真实releasing状态后触发Drop，与事务
+ * 回滚删除relation时相同；不修改owner内部标志、不伪造IO/pin或CV状态。
+ * 只进入一次，排除清理异常后再次递归Drop；smgr由外层真实关系锁保护。
+ */
+static void
+test_dsg_releasing_io(ResourceReleasePhase phase, bool isCommit,
+					  bool isTopLevel, void *arg)
+{
+	DsgReleasingIOTest *test = (DsgReleasingIOTest *) arg;
+
+	if (phase == RESOURCE_RELEASE_BEFORE_LOCKS &&
+		CurrentResourceOwner == test->owner && test->pending)
+	{
+		ForkNumber	forknum = MAIN_FORKNUM;
+		BlockNumber first = 0;
+
+		test->pending = false;
+		DropRelationBuffers(test->smgr, &forknum, 1, &first);
+	}
 }
 #endif
 
@@ -1019,21 +1052,48 @@ test_dsg_io(PG_FUNCTION_ARGS)
 		PG_END_TRY();
 		UnlockReleaseBuffer(buffer);
 	}
-	else if (strcmp(mode, "invalidate") == 0)
+	else if (strcmp(mode, "invalidate") == 0 || strcmp(mode, "invalidate_release") == 0)
 	{
 		ForkNumber	forknum = MAIN_FORKNUM;
 		BlockNumber first = 0;
+		DsgReleasingIOTest *releasing = NULL;
+		ResourceOwner saved_owner = CurrentResourceOwner;
+
+		if (strcmp(mode, "invalidate_release") == 0)
+			releasing = palloc0(sizeof(*releasing));
 
 		rel = table_open(PG_GETARG_OID(0), AccessExclusiveLock);
 		test_dsg_check(rel->rd_rel->relpersistence != RELPERSISTENCE_TEMP,
 					   "IO tests require a shared relation");
 		io_waiter_armed = true;
-		PG_ENSURE_ERROR_CLEANUP(test_dsg_io_audit, (Datum) 0);
+		PG_TRY();
 		{
-			DropRelationBuffers(RelationGetSmgr(rel), &forknum, 1, &first);
+			if (releasing != NULL)
+			{
+				releasing->owner = ResourceOwnerCreate(NULL, "DSGA releasing IO test");
+				releasing->smgr = RelationGetSmgr(rel);
+				releasing->pending = true;
+				RegisterResourceReleaseCallback(test_dsg_releasing_io, releasing);
+				ResourceOwnerRelease(releasing->owner, RESOURCE_RELEASE_BEFORE_LOCKS,
+									 false, false);
+			}
+			else
+				DropRelationBuffers(RelationGetSmgr(rel), &forknum, 1, &first);
 		}
-		PG_END_ENSURE_ERROR_CLEANUP(test_dsg_io_audit, (Datum) 0);
-		io_waiter_armed = false;
+		PG_FINALLY();
+		{
+			io_waiter_armed = false;
+			CurrentResourceOwner = saved_owner;
+			if (releasing != NULL)
+			{
+				UnregisterResourceReleaseCallback(test_dsg_releasing_io, releasing);
+				if (releasing->owner != NULL)
+					ResourceOwnerDelete(releasing->owner);
+			}
+		}
+		PG_END_TRY();
+		if (releasing != NULL)
+			pfree(releasing);
 
 		/*
 		 * 若 WaitIO 遗留自身 pin，InvalidateBuffer 的原生检查已报错。
@@ -1066,6 +1126,8 @@ test_dsg_io_control(PG_FUNCTION_ARGS)
 							 "test_dsg_io_pause", NULL, 0);
 		InjectionPointAttach("dsg-buffer-io-wait-prepared", "test_dsg_region",
 							 "test_dsg_io_pause", NULL, 0);
+		InjectionPointAttach("dsg-buffer-io-wait-cleaned", "test_dsg_region",
+							 "test_dsg_io_audit", NULL, 0);
 	}
 	else if (strcmp(action, "writer_waiting") == 0)
 		result = pg_atomic_read_u32(&state->io_writer_gate) == 1;
@@ -1102,6 +1164,7 @@ test_dsg_io_control(PG_FUNCTION_ARGS)
 	{
 		InjectionPointDetach("dsg-buffer-before-write");
 		InjectionPointDetach("dsg-buffer-io-wait-prepared");
+		InjectionPointDetach("dsg-buffer-io-wait-cleaned");
 		InjectionPointDetach("dsg-buffer-fast-drop-found");
 	}
 	else

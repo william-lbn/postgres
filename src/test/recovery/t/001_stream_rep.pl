@@ -89,11 +89,13 @@ $node_standby_1->wait_for_replay_catchup($node_standby_2, $node_primary);
 
 $result = $node_standby_1->safe_psql('postgres', "SELECT * FROM seq1");
 print "standby 1: $result\n";
-is($result, qq(33|0|t), 'check streamed sequence content on standby 1');
+# Neon的SEQ_LOG_VALS=0逐次记录序列，不使用社区预写32个值的优化；精确检查已
+# nextval到1的状态，不能为了测试预期改掉生产序列/WAL语义。
+is($result, qq(1|0|t), 'check streamed sequence content on standby 1');
 
 $result = $node_standby_2->safe_psql('postgres', "SELECT * FROM seq1");
 print "standby 2: $result\n";
-is($result, qq(33|0|t), 'check streamed sequence content on standby 2');
+is($result, qq(1|0|t), 'check streamed sequence content on standby 2');
 
 # Check pg_sequence_last_value() returns NULL for unlogged sequence on standby
 $node_primary->safe_psql('postgres',

@@ -13,7 +13,13 @@ use Test::More;
 
 sub compare_confirmed_flush
 {
-	my ($node, $confirmed_flush_from_log) = @_;
+	my ($node, $confirmed_flush_from_log, $saved_confirmed_flush) = @_;
+
+	# Neon在PreCheckPointGuts保存slot并为其写入neon-file WAL，所以最终
+	# checkpoint位置会在已确认LSN之后。必须精确验证重启后恢复的是关机时
+	# 最后保存的confirmed_flush，不能把正确条件降成“任意较旧LSN都可以”。
+	is($confirmed_flush_from_log, $saved_confirmed_flush,
+		"slot confirmed_flush survives shutdown without retreat");
 
 	# Fetch Latest checkpoint location from the control file
 	my ($stdout, $stderr) =
@@ -31,10 +37,10 @@ sub compare_confirmed_flush
 	die "Latest checkpoint location not found in control file\n"
 	  unless defined($latest_checkpoint);
 
-	# Is it same as the value read from log?
-	ok( $latest_checkpoint eq $confirmed_flush_from_log,
-		"Check that the slot's confirmed_flush LSN is the same as the latest_checkpoint location"
-	);
+	# 额外验证该确认点不越过已持久的checkpoint。比较pg_lsn而非字符串排序。
+	is($node->safe_psql('postgres',
+		"SELECT '$confirmed_flush_from_log'::pg_lsn <= '$latest_checkpoint'::pg_lsn"), 't',
+		"slot confirmed_flush does not exceed the durable shutdown checkpoint");
 
 	return;
 }
@@ -105,8 +111,15 @@ $log_contents =~
   qr/Streaming transactions committing after ([A-F0-9]+\/[A-F0-9]+), reading WAL from ([A-F0-9]+\/[A-F0-9]+)./
   or die "could not get confirmed_flush_lsn";
 
-# Ensure that the slot's confirmed_flush LSN is the same as the
-# latest_checkpoint location.
-compare_confirmed_flush($node_publisher, $1);
+my $confirmed_flush = $1;
+
+# 只取本次关机阶段的最后一次真实保存日志，不能拿重启后的新保存掩盖回退。
+# 未强制刷新的旧缺陷若重现，保存日志缺失或新解码起点不匹配都会失败。
+my ($shutdown_log) = split(/database system is shut down/, $log_contents, 2);
+my @saved = $shutdown_log =~
+  /Save replication slot at pg_replslot\/sub\/state restart_lsn=[A-F0-9]+\/[A-F0-9]+ confirmed_flush=([A-F0-9]+\/[A-F0-9]+)/g;
+ok(scalar @saved > 0, 'logical slot was explicitly saved during shutdown');
+compare_confirmed_flush($node_publisher, $confirmed_flush,
+	@saved ? $saved[-1] : '0/0');
 
 done_testing();

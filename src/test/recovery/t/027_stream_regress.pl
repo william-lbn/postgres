@@ -21,9 +21,10 @@ $node_primary->append_conf('postgresql.conf',
 # Enable pg_stat_statements to force tests to do query jumbling.
 # pg_stat_statements.max should be large enough to hold all the entries
 # of the regression database.
+$node_primary->append_shared_preload_library('pg_stat_statements');
 $node_primary->append_conf(
 	'postgresql.conf',
-	qq{shared_preload_libraries = 'pg_stat_statements'
+	qq{
 pg_stat_statements.max = 50000
 compute_query_id = 'regress'
 });

@@ -10,11 +10,11 @@ use Test::More;
 my $node = PostgreSQL::Test::Cluster->new('main');
 
 $node->init;
+$node->append_shared_preload_library('test_custom_rmgrs');
 $node->append_conf(
 	'postgresql.conf', q{
 wal_level = 'replica'
 max_wal_senders = 4
-shared_preload_libraries = 'test_custom_rmgrs'
 });
 $node->start;
 

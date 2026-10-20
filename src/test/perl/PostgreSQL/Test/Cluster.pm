@@ -756,6 +756,37 @@ sub append_conf
 
 =pod
 
+=item $node->append_shared_preload_library(library)
+
+追加一个具名测试库并保留实际配置中的预加载项；使用postgres自己的配置解析器
+处理TEMP_CONFIG、include及转义，不能通过覆盖列表丢掉Neon WAL资源管理器。
+只接受简单库名，本方法不启动节点、不重载已经运行的节点。
+
+=cut
+
+sub append_shared_preload_library
+{
+	my ($self, $library) = @_;
+
+	die "expected a simple shared-preload library name"
+	  unless $library =~ m/\A[A-Za-z0-9_.-]+\z/;
+	my ($current, $stderr) = ('', '');
+	IPC::Run::run(
+		[ 'postgres', '-D', $self->data_dir, '-C', 'shared_preload_libraries' ],
+		'>', \$current, '2>', \$stderr)
+	  or die "could not read actual shared-preload configuration: $stderr";
+	chomp $current;
+	my $combined = length($current) ? "$current,$library" : $library;
+	# PostgreSQL配置字符串转义；不能复用shell引号规则或手写解析旧列表。
+	$combined =~ s/\\/\\\\/g;
+	$combined =~ s/'/''/g;
+	$self->append_conf('postgresql.conf',
+		"shared_preload_libraries = '$combined'");
+	return;
+}
+
+=pod
+
 =item $node->adjust_conf(filename, setting, value, skip_equals)
 
 Modify the named config file setting with the value. If the value is undefined,

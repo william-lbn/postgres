@@ -124,3 +124,27 @@ isolation **123/123** 通过。合并冲突仅为本中文记录末尾的两侧�
 4 个官方代码/回归文件与维护头一致。日志 `build/v3-feature-upstream-build.log`、
 `build/v3-feature-upstream-core.log`、`build/v3-feature-upstream-isolation.log`。
 随后才恢复 M2f 草稿，维护同步与业务改动分别提交。
+
+## 2026-10-23：提交前最新维护与恢复期边界
+
+本次fresh fetch锁定社区`e05b7e2a45c7a151ad3f8771ba7f5d8b4ddd8d0c`，独立维护
+`d70986fd29d8293058c5780df982fce23e09eecf`完整包含六项新维护及Neon`56692dfb`。
+5个官方文件无冲突、与新社区头逐字节一致，保留原作者/注释；新增内容包括
+currtid恢复期unlogged访问拒绝、空tsquery二进制输入、索引进度bigint参数、
+psql补全、逻辑复制测试竞态和slot命名修复。本批没有改变WAL格式或DSGA协议。
+
+维护层debug/cassert/injection/TAP构建：225核心、123隔离、14真实主备/边界全部
+通过。功能组合候选单独构建并通过225核心、123隔离，受影响的035逻辑复制与
+新增062真实边界合计97项TAP通过。候选构建使用显式candidate版本名；不把候选
+日志或旧准确0edff的结果当成本提交准确SHA认证。最终准确构建/门禁以Neon
+主仓《DSGA-Mac收尾与Linux交接-20261023》及机器证据为准。
+
+新增`src/test/recovery/t/062_neon_currtid_recovery.pl`有详细中文原因/边界说明：
+真实pg_basebackup主备，核对恢复状态、主库普通/临时/unlogged访问、备库普通表
+成功及unlogged/视图拒绝的退出码/无输出/SQLSTATE 0A000，错误后仍能查询；
+同场检验空tsquery二进制COPY和高32位不为零的bigint阶段参数，避免只有源码
+字符串检查。框架管理独占目录与进程，不接触用户数据库。
+
+证据保留在工作区build/upstreame05b7-maint-*、upstreame05b7-feature-*。本批未
+重做全部check-world、Windows/可选SSL/GSS/ICU组合，不替代Linux/NeonVM/HugeTLB
+及最终完整业务认证。功能默认关闭；自有主分支不变。

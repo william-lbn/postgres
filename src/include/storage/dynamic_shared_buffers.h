@@ -18,6 +18,8 @@
 /* 准入是独立增量能力，不改变Buffer ABI6的既有结构/函数布局。 */
 #define NEON_DSG_ADMISSION_API_VERSION 1
 #define NEON_DSG_ADMISSION_STATUS_API_VERSION 1
+/* 独立成本能力，不改变Buffer ABI6或已有snapshot结构。 */
+#define NEON_DSG_SHARED_COST_API_VERSION 1
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
 #define DSG_BUFFER_HISTORY_SIZE 16
 #define DSG_BUFFER_CONTEXT_BYTES 32
@@ -264,6 +266,19 @@ typedef struct DsgBufferControlResponse
 } DsgBufferControlResponse;
 
 /*-
+ * 固定主共享段与四个DSG数组的互不重计上界。startup_shared_upper_bytes
+ * 已包含bootstrap数组，运行时不能再把整个启动总量与当前数组简单相加。
+ * 不包含DSM、私有查询/进程、LFC或Guest池等外层成本，不表示VM许可。
+ */
+typedef struct DsgBufferSharedCost
+{
+	Size		startup_main_upper_bytes;
+	Size		startup_arrays_upper_bytes;
+	Size		current_main_and_arrays_upper_bytes;
+	DsgBufferSnapshot observed;
+} DsgBufferSharedCost;
+
+/*-
  * 接管事实独立于resize回执。PENDING已推进最低代次，但旧执行者/Provider
  * 尚未全部退出；只有FENCED表示本次条件取得串行锁时已无旧副作用。此事实
  * 不认证领导权，不替代外层持久意图、预算、Guest或最终VM执行许可。
@@ -369,6 +384,7 @@ extern void DynamicSharedBuffersInit(void);
 extern DsgBufferAccess DsgBufferAccessBegin(void);
 extern void DsgBufferAccessEnd(DsgBufferAccess *access);
 extern void DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot);
+extern void DsgBufferGetSharedCost(DsgBufferSharedCost *cost);
 extern bool DsgBufferParseUint64(const char *value, Size length, uint64 *result);
 extern void DsgBufferCheckStartupBudget(Size main_segment_bytes);
 extern void DsgBufferCheckAdmission(void);

@@ -40,6 +40,12 @@ StaticAssertDecl(sizeof(DsgAdmissionIdentity) <= PG_CACHE_LINE_SIZE,
 static DsgAdmissionIdentity *admission_identity;
 DynamicSharedBuffersControl *DSBCtrl = NULL;
 static Size startup_shared_upper_bytes;
+/*-
+ * 在Postmaster创建共享段前固定，fork backend继承；内部崩溃恢复重新计算。
+ * 不增加目录/主共享段中的未预算字节，也不改变已有公开控制结构布局。
+ */
+static Size startup_main_upper_bytes;
+static Size startup_arrays_upper_bytes;
 
 /*-
  * 在主共享段及 preload 扩展请求全部计入后，额外计入四个独立数组的
@@ -84,15 +90,20 @@ DsgBufferCheckStartupBudget(Size main_segment_bytes)
 	}
 	if (main_segment_bytes % main_page_bytes != 0)
 		bytes = add_size(bytes, main_page_bytes - main_segment_bytes % main_page_bytes);
+	startup_main_upper_bytes = bytes;
+	startup_arrays_upper_bytes = 0;
 	for (i = 0; i < lengthof(elements); i++)
 	{
 		Size		array_bytes = mul_size(NBuffers, elements[i]);
+		Size		aligned_bytes;
 
 		/*-
 		 * 加法先检查溢出，再向下对齐已加padding的长度，得到安全ceil。
 		 */
-		bytes = add_size(bytes, TYPEALIGN_DOWN((Size) page_bytes,
-											   add_size(array_bytes, (Size) page_bytes - 1)));
+		aligned_bytes = TYPEALIGN_DOWN((Size) page_bytes,
+									  add_size(array_bytes, (Size) page_bytes - 1));
+		bytes = add_size(bytes, aligned_bytes);
+		startup_arrays_upper_bytes = add_size(startup_arrays_upper_bytes, aligned_bytes);
 	}
 	startup_shared_upper_bytes = bytes;
 	if (dynamic_shared_buffers_startup_budget > 0 &&
@@ -102,6 +113,35 @@ DsgBufferCheckStartupBudget(Size main_segment_bytes)
 				 errmsg("dynamic buffer startup layout exceeds the shared-memory budget"),
 				 errdetail("Layout requires %zu bytes; budget is %d kB.", bytes,
 						   dynamic_shared_buffers_startup_budget)));
+}
+
+/*-
+ * 只在已有status spinlock下复制同一时刻的完整快照，随后无锁计算checked
+ * 上界；不获取resize/Provider锁，不写floor、门禁或容量。主段上界保留启动
+ * 的巨页/普通页padding和身份页，不能按当前H重算固定hash或preload成本。
+ * 数组采用原生登记的最坏占用：未发布分配、失败/未知尾部和未实际回收部分
+ * 都继续计费；逻辑H缩小不能使此成本自行下降。计算溢出是错误，不能饱和为小值。
+ */
+void
+DsgBufferGetSharedCost(DsgBufferSharedCost *cost)
+{
+	int			i;
+
+	MemSet(cost, 0, sizeof(*cost));
+	DsgBufferGetSnapshot(&cost->observed);
+	if (startup_main_upper_bytes == 0 ||
+		add_size(startup_main_upper_bytes, startup_arrays_upper_bytes) !=
+		cost->observed.startup_shared_upper_bytes)
+		ereport(ERROR,
+				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+				 errmsg("dynamic buffer startup cost is unavailable or inconsistent")));
+	cost->startup_main_upper_bytes = startup_main_upper_bytes;
+	cost->startup_arrays_upper_bytes = startup_arrays_upper_bytes;
+	cost->current_main_and_arrays_upper_bytes = startup_main_upper_bytes;
+	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
+		cost->current_main_and_arrays_upper_bytes =
+			add_size(cost->current_main_and_arrays_upper_bytes,
+					 cost->observed.committed_upper_bytes[i]);
 }
 
 /*-

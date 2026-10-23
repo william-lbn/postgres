@@ -20,6 +20,24 @@ bool		enable_dynamic_shared_buffers = false;
 int			max_shared_buffers = 0;
 bool		dynamic_shared_buffers_require_admission = false;
 int			dynamic_shared_buffers_startup_budget = 0;
+
+/*-
+ * 私有准入回执放在目录尾部已经计入ShmemSize的保留cache line内，不改变公开
+ * DynamicSharedBuffersControl/Buffer ABI6的字段偏移，也不另申请未计入预算的
+ * 共享区。fork子进程继承指针；每次共享内存重建MemSet清零，不继承旧boot许可。
+ * status_lock同时保护它与原admission_revision/open；锁内只有定长比较/复制。
+ */
+typedef struct DsgAdmissionIdentity
+{
+	uint64		epoch;
+	uint64		revision;
+	unsigned char context_sha256[DSG_BUFFER_CONTEXT_BYTES];
+	bool		valid;
+} DsgAdmissionIdentity;
+
+StaticAssertDecl(sizeof(DsgAdmissionIdentity) <= PG_CACHE_LINE_SIZE,
+				 "DSGA admission identity must fit reserved directory cache line");
+static DsgAdmissionIdentity *admission_identity;
 DynamicSharedBuffersControl *DSBCtrl = NULL;
 static Size startup_shared_upper_bytes;
 
@@ -142,11 +160,82 @@ DsgBufferSetAdmission(uint64 boot_id, uint64 revision, uint64 expected_generatio
 	{
 		DSBCtrl->admission_revision = revision;
 		pg_atomic_write_u32(&DSBCtrl->admission_open, open ? 1 : 0);
+		/*- 旧测试/内部入口没有完整来源摘要，不能据它伪造新协议重放证明。 */
+		admission_identity->valid = false;
 	}
 	SpinLockRelease(&DSBCtrl->status_lock);
 	if (!valid)
 		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 						errmsg("invalid or stale dynamic buffer admission request")));
+}
+
+/*-
+ * 先显式FenceIssuer取得当前epoch，再调用本入口。epoch不得在此隐式推进；
+ * 旧owner迟到的开门请求不能越过更高floor。开门条件取得resize串行锁，拒绝
+ * 仍PREPARING的未知效果；关门不等resize/Provider，及时停止普通新命令。
+ * 锁序resize(仅开门)→status；调用者不能已持access/resize锁。无网络/分配/IO/
+ * ERROR位于spinlock内；成功观察仅PG准入事实，不是排空/预算或VM许可。
+ */
+void
+DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
+						  DsgBufferAdmissionResponse *response)
+{
+	bool		locked = false;
+	bool		same;
+
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("dynamic buffer admission requires a superuser session")));
+	if (DSBCtrl == NULL || !IsUnderPostmaster || admission_identity == NULL)
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("DSGA admission requires an enabled running server")));
+	if (request->boot_id == 0 || request->issuer_epoch == 0 || request->revision == 0 || request->expected_generation == 0)
+		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE), errmsg("invalid DSGA admission identity")));
+	if (LWLockHeldByMe(&DSBCtrl->access_lock) || LWLockHeldByMe(&DSBCtrl->resize_lock))
+		elog(ERROR, "DSGA admission cannot run while holding buffer coordination locks");
+	MemSet(response, 0, sizeof(*response));
+	if (request->open)
+	{
+		locked = LWLockConditionalAcquire(&DSBCtrl->resize_lock, LW_EXCLUSIVE);
+		if (!locked)
+		{
+			response->disposition = DSG_ADMISSION_BUSY;
+			DsgBufferGetSnapshot(&response->observed);
+			return;
+		}
+	}
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	same = admission_identity->valid && admission_identity->epoch == request->issuer_epoch &&
+		admission_identity->revision == request->revision &&
+		request->open == (pg_atomic_read_u32(&DSBCtrl->admission_open) != 0) &&
+		memcmp(admission_identity->context_sha256, request->context_sha256, DSG_BUFFER_CONTEXT_BYTES) == 0;
+	if (request->boot_id != DSBCtrl->boot_id || request->issuer_epoch != DSBCtrl->issuer_floor_epoch ||
+		request->revision < DSBCtrl->admission_revision)
+		response->disposition = DSG_ADMISSION_STALE;
+	else if (request->revision == DSBCtrl->admission_revision)
+		response->disposition = same ? DSG_ADMISSION_REPLAYED : DSG_ADMISSION_CONFLICT;
+	else if (request->expected_generation != pg_atomic_read_u64(&DSBCtrl->generation))
+		response->disposition = DSG_ADMISSION_STALE;
+	else if (request->open && DSBCtrl->operation.phase == DSG_OP_PREPARING)
+		response->disposition = DSG_ADMISSION_BUSY;
+	else if (DSBCtrl->admission_revision == PG_UINT64_MAX ||
+			 request->revision != DSBCtrl->admission_revision + 1)
+		response->disposition = DSG_ADMISSION_CONFLICT;
+	else
+	{
+		admission_identity->epoch = request->issuer_epoch;
+		admission_identity->revision = request->revision;
+		memcpy(admission_identity->context_sha256, request->context_sha256, DSG_BUFFER_CONTEXT_BYTES);
+		admission_identity->valid = true;
+		DSBCtrl->admission_revision = request->revision;
+		pg_atomic_write_u32(&DSBCtrl->admission_open, request->open ? 1 : 0);
+		response->disposition = DSG_ADMISSION_APPLIED;
+	}
+	DsgBufferCopySnapshotLocked(&response->observed);
+	SpinLockRelease(&DSBCtrl->status_lock);
+	/*- 取得串行锁后只运行上述有界无错误状态段，无需跨中断/外部动作保留锁。 */
+	if (locked)
+		LWLockRelease(&DSBCtrl->resize_lock);
 }
 
 /*-
@@ -228,6 +317,7 @@ DynamicSharedBuffersInit(void)
 	 */
 	Assert(!found);
 	MemSet(DSBCtrl, 0, size);
+	admission_identity = (DsgAdmissionIdentity *) ((char *) DSBCtrl + size - PG_CACHE_LINE_SIZE);
 	pg_atomic_init_u32(&DSBCtrl->low, NBuffers);
 	pg_atomic_init_u32(&DSBCtrl->high, NBuffers);
 	pg_atomic_init_u32(&DSBCtrl->admission_open, dynamic_shared_buffers_require_admission ? 0 : 1);

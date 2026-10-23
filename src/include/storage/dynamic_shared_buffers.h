@@ -15,6 +15,8 @@
 
 /* Neon 扩展按能力宏适配，不能由 PG 大版本号推断本 fork 的内核接口。 */
 #define NEON_DSG_BUFFER_API_VERSION 6
+/* 准入是独立增量能力，不改变Buffer ABI6的既有结构/函数布局。 */
+#define NEON_DSG_ADMISSION_API_VERSION 1
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
 #define DSG_BUFFER_HISTORY_SIZE 16
 #define DSG_BUFFER_CONTEXT_BYTES 32
@@ -187,6 +189,36 @@ typedef struct DsgBufferSnapshot
 } DsgBufferSnapshot;
 
 /*-
+ * 原创建/预算协调器先持久化完整准入意图，认证管理层计算规范摘要。这里不认证
+ * 预算内容，只在同boot/已建立的issuer floor/容量代次下串行发布门禁。revision
+ * 属于准入域，不与resize revision混用；重放必须有相同完整摘要，不能只同open。
+ */
+typedef struct DsgBufferAdmissionRequest
+{
+	uint64		boot_id;
+	uint64		issuer_epoch;
+	uint64		revision;
+	uint64		expected_generation;
+	bool		open;
+	unsigned char context_sha256[DSG_BUFFER_CONTEXT_BYTES];
+} DsgBufferAdmissionRequest;
+
+typedef enum DsgBufferAdmissionDisposition
+{
+	DSG_ADMISSION_APPLIED,
+	DSG_ADMISSION_REPLAYED,
+	DSG_ADMISSION_BUSY,
+	DSG_ADMISSION_STALE,
+	DSG_ADMISSION_CONFLICT
+} DsgBufferAdmissionDisposition;
+
+typedef struct DsgBufferAdmissionResponse
+{
+	DsgBufferAdmissionDisposition disposition;
+	DsgBufferSnapshot observed;
+} DsgBufferAdmissionResponse;
+
+/*-
  * 回执属于本请求；result只有has_result时有效，是该操作的历史事实。
  * observed另取当前快照，二者不得混用，尤其不能把别人的COMMITTED当本次结果。
  * 历史只在本boot有界保留，淘汰后拒绝重新执行，外层负责持久历史。
@@ -340,6 +372,8 @@ extern void DsgBufferCheckAdmission(void);
 extern void DsgBufferCheckPhysicalReplication(void);
 extern void DsgBufferSetAdmission(uint64 boot_id, uint64 revision,
 								  uint64 expected_generation, bool open);
+extern void DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
+									 DsgBufferAdmissionResponse *response);
 
 /* 内核协调接口；调用者须先完成权限/外层资源预算检查，尚无用户 SQL 入口。 */
 extern bool DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms,

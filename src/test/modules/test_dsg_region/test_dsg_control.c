@@ -20,6 +20,7 @@ PG_FUNCTION_INFO_V1(test_dsg_control);
 PG_FUNCTION_INFO_V1(test_dsg_control_parse);
 PG_FUNCTION_INFO_V1(test_dsg_control_hold_guard);
 PG_FUNCTION_INFO_V1(test_dsg_fence_issuer);
+PG_FUNCTION_INFO_V1(test_dsg_control_admission);
 
 static void
 DsgTestControlCheck(void)
@@ -38,6 +39,39 @@ DsgTestControlUint64(text *input)
 		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 						errmsg("DSGA uint64 must be a canonical decimal string")));
 	return value;
+}
+
+/*- 仅翻译参数和真实快照；token生成定长测试上下文，不代表生产SHA或预算证明。 */
+Datum
+test_dsg_control_admission(PG_FUNCTION_ARGS)
+{
+	DsgBufferAdmissionRequest request;
+	DsgBufferAdmissionResponse response;
+	DsgBufferAccess access;
+	StringInfoData output;
+	int32		token;
+	bool		guarded;
+
+	DsgTestControlCheck();
+	MemSet(&request, 0, sizeof(request));
+	request.boot_id = DsgTestControlUint64(PG_GETARG_TEXT_PP(0));
+	request.issuer_epoch = DsgTestControlUint64(PG_GETARG_TEXT_PP(1));
+	request.revision = DsgTestControlUint64(PG_GETARG_TEXT_PP(2));
+	request.expected_generation = DsgTestControlUint64(PG_GETARG_TEXT_PP(3));
+	request.open = PG_GETARG_BOOL(4);
+	token = PG_GETARG_INT32(5);
+	memcpy(request.context_sha256, &token, sizeof(token));
+	guarded = PG_GETARG_BOOL(6);
+	if (guarded)
+		access = DsgBufferAccessBegin();
+	DsgBufferControlAdmission(&request, &response);
+	if (guarded)
+		DsgBufferAccessEnd(&access);
+	initStringInfo(&output);
+	appendStringInfo(&output,
+					 "{\"disposition\":%d,\"admission_open\":%s,\"admission_revision\":\"" UINT64_FORMAT "\"}",
+					 response.disposition, response.observed.admission_open ? "true" : "false", response.observed.admission_revision);
+	PG_RETURN_DATUM(DirectFunctionCall1(jsonb_in, CStringGetDatum(output.data)));
 }
 
 static void

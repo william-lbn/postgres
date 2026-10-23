@@ -51,6 +51,7 @@
 #include "replication/slot.h"
 #include "replication/walsender_private.h"
 #include "replication/message.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
 #include "storage/proc.h"
@@ -347,6 +348,10 @@ ReplicationSlotCreate(const char *name, bool db_specific,
 
 	ReplicationSlotValidateName(name, ERROR);
 
+	/*- 同时覆盖SQL函数与复制协议；拒绝必须早于目录/磁盘槽分配。 */
+	if (!db_specific)
+		DsgBufferCheckPhysicalReplication();
+
 	if (failover)
 	{
 		/*
@@ -590,6 +595,14 @@ retry:
 				 errmsg("replication slot \"%s\" does not exist",
 						name)));
 	}
+
+	/*-
+	 * ControlLock保护槽存在，物理/逻辑分类在同一槽生命周期内固定；尚未持mutex、排队或改
+	 * active_pid。不能在外层按名字检查再解锁后执行DROP/ADVANCE/COPY，否则
+	 * 同名槽重建会穿透类型边界。拒绝时PG ERROR清理释放LWLock，不认领槽。
+	 */
+	if (SlotIsPhysical(s))
+		DsgBufferCheckPhysicalReplication();
 
 	/*
 	 * This is the slot we want; check if it's active under some other

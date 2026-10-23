@@ -44,6 +44,7 @@
 #include "replication/slotsync.h"
 #include "replication/walsender.h"
 #include "storage/bufmgr.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
 #include "storage/lmgr.h"
@@ -980,6 +981,14 @@ InitPostgres(const char *in_dbname, Oid dboid,
 					 errmsg("permission denied to start WAL sender"),
 					 errdetail("Only roles with the %s attribute may start a WAL sender process.",
 							   "REPLICATION")));
+
+		/*-
+		 * 业务角色保留逻辑复制，不能以replication=true启动全实例通道。
+		 * startup options仍可能切换ROLE，命令入口还会复查当前身份；
+		 * replication=database也不能据此取得BASE_BACKUP权限。
+		 */
+		if (!am_db_walsender)
+			DsgBufferCheckPhysicalReplication();
 	}
 
 	/*

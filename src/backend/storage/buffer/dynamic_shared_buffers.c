@@ -104,6 +104,24 @@ DsgBufferCheckAdmission(void)
 				 errmsg("dynamic shared buffer admission is closed for this boot")));
 }
 
+/*-
+ * 业务REPLICATION属性只用于逻辑复制，不能授予全实例物理WAL/备份/物理槽权限。
+ * 物理数据包含全局认证目录，仅有SQL列ACL无法隔离。当前及session身份均须为
+ * 内部SU；使用初始化/SET ROLE维护的缓存标志，不启动事务或读取系统目录，
+ * 因而适用于没有数据库的physical walsender以及持槽ControlLock的调用点。
+ * 调用方不得持spinlock；ERROR按PG标准清理LWLock，须发生在槽认领/写入前。
+ * 非DSGA保持官方行为。此检查不代替私有HBA/镜像认证、逻辑槽预算或流式排空。
+ */
+void
+DsgBufferCheckPhysicalReplication(void)
+{
+	if (enable_dynamic_shared_buffers &&
+		(!current_role_is_superuser || !GetSessionUserIsSuperuser()))
+		ereport(ERROR,
+				(errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+				 errmsg("dynamic shared buffer physical replication requires internal management privileges")));
+}
+
 void
 DsgBufferSetAdmission(uint64 boot_id, uint64 revision, uint64 expected_generation, bool open)
 {

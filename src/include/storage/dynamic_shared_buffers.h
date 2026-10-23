@@ -337,6 +337,7 @@ extern void DsgBufferGetSnapshot(DsgBufferSnapshot *snapshot);
 extern bool DsgBufferParseUint64(const char *value, Size length, uint64 *result);
 extern void DsgBufferCheckStartupBudget(Size main_segment_bytes);
 extern void DsgBufferCheckAdmission(void);
+extern void DsgBufferCheckPhysicalReplication(void);
 extern void DsgBufferSetAdmission(uint64 boot_id, uint64 revision,
 								  uint64 expected_generation, bool open);
 

@@ -80,6 +80,7 @@
 #include "replication/walsender.h"
 #include "replication/walsender_private.h"
 #include "storage/condition_variable.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
 #include "storage/pmsignal.h"
@@ -2124,6 +2125,32 @@ exec_replication_command(const char *cmd_string)
 	replication_scanner_finish();
 
 	cmd_node = replication_parse_result;
+
+	/*-
+	 * logical walsender也接受物理命令，不能仅按startup的replication参数分类。
+	 * 发送数据/进入COPY或分配备份状态前检查真实命令。逻辑建槽、逻辑流及
+	 * IDENTIFY_SYSTEM/SHOW保留官方语义；DROP/ALTER经SlotAcquire按槽真实类型
+	 * 检查，避免按名字预读再执行时同名槽被替换造成TOCTOU。
+	 */
+	switch (cmd_node->type)
+	{
+		case T_BaseBackupCmd:
+		case T_TimeLineHistoryCmd:
+		case T_UploadManifestCmd:
+		case T_ReadReplicationSlotCmd:
+			DsgBufferCheckPhysicalReplication();
+			break;
+		case T_CreateReplicationSlotCmd:
+			if (((CreateReplicationSlotCmd *) cmd_node)->kind == REPLICATION_KIND_PHYSICAL)
+				DsgBufferCheckPhysicalReplication();
+			break;
+		case T_StartReplicationCmd:
+			if (((StartReplicationCmd *) cmd_node)->kind == REPLICATION_KIND_PHYSICAL)
+				DsgBufferCheckPhysicalReplication();
+			break;
+		default:
+			break;
+	}
 
 	/*
 	 * Report query to various monitoring facilities.  For this purpose, we

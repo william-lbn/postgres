@@ -169,6 +169,19 @@ DsgBufferSetAdmission(uint64 boot_id, uint64 revision, uint64 expected_generatio
 						errmsg("invalid or stale dynamic buffer admission request")));
 }
 
+static void
+DsgCheckAdmissionRequest(const DsgBufferAdmissionRequest *request)
+{
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("dynamic buffer admission requires a superuser session")));
+	if (DSBCtrl == NULL || !IsUnderPostmaster || admission_identity == NULL)
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("DSGA admission requires an enabled running server")));
+	if (request->boot_id == 0 || request->issuer_epoch == 0 || request->revision == 0 || request->expected_generation == 0)
+		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE), errmsg("invalid DSGA admission identity")));
+}
+
 /*-
  * 先显式FenceIssuer取得当前epoch，再调用本入口。epoch不得在此隐式推进；
  * 旧owner迟到的开门请求不能越过更高floor。开门条件取得resize串行锁，拒绝
@@ -183,14 +196,7 @@ DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
 	bool		locked = false;
 	bool		same;
 
-	if (!superuser() || !superuser_arg(GetSessionUserId()))
-		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
-						errmsg("dynamic buffer admission requires a superuser session")));
-	if (DSBCtrl == NULL || !IsUnderPostmaster || admission_identity == NULL)
-		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
-						errmsg("DSGA admission requires an enabled running server")));
-	if (request->boot_id == 0 || request->issuer_epoch == 0 || request->revision == 0 || request->expected_generation == 0)
-		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE), errmsg("invalid DSGA admission identity")));
+	DsgCheckAdmissionRequest(request);
 	if (LWLockHeldByMe(&DSBCtrl->access_lock) || LWLockHeldByMe(&DSBCtrl->resize_lock))
 		elog(ERROR, "DSGA admission cannot run while holding buffer coordination locks");
 	MemSet(response, 0, sizeof(*response));
@@ -236,6 +242,38 @@ DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
 	/*- 取得串行锁后只运行上述有界无错误状态段，无需跨中断/外部动作保留锁。 */
 	if (locked)
 		LWLockRelease(&DSBCtrl->resize_lock);
+}
+
+/*-
+ * 换owner也只能观察原请求，不能把旧epoch改成新epoch重放。此入口仅在status
+ * spinlock内比较本boot最后一份完整回执和复制当前快照，绝不提升floor/修改
+ * revision/门禁、取得resize锁或调用Provider，所以在resize阻塞时仍能到达。
+ * NOT_FOUND只表示观察时未见回执，不能证明已发送请求不会迟到；旧回执被更高
+ * revision覆盖则明确RESULT_EXPIRED，不能把当前open值拼成旧预算的成功证明。
+ */
+void
+DsgBufferAdmissionStatus(const DsgBufferAdmissionRequest *request,
+						 DsgBufferAdmissionResponse *response)
+{
+	bool		same;
+
+	DsgCheckAdmissionRequest(request);
+	MemSet(response, 0, sizeof(*response));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	same = admission_identity->valid && admission_identity->epoch == request->issuer_epoch &&
+		admission_identity->revision == request->revision &&
+		request->open == (pg_atomic_read_u32(&DSBCtrl->admission_open) != 0) &&
+		memcmp(admission_identity->context_sha256, request->context_sha256, DSG_BUFFER_CONTEXT_BYTES) == 0;
+	if (request->boot_id != DSBCtrl->boot_id)
+		response->disposition = DSG_ADMISSION_STALE;
+	else if (request->revision < DSBCtrl->admission_revision)
+		response->disposition = DSG_ADMISSION_RESULT_EXPIRED;
+	else if (request->revision > DSBCtrl->admission_revision)
+		response->disposition = DSG_ADMISSION_NOT_FOUND;
+	else
+		response->disposition = same ? DSG_ADMISSION_REPLAYED : DSG_ADMISSION_CONFLICT;
+	DsgBufferCopySnapshotLocked(&response->observed);
+	SpinLockRelease(&DSBCtrl->status_lock);
 }
 
 /*-

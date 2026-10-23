@@ -17,6 +17,7 @@
 #define NEON_DSG_BUFFER_API_VERSION 6
 /* 准入是独立增量能力，不改变Buffer ABI6的既有结构/函数布局。 */
 #define NEON_DSG_ADMISSION_API_VERSION 1
+#define NEON_DSG_ADMISSION_STATUS_API_VERSION 1
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
 #define DSG_BUFFER_HISTORY_SIZE 16
 #define DSG_BUFFER_CONTEXT_BYTES 32
@@ -209,7 +210,9 @@ typedef enum DsgBufferAdmissionDisposition
 	DSG_ADMISSION_REPLAYED,
 	DSG_ADMISSION_BUSY,
 	DSG_ADMISSION_STALE,
-	DSG_ADMISSION_CONFLICT
+	DSG_ADMISSION_CONFLICT,
+	DSG_ADMISSION_NOT_FOUND,
+	DSG_ADMISSION_RESULT_EXPIRED
 } DsgBufferAdmissionDisposition;
 
 typedef struct DsgBufferAdmissionResponse
@@ -374,6 +377,8 @@ extern void DsgBufferSetAdmission(uint64 boot_id, uint64 revision,
 								  uint64 expected_generation, bool open);
 extern void DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
 									 DsgBufferAdmissionResponse *response);
+extern void DsgBufferAdmissionStatus(const DsgBufferAdmissionRequest *request,
+									DsgBufferAdmissionResponse *response);
 
 /* 内核协调接口；调用者须先完成权限/外层资源预算检查，尚无用户 SQL 入口。 */
 extern bool DsgBufferGrow(const DsgBufferGrowRequest *request, int timeout_ms,

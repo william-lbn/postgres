@@ -8,6 +8,7 @@ backend_sources += files(
   'dsg_buffer_grow.c',
   'dsg_buffer_control.c',
   'dsg_buffer_shrink.c',
+  'dsg_work.c',
   'freelist.c',
   'localbuf.c',
 )

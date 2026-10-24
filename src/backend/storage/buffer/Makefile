@@ -20,6 +20,7 @@ OBJS = \
 	dsg_buffer_grow.o \
 	dsg_buffer_control.o \
 	dsg_buffer_shrink.o \
+	dsg_work.o \
 	freelist.o \
 	localbuf.o
 

@@ -42,6 +42,7 @@
 #include "replication/slotsync.h"
 #include "replication/syncrep.h"
 #include "storage/condition_variable.h"
+#include "storage/dsg_work.h"
 #include "storage/ipc.h"
 #include "storage/lmgr.h"
 #include "storage/pmsignal.h"
@@ -480,6 +481,9 @@ InitProcess(void)
 	if (IsUnderPostmaster)
 		AttachSharedMemoryStructs();
 #endif
+
+	/* 退出回调先安装；此时已释放ProcStructLock，登记失败不会遗留伪空闲槽。 */
+	DsgWorkAttach(false);
 }
 
 /*
@@ -651,6 +655,8 @@ InitAuxiliaryProcess(void)
 	if (IsUnderPostmaster)
 		AttachSharedMemoryStructs();
 #endif
+
+	DsgWorkAttach(true);
 }
 
 /*
@@ -953,6 +959,8 @@ ProcKill(int code, Datum arg)
 	/* See comment above, close to DisownLatch() */
 	pgstat_reset_wait_event_storage();
 
+	/* 资源/锁组已清理；不得先注销再进行仍可分配的退出工作。 */
+	DsgWorkDetach();
 	MyProc = NULL;
 	MyProcNumber = INVALID_PROC_NUMBER;
 
@@ -1032,6 +1040,8 @@ AuxiliaryProcKill(int code, Datum arg)
 	pgstat_reset_wait_event_storage();
 
 	proc = MyProc;
+	/* 资源/锁组已清理；不得先注销再进行仍可分配的退出工作。 */
+	DsgWorkDetach();
 	MyProc = NULL;
 	MyProcNumber = INVALID_PROC_NUMBER;
 	DisownLatch(&proc->procLatch);

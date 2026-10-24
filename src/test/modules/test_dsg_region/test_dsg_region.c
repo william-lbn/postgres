@@ -10,6 +10,7 @@
 #include "port/atomics.h"
 #include "storage/buf_internals.h"
 #include "storage/dsg_region.h"
+#include "storage/dsg_work.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/latch.h"
@@ -50,6 +51,7 @@ PG_FUNCTION_INFO_V1(test_dsg_io_control);
 PG_FUNCTION_INFO_V1(test_dsg_grow_control);
 PG_FUNCTION_INFO_V1(test_dsg_admission);
 PG_FUNCTION_INFO_V1(test_dsg_admission_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_work_snapshot);
 
 void		_PG_init(void);
 
@@ -372,6 +374,27 @@ test_dsg_admission_snapshot(PG_FUNCTION_ARGS)
 											  snapshot.admission_open ? "yes" : "no",
 											  snapshot.admission_revision, snapshot.high,
 											  snapshot.startup_shared_upper_bytes)));
+}
+
+/* 只读真实观察；不为测试伪造排空或覆盖Native boot/floor。 */
+Datum
+test_dsg_work_snapshot(PG_FUNCTION_ARGS)
+{
+	DsgWorkSnapshot s;
+
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE), errmsg("work observation requires administrator")));
+	DsgWorkGetSnapshot(&s);
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf(
+		"{\"client_processes\":%u,\"startup_clients\":%u,\"idle_clients\":%u,"
+		"\"frontend_reads\":%u,\"frontend_executes\":%u,\"bounded_inputs\":%u,"
+		"\"retained_transactions\":%u,\"background_processes\":%u,\"auxiliary_processes\":%u,"
+		"\"observer_excluded\":%s,\"foreground_idle\":%s,\"admission_open\":%s,\"pg_boot_id\":\"" UINT64_FORMAT "\"}",
+		s.client_processes, s.startup_clients, s.idle_clients, s.frontend_reads,
+		s.frontend_executes, s.bounded_inputs, s.retained_transactions,
+		s.background_processes, s.auxiliary_processes,
+		s.observer_excluded ? "true" : "false", s.foreground_idle ? "true" : "false",
+		s.observed.admission_open ? "true" : "false", s.observed.boot_id)));
 }
 
 /*-

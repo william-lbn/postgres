@@ -41,6 +41,7 @@
 #include "storage/bufmgr.h"
 #include "storage/dsm.h"
 #include "storage/dsm_registry.h"
+#include "storage/dsg_work.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/pg_shmem.h"
@@ -121,6 +122,7 @@ CalculateShmemSize(int *num_semaphores)
 	size = add_size(size, LockShmemSize());
 	size = add_size(size, PredicateLockShmemSize());
 	size = add_size(size, ProcGlobalShmemSize());
+	size = add_size(size, DsgWorkShmemSize());
 	size = add_size(size, XLogPrefetchShmemSize());
 	size = add_size(size, VarsupShmemSize());
 	size = add_size(size, XLOGShmemSize());
@@ -324,6 +326,7 @@ CreateOrAttachShmemStructs(void)
 	 */
 	if (!IsUnderPostmaster)
 		InitProcGlobal();
+	DsgWorkShmemInit();
 	CreateSharedProcArray();
 	CreateSharedBackendStatus();
 	TwoPhaseShmemInit();

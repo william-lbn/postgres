@@ -64,6 +64,7 @@
 #include "rewrite/rewriteHandler.h"
 #include "storage/bufmgr.h"
 #include "storage/dynamic_shared_buffers.h"
+#include "storage/dsg_work.h"
 #include "storage/ipc.h"
 #include "storage/pmsignal.h"
 #include "storage/proc.h"
@@ -488,19 +489,11 @@ SocketBackend(StringInfo inBuf)
 	 */
 	discard_ignored = enable_dynamic_shared_buffers &&
 		(ignore_till_sync || qtype == PqMsg_CopyData);
-	if (!discard_ignored && DsgBufferAdmissionBlocksCurrentRole())
-	{
-		switch (qtype)
-		{
-			case PqMsg_Query:
-			case PqMsg_Parse:
-			case PqMsg_Bind:
-			case PqMsg_Execute:
-			case PqMsg_FunctionCall:
-				reject_admission = true;
-				break;
-		}
-	}
+	/* Describe可触发缓存计划重新校验，同Parse/Bind一样必须在正文前登记/门禁。 */
+	reject_admission = DsgWorkStartMessage(
+		!discard_ignored && (qtype == PqMsg_Query || qtype == PqMsg_Parse ||
+		qtype == PqMsg_Bind || qtype == PqMsg_Describe ||
+		qtype == PqMsg_Execute || qtype == PqMsg_FunctionCall), discard_ignored);
 	if (discard_ignored || reject_admission)
 	{
 		resetStringInfo(inBuf);
@@ -4774,12 +4767,19 @@ PostgresMain(const char *dbname, const char *username)
 		 * conditional since we don't want, say, reads on behalf of COPY FROM
 		 * STDIN doing the same thing.)
 		 */
+		/*-
+		 * 仅在消息内存重置、ERROR事务/Portal清理和Ready刷出后报告空闲。
+		 * COPY及WAL流一直留在执行状态，直到真实命令返回；longjmp也不提前清零。
+		 * 事务状态在锁外读取，保留标志独立于读取/丢弃阶段，防止慢拒绝帧隐藏事务。
+		 */
+		DsgWorkIdle(IsTransactionOrTransactionBlock() || IsAbortedTransactionBlockState());
 		DoingCommandRead = true;
 
 		/*
 		 * (3) read a command (loop blocks here)
 		 */
 		firstchar = ReadCommand(&input_message);
+		DsgWorkStartExecution();
 
 		/*
 		 * (4) turn off the idle-in-transaction and idle-session timeouts if
@@ -4839,6 +4839,7 @@ PostgresMain(const char *dbname, const char *username)
 			case PqMsg_Query:
 			case PqMsg_Parse:
 			case PqMsg_Bind:
+			case PqMsg_Describe:
 			case PqMsg_Execute:
 			case PqMsg_FunctionCall:
 				DsgBufferCheckAdmission();

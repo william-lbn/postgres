@@ -54,6 +54,7 @@ PG_FUNCTION_INFO_V1(test_dsg_admission);
 PG_FUNCTION_INFO_V1(test_dsg_admission_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_work_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_work_stop_with_status_lock);
+PG_FUNCTION_INFO_V1(test_dsg_connection_snapshot);
 
 void		_PG_init(void);
 
@@ -393,6 +394,32 @@ test_dsg_work_stop_with_status_lock(PG_FUNCTION_ARGS)
 	kill(MyProcPid, SIGSTOP);
 	SpinLockRelease(&DSBCtrl->status_lock);
 	PG_RETURN_BOOL(true);
+}
+
+/* 同一观察点的真实连接门禁；夹具不能代造ack/序号，不提供修改内存入口。 */
+Datum
+test_dsg_connection_snapshot(PG_FUNCTION_ARGS)
+{
+	DsgConnectionSnapshot s;
+	StringInfoData out;
+
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE), errmsg("connection observation requires administrator")));
+	DsgConnectionGetSnapshot(&s);
+	initStringInfo(&out);
+	appendStringInfo(&out,
+		"{\"enabled\":%s,\"requested_serial\":%u,\"applied_serial\":%u,"
+		"\"requested_open\":%s,\"applied_open\":%s,\"acknowledged\":%s,"
+		"\"private_management_ready\":%s,\"public_connections_blocked\":%s,"
+		"\"startup_clients\":%u,\"client_processes\":%u,\"foreground_idle\":%s,"
+		"\"admission_open\":%s,\"pg_boot_id\":\"" UINT64_FORMAT "\"}",
+		s.enabled ? "true" : "false", s.requested_serial, s.applied_serial,
+		s.requested_open ? "true" : "false", s.applied_open ? "true" : "false",
+		s.acknowledged ? "true" : "false", s.private_management_ready ? "true" : "false",
+		s.public_connections_blocked ? "true" : "false", s.work.startup_clients,
+		s.work.client_processes, s.work.foreground_idle ? "true" : "false",
+		s.work.observed.admission_open ? "true" : "false", s.work.observed.boot_id);
+	PG_RETURN_TEXT_P(cstring_to_text(out.data));
 }
 
 /* 只读真实观察；不为测试伪造排空或覆盖Native boot/floor。 */

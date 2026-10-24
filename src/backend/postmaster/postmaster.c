@@ -1639,6 +1639,8 @@ ServerLoop(void)
 	{
 		time_t		now;
 
+		/* 初始/重建boot及丢失唤醒也应确认；不在信号处理器或launch中途ack。 */
+		DsgConnectionPostmasterRefresh();
 		nevents = WaitEventSetWait(pm_wait_set,
 								   DetermineSleepTime(),
 								   events,
@@ -3535,6 +3537,10 @@ BackendStartup(ClientSocket *client_sock)
 	pid_t		pid;
 	BackendStartupData startup_data;
 
+	/* 不读取客户端协议；关闭时仅允许已核验私有端点，拒绝发生于任何新fork前。 */
+	if (!DsgConnectionAccept(client_sock->sock))
+		return STATUS_ERROR;
+
 	/*
 	 * Create backend data structure.  Better before the fork() so we can
 	 * handle failure cleanly.
@@ -3704,6 +3710,8 @@ static void
 process_pm_pmsignal(void)
 {
 	pending_pm_pmsignal = false;
+	if (CheckPostmasterSignal(PMSIGNAL_DSG_CONNECTION_GATE))
+		DsgConnectionPostmasterRefresh();
 
 	ereport(DEBUG2,
 			(errmsg_internal("postmaster received pmsignal signal")));

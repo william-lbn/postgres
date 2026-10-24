@@ -12,6 +12,7 @@
 #include "miscadmin.h"
 #include "storage/buf_internals.h"
 #include "storage/dynamic_shared_buffers.h"
+#include "storage/dsg_work.h"
 #include "storage/pg_shmem.h"
 #include "storage/shmem.h"
 #include "utils/guc.h"
@@ -64,7 +65,8 @@ DsgBufferCheckStartupBudget(Size main_segment_bytes)
 
 	if (!enable_dynamic_shared_buffers)
 	{
-		if (dynamic_shared_buffers_require_admission || dynamic_shared_buffers_startup_budget != 0)
+		if (dynamic_shared_buffers_require_admission || dynamic_shared_buffers_startup_budget != 0 ||
+			dynamic_shared_buffers_require_connection_gate)
 			ereport(FATAL, (errmsg("managed dynamic buffer settings require dynamic shared buffers")));
 		return;
 	}
@@ -203,6 +205,8 @@ DsgBufferSetAdmission(uint64 boot_id, uint64 revision, uint64 expected_generatio
 		 (revision == DSBCtrl->admission_revision &&
 		  open == (pg_atomic_read_u32(&DSBCtrl->admission_open) != 0)));
 	if (valid)
+		valid = DsgConnectionPublishLocked(open);
+	if (valid)
 	{
 		DSBCtrl->admission_revision = revision;
 		pg_atomic_write_u32(&DSBCtrl->admission_open, open ? 1 : 0);
@@ -213,6 +217,7 @@ DsgBufferSetAdmission(uint64 boot_id, uint64 revision, uint64 expected_generatio
 	if (!valid)
 		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 						errmsg("invalid or stale dynamic buffer admission request")));
+	DsgConnectionNotify();
 }
 
 static void
@@ -273,6 +278,8 @@ DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
 	else if (DSBCtrl->admission_revision == PG_UINT64_MAX ||
 			 request->revision != DSBCtrl->admission_revision + 1)
 		response->disposition = DSG_ADMISSION_CONFLICT;
+	else if (!DsgConnectionPublishLocked(request->open))
+		response->disposition = DSG_ADMISSION_CONFLICT;
 	else
 	{
 		admission_identity->epoch = request->issuer_epoch;
@@ -288,6 +295,9 @@ DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
 	/*- 取得串行锁后只运行上述有界无错误状态段，无需跨中断/外部动作保留锁。 */
 	if (locked)
 		LWLockRelease(&DSBCtrl->resize_lock);
+	if (response->disposition == DSG_ADMISSION_APPLIED ||
+		response->disposition == DSG_ADMISSION_REPLAYED)
+		DsgConnectionNotify();
 }
 
 /*-

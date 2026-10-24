@@ -75,6 +75,7 @@
 #include "replication/walreceiver.h"
 #include "storage/bufmgr.h"
 #include "storage/dynamic_shared_buffers.h"
+#include "storage/dsg_work.h"
 #include "storage/fd.h"
 #include "storage/large_object.h"
 #include "storage/pg_shmem.h"
@@ -784,6 +785,15 @@ StaticAssertDecl(lengthof(config_type_names) == (PGC_ENUM + 1),
 
 struct config_bool ConfigureNamesBool[] =
 {
+	{
+		{"dynamic_shared_buffers_require_connection_gate", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Requires the Postmaster private-channel connection gate for dynamic buffers."),
+			NULL, GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_require_connection_gate,
+		false,
+		NULL, NULL, NULL
+	},
 	{
 		{"dynamic_shared_buffers_require_admission", PGC_POSTMASTER, RESOURCES_MEM,
 			gettext_noop("Closes application admission on every dynamic buffer boot."),

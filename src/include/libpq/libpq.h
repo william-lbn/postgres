@@ -76,6 +76,8 @@ extern void pq_startmsgread(void);
 extern void pq_endmsgread(void);
 extern bool pq_is_reading_msg(void);
 extern int	pq_getmessage(StringInfo s, int maxlen);
+/* 消费已决定拒绝的完整帧，复用固定接收缓冲，不按客户端长度分配。 */
+extern int	pq_discardmessage(int maxlen);
 extern int	pq_getbyte(void);
 extern int	pq_peekbyte(void);
 extern int	pq_getbyte_if_available(unsigned char *c);

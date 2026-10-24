@@ -149,14 +149,20 @@ DsgBufferGetSharedCost(DsgBufferSharedCost *cost)
  * 返回正常SQL ERROR，不主动终止连接；内部PG超级用户保留恢复/管理通道。
  * 此处是启动门禁，不替代运行时私有预算、所有后台工作排空和VM执行栅栏。
  */
-void
-DsgBufferCheckAdmission(void)
+bool
+DsgBufferAdmissionBlocksCurrentRole(void)
 {
 	/*
 	 * 消息入口尚未开始事务；使用PG随SET ROLE维护的只读权限标志，不查系统表。
 	 */
-	if (DSBCtrl != NULL && pg_atomic_read_u32(&DSBCtrl->admission_open) == 0 &&
-		!current_role_is_superuser)
+	return DSBCtrl != NULL && pg_atomic_read_u32(&DSBCtrl->admission_open) == 0 &&
+		!current_role_is_superuser;
+}
+
+void
+DsgBufferCheckAdmission(void)
+{
+	if (DsgBufferAdmissionBlocksCurrentRole())
 		ereport(ERROR,
 				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
 				 errmsg("dynamic shared buffer admission is closed for this boot")));

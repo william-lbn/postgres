@@ -1182,30 +1182,17 @@ pq_is_reading_msg(void)
 	return PqCommReadingMsg;
 }
 
-/* --------------------------------
- *		pq_getmessage	- get a message with length word from connection
- *
- *		The return value is placed in an expansible StringInfo, which has
- *		already been initialized by the caller.
- *		Only the message body is placed in the StringInfo; the length word
- *		is removed.  Also, s->cursor is initialized to zero for convenience
- *		in scanning the message contents.
- *
- *		maxlen is the upper limit on the length of the
- *		message we are willing to accept.  We abort the connection (by
- *		returning EOF) if client tries to send more than that.
- *
- *		returns 0 if OK, EOF if trouble
- * --------------------------------
+/*-
+ * 所有消息读取/丢弃共用长度校验，保持原协议上限与EOF语义。返回正文长度，
+ * EOF表示帧边界已无法恢复，调用者必须走原断连流程，不能发送可继续的SQL错误。
+ * 本函数不分配消息体，也不结束PqCommReadingMsg，正文仍须完整读取或丢弃。
  */
-int
-pq_getmessage(StringInfo s, int maxlen)
+static int
+pq_getmessage_length(int maxlen)
 {
 	int32		len;
 
 	Assert(PqCommReadingMsg);
-
-	resetStringInfo(s);
 
 	/* Read message length word */
 	if (pq_getbytes((char *) &len, 4) == EOF)
@@ -1226,7 +1213,57 @@ pq_getmessage(StringInfo s, int maxlen)
 		return EOF;
 	}
 
-	len -= 4;					/* discount length itself */
+	return len - 4;				/* discount length itself */
+}
+
+/*-
+ * 已关闭准入或已经ignore-till-Sync的消息不能先enlargeStringInfo再拒绝。
+ * pq_discardbytes只复用固定PqRecvBuffer，流式消费正文，不解析/执行其内容。
+ * 完整消费后才恢复帧边界；半帧/非法长度仍与pq_getmessage一样断连。
+ */
+int
+pq_discardmessage(int maxlen)
+{
+	int			len = pq_getmessage_length(maxlen);
+
+	if (len == EOF)
+		return EOF;
+	if (pq_discardbytes(len) == EOF)
+	{
+		ereport(COMMERROR,
+				(errcode(ERRCODE_PROTOCOL_VIOLATION),
+				 errmsg("incomplete message from client")));
+		return EOF;
+	}
+	pq_endmsgread();
+	return 0;
+}
+
+/* --------------------------------
+ *		pq_getmessage	- get a message with length word from connection
+ *
+ *		The return value is placed in an expansible StringInfo, which has
+ *		already been initialized by the caller.
+ *		Only the message body is placed in the StringInfo; the length word
+ *		is removed.  Also, s->cursor is initialized to zero for convenience
+ *		in scanning the message contents.
+ *
+ *		maxlen is the upper limit on the length of the
+ *		message we are willing to accept.  We abort the connection (by
+ *		returning EOF) if client tries to send more than that.
+ *
+ *		returns 0 if OK, EOF if trouble
+ * --------------------------------
+ */
+int
+pq_getmessage(StringInfo s, int maxlen)
+{
+	int			len;
+
+	resetStringInfo(s);
+	len = pq_getmessage_length(maxlen);
+	if (len == EOF)
+		return EOF;
 
 	if (len > 0)
 	{

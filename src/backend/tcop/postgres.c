@@ -369,6 +369,8 @@ SocketBackend(StringInfo inBuf)
 {
 	int			qtype;
 	int			maxmsglen;
+	bool		discard_ignored;
+	bool		reject_admission = false;
 
 	/*
 	 * Get message type code from the frontend.
@@ -471,6 +473,47 @@ SocketBackend(StringInfo inBuf)
 					 errmsg("invalid frontend message type %d", qtype)));
 			maxmsglen = 0;		/* keep compiler quiet */
 			break;
+	}
+
+	/*-
+	 * 必须在pq_getmessage/enlargeStringInfo之前作准入决定，否则关闭期间
+	 * Query/Parse/Bind/FastPath甚至主循环中被忽略的CopyData仍可按攻击者声明
+	 * 的大长度申请内存。保留原消息类型/长度校验和extended错误恢复语义。
+	 * Sync/Terminate已在上面的switch清掉ignore标记，仍按官方路径处理。
+	 */
+	discard_ignored = enable_dynamic_shared_buffers && ignore_till_sync;
+	if (!discard_ignored && DsgBufferAdmissionBlocksCurrentRole())
+	{
+		switch (qtype)
+		{
+			case PqMsg_Query:
+			case PqMsg_Parse:
+			case PqMsg_Bind:
+			case PqMsg_Execute:
+			case PqMsg_FunctionCall:
+			case PqMsg_CopyData:
+				reject_admission = true;
+				break;
+		}
+	}
+	if (discard_ignored || reject_admission)
+	{
+		resetStringInfo(inBuf);
+		if (pq_discardmessage(maxmsglen))
+			return EOF;
+		RESUME_CANCEL_INTERRUPTS();
+		if (reject_admission)
+		{
+			/*-
+			 * 丢弃时门禁可能重开，仍拒绝本帧：正文已经消费，不能再次检查
+			 * 后把空inBuf当正常命令。完整帧后ERROR保留连接和Sync清理能力；
+			 * 半帧/非法长度只走上面EOF断连，不能假造已恢复协议同步。
+			 */
+			ereport(ERROR,
+					(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+					 errmsg("dynamic shared buffer admission is closed for this boot")));
+		}
+		return qtype;
 	}
 
 	/*

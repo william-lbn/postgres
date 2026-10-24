@@ -481,7 +481,13 @@ SocketBackend(StringInfo inBuf)
 	 * 的大长度申请内存。保留原消息类型/长度校验和extended错误恢复语义。
 	 * Sync/Terminate已在上面的switch清掉ignore标记，仍按官方路径处理。
 	 */
-	discard_ignored = enable_dynamic_shared_buffers && ignore_till_sync;
+	/*-
+	 * 到达主循环的CopyData是COPY失败后可能仍在途的残留，官方协议要求
+	 * 静默忽略。只改变其内存读取方式，不额外产生ERROR或Ready；正在执行
+	 * 的COPY使用自己的读取器，不能把这里当作其排空/取消证明。
+	 */
+	discard_ignored = enable_dynamic_shared_buffers &&
+		(ignore_till_sync || qtype == PqMsg_CopyData);
 	if (!discard_ignored && DsgBufferAdmissionBlocksCurrentRole())
 	{
 		switch (qtype)
@@ -491,7 +497,6 @@ SocketBackend(StringInfo inBuf)
 			case PqMsg_Bind:
 			case PqMsg_Execute:
 			case PqMsg_FunctionCall:
-			case PqMsg_CopyData:
 				reject_admission = true;
 				break;
 		}

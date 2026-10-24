@@ -1,8 +1,9 @@
 /*-------------------------------------------------------------------------
  * dsg_work.h -- 同一PG boot的真实进程/前台工作观察，独立于Buffer ABI6。
  *
- * 前台空闲只说明已登记的消息/命令/保留事务，不是完整Quiesce证书；启动前
- * 连接、认证、后台/DSM、外部预算和VM栅栏必须分别有实际覆盖，不能由本值推断。
+ * Work2含Postmaster fork前登记、启动包/SSL/GSS及PGPROC交接；前台空闲仍是
+ * 观察点，不是禁止后续新fork的ack或完整Quiesce。后台/DSM、外部持续预算和
+ * VM栅栏必须分别有实际覆盖，不能由本值推断。
  *-------------------------------------------------------------------------
  */
 #ifndef DSG_WORK_H
@@ -10,7 +11,7 @@
 
 #include "storage/dynamic_shared_buffers.h"
 
-#define NEON_DSG_WORK_API_VERSION 1
+#define NEON_DSG_WORK_API_VERSION 2
 
 typedef struct DsgWorkSnapshot
 {
@@ -30,6 +31,9 @@ typedef struct DsgWorkSnapshot
 
 extern Size DsgWorkShmemSize(void);
 extern void DsgWorkShmemInit(void);
+/* Postmaster专用：只用原生32位原子，不取得backend共享锁，不在早期child清理。 */
+extern void DsgWorkPreStart(int child_slot);
+extern void DsgWorkPreForget(int child_slot);
 extern void DsgWorkAttach(bool auxiliary);
 extern void DsgWorkDetach(void);
 extern bool DsgWorkStartMessage(bool ordinary_work, bool bounded_discard);

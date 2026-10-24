@@ -1,6 +1,7 @@
 #include "postgres.h"
 
 #include <unistd.h>
+#include <signal.h>
 #include <sys/mman.h>
 
 #include "access/table.h"
@@ -52,6 +53,7 @@ PG_FUNCTION_INFO_V1(test_dsg_grow_control);
 PG_FUNCTION_INFO_V1(test_dsg_admission);
 PG_FUNCTION_INFO_V1(test_dsg_admission_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_work_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_work_stop_with_status_lock);
 
 void		_PG_init(void);
 
@@ -374,6 +376,23 @@ test_dsg_admission_snapshot(PG_FUNCTION_ARGS)
 											  snapshot.admission_open ? "yes" : "no",
 											  snapshot.admission_revision, snapshot.high,
 											  snapshot.startup_shared_upper_bytes)));
+}
+
+/*-
+ * 仅私有故障夹具：故意在status自旋锁内SIGSTOP自身，测试确认T状态后SIGKILL。
+ * 这是对“锁所有者崩溃”的真实注入，不是生产允许在spinlock内发信号/等待。
+ * 如果Postmaster新登记错误取得同锁，它将无法reap/重建，本机门禁必须失败。
+ * 不接收任意PID、不对其他进程发信号；只允许当前及session原SU。
+ */
+Datum
+test_dsg_work_stop_with_status_lock(PG_FUNCTION_ARGS)
+{
+	if (!superuser() || !superuser_arg(GetSessionUserId()) || DSBCtrl == NULL)
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE), errmsg("work fault injection requires administrator")));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	kill(MyProcPid, SIGSTOP);
+	SpinLockRelease(&DSBCtrl->status_lock);
+	PG_RETURN_BOOL(true);
 }
 
 /* 只读真实观察；不为测试伪造排空或覆盖Native boot/floor。 */

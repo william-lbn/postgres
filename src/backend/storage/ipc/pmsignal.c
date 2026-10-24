@@ -25,6 +25,7 @@
 #include "postmaster/postmaster.h"
 #include "replication/walsender.h"
 #include "storage/pmsignal.h"
+#include "storage/dsg_work.h"
 #include "storage/shmem.h"
 #include "utils/memutils.h"
 
@@ -286,6 +287,8 @@ ReleasePostmasterChildSlot(int slot)
 	bool		result;
 
 	Assert(slot > 0 && slot <= num_child_inuse);
+	/* 不等backend共享锁；真实退出/fork失败才清启动登记，重复回收无效果。 */
+	DsgWorkPreForget(slot);
 	slot--;
 
 	/*

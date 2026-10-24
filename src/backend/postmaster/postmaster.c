@@ -113,6 +113,7 @@
 #include "replication/walsender.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
+#include "storage/dsg_work.h"
 #include "storage/pmsignal.h"
 #include "storage/proc.h"
 #include "tcop/backend_startup.h"
@@ -3563,6 +3564,17 @@ BackendStartup(ClientSocket *client_sock)
 
 	/* Pass down canAcceptConnections state */
 	startup_data.canAcceptConnections = canAcceptConnections(BACKEND_TYPE_NORMAL);
+	/*-
+	 * 受管DSGA不能无限fork不登记的dead-end连接：它们也可能停在启动包，
+	 * 没有PGPROC且超过固定子槽预算。容量/恢复/关闭状态拒绝在fork前直接
+	 * 关闭socket，由ServerLoop统一关FD；不在Postmaster等待客户端协议。
+	 * 非DSGA保留官方dead-end及错误协议。此处不是关门ack或完整Quiesce。
+	 */
+	if (enable_dynamic_shared_buffers && startup_data.canAcceptConnections != CAC_OK)
+	{
+		pfree(bn);
+		return STATUS_ERROR;
+	}
 	bn->dead_end = (startup_data.canAcceptConnections != CAC_OK);
 	bn->cancel_key = MyCancelKey;
 
@@ -3577,6 +3589,8 @@ BackendStartup(ClientSocket *client_sock)
 	/* Hasn't asked to be notified about any bgworkers yet */
 	bn->bgworker_notify = false;
 
+	if (!bn->dead_end)
+		DsgWorkPreStart(bn->child_slot);
 	pid = postmaster_child_launch(B_BACKEND,
 								  (char *) &startup_data, sizeof(startup_data),
 								  client_sock);

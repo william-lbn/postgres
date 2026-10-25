@@ -37,6 +37,7 @@
 #include "lib/ilist.h"
 #include "miscadmin.h"
 #include "port/pg_bitutils.h"
+#include "storage/dsg_dsm.h"
 #include "storage/dsm.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
@@ -44,6 +45,7 @@
 #include "storage/pg_shmem.h"
 #include "storage/shmem.h"
 #include "utils/freepage.h"
+#include "utils/injection_point.h"
 #include "utils/memutils.h"
 #include "utils/resowner.h"
 
@@ -73,6 +75,8 @@ struct dsm_segment
 	void	   *mapped_address; /* Mapping address, or NULL if unmapped. */
 	Size		mapped_size;	/* Size of our mapping. */
 	slist_head	on_detach;		/* On-detach callbacks. */
+	/* 本次 CREATE 尚未发布；attach 从不带此标记，不销毁其他 backend 的段。 */
+	bool creating;
 };
 
 /* Shared-memory state for a dynamic shared memory segment. */
@@ -167,6 +171,71 @@ ResourceOwnerForgetDSM(ResourceOwner owner, dsm_segment *seg)
 	ResourceOwnerForget(owner, PointerGetDatum(seg), &dsm_resowner_desc);
 }
 
+/*-
+ * 仅 backend 的外部 DSM 经过本包装；Postmaster 保留原无 backend 锁路径。
+ * CREATE 在 OS 前记账；撞名明确无效果时撤销预留，异常则保持未知预算。
+ * 不将候选 handle 提前写入原生控制清理表，避免撞名时误删其他 PG 对象。
+ */
+static bool
+dsm_dsg_impl_op(dsm_op op, dsm_handle handle, Size request_size,
+				void **impl_private, void **mapped_address, Size *mapped_size,
+				int elevel)
+{
+	bool result = false;
+	volatile int token = -1;
+	volatile bool os_started = false;
+
+	/*-
+	 * 早期子进程/EXEC_BACKEND 可能在尚无 PGPROC 时只附加或解除控制段。
+	 * 固定控制成本已在启动登记，此路径必须原样无 backend 锁；不能为了
+	 * 一次找不到记录的 lookup 取得需要 MyProc 的 LWLock。
+	 */
+	if (!enable_dynamic_shared_buffers || !IsUnderPostmaster ||
+		(op != DSM_OP_CREATE && handle == dsm_control_handle))
+		return dsm_impl_op(op, handle, request_size, impl_private,
+						   mapped_address, mapped_size, elevel);
+	PG_TRY();
+	{
+		if (op == DSM_OP_CREATE)
+		{
+			token = DsgDsmBeginCreate(handle, request_size);
+			if (token >= 0)
+			{
+				INJECTION_POINT("dsg-dsm-before-create");
+				os_started = true;
+				result = dsm_impl_op(op, handle, request_size, impl_private,
+									 mapped_address, mapped_size, elevel);
+				if (result)
+					DsgDsmCreated(token, *mapped_size);
+				else
+				{
+					DsgDsmCreateCollision(token);
+					token = -1;
+				}
+			}
+		}
+		else
+		{
+			if (op == DSM_OP_DESTROY)
+				INJECTION_POINT("dsg-dsm-before-destroy");
+			result = dsm_impl_op(op, handle, request_size, impl_private,
+								 mapped_address, mapped_size, elevel);
+			if (op == DSM_OP_DETACH || op == DSM_OP_DESTROY)
+				DsgDsmAfterOp(handle, op, result);
+		}
+	}
+	PG_CATCH();
+	{
+		if (op == DSM_OP_CREATE && token >= 0)
+			DsgDsmCreateError(token, os_started);
+		else if (op == DSM_OP_DETACH || op == DSM_OP_DESTROY)
+			DsgDsmAfterOp(handle, op, false);
+		PG_RE_THROW();
+	}
+	PG_END_TRY();
+	return result;
+}
+
 /*
  * Start up the dynamic shared memory system.
  *
@@ -192,11 +261,11 @@ dsm_postmaster_startup(PGShmemHeader *shim)
 		dsm_cleanup_for_mmap();
 
 	/* Determine size for new control segment. */
-	maxitems = PG_DYNSHMEM_FIXED_SLOTS
-		+ PG_DYNSHMEM_SLOTS_PER_BACKEND * MaxBackends;
+	maxitems = dsm_control_slot_capacity();
 	elog(DEBUG2, "dynamic shared memory system will support %u segments",
 		 maxitems);
 	segsize = dsm_control_bytes_needed(maxitems);
+	DsgDsmSetControlSize(segsize);
 
 	/*
 	 * Loop until we find an unused identifier for the new control segment. We
@@ -463,6 +532,13 @@ dsm_set_control_handle(dsm_handle h)
 }
 #endif
 
+/* 固定原生槽公式只在此维护；DSGA固定登记表复用容量，避免两套常量漂移。 */
+uint32
+dsm_control_slot_capacity(void)
+{
+	return PG_DYNSHMEM_FIXED_SLOTS + PG_DYNSHMEM_SLOTS_PER_BACKEND * MaxBackends;
+}
+
 /*
  * Reserve some space in the main shared memory segment for DSM segments.
  */
@@ -573,10 +649,14 @@ dsm_create(Size size, int flags)
 			seg->handle = pg_prng_uint32(&pg_global_prng_state) << 1;
 			if (seg->handle == DSM_HANDLE_INVALID)	/* Reserve sentinel */
 				continue;
-			if (dsm_impl_op(DSM_OP_CREATE, seg->handle, size, &seg->impl_private,
+			seg->creating = enable_dynamic_shared_buffers;
+			if (dsm_dsg_impl_op(DSM_OP_CREATE, seg->handle, size, &seg->impl_private,
 							&seg->mapped_address, &seg->mapped_size, ERROR))
 				break;
+			seg->creating = false;
 		}
+		if (enable_dynamic_shared_buffers)
+			INJECTION_POINT("dsg-dsm-after-create");
 		LWLockAcquire(DynamicSharedMemoryControlLock, LW_EXCLUSIVE);
 	}
 
@@ -600,6 +680,9 @@ dsm_create(Size size, int flags)
 			dsm_control->item[i].impl_private_pm_handle = NULL;
 			dsm_control->item[i].pinned = false;
 			seg->control_slot = i;
+			if (!using_main_dsm_region)
+				DsgDsmPublishLocked(seg->handle);
+			seg->creating = false;
 			LWLockRelease(DynamicSharedMemoryControlLock);
 			return seg;
 		}
@@ -612,7 +695,7 @@ dsm_create(Size size, int flags)
 			FreePageManagerPut(dsm_main_space_fpm, first_page, npages);
 		LWLockRelease(DynamicSharedMemoryControlLock);
 		if (!using_main_dsm_region)
-			dsm_impl_op(DSM_OP_DESTROY, seg->handle, 0, &seg->impl_private,
+			dsm_dsg_impl_op(DSM_OP_DESTROY, seg->handle, 0, &seg->impl_private,
 						&seg->mapped_address, &seg->mapped_size, WARNING);
 		if (seg->resowner != NULL)
 			ResourceOwnerForgetDSM(seg->resowner, seg);
@@ -640,6 +723,9 @@ dsm_create(Size size, int flags)
 	dsm_control->item[nitems].pinned = false;
 	seg->control_slot = nitems;
 	dsm_control->nitems++;
+	if (!using_main_dsm_region)
+		DsgDsmPublishLocked(seg->handle);
+	seg->creating = false;
 	LWLockRelease(DynamicSharedMemoryControlLock);
 
 	return seg;
@@ -742,7 +828,7 @@ dsm_attach(dsm_handle h)
 
 	/* Here's where we actually try to map the segment. */
 	if (!is_main_region_dsm_handle(seg->handle))
-		dsm_impl_op(DSM_OP_ATTACH, seg->handle, 0, &seg->impl_private,
+		dsm_dsg_impl_op(DSM_OP_ATTACH, seg->handle, 0, &seg->impl_private,
 					&seg->mapped_address, &seg->mapped_size, ERROR);
 
 	return seg;
@@ -839,7 +925,13 @@ dsm_detach(dsm_segment *seg)
 	if (seg->mapped_address != NULL)
 	{
 		if (!is_main_region_dsm_handle(seg->handle))
-			dsm_impl_op(DSM_OP_DETACH, seg->handle, 0, &seg->impl_private,
+			/*-
+			 * 只有本次 CREATE 未发布且真实映射已存在才可证明对象属于本次。
+			 * 创建抛错但没有映射时无法排除撞名，不盲目 DESTROY 候选名称。
+			 * 失败仍由登记表保留预算；attach 只做原生 DETACH。
+			 */
+			dsm_dsg_impl_op(seg->creating ? DSM_OP_DESTROY : DSM_OP_DETACH,
+						seg->handle, 0, &seg->impl_private,
 						&seg->mapped_address, &seg->mapped_size, WARNING);
 		seg->impl_private = NULL;
 		seg->mapped_address = NULL;
@@ -881,7 +973,7 @@ dsm_detach(dsm_segment *seg)
 			 * we did.  There's not much we can do about that, though.
 			 */
 			if (is_main_region_dsm_handle(seg->handle) ||
-				dsm_impl_op(DSM_OP_DESTROY, seg->handle, 0, &seg->impl_private,
+				dsm_dsg_impl_op(DSM_OP_DESTROY, seg->handle, 0, &seg->impl_private,
 							&seg->mapped_address, &seg->mapped_size, WARNING))
 			{
 				LWLockAcquire(DynamicSharedMemoryControlLock, LW_EXCLUSIVE);
@@ -1053,7 +1145,7 @@ dsm_unpin_segment(dsm_handle handle)
 		 * here.
 		 */
 		if (is_main_region_dsm_handle(handle) ||
-			dsm_impl_op(DSM_OP_DESTROY, handle, 0, &junk_impl_private,
+			dsm_dsg_impl_op(DSM_OP_DESTROY, handle, 0, &junk_impl_private,
 						&junk_mapped_address, &junk_mapped_size, WARNING))
 		{
 			LWLockAcquire(DynamicSharedMemoryControlLock, LW_EXCLUSIVE);
@@ -1210,6 +1302,7 @@ dsm_create_descriptor(void)
 
 	/* seg->handle must be initialized by the caller */
 	seg->control_slot = INVALID_CONTROL_SLOT;
+	seg->creating = false;
 	seg->impl_private = NULL;
 	seg->mapped_address = NULL;
 	seg->mapped_size = 0;

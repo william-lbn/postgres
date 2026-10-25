@@ -12,6 +12,8 @@
 #include "storage/buf_internals.h"
 #include "storage/dsg_region.h"
 #include "storage/dsg_work.h"
+#include "storage/dsg_dsm.h"
+#include "storage/dsm.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/latch.h"
@@ -57,6 +59,13 @@ PG_FUNCTION_INFO_V1(test_dsg_work_stop_with_status_lock);
 PG_FUNCTION_INFO_V1(test_dsg_connection_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_prepared_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_prepared_control);
+PG_FUNCTION_INFO_V1(test_dsg_dsm_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_dsm_allocate);
+PG_FUNCTION_INFO_V1(test_dsg_dsm_attach);
+PG_FUNCTION_INFO_V1(test_dsg_dsm_detach);
+PG_FUNCTION_INFO_V1(test_dsg_dsm_unpin);
+PG_FUNCTION_INFO_V1(test_dsg_dsm_probe);
+PG_FUNCTION_INFO_V1(test_dsg_dsm_control);
 
 void		_PG_init(void);
 
@@ -79,6 +88,7 @@ typedef struct DsgTestSharedState
 	pg_atomic_uint32 grow_exit_gate;
 	pg_atomic_uint32 grow_prepare_gate;
 	pg_atomic_uint32 prepared_gate;
+	pg_atomic_uint32 dsm_gate;
 } DsgTestSharedState;
 
 static void test_dsg_wait_gate(pg_atomic_uint32 *gate, const char *event_name);
@@ -104,6 +114,27 @@ static bool io_waiter_armed;
 static int	grow_mode;
 static int	release_probe_calls;
 static int prepared_mode;
+static int dsm_mode;
+extern PGDLLEXPORT void test_dsg_dsm_fault(const char *name, const void *private_data);
+
+/* 只暂停或抛错，不改实际 OS 资源、原生控制表/预算计数或 VM 回执。 */
+void
+test_dsg_dsm_fault(const char *name, const void *private_data)
+{
+	int mode = dsm_mode;
+	bool matches = ((mode == 1 || mode == 2) && strcmp(name, "dsg-dsm-before-create") == 0) ||
+		((mode == 3 || mode == 4) && strcmp(name, "dsg-dsm-after-create") == 0) ||
+		(mode == 5 && strcmp(name, "dsg-dsm-before-destroy") == 0);
+
+	if (!matches)
+		return;
+	dsm_mode = 0;
+	if (mode == 2 || mode == 4 || mode == 5)
+		ereport(ERROR, (errmsg("DSGA test DSM lifecycle ERROR")));
+	test_dsg_wait_gate(&((DsgTestSharedState *) inherited_region.address)->dsm_gate,
+					   "DsgTestDsmLifecycle");
+}
+
 extern PGDLLEXPORT void test_dsg_prepared_pause(const char *name, const void *private_data);
 
 /* 只改变本测试backend的调度，不造prepared计数/valid/WAL/关闭回执。 */
@@ -1645,4 +1676,165 @@ test_dsg_region(PG_FUNCTION_ARGS)
 	pfree(region);
 	pfree(scenario);
 	PG_RETURN_BOOL(true);
+}
+
+/* 仅临时真实 PG 夹具使用：调用实际 DSM API，不伪造生命周期/预算。 */
+static void
+test_dsg_dsm_admin(void)
+{
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("DSM test requires administrator")));
+}
+
+Datum
+test_dsg_dsm_snapshot(PG_FUNCTION_ARGS)
+{
+	DsgDsmSnapshot s;
+	DsgDsmCounters *c = &s.dsm;
+
+	test_dsg_dsm_admin();
+	DsgDsmGetSnapshot(&s);
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf(
+		"{\"reserved_upper_bytes\":\"" UINT64_FORMAT "\",\"control_upper_bytes\":\"" UINT64_FORMAT "\","
+		"\"external_budget_bytes\":\"" UINT64_FORMAT "\",\"external_segments\":%u,"
+		"\"pending_creations\":%u,\"unknown_segments\":%u,\"page_bytes\":%u,"
+		"\"limit_enforced\":%s,\"accounting_valid\":%s,\"foreground_idle\":%s,"
+		"\"admission_open\":%s,\"pg_boot_id\":\"" UINT64_FORMAT "\"}",
+		c->reserved_upper_bytes, c->control_upper_bytes, c->external_budget_bytes,
+		c->external_segments, c->pending_creations, c->unknown_segments, c->page_bytes,
+		c->limit_enforced ? "true" : "false", c->accounting_valid ? "true" : "false",
+		s.prepared.connections.work.foreground_idle ? "true" : "false",
+		s.prepared.connections.work.observed.admission_open ? "true" : "false",
+		s.prepared.connections.work.observed.boot_id)));
+}
+
+Datum
+test_dsg_dsm_allocate(PG_FUNCTION_ARGS)
+{
+	int64 bytes = PG_GETARG_INT64(0);
+	dsm_segment *seg;
+
+	test_dsg_dsm_admin();
+	if (bytes <= 0 || (uint64) bytes > SIZE_MAX)
+		ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE), errmsg("invalid test DSM size")));
+	seg = dsm_create((Size) bytes, 0);
+	/* 实际访问 backing，避免只有虚拟地址或伪造 handle 的夹具。 */
+	*((volatile unsigned char *) dsm_segment_address(seg)) = 42;
+	if (PG_GETARG_BOOL(2))
+		dsm_pin_segment(seg);
+	if (PG_GETARG_BOOL(1))
+		dsm_pin_mapping(seg);
+	PG_RETURN_INT64((int64) dsm_segment_handle(seg));
+}
+
+Datum
+test_dsg_dsm_attach(PG_FUNCTION_ARGS)
+{
+	dsm_segment *seg;
+
+	test_dsg_dsm_admin();
+	seg = dsm_attach((dsm_handle) PG_GETARG_INT64(0));
+	if (seg == NULL)
+		PG_RETURN_BOOL(false);
+	if (*((volatile unsigned char *) dsm_segment_address(seg)) != 42)
+		elog(ERROR, "test DSM shared marker does not match actual backing");
+	if (PG_GETARG_BOOL(1))
+		dsm_pin_mapping(seg);
+	PG_RETURN_BOOL(true);
+}
+
+Datum
+test_dsg_dsm_detach(PG_FUNCTION_ARGS)
+{
+	dsm_segment *seg;
+
+	test_dsg_dsm_admin();
+	seg = dsm_find_mapping((dsm_handle) PG_GETARG_INT64(0));
+	if (seg == NULL)
+		PG_RETURN_BOOL(false);
+	dsm_detach(seg);
+	PG_RETURN_BOOL(true);
+}
+
+Datum
+test_dsg_dsm_unpin(PG_FUNCTION_ARGS)
+{
+	test_dsg_dsm_admin();
+	dsm_unpin_segment((dsm_handle) PG_GETARG_INT64(0));
+	PG_RETURN_BOOL(true);
+}
+
+Datum
+test_dsg_dsm_probe(PG_FUNCTION_ARGS)
+{
+	dsm_handle handle = (dsm_handle) PG_GETARG_INT64(0);
+	void *private = NULL;
+	void *address = NULL;
+	Size bytes = 0;
+	bool found;
+
+	test_dsg_dsm_admin();
+	/*-
+	 * 测试专用独立 OS 探针：仅 attach/detach 本测试创建的外部 handle，
+	 * 不创建新段、不绕过生产 native refcnt 来持久保留映射/修改账本。
+	 * 用它区分 native moribund 与真实 DESTROY，不能以返回0的计数代替资源事实。
+	 */
+	if ((handle & 1) != 0)
+		elog(ERROR, "test OS probe requires an external DSM handle");
+	found = dsm_impl_op(DSM_OP_ATTACH, handle, 0, &private, &address, &bytes, WARNING);
+	if (found)
+	{
+		if (*((volatile unsigned char *) address) != 42)
+			elog(ERROR, "test DSM OS marker does not match actual backing");
+		if (!dsm_impl_op(DSM_OP_DETACH, handle, 0, &private, &address, &bytes, WARNING))
+			elog(ERROR, "test DSM OS probe failed to release its mapping");
+	}
+	PG_RETURN_BOOL(found);
+}
+
+Datum
+test_dsg_dsm_control(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	char *action = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	DsgTestSharedState *s = (DsgTestSharedState *) inherited_region.address;
+
+	test_dsg_dsm_admin();
+	(void) test_dsg_shared_value();
+	if (strcmp(action, "attach") == 0)
+	{
+		InjectionPointAttach("dsg-dsm-before-create", "test_dsg_region", "test_dsg_dsm_fault", NULL, 0);
+		InjectionPointAttach("dsg-dsm-after-create", "test_dsg_region", "test_dsg_dsm_fault", NULL, 0);
+		InjectionPointAttach("dsg-dsm-before-destroy", "test_dsg_region", "test_dsg_dsm_fault", NULL, 0);
+	}
+	else if (strcmp(action, "before_wait") == 0)
+		dsm_mode = 1;
+	else if (strcmp(action, "before_error") == 0)
+		dsm_mode = 2;
+	else if (strcmp(action, "after_wait") == 0)
+		dsm_mode = 3;
+	else if (strcmp(action, "after_error") == 0)
+		dsm_mode = 4;
+	else if (strcmp(action, "destroy_error") == 0)
+		dsm_mode = 5;
+	else if (strcmp(action, "state") == 0)
+		PG_RETURN_INT32((int32) pg_atomic_read_u32(&s->dsm_gate));
+	else if (strcmp(action, "release") == 0)
+		pg_atomic_write_u32(&s->dsm_gate, 2);
+	else if (strcmp(action, "detach") == 0)
+	{
+		(void) InjectionPointDetach("dsg-dsm-before-create");
+		(void) InjectionPointDetach("dsg-dsm-after-create");
+		(void) InjectionPointDetach("dsg-dsm-before-destroy");
+		pg_atomic_write_u32(&s->dsm_gate, 0);
+	}
+	else
+		elog(ERROR, "unknown DSM test control action");
+	pfree(action);
+	PG_RETURN_INT32(0);
+#else
+	ereport(ERROR, (errmsg("DSM tests require injection points")));
+	PG_RETURN_NULL();
+#endif
 }

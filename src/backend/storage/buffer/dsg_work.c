@@ -18,6 +18,7 @@
 #include "miscadmin.h"
 #include "postmaster/postmaster.h"
 #include "storage/dsg_work.h"
+#include "storage/dsg_dsm.h"
 #include "storage/proc.h"
 #include "storage/pmsignal.h"
 #include "storage/shmem.h"
@@ -522,7 +523,8 @@ DsgConnectionAccept(pgsocket socket)
 }
 
 static void
-DsgConnectionCopySnapshot(DsgConnectionSnapshot *snapshot, uint32 *prepared_slots)
+DsgConnectionCopySnapshot(DsgConnectionSnapshot *snapshot, uint32 *prepared_slots,
+			  DsgDsmCounters *dsm)
 {
 	DsgWorkSlot *slot;
 	uint32 wanted;
@@ -549,6 +551,8 @@ DsgConnectionCopySnapshot(DsgConnectionSnapshot *snapshot, uint32 *prepared_slot
 	valid = DsgWorkCopyLocked(&snapshot->work, slot, may_exclude);
 	if (prepared_slots != NULL)
 		*prepared_slots = work_control->prepared_slots;
+	if (dsm != NULL)
+		DsgDsmCopyLocked(dsm);
 	SpinLockRelease(&DSBCtrl->status_lock);
 	if (!valid)
 		elog(ERROR, "DSGA prestart registry count is inconsistent");
@@ -563,7 +567,7 @@ DsgConnectionCopySnapshot(DsgConnectionSnapshot *snapshot, uint32 *prepared_slot
 void
 DsgConnectionGetSnapshot(DsgConnectionSnapshot *snapshot)
 {
-	DsgConnectionCopySnapshot(snapshot, NULL);
+	DsgConnectionCopySnapshot(snapshot, NULL, NULL);
 }
 
 /*-
@@ -616,7 +620,16 @@ DsgPreparedForget(void)
 void
 DsgPreparedGetSnapshot(DsgPreparedSnapshot *snapshot)
 {
-	DsgConnectionCopySnapshot(&snapshot->connections, &snapshot->prepared_slots);
+	DsgConnectionCopySnapshot(&snapshot->connections, &snapshot->prepared_slots, NULL);
 	/* postmaster-only GUC，本boot不可变，不属于另一次运行期采样。 */
 	snapshot->maximum_prepared_slots = (uint32) max_prepared_xacts;
+}
+
+/* 不反取 DSM 控制锁，关门和整个工作/保留资源观察点共用 status_lock。 */
+void
+DsgDsmGetSnapshot(DsgDsmSnapshot *snapshot)
+{
+	DsgConnectionCopySnapshot(&snapshot->prepared.connections,
+		&snapshot->prepared.prepared_slots, &snapshot->dsm);
+	snapshot->prepared.maximum_prepared_slots = (uint32) max_prepared_xacts;
 }

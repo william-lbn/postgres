@@ -26,6 +26,7 @@ extern void dsm_postmaster_startup(struct PGShmemHeader *);
 extern void dsm_backend_shutdown(void);
 extern void dsm_detach_all(void);
 
+extern uint32 dsm_control_slot_capacity(void);
 extern size_t dsm_estimate_size(void);
 extern void dsm_shmem_init(void);
 

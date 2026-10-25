@@ -11,6 +11,7 @@ include $(top_builddir)/src/Makefile.global
 OBJS = \
 	barrier.o \
 	dsg_region.o \
+	dsg_dsm.o \
 	dsm.o \
 	dsm_impl.o \
 	dsm_registry.o \

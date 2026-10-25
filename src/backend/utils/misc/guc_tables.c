@@ -76,6 +76,7 @@
 #include "storage/bufmgr.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/dsg_work.h"
+#include "storage/dsg_dsm.h"
 #include "storage/fd.h"
 #include "storage/large_object.h"
 #include "storage/pg_shmem.h"
@@ -2314,6 +2315,17 @@ struct config_int ConfigureNamesInt[] =
 		},
 		&ReservedConnections,
 		0, 0, MAX_BACKENDS,
+		NULL, NULL, NULL
+	},
+
+	{
+		{"dynamic_shared_buffers_dsm_budget", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Limits external DSM payload reservations for this PG boot."),
+			gettext_noop("Zero leaves the payload budget unenforced."),
+			GUC_UNIT_KB | GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_dsm_budget,
+		0, 0, INT_MAX,
 		NULL, NULL, NULL
 	},
 

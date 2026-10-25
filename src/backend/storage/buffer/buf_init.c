@@ -36,19 +36,45 @@ Buffer		wal_redo_buffer;
 bool		am_wal_redo_postgres = false;
 
 /*-
- * Postmaster 在子进程全部退出后调用 shmem_exit 重建共享内存。此回调在
- * 主共享内存解除映射前执行，先销毁额外映射并清空目录指针，避免同一
- * Postmaster 多次 crash recovery 累积旧映射或沿用旧 boot 身份。
+ * Postmaster 在共享内存子进程全部退出后调用 shmem_exit 重建共享内存。
+ * logger等不使用共享内存的子进程出生时独立脱离四数组，不能让其继续持有
+ * 旧backing。此回调在主段解除映射前执行，避免多次恢复累积旧映射/boot。
  * fork 子进程的退出回调列表会由 PG 重置，不会销毁其他进程的映射。
  */
 static void
 DestroyDynamicBufferRegions(int code, Datum arg)
 {
-	int			i;
+	DsgBufferDetachInheritedArrays();
+}
 
+/*-
+ * 仅解除当前进程的继承映射；调用者必须已停止本进程对数组的全部访问。
+ * postmaster_child_launch在非共享内存子进程的Main之前调用，此时没有PGPROC，
+ * 不取backend锁。四数组VA/span在本boot不可变，可直接复制几何信息。
+ *
+ * 必须销毁局部DsgRegion副本：目录本身是MAP_SHARED，直接Destroy目录里的
+ * region会MemSet父进程和所有业务backend仍使用的地址/长度。只清本进程的
+ * 全局别名，不触碰共享目录、提交成本/未知标记或父进程退出回调。munmap失败
+ * 继续走原ERROR/退出路径，不能进入声称不持共享内存的Main继续运行。
+ */
+void
+DsgBufferDetachInheritedArrays(void)
+{
+	int i;
+
+	if (DSBCtrl == NULL)
+		return;
 	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
-		DsgRegionDestroy(&DSBCtrl->arrays[i].region);
+	{
+		DsgRegion local = DSBCtrl->arrays[i].region;
+
+		DsgRegionDestroy(&local);
+	}
 	DSBCtrl = NULL;
+	BufferDescriptors = NULL;
+	BufferBlocks = NULL;
+	BufferIOCVArray = NULL;
+	CkptBufferIds = NULL;
 }
 
 static void *

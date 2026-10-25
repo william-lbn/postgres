@@ -415,6 +415,9 @@ extern void DsgBufferFenceIssuer(uint64 boot_id, uint64 issuer_epoch,
 								 DsgBufferIssuerFenceResponse *response);
 
 /* 以下为协调器内部接口，不能由扩展绕开上述受管入口。 */
+/* 仅脱离调用进程的继承数组；不改变共享目录，须在主共享段detach之前调用。 */
+extern void DsgBufferDetachInheritedArrays(void);
+
 extern bool DsgBufferSameRequest(const DsgBufferResizeRequest *a,
 								 const DsgBufferResizeRequest *b);
 extern bool DsgBufferRequestNewer(const DsgBufferResizeRequest *a,

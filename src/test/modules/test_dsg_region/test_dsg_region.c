@@ -30,6 +30,7 @@ PG_FUNCTION_INFO_V1(test_dsg_region);
 PG_FUNCTION_INFO_V1(test_dsg_shared_write);
 PG_FUNCTION_INFO_V1(test_dsg_shared_read);
 PG_FUNCTION_INFO_V1(test_dsg_buffer_layout);
+PG_FUNCTION_INFO_V1(test_dsg_array_mappings);
 PG_FUNCTION_INFO_V1(test_dsg_boot_id);
 PG_FUNCTION_INFO_V1(test_dsg_exclusive_available);
 PG_FUNCTION_INFO_V1(test_dsg_access_error);
@@ -1453,6 +1454,37 @@ test_dsg_unpin_probe(PG_FUNCTION_ARGS)
  * 前缀、四数组分别按 M 预留。嵌套 Guard 测试覆盖重复读锁的释放责任。
  * 这里不触摸未发布尾部，避免测试自身把整个 M 变成实际占用。
  */
+Datum
+test_dsg_array_mappings(PG_FUNCTION_ARGS)
+{
+	StringInfoData out;
+	int i;
+
+	/*-
+	 * 仅独占临时集群的OS映射验收：给出本backend从Postmaster继承的真实四个
+	 * VA/span，供外部核验logger等无共享内存子进程是否仍持有同一映射。
+	 * 几何在本boot不可变，不读/改committed状态，不获取Postmaster不允许的锁，
+	 * 也不把VA存在解释为已驻留或已释放。两层SU防误授权及definer借权。
+	 */
+	if (!superuser() || !superuser_arg(GetSessionUserId()) || DSBCtrl == NULL)
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("array mapping test requires original administrator and DSGA")));
+	initStringInfo(&out);
+	appendStringInfo(&out, "{\"boot_id\":\"" UINT64_FORMAT "\",\"pid\":%d,\"arrays\":[",
+					 DSBCtrl->boot_id, MyProcPid);
+	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
+	{
+		DsgRegion *region = &DSBCtrl->arrays[i].region;
+
+		appendStringInfo(&out, "%s{\"array\":%d,\"address\":\"" UINT64_FORMAT
+						 "\",\"mapped_bytes\":\"" UINT64_FORMAT "\"}",
+						 i ? "," : "", i, (uint64) (uintptr_t) region->address,
+						 (uint64) region->mapped_bytes);
+	}
+	appendStringInfoString(&out, "]}");
+	PG_RETURN_TEXT_P(cstring_to_text(out.data));
+}
+
 Datum
 test_dsg_buffer_layout(PG_FUNCTION_ARGS)
 {

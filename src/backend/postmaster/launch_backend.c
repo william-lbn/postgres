@@ -54,6 +54,7 @@
 #include "replication/slotsync.h"
 #include "replication/walreceiver.h"
 #include "storage/dsm.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
 #include "storage/pg_shmem.h"
@@ -254,6 +255,12 @@ postmaster_child_launch(BackendType child_type,
 		if (!child_process_kinds[child_type].shmem_attach)
 		{
 			dsm_detach_all();
+			/*-
+			 * DSG四数组独立于主共享段和DSM。日志等长寿命子进程必须先脱离
+			 * 自己继承的额外映射，避免跨PG恢复继续持有旧backing；函数只读
+			 * 原共享目录并改本地别名，不能清父/业务进程仍使用的目录字段。
+			 */
+			DsgBufferDetachInheritedArrays();
 			PGSharedMemoryDetach();
 		}
 

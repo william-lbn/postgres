@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "access/twophase.h"
 #include "access/xact.h"
 #include "libpq/pqcomm.h"
 #include "nodes/pg_list.h"
@@ -58,6 +59,7 @@ typedef struct DsgWorkControl
 	uint32 retained_transactions;
 	uint32 backgrounds;
 	uint32 auxiliaries;
+	uint32 prepared_slots;
 	pg_atomic_uint32 prestart_clients;
 	pg_atomic_uint32 connection_wanted;
 	pg_atomic_uint32 connection_applied;
@@ -89,7 +91,7 @@ DsgWorkShmemSize(void)
 {
 	if (!enable_dynamic_shared_buffers)
 		return 0;
-	/* 预备事务不是活进程；其资源仍需完整Quiesce策略另行审查。 */
+	/* 活进程槽不含2PC dummy PGPROC；独立prepared计数已计入固定control预算。 */
 	return add_size(DsgWorkProcBytes(),
 		mul_size(MaxLivePostmasterChildren(), sizeof(pg_atomic_uint32)));
 }
@@ -519,8 +521,8 @@ DsgConnectionAccept(pgsocket socket)
 		strcmp(local.sun_path, management_socket) == 0 && DsgConnectionPrivateReady(true);
 }
 
-void
-DsgConnectionGetSnapshot(DsgConnectionSnapshot *snapshot)
+static void
+DsgConnectionCopySnapshot(DsgConnectionSnapshot *snapshot, uint32 *prepared_slots)
 {
 	DsgWorkSlot *slot;
 	uint32 wanted;
@@ -545,6 +547,8 @@ DsgConnectionGetSnapshot(DsgConnectionSnapshot *snapshot)
 	 */
 	pg_read_barrier();
 	valid = DsgWorkCopyLocked(&snapshot->work, slot, may_exclude);
+	if (prepared_slots != NULL)
+		*prepared_slots = work_control->prepared_slots;
 	SpinLockRelease(&DSBCtrl->status_lock);
 	if (!valid)
 		elog(ERROR, "DSGA prestart registry count is inconsistent");
@@ -554,4 +558,65 @@ DsgConnectionGetSnapshot(DsgConnectionSnapshot *snapshot)
 	snapshot->applied_open = (applied & 1) != 0;
 	snapshot->acknowledged = snapshot->enabled && wanted != 0 && wanted == applied;
 	snapshot->public_connections_blocked = snapshot->acknowledged && !snapshot->requested_open;
+}
+
+void
+DsgConnectionGetSnapshot(DsgConnectionSnapshot *snapshot)
+{
+	DsgConnectionCopySnapshot(snapshot, NULL);
+}
+
+/*-
+ * 两阶段槽可能在backend退出后继续持有PGPROC/锁，不能从活进程数或valid=true
+ * 的pg_prepared_xacts行数推导。固定锁序TwoPhaseStateLock→status_lock；观察路径
+ * 只取status_lock，不反取TwoPhaseStateLock。登记在原生active array发布之前，
+ * 与关闭准入串行，关门后包括SU/后台在内禁止新的运行期PREPARE。恢复不能被
+ * 阻断，必须如实重建旧槽；后续全排空看到非零即保持旧预算/拒绝VM许可。
+ * 此函数与原数组写之间仅有不报错/不检查中断的原生初始化；不创建悬空登记。
+ */
+bool
+DsgPreparedReserve(bool recovery)
+{
+	bool allowed;
+	bool valid;
+
+	if (!enable_dynamic_shared_buffers)
+		return true;
+	if (work_control == NULL || DSBCtrl == NULL)
+		elog(PANIC, "DSGA prepared registry is unavailable");
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	valid = work_control->prepared_slots < (uint32) max_prepared_xacts;
+	allowed = recovery || pg_atomic_read_u32(&DSBCtrl->admission_open) != 0;
+	if (valid && allowed)
+		work_control->prepared_slots++;
+	SpinLockRelease(&DSBCtrl->status_lock);
+	if (!valid)
+		elog(PANIC, "DSGA prepared registry exceeds native slot capacity");
+	return allowed;
+}
+
+/* 在原RemoveGXact统一回收：失败准备、正常结束及redo移除都必须恰好一次。 */
+void
+DsgPreparedForget(void)
+{
+	bool valid;
+
+	if (!enable_dynamic_shared_buffers)
+		return;
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	valid = work_control->prepared_slots > 0;
+	if (valid)
+		work_control->prepared_slots--;
+	SpinLockRelease(&DSBCtrl->status_lock);
+	/* 未知计数不清零重造空闲，重建PG boot后重新按WAL/文件恢复真实槽。 */
+	if (!valid)
+		elog(PANIC, "DSGA prepared registry lost native slot ownership");
+}
+
+void
+DsgPreparedGetSnapshot(DsgPreparedSnapshot *snapshot)
+{
+	DsgConnectionCopySnapshot(&snapshot->connections, &snapshot->prepared_slots);
+	/* postmaster-only GUC，本boot不可变，不属于另一次运行期采样。 */
+	snapshot->maximum_prepared_slots = (uint32) max_prepared_xacts;
 }

@@ -55,6 +55,8 @@ PG_FUNCTION_INFO_V1(test_dsg_admission_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_work_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_work_stop_with_status_lock);
 PG_FUNCTION_INFO_V1(test_dsg_connection_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_prepared_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_prepared_control);
 
 void		_PG_init(void);
 
@@ -76,6 +78,7 @@ typedef struct DsgTestSharedState
 	pg_atomic_uint32 fast_drop_found;
 	pg_atomic_uint32 grow_exit_gate;
 	pg_atomic_uint32 grow_prepare_gate;
+	pg_atomic_uint32 prepared_gate;
 } DsgTestSharedState;
 
 static void test_dsg_wait_gate(pg_atomic_uint32 *gate, const char *event_name);
@@ -100,6 +103,22 @@ static bool io_writer_armed;
 static bool io_waiter_armed;
 static int	grow_mode;
 static int	release_probe_calls;
+static int prepared_mode;
+extern PGDLLEXPORT void test_dsg_prepared_pause(const char *name, const void *private_data);
+
+/* 只改变本测试backend的调度，不造prepared计数/valid/WAL/关闭回执。 */
+void
+test_dsg_prepared_pause(const char *name, const void *private_data)
+{
+	int mode = prepared_mode;
+
+	prepared_mode = 0;
+	if (mode == 1)
+		ereport(ERROR, (errmsg("DSGA test prepared registration ERROR")));
+	if (mode == 2)
+		test_dsg_wait_gate(&((DsgTestSharedState *) inherited_region.address)->prepared_gate,
+						   "DsgTestPreparedRegistered");
+}
 
 /*-
  * 此回调后登记、先执行，恰好暂停在 PG 原生已放锁、内核 Grow 清理之前。
@@ -280,6 +299,7 @@ _PG_init(void)
 		pg_atomic_init_u32(&state->fast_drop_found, 0);
 		pg_atomic_init_u32(&state->grow_exit_gate, 0);
 		pg_atomic_init_u32(&state->grow_prepare_gate, 0);
+		pg_atomic_init_u32(&state->prepared_gate, 0);
 	}
 }
 
@@ -427,6 +447,64 @@ test_dsg_connection_snapshot(PG_FUNCTION_ARGS)
 		s.work.bounded_inputs, s.work.retained_transactions,
 		s.work.observed.admission_open ? "true" : "false", s.work.observed.boot_id);
 	PG_RETURN_TEXT_P(cstring_to_text(out.data));
+}
+
+/* 两阶段槽及连接/工作来自同一原生观察点，不能拼pg_prepared_xacts采样。 */
+Datum
+test_dsg_prepared_snapshot(PG_FUNCTION_ARGS)
+{
+	DsgPreparedSnapshot s;
+
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE), errmsg("prepared observation requires administrator")));
+	DsgPreparedGetSnapshot(&s);
+	PG_RETURN_TEXT_P(cstring_to_text(psprintf(
+		"{\"prepared_slots\":%u,\"maximum_prepared_slots\":%u,\"admission_open\":%s,"
+		"\"foreground_idle\":%s,\"frontend_executes\":%u,\"retained_transactions\":%u,"
+		"\"acknowledged\":%s,\"public_connections_blocked\":%s,\"pg_boot_id\":\"" UINT64_FORMAT "\"}",
+		s.prepared_slots, s.maximum_prepared_slots,
+		s.connections.work.observed.admission_open ? "true" : "false",
+		s.connections.work.foreground_idle ? "true" : "false",
+		s.connections.work.frontend_executes, s.connections.work.retained_transactions,
+		s.connections.acknowledged ? "true" : "false",
+		s.connections.public_connections_blocked ? "true" : "false",
+		s.connections.work.observed.boot_id)));
+}
+
+Datum
+test_dsg_prepared_control(PG_FUNCTION_ARGS)
+{
+#ifdef USE_INJECTION_POINTS
+	char *action = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	DsgTestSharedState *state = (DsgTestSharedState *) inherited_region.address;
+
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE), errmsg("prepared fault control requires administrator")));
+	(void) test_dsg_shared_value();
+	if (strcmp(action, "attach") == 0)
+		InjectionPointAttach("dsg-prepared-after-register", "test_dsg_region",
+							 "test_dsg_prepared_pause", NULL, 0);
+	else if (strcmp(action, "arm_wait") == 0)
+		prepared_mode = 2;
+	else if (strcmp(action, "arm_error") == 0)
+		prepared_mode = 1;
+	else if (strcmp(action, "state") == 0)
+		PG_RETURN_INT32((int32) pg_atomic_read_u32(&state->prepared_gate));
+	else if (strcmp(action, "release") == 0)
+		pg_atomic_write_u32(&state->prepared_gate, 2);
+	else if (strcmp(action, "detach") == 0)
+	{
+		(void) InjectionPointDetach("dsg-prepared-after-register");
+		pg_atomic_write_u32(&state->prepared_gate, 0);
+	}
+	else
+		elog(ERROR, "unknown prepared test action");
+	pfree(action);
+	PG_RETURN_INT32(0);
+#else
+	ereport(ERROR, (errmsg("prepared tests require injection points")));
+	PG_RETURN_NULL();
+#endif
 }
 
 /* 只读真实观察；不为测试伪造排空或覆盖Native boot/floor。 */

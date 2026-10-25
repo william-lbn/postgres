@@ -96,6 +96,7 @@
 #include "pgstat.h"
 #include "replication/origin.h"
 #include "replication/syncrep.h"
+#include "storage/dsg_work.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
 #include "storage/md.h"
@@ -103,6 +104,7 @@
 #include "storage/proc.h"
 #include "storage/procarray.h"
 #include "utils/builtins.h"
+#include "utils/injection_point.h"
 #include "utils/memutils.h"
 #include "utils/timestamp.h"
 
@@ -404,6 +406,18 @@ MarkAsPreparing(TransactionId xid, const char *gid,
 				 errmsg("maximum number of prepared transactions reached"),
 				 errhint("Increase \"max_prepared_transactions\" (currently %d).",
 						 max_prepared_xacts)));
+	/*-
+	 * 在取走原生槽之前与DSGA关门同锁登记；失败不改freelist/MyLockedGxact。
+	 * 包括SU和后台的新PREPARE均拒绝，恢复走独立redo登记。必要检查点/回收
+	 * 不依赖创建新两阶段事务，不能把已有PREPARED当作前台空闲而丢掉预算。
+	 */
+	if (!DsgPreparedReserve(false))
+	{
+		LWLockRelease(TwoPhaseStateLock);
+		ereport(ERROR,
+				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+				 errmsg("dynamic shared buffer admission is closed for new prepared transactions")));
+	}
 	gxact = TwoPhaseState->freeGXacts;
 	TwoPhaseState->freeGXacts = gxact->next;
 
@@ -414,6 +428,8 @@ MarkAsPreparing(TransactionId xid, const char *gid,
 	/* And insert it into the active array */
 	Assert(TwoPhaseState->numPrepXacts < max_prepared_xacts);
 	TwoPhaseState->prepXacts[TwoPhaseState->numPrepXacts++] = gxact;
+	/* 仅测试可暂停/失败；原槽与登记均已建立，AtAbort_Twophase可真实回收。 */
+	INJECTION_POINT("dsg-prepared-after-register");
 
 	LWLockRelease(TwoPhaseStateLock);
 
@@ -638,6 +654,7 @@ RemoveGXact(GlobalTransaction gxact)
 			/* remove from the active array */
 			TwoPhaseState->numPrepXacts--;
 			TwoPhaseState->prepXacts[i] = TwoPhaseState->prepXacts[TwoPhaseState->numPrepXacts];
+			DsgPreparedForget();
 
 			/* and put it back in the freelist */
 			gxact->next = TwoPhaseState->freeGXacts;
@@ -2546,6 +2563,9 @@ PrepareRedoAdd(char *buf, XLogRecPtr start_lsn,
 	gxact->inredo = true;		/* yes, added in redo */
 	strcpy(gxact->gid, gid);
 
+	/* 恢复必须保留WAL/磁盘真实意图，即使新boot普通准入仍关闭；不能丢旧槽。 */
+	if (!DsgPreparedReserve(true))
+		elog(PANIC, "DSGA prepared recovery registration was refused");
 	/* And insert it into the active array */
 	Assert(TwoPhaseState->numPrepXacts < max_prepared_xacts);
 	TwoPhaseState->prepXacts[TwoPhaseState->numPrepXacts++] = gxact;

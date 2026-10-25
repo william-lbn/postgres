@@ -41,6 +41,15 @@ typedef struct DsgMemoryResult
 /* Region 必须先清零；maximum_bytes 是可访问上限，映射按系统页向上对齐。 */
 extern void DsgRegionReserve(DsgRegion *region, Size maximum_bytes);
 extern void DsgRegionDestroy(DsgRegion *region);
+/*-
+ * 仅用于调用者独占的完整Region寿命转换。Park以PROT_NONE私有占位替换
+ * 旧共享backing但不释放VA；Rearm只把该占位换成全新零填充共享backing。
+ * 不可传入任意地址/子区间，不能有本进程访问者或旧共享子进程。几何保持
+ * 不变；固定映射出现不确定失败则FATAL，禁止继续使用/复用未知地址所有权。
+ * 这是进程映射生命周期，不是跨进程物理回收或VM预算许可。
+ */
+extern void DsgRegionPark(DsgRegion *region);
+extern void DsgRegionRearm(DsgRegion *region);
 extern DsgMemoryResult DsgRegionPopulate(DsgRegion *region, Size offset, Size bytes);
 extern DsgMemoryResult DsgRegionRelease(DsgRegion *region, Size offset, Size bytes);
 

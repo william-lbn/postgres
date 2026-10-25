@@ -36,6 +36,36 @@ Buffer		wal_redo_buffer;
 bool		am_wal_redo_postgres = false;
 
 /*-
+ * Postmaster进程私有的VA所有权表；fork继承副本，不在MAP_SHARED目录里。
+ * 四数组几何在整个Postmaster寿命内固定，内部恢复只换backing。Parked占位
+ * 不可访问且不含旧共享数据，不能因DSBCtrl被销毁就把它当成未预留。非共享
+ * 子进程必须独立解除Shared和Parked两种映射，不能依赖共享目录仍存在。
+ */
+typedef enum DsgArrayMappingState
+{
+	DSG_ARRAY_MAPPING_EMPTY,
+	DSG_ARRAY_MAPPING_SHARED,
+	DSG_ARRAY_MAPPING_PARKED,
+	DSG_ARRAY_MAPPING_TRANSITION
+} DsgArrayMappingState;
+
+static struct
+{
+	DsgRegion	region;
+	DsgArrayMappingState state;
+} DynamicBufferMappings[DSG_BUFFER_ARRAY_COUNT];
+
+static void
+ClearDynamicBufferAliases(void)
+{
+	DSBCtrl = NULL;
+	BufferDescriptors = NULL;
+	BufferBlocks = NULL;
+	BufferIOCVArray = NULL;
+	CkptBufferIds = NULL;
+}
+
+/*-
  * Postmaster 在共享内存子进程全部退出后调用 shmem_exit 重建共享内存。
  * logger等不使用共享内存的子进程出生时独立脱离四数组，不能让其继续持有
  * 旧backing。此回调在主段解除映射前执行，避免多次恢复累积旧映射/boot。
@@ -44,7 +74,20 @@ bool		am_wal_redo_postgres = false;
 static void
 DestroyDynamicBufferRegions(int code, Datum arg)
 {
-	DsgBufferDetachInheritedArrays();
+	int			i;
+
+	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
+	{
+		if (DynamicBufferMappings[i].state == DSG_ARRAY_MAPPING_TRANSITION)
+			elog(FATAL, "DSGA array mapping ownership is unconfirmed");
+		if (DynamicBufferMappings[i].state != DSG_ARRAY_MAPPING_SHARED)
+			continue;
+		/* 保持VA占位，但解除此进程对旧共享backing的引用；不触共享目录。 */
+		DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_TRANSITION;
+		DsgRegionPark(&DynamicBufferMappings[i].region);
+		DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_PARKED;
+	}
+	ClearDynamicBufferAliases();
 }
 
 /*-
@@ -52,29 +95,26 @@ DestroyDynamicBufferRegions(int code, Datum arg)
  * postmaster_child_launch在非共享内存子进程的Main之前调用，此时没有PGPROC，
  * 不取backend锁。四数组VA/span在本boot不可变，可直接复制几何信息。
  *
- * 必须销毁局部DsgRegion副本：目录本身是MAP_SHARED，直接Destroy目录里的
- * region会MemSet父进程和所有业务backend仍使用的地址/长度。只清本进程的
+ * 只销毁进程私有所有权表：共享目录属于MAP_SHARED，直接Destroy目录里的
+ * region会MemSet父进程和业务backend仍使用的地址/长度。只清本进程的表与
  * 全局别名，不触碰共享目录、提交成本/未知标记或父进程退出回调。munmap失败
  * 继续走原ERROR/退出路径，不能进入声称不持共享内存的Main继续运行。
  */
 void
 DsgBufferDetachInheritedArrays(void)
 {
-	int i;
+	int			i;
 
-	if (DSBCtrl == NULL)
-		return;
 	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
 	{
-		DsgRegion local = DSBCtrl->arrays[i].region;
-
-		DsgRegionDestroy(&local);
+		/* 此表是进程私有，Destroy清零不会MemSet父/业务进程的共享目录。
+		 * DSBCtrl已为空时也要清理恢复期间继承的PROT_NONE占位。 */
+		if (DynamicBufferMappings[i].state == DSG_ARRAY_MAPPING_TRANSITION)
+			elog(FATAL, "cannot detach unconfirmed DSGA array mapping");
+		DsgRegionDestroy(&DynamicBufferMappings[i].region);
+		DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_EMPTY;
 	}
-	DSBCtrl = NULL;
-	BufferDescriptors = NULL;
-	BufferBlocks = NULL;
-	BufferIOCVArray = NULL;
-	CkptBufferIds = NULL;
+	ClearDynamicBufferAliases();
 }
 
 static void *
@@ -83,9 +123,25 @@ ReserveDynamicBufferArray(DsgBufferArrayId id, Size element_bytes)
 	DsgBufferArray *array = &DSBCtrl->arrays[id];
 	Size		initial_bytes = mul_size(NBuffers, element_bytes);
 	DsgMemoryResult result;
+	Size		maximum_bytes = mul_size(DSBCtrl->maximum, element_bytes);
 
 	array->element_bytes = element_bytes;
-	DsgRegionReserve(&array->region, mul_size(DSBCtrl->maximum, element_bytes));
+	if (DynamicBufferMappings[id].state == DSG_ARRAY_MAPPING_EMPTY)
+	{
+		DsgRegionReserve(&DynamicBufferMappings[id].region, maximum_bytes);
+		DynamicBufferMappings[id].state = DSG_ARRAY_MAPPING_SHARED;
+	}
+	else
+	{
+		if (DynamicBufferMappings[id].state != DSG_ARRAY_MAPPING_PARKED ||
+			DynamicBufferMappings[id].region.maximum_bytes != maximum_bytes)
+			elog(FATAL, "DSGA array mapping lifetime or geometry changed");
+		/* 新boot只能复用自己始终持有的占位，不attach旧共享backing。 */
+		DynamicBufferMappings[id].state = DSG_ARRAY_MAPPING_TRANSITION;
+		DsgRegionRearm(&DynamicBufferMappings[id].region);
+		DynamicBufferMappings[id].state = DSG_ARRAY_MAPPING_SHARED;
+	}
+	array->region = DynamicBufferMappings[id].region;
 	result = DsgRegionPopulate(&array->region, 0, initial_bytes);
 	if (result.status != DSG_MEMORY_OK)
 	{

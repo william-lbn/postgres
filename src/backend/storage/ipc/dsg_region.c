@@ -97,6 +97,58 @@ DsgRegionDestroy(DsgRegion *region)
 	MemSet(region, 0, sizeof(*region));
 }
 
+/*-
+ * MAP_FIXED只允许覆盖本进程仍独占的完整Region；调用方的私有寿命表证明
+ * 该范围没有被交还通用地址分配器。不能先munmap再mmap：窗口内可能有新的
+ * 分配，也会暂时释放未来私有额度证明所依赖的固定VA。一次替换丢弃旧引用，
+ * 不改Region几何，更不写其他进程的映射。旧共享进程必须先退出/独立脱离。
+ *
+ * 失败后的映射状态不能一概假设未变，故FATAL而不是返回可重试ERROR；调用者
+ * 也必须先标记转换中，只有系统调用完整成功才发布Parked/Shared状态。此API
+ * 不声称物理释放，不修改控制目录的已提交成本或旧操作结果。
+ */
+static void
+DsgRegionReplaceOwnedMapping(DsgRegion *region, bool shared)
+{
+#ifndef WIN32
+	void *address;
+
+	if (region == NULL || region->address == NULL || region->page_bytes == 0 ||
+		region->maximum_bytes == 0 || region->mapped_bytes == 0 ||
+		region->mapped_bytes % region->page_bytes != 0 ||
+		region->maximum_bytes > region->mapped_bytes ||
+		(uintptr_t) region->address % region->page_bytes != 0)
+		ereport(FATAL,
+				(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+				 errmsg("invalid owned DSGA mapping geometry")));
+	address = mmap(region->address, region->mapped_bytes,
+				   shared ? PROT_READ | PROT_WRITE : PROT_NONE,
+				   MAP_FIXED | MAP_ANONYMOUS | (shared ? MAP_SHARED : MAP_PRIVATE), -1, 0);
+	if (address == MAP_FAILED)
+		ereport(FATAL,
+				(errcode_for_file_access(),
+				 errmsg("could not replace owned DSGA mapping: %m")));
+	if (address != region->address)
+		elog(FATAL, "owned DSGA mapping replacement returned a different address");
+#else
+		ereport(FATAL,
+				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+				 errmsg("DSGA owned mapping replacement requires mmap support")));
+#endif
+}
+
+void
+DsgRegionPark(DsgRegion *region)
+{
+	DsgRegionReplaceOwnedMapping(region, false);
+}
+
+void
+DsgRegionRearm(DsgRegion *region)
+{
+	DsgRegionReplaceOwnedMapping(region, true);
+}
+
 DsgMemoryResult
 DsgRegionPopulate(DsgRegion *region, Size offset, Size bytes)
 {

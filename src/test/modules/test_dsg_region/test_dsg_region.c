@@ -31,6 +31,7 @@ PG_FUNCTION_INFO_V1(test_dsg_shared_write);
 PG_FUNCTION_INFO_V1(test_dsg_shared_read);
 PG_FUNCTION_INFO_V1(test_dsg_buffer_layout);
 PG_FUNCTION_INFO_V1(test_dsg_array_mappings);
+PG_FUNCTION_INFO_V1(test_dsg_region_recycle);
 PG_FUNCTION_INFO_V1(test_dsg_boot_id);
 PG_FUNCTION_INFO_V1(test_dsg_exclusive_available);
 PG_FUNCTION_INFO_V1(test_dsg_access_error);
@@ -1450,10 +1451,91 @@ test_dsg_unpin_probe(PG_FUNCTION_ARGS)
 }
 
 /*-
- * 断言实际 Buffer Manager 指针来自目录中的共享映射，并校验只提交初始
- * 前缀、四数组分别按 M 预留。嵌套 Guard 测试覆盖重复读锁的释放责任。
- * 这里不触摸未发布尾部，避免测试自身把整个 M 变成实际占用。
+ * 独占测试backend自己的临时Region，不触DSG四数组或业务数据。通过持久协议
+ * 连接分阶段调用，让外部OS工具看到真实PROT_NONE占位/新共享映射。Park阶段
+ * 绝不读内存；Rearm后读全span（含独占padding）确认新零backing，不用RSS猜测。
+ * 状态在本backend私有空间；不确定OS替换FATAL后由进程退出清理，不继续复用。
  */
+Datum
+test_dsg_region_recycle(PG_FUNCTION_ARGS)
+{
+	static DsgRegion region;
+	static int state;	/* 0=empty, 1=shared, 2=parked, 3=transition */
+	char *command = text_to_cstring(PG_GETARG_TEXT_PP(0));
+	const char *zero = "null";
+	const char *label;
+	StringInfoData out;
+
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("region lifecycle test requires original administrator")));
+	if (strcmp(command, "invalid") == 0)
+	{
+		DsgRegion invalid = {0};
+
+		/* 独立瞬态backend验证坏几何FATAL，不传任意目标地址给MAP_FIXED。 */
+		DsgRegionPark(&invalid);
+		elog(ERROR, "invalid owned mapping geometry unexpectedly continued");
+	}
+	if (state == 3)
+		elog(FATAL, "test region mapping ownership is unconfirmed");
+	if (strcmp(command, "reserve") == 0)
+	{
+		long page = sysconf(_SC_PAGESIZE);
+
+		test_dsg_check(state == 0 && region.address == NULL, "region already reserved");
+		test_dsg_check(page > 0 && (uint64) page < SIZE_MAX / 4, "invalid actual page size");
+		DsgRegionReserve(&region, (Size) page * 3 + 1);
+		state = 1;
+		memset(region.address, 0x5a, region.mapped_bytes);
+	}
+	else if (strcmp(command, "park") == 0)
+	{
+		test_dsg_check(state == 1, "only owned shared mapping can park");
+		state = 3;
+		DsgRegionPark(&region);
+		state = 2;
+	}
+	else if (strcmp(command, "rearm") == 0)
+	{
+		test_dsg_check(state == 2, "only parked mapping can rearm");
+		state = 3;
+		DsgRegionRearm(&region);
+		state = 1;
+	}
+	else if (strcmp(command, "mark") == 0)
+	{
+		test_dsg_check(state == 1, "cannot write parked region");
+		memset(region.address, 0x5a, region.mapped_bytes);
+	}
+	else if (strcmp(command, "destroy") == 0)
+	{
+		DsgRegionDestroy(&region);
+		state = 0;
+	}
+	else
+		elog(ERROR, "unknown test region lifecycle command");
+	if (state == 1)
+	{
+		Size i;
+
+		zero = "true";
+		for (i = 0; i < region.mapped_bytes; i++)
+			if (region.address[i] != 0)
+			{
+				zero = "false";
+				break;
+			}
+	}
+	label = state == 0 ? "empty" : state == 1 ? "shared" : "parked";
+	initStringInfo(&out);
+	appendStringInfo(&out, "{\"state\":\"%s\",\"address\":\"" UINT64_FORMAT
+					 "\",\"mapped_bytes\":\"" UINT64_FORMAT "\",\"all_zero\":%s}",
+					 label, (uint64) (uintptr_t) region.address,
+					 (uint64) region.mapped_bytes, zero);
+	PG_RETURN_TEXT_P(cstring_to_text(out.data));
+}
+
 Datum
 test_dsg_array_mappings(PG_FUNCTION_ARGS)
 {
@@ -1485,6 +1567,11 @@ test_dsg_array_mappings(PG_FUNCTION_ARGS)
 	PG_RETURN_TEXT_P(cstring_to_text(out.data));
 }
 
+/*-
+ * 断言实际 Buffer Manager 指针来自目录中的共享映射，并校验只提交初始
+ * 前缀、四数组分别按 M 预留。嵌套 Guard 测试覆盖重复读锁的释放责任。
+ * 这里不触摸未发布尾部，避免测试自身把整个 M 变成实际占用。
+ */
 Datum
 test_dsg_buffer_layout(PG_FUNCTION_ARGS)
 {

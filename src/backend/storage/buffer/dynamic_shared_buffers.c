@@ -54,6 +54,17 @@ typedef struct DsgAdmissionLeaseState
 	uint64 epoch;
 	bool armed;
 	bool expired;
+	/*-
+	 * 原rearm成功和该定长回执在同一个status_lock临界区发布。boot由目录
+	 * 固定，rearm_epoch非零才有效；renew/Fence/过期不覆盖。只保留最近
+	 * 成功一次，后继rearm可覆盖更旧项，未命中必须返回未知。全部字段仍
+	 * 位于已预算的原cache line，不能为恢复协议增加未计费共享内存。
+	 */
+	uint64 rearm_epoch;
+	uint64 rearm_generation;
+	uint64 rearm_revision;
+	uint64 rearm_expected_deadline_ns;
+	uint64 rearm_applied_deadline_ns;
 } DsgAdmissionLeaseState;
 
 StaticAssertDecl(sizeof(DsgAdmissionLeaseState) <= PG_CACHE_LINE_SIZE,
@@ -166,6 +177,14 @@ DsgBufferAdmissionLease(const DsgAdmissionLeaseRequest *request,
 		  request->issuer_epoch > admission_lease->epoch &&
 		  pg_atomic_read_u32(&DSBCtrl->admission_open) == 0)))
 	{
+		if (request->rearm)
+		{
+			admission_lease->rearm_epoch = request->issuer_epoch;
+			admission_lease->rearm_generation = request->expected_generation;
+			admission_lease->rearm_revision = request->expected_revision;
+			admission_lease->rearm_expected_deadline_ns = request->expected_deadline_ns;
+			admission_lease->rearm_applied_deadline_ns = now + duration;
+		}
 		pg_atomic_write_u64(&admission_lease->deadline_ns, now + duration);
 		admission_lease->epoch = request->issuer_epoch;
 		admission_lease->expired = false;
@@ -177,6 +196,44 @@ DsgBufferAdmissionLease(const DsgAdmissionLeaseRequest *request,
 	response->armed = admission_lease->armed;
 	response->expired = admission_lease->expired;
 	response->timeout_ms = dynamic_shared_buffers_admission_lease_timeout;
+	SpinLockRelease(&DSBCtrl->status_lock);
+	DsgConnectionNotify();
+}
+
+/*-
+ * 恢复只能查询原rearm，不能通过重复setter把新deadline冒充原回执。此处
+ * 不续租、不fence、不开放；仅按现有规则先公布过期关闭，然后在同一锁内
+ * 比较完整原CAS并复制当前事实。调用前检查权限/环境，不在spinlock内分配
+ * 或报错。共享内存重建会同时清空回执和期限；旧boot不能匹配新目录。
+ */
+void
+DsgBufferAdmissionRearmStatus(const DsgAdmissionLeaseRequest *request,
+							DsgAdmissionRearmStatus *response)
+{
+	if (!superuser() || !GetSessionUserIsSuperuser())
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("DSGA admission rearm status requires a superuser session")));
+	if (DSBCtrl == NULL || !IsUnderPostmaster || !dynamic_shared_buffers_require_admission)
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("DSGA admission rearm status requires managed dynamic buffers")));
+	MemSet(response, 0, sizeof(*response));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
+	if (request != NULL && request->rearm && request->boot_id == DSBCtrl->boot_id &&
+		request->issuer_epoch != 0 && request->issuer_epoch == admission_lease->rearm_epoch &&
+		request->expected_generation == admission_lease->rearm_generation &&
+		request->expected_revision == admission_lease->rearm_revision &&
+		request->expected_deadline_ns == admission_lease->rearm_expected_deadline_ns)
+	{
+		response->retained = true;
+		response->applied_deadline_ns = admission_lease->rearm_applied_deadline_ns;
+	}
+	DsgBufferCopySnapshotLocked(&response->current.observed);
+	response->current.deadline_ns = pg_atomic_read_u64(&admission_lease->deadline_ns);
+	response->current.lease_epoch = admission_lease->epoch;
+	response->current.armed = admission_lease->armed;
+	response->current.expired = admission_lease->expired;
+	response->current.timeout_ms = dynamic_shared_buffers_admission_lease_timeout;
 	SpinLockRelease(&DSBCtrl->status_lock);
 	DsgConnectionNotify();
 }

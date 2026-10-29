@@ -19,6 +19,7 @@
 #define NEON_DSG_ADMISSION_API_VERSION 1
 #define NEON_DSG_ADMISSION_STATUS_API_VERSION 1
 #define NEON_DSG_ADMISSION_LEASE_API_VERSION 1
+#define NEON_DSG_ADMISSION_REARM_STATUS_API_VERSION 1
 /* 独立成本能力，不改变Buffer ABI6或已有snapshot结构。 */
 #define NEON_DSG_SHARED_COST_API_VERSION 1
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
@@ -398,8 +399,22 @@ typedef struct DsgAdmissionLeaseResponse
 	DsgBufferSnapshot observed;
 } DsgAdmissionLeaseResponse;
 
+/*-
+ * 只查询最近一次成功rearm的完整CAS身份。retained=false表示未知，绝不
+ * 表示未执行；applied_deadline_ns是历史应用值，不能替代当前有效期限。
+ * current独立提供当前事实，可能已经续租、过期或被更高owner接管。
+ */
+typedef struct DsgAdmissionRearmStatus
+{
+	bool retained;
+	uint64 applied_deadline_ns;
+	DsgAdmissionLeaseResponse current;
+} DsgAdmissionRearmStatus;
+
 extern void DsgBufferAdmissionLease(const DsgAdmissionLeaseRequest *request,
 								  DsgAdmissionLeaseResponse *response);
+extern void DsgBufferAdmissionRearmStatus(const DsgAdmissionLeaseRequest *request,
+										DsgAdmissionRearmStatus *response);
 extern void DsgBufferAdmissionLeaseFenceLocked(uint64 epoch);
 extern void DsgBufferAdmissionExpireLocked(void);
 extern void DsgBufferAdmissionExpire(void);

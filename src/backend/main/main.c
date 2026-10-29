@@ -22,6 +22,11 @@
 
 #include <unistd.h>
 
+#if defined(__linux__)
+#include <sys/resource.h>
+#include <sys/prctl.h>
+#endif
+
 #if defined(WIN32)
 #include <crtdbg.h>
 #endif
@@ -44,6 +49,76 @@
 
 const char *progname;
 static bool reached_main = false;
+
+/*-
+ * root出生程序只从原不可变资源来源传入此值，不用租户GUC或运行期SQL调整。
+ * 必须在原生PG中而不是仍有GC/多线程的Go启动器中落实：后者已有较大VA保留，
+ * 先压低AS再运行Go可能在exec前不可恢复地分配失败。本函数尚无MemoryContext，
+ * 因此只用栈变量/原始stderr/exit，不elog、不走目录/共享锁，也不构造预算回执。
+ *
+ * hard=soft限制整个地址空间，包含共享映射及PROT_NONE占位；它不是私有RSS。
+ * fork/exec及同Postmaster内部恢复继承硬限，普通PG不能重新放宽。Root后续仍须
+ * 核实际PG executable、完整出生、UID/cgroup、全部进程硬限/NNP/无能力/VmSize。
+ * 旧PG忽略环境不能成为来源：真实读回会拒绝。默认缺省保留未约束旧行为。
+ */
+static void
+dsg_apply_inherited_address_space(void)
+{
+	const char *raw = getenv("NEON_DSGA_ADDRESS_SPACE_MAX_BYTES");
+	const char *cursor;
+	uint64 value = 0;
+
+	if (raw == NULL)
+		return;
+	if (raw[0] < '1' || raw[0] > '9')
+		goto invalid;
+	for (cursor = raw; *cursor != '\0'; cursor++)
+	{
+		unsigned digit;
+
+		if (*cursor < '0' || *cursor > '9')
+			goto invalid;
+		digit = (unsigned) (*cursor - '0');
+		if (value > (PG_INT64_MAX - digit) / 10)
+			goto invalid;
+		value = value * 10 + digit;
+	}
+	if (value == 0 || value % (64 * 1024) != 0)
+		goto invalid;
+#if defined(__linux__) && defined(RLIMIT_AS)
+	{
+		struct rlimit wanted;
+		struct rlimit actual;
+
+		/*- NNP不可撤回并跨fork/exec继承。启动器应已降权清能力；root或
+		 * 可重新获权的调用不享有有限额度身份，拒绝启动，不静默降级。 */
+		if (getuid() == 0 || getuid() != geteuid() ||
+			prctl(PR_GET_NO_NEW_PRIVS, 0L, 0L, 0L, 0L) != 1)
+		{
+			fprintf(stderr, "DSGA address space requires an unprivileged no-new-privileges birth\n");
+			exit(1);
+		}
+		wanted.rlim_cur = wanted.rlim_max = (rlim_t) value;
+		if ((uint64) wanted.rlim_max != value ||
+			setrlimit(RLIMIT_AS, &wanted) != 0 ||
+			getrlimit(RLIMIT_AS, &actual) != 0 ||
+			actual.rlim_cur != wanted.rlim_cur || actual.rlim_max != wanted.rlim_max)
+		{
+			fprintf(stderr, "DSGA original address space hard limit could not be established\n");
+			exit(1);
+		}
+		return;
+	}
+#else
+	/* Mac只执行解析/拒绝与未启用回归；不能冒充Linux RLIMIT_AS认证。 */
+	fprintf(stderr, "DSGA finite address space requires the supported Linux resource guard\n");
+	exit(1);
+#endif
+
+invalid:
+	fprintf(stderr, "invalid DSGA original address space limit\n");
+	exit(1);
+}
 
 
 static void startup_hacks(const char *progname);
@@ -96,6 +171,7 @@ main(int argc, char *argv[])
 	bool		do_check_root = true;
 
 	reached_main = true;
+	dsg_apply_inherited_address_space();
 
 	/*
 	 * If supported on the current platform, set up a handler to be called if

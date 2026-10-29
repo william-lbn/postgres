@@ -275,8 +275,19 @@ DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
 		response->disposition = DSG_ADMISSION_STALE;
 	else if (request->open && DSBCtrl->operation.phase == DSG_OP_PREPARING)
 		response->disposition = DSG_ADMISSION_BUSY;
-	else if (DSBCtrl->admission_revision == PG_UINT64_MAX ||
-			 request->revision != DSBCtrl->admission_revision + 1)
+	/*-
+	 * 关闭是覆盖旧门禁的单调水位，必须允许跨过尚未到达的开放revision。
+	 * 例如外层先持久化开放1但网络未投递，来源异常后关闭2应直接生效；
+	 * 若为凑连续水位而先重发开放1，反而会在坏预算上短暂开始服务。旧
+	 * 请求随后到达仍由上方revision/floor检查拒绝，不把它记为未执行。
+	 * 只对开放保留精确next要求；同revision完整摘要、boot、floor、容量
+	 * 和resize门禁均先校验，关闭不获得排空/预算/物理回收许可。所有
+	 * 比较和发布仍在同一status_lock临界段，无新增锁/分配/IO；最大值
+	 * 时不做加法，避免水位回绕。关闭到最大值后本boot不能再次开放。
+	 */
+	else if (request->open &&
+			 (DSBCtrl->admission_revision == PG_UINT64_MAX ||
+			  request->revision != DSBCtrl->admission_revision + 1))
 		response->disposition = DSG_ADMISSION_CONFLICT;
 	else if (!DsgConnectionPublishLocked(request->open))
 		response->disposition = DSG_ADMISSION_CONFLICT;

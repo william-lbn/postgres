@@ -1647,6 +1647,23 @@ include_dir 'conf.d'
      <title>Memory</title>
 
      <variablelist>
+     <varlistentry id="guc-dynamic-shared-buffers-admission-lease-timeout"
+                   xreflabel="dynamic_shared_buffers_admission_lease_timeout">
+      <term><varname>dynamic_shared_buffers_admission_lease_timeout</varname> (<type>integer</type>)</term>
+      <listitem>
+       <para>
+        Bounds managed dynamic-buffer admission without a verified renewal.
+        The default is 30 seconds; the allowed range is 1 to 60 seconds.
+        This setting is fixed at server start and applies when
+        <varname>dynamic_shared_buffers_require_admission</varname> is enabled.
+        The first issuer fence starts a native monotonic deadline. Expiration
+        closes new ordinary work and connections; it does not cancel running
+        work, release budgets, or authorize memory reclamation. Ordinary fences,
+        observations, retries, and late renewals cannot reopen admission.
+        Explicit recovery requires a higher issuer and keeps admission closed.
+       </para>
+      </listitem>
+     </varlistentry>
      <varlistentry id="guc-shared-buffers" xreflabel="shared_buffers">
       <term><varname>shared_buffers</varname> (<type>integer</type>)
       <indexterm>

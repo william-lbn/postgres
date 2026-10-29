@@ -2121,6 +2121,15 @@ struct config_bool ConfigureNamesBool[] =
 struct config_int ConfigureNamesInt[] =
 {
 	{
+		{"dynamic_shared_buffers_admission_lease_timeout", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Bounds managed admission without a verified renewal."),
+			NULL, GUC_UNIT_MS | GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_admission_lease_timeout,
+		30000, 1000, 60000,
+		NULL, NULL, NULL
+	},
+	{
 		{"archive_timeout", PGC_SIGHUP, WAL_ARCHIVING,
 			gettext_noop("Sets the amount of time to wait before forcing a "
 						 "switch to the next WAL file."),

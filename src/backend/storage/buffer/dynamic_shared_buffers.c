@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "miscadmin.h"
+#include "portability/instr_time.h"
 #include "storage/buf_internals.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/dsg_work.h"
@@ -21,6 +22,7 @@ bool		enable_dynamic_shared_buffers = false;
 int			max_shared_buffers = 0;
 bool		dynamic_shared_buffers_require_admission = false;
 int			dynamic_shared_buffers_startup_budget = 0;
+int			dynamic_shared_buffers_admission_lease_timeout = 30000;
 
 /*-
  * 私有准入回执放在目录尾部已经计入ShmemSize的保留cache line内，不改变公开
@@ -39,6 +41,145 @@ typedef struct DsgAdmissionIdentity
 StaticAssertDecl(sizeof(DsgAdmissionIdentity) <= PG_CACHE_LINE_SIZE,
 				 "DSGA admission identity must fit reserved directory cache line");
 static DsgAdmissionIdentity *admission_identity;
+
+/*-
+ * 第二条已计入启动预算的私有cache line保存失联防线。deadline是本机单调时钟
+ * 纳秒值，绝不使用调用者墙钟或JWT到期时间。Postmaster仅作原子读取，不能
+ * 取得可能由崩溃backend遗留的共享锁；所有写者按status_lock串行。
+ * expired在同一租约内不可撤回：提高floor、重发setter或迟到续租均不能重开。
+ */
+typedef struct DsgAdmissionLeaseState
+{
+	pg_atomic_uint64 deadline_ns;
+	uint64 epoch;
+	bool armed;
+	bool expired;
+} DsgAdmissionLeaseState;
+
+StaticAssertDecl(sizeof(DsgAdmissionLeaseState) <= PG_CACHE_LINE_SIZE,
+				 "DSGA admission lease must fit reserved directory cache line");
+static DsgAdmissionLeaseState *admission_lease;
+
+/*- 时钟失败/溢出按已过期处理，不在spinlock中报错或产生未初始化时间。 */
+static uint64
+DsgAdmissionNow(void)
+{
+	struct timespec now;
+
+	if (clock_gettime(PG_INSTR_CLOCK, &now) != 0 || now.tv_sec < 0 ||
+		now.tv_sec > (PG_INT64_MAX - NS_PER_S) / NS_PER_S ||
+		now.tv_nsec < 0 || now.tv_nsec >= NS_PER_S)
+		return PG_INT64_MAX;
+	return (uint64) now.tv_sec * NS_PER_S + now.tv_nsec;
+}
+
+/*- 调用者持status_lock；只做定长状态发布，不等待IO/Provider/resize。 */
+void
+DsgBufferAdmissionExpireLocked(void)
+{
+	if (!dynamic_shared_buffers_require_admission || admission_lease == NULL ||
+		!admission_lease->armed || admission_lease->expired ||
+		DsgAdmissionNow() < pg_atomic_read_u64(&admission_lease->deadline_ns))
+		return;
+	admission_lease->expired = true;
+	admission_identity->valid = false;
+	pg_atomic_write_u32(&DSBCtrl->admission_open, 0);
+	(void) DsgConnectionPublishLocked(false);
+}
+
+void
+DsgBufferAdmissionExpire(void)
+{
+	if (DSBCtrl == NULL || !dynamic_shared_buffers_require_admission)
+		return;
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
+	SpinLockRelease(&DSBCtrl->status_lock);
+}
+
+bool
+DsgBufferAdmissionLeaseAllowsConnections(void)
+{
+	uint64 deadline;
+
+	if (!dynamic_shared_buffers_require_admission || admission_lease == NULL)
+		return true;
+	deadline = pg_atomic_read_u64(&admission_lease->deadline_ns);
+	return deadline != 0 && DsgAdmissionNow() < deadline;
+}
+
+/*-
+ * 第一次原生Fence开始计时，包括尚未到达的首次开放。后续Fence只推进原floor，
+ * 绝不续租；否则无预算的只读轮询就能维持旧开放。初始发布前deadline先可见，
+ * Backend和Postmaster按各自准入入口检查。时钟不可用时立即进入关闭事实。
+ */
+void
+DsgBufferAdmissionLeaseFenceLocked(uint64 epoch)
+{
+	uint64 now;
+	uint64 duration = (uint64) dynamic_shared_buffers_admission_lease_timeout * NS_PER_MS;
+
+	if (!dynamic_shared_buffers_require_admission || admission_lease->armed)
+		return;
+	now = DsgAdmissionNow();
+	admission_lease->epoch = epoch;
+	admission_lease->armed = true;
+	pg_atomic_write_u64(&admission_lease->deadline_ns,
+					   now > PG_INT64_MAX - duration ? now : now + duration);
+	DsgBufferAdmissionExpireLocked();
+}
+
+/*-
+ * NULL只查询。写入绑定boot、当前floor、容量、准入revision和原deadline CAS；
+ * 同一续租重复/乱序投递不能再延长。过期先关闭，再比较，迟到请求不能复活。
+ * rearm是显式的独立恢复动作：必须已关闭、过期、使用比原租约更高的owner，
+ * 且保持原deadline；只恢复续租能力，不开放业务、不生成预算或VM许可。
+ * 调用者仍须在外层认证原来源和恢复选择；内核不把SU自报字段当作预算证明。
+ */
+void
+DsgBufferAdmissionLease(const DsgAdmissionLeaseRequest *request,
+						DsgAdmissionLeaseResponse *response)
+{
+	uint64 now;
+	uint64 duration = (uint64) dynamic_shared_buffers_admission_lease_timeout * NS_PER_MS;
+
+	if (!superuser() || !GetSessionUserIsSuperuser())
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+						errmsg("DSGA admission lease requires a superuser session")));
+	if (DSBCtrl == NULL || !IsUnderPostmaster || !dynamic_shared_buffers_require_admission)
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("DSGA admission lease requires managed dynamic buffers")));
+	MemSet(response, 0, sizeof(*response));
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
+	now = DsgAdmissionNow();
+	if (request != NULL && admission_lease->armed &&
+		request->boot_id == DSBCtrl->boot_id && request->issuer_epoch != 0 &&
+		request->issuer_epoch == DSBCtrl->issuer_floor_epoch &&
+		request->expected_generation == pg_atomic_read_u64(&DSBCtrl->generation) &&
+		request->expected_revision == DSBCtrl->admission_revision &&
+		request->expected_deadline_ns == pg_atomic_read_u64(&admission_lease->deadline_ns) &&
+		now <= PG_INT64_MAX - duration &&
+		now + duration > request->expected_deadline_ns &&
+		((!request->rearm && !admission_lease->expired) ||
+		 (request->rearm && admission_lease->expired &&
+		  request->issuer_epoch > admission_lease->epoch &&
+		  pg_atomic_read_u32(&DSBCtrl->admission_open) == 0)))
+	{
+		pg_atomic_write_u64(&admission_lease->deadline_ns, now + duration);
+		admission_lease->epoch = request->issuer_epoch;
+		admission_lease->expired = false;
+		response->renewed = true;
+	}
+	DsgBufferCopySnapshotLocked(&response->observed);
+	response->deadline_ns = pg_atomic_read_u64(&admission_lease->deadline_ns);
+	response->lease_epoch = admission_lease->epoch;
+	response->armed = admission_lease->armed;
+	response->expired = admission_lease->expired;
+	response->timeout_ms = dynamic_shared_buffers_admission_lease_timeout;
+	SpinLockRelease(&DSBCtrl->status_lock);
+	DsgConnectionNotify();
+}
 DynamicSharedBuffersControl *DSBCtrl = NULL;
 static Size startup_shared_upper_bytes;
 /*-
@@ -154,6 +295,7 @@ DsgBufferGetSharedCost(DsgBufferSharedCost *cost)
 bool
 DsgBufferAdmissionBlocksCurrentRole(void)
 {
+	DsgBufferAdmissionExpire();
 	/*
 	 * 消息入口尚未开始事务；使用PG随SET ROLE维护的只读权限标志，不查系统表。
 	 */
@@ -199,11 +341,18 @@ DsgBufferSetAdmission(uint64 boot_id, uint64 revision, uint64 expected_generatio
 	if (DSBCtrl == NULL)
 		ereport(ERROR, (errmsg("dynamic shared buffers are disabled")));
 	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
 	valid = boot_id == DSBCtrl->boot_id && revision > 0 &&
+		(!open || !admission_lease->expired) &&
 		expected_generation == pg_atomic_read_u64(&DSBCtrl->generation) &&
 		(revision > DSBCtrl->admission_revision ||
 		 (revision == DSBCtrl->admission_revision &&
 		  open == (pg_atomic_read_u32(&DSBCtrl->admission_open) != 0)));
+	if (valid && open)
+	{
+		DsgBufferAdmissionLeaseFenceLocked(DSBCtrl->issuer_floor_epoch);
+		valid = !admission_lease->expired;
+	}
 	if (valid)
 		valid = DsgConnectionPublishLocked(open);
 	if (valid)
@@ -262,6 +411,15 @@ DsgBufferControlAdmission(const DsgBufferAdmissionRequest *request,
 		}
 	}
 	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
+	if (request->open && admission_lease->expired)
+	{
+		SpinLockRelease(&DSBCtrl->status_lock);
+		if (locked)
+			LWLockRelease(&DSBCtrl->resize_lock);
+		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+						errmsg("DSGA admission lease expired; controlled recovery is required")));
+	}
 	same = admission_identity->valid && admission_identity->epoch == request->issuer_epoch &&
 		admission_identity->revision == request->revision &&
 		request->open == (pg_atomic_read_u32(&DSBCtrl->admission_open) != 0) &&
@@ -327,6 +485,7 @@ DsgBufferAdmissionStatus(const DsgBufferAdmissionRequest *request,
 	DsgCheckAdmissionRequest(request);
 	MemSet(response, 0, sizeof(*response));
 	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
 	same = admission_identity->valid && admission_identity->epoch == request->issuer_epoch &&
 		admission_identity->revision == request->revision &&
 		request->open == (pg_atomic_read_u32(&DSBCtrl->admission_open) != 0) &&
@@ -400,7 +559,7 @@ DynamicSharedBuffersShmemSize(void)
 	count = 1 + (GetMaxNBuffers() - 1) / DSG_BUFFER_GRANULE_BUFFERS;
 	size = add_size(offsetof(DynamicSharedBuffersControl, granules),
 					mul_size(count, sizeof(DsgBufferGranule)));
-	return add_size(MAXALIGN(size), PG_CACHE_LINE_SIZE);
+	return add_size(MAXALIGN(size), 2 * PG_CACHE_LINE_SIZE);
 }
 
 void
@@ -422,7 +581,9 @@ DynamicSharedBuffersInit(void)
 	 */
 	Assert(!found);
 	MemSet(DSBCtrl, 0, size);
-	admission_identity = (DsgAdmissionIdentity *) ((char *) DSBCtrl + size - PG_CACHE_LINE_SIZE);
+	admission_identity = (DsgAdmissionIdentity *) ((char *) DSBCtrl + size - 2 * PG_CACHE_LINE_SIZE);
+	admission_lease = (DsgAdmissionLeaseState *) ((char *) DSBCtrl + size - PG_CACHE_LINE_SIZE);
+	pg_atomic_init_u64(&admission_lease->deadline_ns, 0);
 	pg_atomic_init_u32(&DSBCtrl->low, NBuffers);
 	pg_atomic_init_u32(&DSBCtrl->high, NBuffers);
 	pg_atomic_init_u32(&DSBCtrl->admission_open, dynamic_shared_buffers_require_admission ? 0 : 1);

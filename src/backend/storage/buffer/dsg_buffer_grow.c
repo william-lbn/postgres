@@ -35,6 +35,7 @@ DsgBufferCopySnapshotLocked(DsgBufferSnapshot *snapshot)
 {
 	int			i;
 
+	DsgBufferAdmissionExpireLocked();
 	MemSet(snapshot, 0, sizeof(*snapshot));
 	snapshot->operation = DSBCtrl->operation;
 	snapshot->boot_id = DSBCtrl->boot_id;

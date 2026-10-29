@@ -353,6 +353,7 @@ DsgWorkStartMessage(bool ordinary_work, bool bounded_discard)
 		return false;
 	slot = DsgWorkClientSlot();
 	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
 	reject = ordinary_work && !current_role_is_superuser &&
 		pg_atomic_read_u32(&DSBCtrl->admission_open) == 0;
 	DsgWorkSetPhase(slot, bounded_discard || reject ?
@@ -512,7 +513,8 @@ DsgConnectionAccept(pgsocket socket)
 	socklen_t length = sizeof(local);
 
 	if (!dynamic_shared_buffers_require_connection_gate ||
-		(pg_atomic_read_u32(&work_control->connection_wanted) & 1) != 0)
+		((pg_atomic_read_u32(&work_control->connection_wanted) & 1) != 0 &&
+		 DsgBufferAdmissionLeaseAllowsConnections()))
 		return true;
 	/* 私有端点来自内核getsockname，不读取startup用户名或连接方自报的标记。 */
 	MemSet(&local, 0, sizeof(local));
@@ -540,6 +542,7 @@ DsgConnectionCopySnapshot(DsgConnectionSnapshot *snapshot, uint32 *prepared_slot
 	/* 文件检查在锁外；漂移拒绝private-ready，不把历史0700当作当前管理可用。 */
 	snapshot->private_management_ready = snapshot->enabled && DsgConnectionPrivateReady(true);
 	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
 	wanted = pg_atomic_read_u32(&work_control->connection_wanted);
 	applied = pg_atomic_read_u32(&work_control->connection_applied);
 	/*-
@@ -589,6 +592,7 @@ DsgPreparedReserve(bool recovery)
 	if (work_control == NULL || DSBCtrl == NULL)
 		elog(PANIC, "DSGA prepared registry is unavailable");
 	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
 	valid = work_control->prepared_slots < (uint32) max_prepared_xacts;
 	allowed = recovery || pg_atomic_read_u32(&DSBCtrl->admission_open) != 0;
 	if (valid && allowed)

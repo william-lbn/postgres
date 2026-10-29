@@ -366,6 +366,7 @@ DsgBufferFenceIssuer(uint64 boot_id, uint64 issuer_epoch, DsgBufferIssuerFenceRe
 	else
 	{
 		DSBCtrl->issuer_floor_epoch = issuer_epoch;
+		DsgBufferAdmissionLeaseFenceLocked(issuer_epoch);
 		if (DSBCtrl->operation.phase == DSG_OP_PREPARING &&
 			DSBCtrl->operation.request.issuer_epoch < issuer_epoch && !DSBCtrl->cancel_closed)
 			DSBCtrl->cancel_requested = true;

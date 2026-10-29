@@ -18,6 +18,7 @@
 /* 准入是独立增量能力，不改变Buffer ABI6的既有结构/函数布局。 */
 #define NEON_DSG_ADMISSION_API_VERSION 1
 #define NEON_DSG_ADMISSION_STATUS_API_VERSION 1
+#define NEON_DSG_ADMISSION_LEASE_API_VERSION 1
 /* 独立成本能力，不改变Buffer ABI6或已有snapshot结构。 */
 #define NEON_DSG_SHARED_COST_API_VERSION 1
 #define DSG_BUFFER_GRANULE_BUFFERS 2048
@@ -373,6 +374,36 @@ typedef struct DsgBufferAccess
 extern PGDLLIMPORT bool enable_dynamic_shared_buffers;
 extern PGDLLIMPORT int max_shared_buffers;
 extern PGDLLIMPORT bool dynamic_shared_buffers_require_admission;
+extern PGDLLIMPORT int dynamic_shared_buffers_admission_lease_timeout;
+
+/*- 独立失联关闭事实，不扩充已有Buffer ABI或准入原请求的摘要布局。 */
+typedef struct DsgAdmissionLeaseRequest
+{
+	uint64 boot_id;
+	uint64 issuer_epoch;
+	uint64 expected_generation;
+	uint64 expected_revision;
+	uint64 expected_deadline_ns;
+	bool rearm;
+} DsgAdmissionLeaseRequest;
+
+typedef struct DsgAdmissionLeaseResponse
+{
+	uint64 deadline_ns;
+	uint64 lease_epoch;
+	bool armed;
+	bool expired;
+	bool renewed;
+	int timeout_ms;
+	DsgBufferSnapshot observed;
+} DsgAdmissionLeaseResponse;
+
+extern void DsgBufferAdmissionLease(const DsgAdmissionLeaseRequest *request,
+								  DsgAdmissionLeaseResponse *response);
+extern void DsgBufferAdmissionLeaseFenceLocked(uint64 epoch);
+extern void DsgBufferAdmissionExpireLocked(void);
+extern void DsgBufferAdmissionExpire(void);
+extern bool DsgBufferAdmissionLeaseAllowsConnections(void);
 extern PGDLLIMPORT int dynamic_shared_buffers_startup_budget;
 extern PGDLLIMPORT DynamicSharedBuffersControl *DSBCtrl;
 

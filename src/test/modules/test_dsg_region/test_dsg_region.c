@@ -56,6 +56,16 @@ PG_FUNCTION_INFO_V1(test_dsg_io_control);
 PG_FUNCTION_INFO_V1(test_dsg_grow_control);
 PG_FUNCTION_INFO_V1(test_dsg_admission);
 PG_FUNCTION_INFO_V1(test_dsg_admission_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_admission_raw);
+
+/*- 仅测试观察：不调用任何expire/snapshot，验证睡眠期间后台独立关闭。 */
+Datum
+test_dsg_admission_raw(PG_FUNCTION_ARGS)
+{
+	if (DSBCtrl == NULL || !superuser())
+		ereport(ERROR, (errmsg("raw DSGA test observation requires enabled management session")));
+	PG_RETURN_BOOL(pg_atomic_read_u32(&DSBCtrl->admission_open) != 0);
+}
 PG_FUNCTION_INFO_V1(test_dsg_work_snapshot);
 PG_FUNCTION_INFO_V1(test_dsg_work_stop_with_status_lock);
 PG_FUNCTION_INFO_V1(test_dsg_connection_snapshot);

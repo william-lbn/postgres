@@ -228,6 +228,9 @@ BackgroundWriterMain(char *startup_data, size_t startup_data_len)
 
 		HandleMainLoopInterrupts();
 
+		/*- 外层Agent/WAL失联时仍独立关闭；Postmaster不能取得backend共享锁。 */
+		DsgBufferAdmissionExpire();
+
 		/*
 		 * Do one cycle of dirty-buffer writing.
 		 */
@@ -304,7 +307,8 @@ BackgroundWriterMain(char *startup_data, size_t startup_data_len)
 		 */
 		rc = WaitLatch(MyLatch,
 					   WL_LATCH_SET | WL_TIMEOUT | WL_EXIT_ON_PM_DEATH,
-					   BgWriterDelay /* ms */ , WAIT_EVENT_BGWRITER_MAIN);
+					   dynamic_shared_buffers_require_admission ? Min(BgWriterDelay, 1000) : BgWriterDelay,
+					   WAIT_EVENT_BGWRITER_MAIN);
 
 		/*
 		 * If no latch event and BgBufferSync says nothing's happening, extend
@@ -331,7 +335,8 @@ BackgroundWriterMain(char *startup_data, size_t startup_data_len)
 			/* Sleep ... */
 			(void) WaitLatch(MyLatch,
 							 WL_LATCH_SET | WL_TIMEOUT | WL_EXIT_ON_PM_DEATH,
-							 BgWriterDelay * HIBERNATE_FACTOR,
+							 dynamic_shared_buffers_require_admission ?
+							 Min(BgWriterDelay * HIBERNATE_FACTOR, 1000) : BgWriterDelay * HIBERNATE_FACTOR,
 							 WAIT_EVENT_BGWRITER_HIBERNATE);
 			/* Reset the notification request in case we timed out */
 			StrategyNotifyBgWriter(-1);

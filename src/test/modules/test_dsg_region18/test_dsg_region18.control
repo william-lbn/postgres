@@ -1,0 +1,4 @@
+comment = 'isolated PG18 ordinary-page provider and actual Buffer/AIO ABI tests'
+default_version = '1.0'
+module_pathname = '$libdir/test_dsg_region18'
+relocatable = true

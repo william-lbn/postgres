@@ -1,0 +1,138 @@
+{
+  "protocol_version": 1,
+  "status": "PASS_LEAF_COMPONENT_ONLY",
+  "base": "a616eefea763784218a67f81395ba95bc2cf7c4d",
+  "base_ref": "REL_18_STABLE_neon",
+  "base_official_url": "https://github.com/neondatabase/postgres/tree/a616eefea763784218a67f81395ba95bc2cf7c4d",
+  "origin": "https://github.com/william-lbn/postgres.git",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "PG17_source": "fd2bdeb460326baa04a897d1e29a6d98d2bf031a",
+  "source_files_sha256": {
+    "src/backend/storage/ipc/Makefile": "b7230c6d1c1d0cc7dae5559dcdf81abf9b022026cfbd010bcf5f4300095a3388",
+    "src/backend/storage/ipc/meson.build": "b2754eb898fbe638b2e83f45c505f072e8bbbfba8bfd2b7c1a57659e048463dc",
+    "src/test/modules/Makefile": "beb639423f85bab3b2267ef752aa96cf10a8ff4b29c1f53371d7f870e7f3798b",
+    "src/test/modules/meson.build": "d6669b260e586c73e56121db98ee145cfa46a078ab870be1584393779825d3f6",
+    "src/backend/storage/ipc/dsg_region.c": "b9008a3ab5c7955c3a14cdb784df94aaea451a0a63dd720eab701ad07be518a2",
+    "src/include/storage/dsg_region.h": "903cd3c6aa48e2da59a96bb1a3b9297dcd89c4cbceaad45d4abcb8b2de631212",
+    "src/test/modules/test_dsg_region18/Makefile": "03c6f6da9175034b0c79c496899d318ab9f435e61f7a3af4b423db2b85f4ea0c",
+    "src/test/modules/test_dsg_region18/README": "2d236d774d7d5b94b85f3564eba60dd8f2f0467f6d1efcc494a16b0e1f6b7330",
+    "src/test/modules/test_dsg_region18/meson.build": "75600c9bfe110e28ead60f5b23e5ea79e2230bd69a80bb5d1510de40608a2bcf",
+    "src/test/modules/test_dsg_region18/t/test_region18.py": "d48fb9bc6285c831381008402ed4c2964537cc46e1d380ff9077dce6f7bb4263",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "df13f14e6d843186f0a7b69f51625a169014a1b52727159bd37cbde0f2955c84",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "416e1ef66d302d233232e8dd3db1ab9cf5e18d7b19fbfa884411c1a24c7a5ede",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.control": "8b753f8cf629e9c81e8078eca69312a5e4cac6527d485dee99fc7460a6e02ba9"
+  },
+  "actual_compiler_source_hashes_match": true,
+  "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+  "compiler": "GCC12.2.0 + liburing2.3-3 (exact transcript in evidence/compiler.txt)",
+  "build_exit": 0,
+  "build_seconds": 39.54115122499934,
+  "test_exit": 0,
+  "test_roots": 7,
+  "test_seconds": 6.567,
+  "cases": [
+    {
+      "id": "PG18-S-AIO-001",
+      "layer": "single-service",
+      "test": "pg18_region.Region.test_PG18_S_AIO_001_stock_sync_and_worker_data",
+      "result": "PASS",
+      "seconds": 1.895618538997951
+    },
+    {
+      "id": "PG18-S-REGION-001",
+      "layer": "single-service",
+      "test": "pg18_region.Region.test_PG18_S_REGION_001_true_shared_fork",
+      "result": "PASS",
+      "seconds": 0.7869371500055422
+    },
+    {
+      "id": "PG18-S-REGION-002",
+      "layer": "single-service",
+      "test": "pg18_region.Region.test_PG18_S_REGION_002_boundary_and_padding",
+      "result": "PASS",
+      "seconds": 0.7883807690013782
+    },
+    {
+      "id": "PG18-S-REGION-003",
+      "layer": "single-service",
+      "test": "pg18_region.Region.test_PG18_S_REGION_003_park_failure_rearm_three_cycles",
+      "result": "PASS",
+      "seconds": 0.7367168220007443
+    },
+    {
+      "id": "PG18-S-REGION-004",
+      "layer": "single-service",
+      "test": "pg18_region.Region.test_PG18_S_REGION_004_original_session_acl",
+      "result": "PASS",
+      "seconds": 0.7922398670052644
+    },
+    {
+      "id": "PG18-U-ABI-001",
+      "layer": "unit-native",
+      "test": "pg18_region.Region.test_PG18_U_ABI_001_actual_native_sizes",
+      "result": "PASS",
+      "seconds": 0.778599433004274
+    },
+    {
+      "id": "PG18-U-REGION-001",
+      "layer": "unit-native",
+      "test": "pg18_region.Region.test_PG18_U_REGION_001_invalid_geometry_cleanup",
+      "result": "PASS",
+      "seconds": 0.7876712689976557
+    }
+  ],
+  "actual_abi": {
+    "pg_version_num": 180002,
+    "descriptor_bytes": "64",
+    "descriptor_padded_bytes": "64",
+    "state_bytes": "4",
+    "aio_wait_ref_bytes": "12",
+    "io_wref_offset": "36",
+    "block_bytes": "8192",
+    "iocv_bytes": "16",
+    "checkpoint_bytes": "20",
+    "cleared_wref_invalid": true,
+    "io_uring_compiled": true,
+    "production_resize_hooked": false
+  },
+  "binary_sha256": {
+    "postgres": "f13d6b56054d89989e4e986d68c881fe410b77bd6313c9cbeed6db704303176b",
+    "test_module": "ecd197ac84df9db8e1a0f5e99352ad605fb8cc0cb5d88f7d80e01233c2e7465a"
+  },
+  "commands": {
+    "build": "build-command.json",
+    "test": "test-command.json"
+  },
+  "validation": "/data/neon-build/validation/pg18-region-native-attempt03-20261030T225945Z-2af540",
+  "source_after_validation": "dirty first leaf implementation; not a clean a616 release binary",
+  "previous_failures": [
+    {
+      "path": "/data/neon-build/validation/pg18-tools-a616-20261030T224430Z",
+      "exit": 125,
+      "kind": "wrapper environment missing existing Docker buildx plugin config; no compilation started"
+    },
+    {
+      "path": "/data/neon-build/validation/pg18-region-native-attempt01-20261030T225226Z-341000",
+      "exit": 2,
+      "kind": "real PG18 compilation: INJECTION_POINT now requires(name,arg); exact old C saved"
+    },
+    {
+      "path": "/data/neon-build/validation/pg18-region-native-attempt02-20261030T225620Z-7cee3c",
+      "exit": 1,
+      "kind": "make/install completed; wrapper used wrong test library directory; fixed via pg_config --pkglibdir"
+    }
+  ],
+  "not_proven": [
+    "production dynamic shared_buffers resize",
+    "AIO held pin → release_aio → shrink retry",
+    "io_uring runtime/profile certification",
+    "DSM/Work/Root cost sources",
+    "Neon compute18 extensions",
+    "safe normal decrease",
+    "KVM/Kubernetes E2E"
+  ],
+  "production_calls_added": false,
+  "public_protocol_changed": false,
+  "PG17_neon_locks_touched": false,
+  "cache_limit": "isolated PG18 ccache1GiB; build CPU4/memory5GiB"
+}

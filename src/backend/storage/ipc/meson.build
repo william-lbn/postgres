@@ -2,6 +2,7 @@
 
 backend_sources += files(
   'barrier.c',
+  'dsg_region.c',
   'dsm.c',
   'dsm_impl.c',
   'dsm_registry.c',

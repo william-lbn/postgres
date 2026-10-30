@@ -1,0 +1,11 @@
+PG18首批叶模块：默认不接生产buffer/resize/AIO路径、不改公共协议或Root许可。
+基线来自GitHub Neon REL_18_STABLE_neon=a616eefea763784218a67f81395ba95bc2cf7c4d。
+Provider c/h来自Linux PG17 fd2bdeb460326baa04a897d1e29a6d98d2bf031a；c仅适配18注入点双参NULL，原/新SHA见validation。
+ABI必须由18实际编译读取；本基线state仍32bit，新增12B PgAioWaitRef，不能照抄17初始化。
+后继shrink须保AIO subsystem的额外pin、完整wref/callback及read_stream pending队列生命期。
+PMChild*/B_IO_WORKER/PM_WAIT_IO_WORKERS与17的登记链不同，本批不移植D门禁。
+实际入口：NEON_TEST_PG_BIN和NEON_TEST_DSG_LIBRARY指向18构建，python3 t/test_region18.py。
+严格七根/零skip；ACL含真实extension REVOKE、GRANT和SECURITY DEFINER原session负例。
+stock sync/worker数据测试只验证原18模式仍工作；io_uring编译能力不等于runtime已验证。
+尚无动态H/L、grow/shrink、DSM/Work、Neon extension、Root profile或normal降限资格。
+默认worker/AIO持pin→TerminateBufferIO/release_aio→shrink重试必须后继真实验证；本批未接resize，不能关闭worker求绿。

@@ -153,8 +153,11 @@ class EarlyArrays(unittest.TestCase):
         self.assertNotEqual(denied.returncode,0);self.assertIn('permission denied for function test_dsg_birth_arrays',denied.stderr)
         # 独立验证C门禁：即使管理员显式GRANT或创建PUBLIC SQL别名仍不能绕过。
         pg.sql('GRANT EXECUTE ON FUNCTION test_dsg_birth_arrays() TO birth_ordinary')
+        # definer恢复effective admin但session仍普通，独立覆盖原会话身份门禁。
+        pg.sql(f"CREATE FUNCTION birth_definer() RETURNS text AS '{LIB}','test_dsg_birth_arrays' LANGUAGE C SECURITY DEFINER;GRANT EXECUTE ON FUNCTION birth_definer() TO birth_ordinary")
         for query in ('SET ROLE birth_ordinary;SELECT test_dsg_birth_arrays()',
-                      'SET SESSION AUTHORIZATION birth_ordinary;SELECT birth()'):
+                      'SET SESSION AUTHORIZATION birth_ordinary;SELECT birth()',
+                      'SET SESSION AUTHORIZATION birth_ordinary;SELECT birth_definer()'):
             denied=pg.sql(query,check=False)
             self.assertNotEqual(denied.returncode,0)
             self.assertIn('birth array observation requires original administrator',denied.stderr)

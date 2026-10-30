@@ -1,0 +1,132 @@
+{
+  "protocol_version": 1,
+  "layer": "mixed-native",
+  "suite": "early-birth",
+  "platform": "Linux-6.8.0-147-generic-x86_64-with-glibc2.36",
+  "python": "3.11.2",
+  "pg_configure": "'CFLAGS=-fsigned-char -O2 -g3 ' 'LDFLAGS=' '--enable-debug' '--enable-cassert' '--enable-injection-points' '--with-openssl' '--with-libseccomp' '--with-icu' 'ICU_CFLAGS=-I/usr/local/icu/include -DU_STATIC_IMPLEMENTATION' 'ICU_LIBS=-L/usr/local/icu/lib -L/usr/local/icu/lib64 -licui18n -licuuc -licudata -lstdc++ -Wl,-Bdynamic -lm' 'INSTALL=/home/nonroot/scripts/ninstall.sh -C' '--with-extra-version= (79367196a74eef82e67cac917877d2e6271d3e70)' '--prefix=/home/nonroot/pg_install/v17'",
+  "postgres_version": "postgres (PostgreSQL) 17.11 (79367196a74eef82e67cac917877d2e6271d3e70)",
+  "binary_sha256": {
+    "postgres": {
+      "path": "/home/nonroot/pg_install/v17/bin/postgres",
+      "sha256": "ebf2ace2a471ac5be0422a7f48a378abfcbcddcfdb3efd392733c139bf008dc5"
+    },
+    "NEON_TEST_DSG_LIBRARY": {
+      "path": "/home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so",
+      "sha256": "7580dfb4413f0e3202c711f4e02ce1acb932b5a79bda70a7b4fc943573f0e647"
+    },
+    "NEON_TEST_RMGR_LIBRARY": {
+      "path": "/home/nonroot/pg_install/v17/lib/postgresql/neon_rmgr.so",
+      "sha256": "d83d845b3e44f8e23ffb968a6e50ace3f0b017e37976925b49c476adc271e556"
+    },
+    "NEON_TEST_NEON_LIBRARY": {
+      "path": "/home/nonroot/pg_install/v17/lib/postgresql/neon.so",
+      "sha256": "85060c44babaef951677f0f26a205dff9786cd44d5897721353595c2d42f0c03"
+    }
+  },
+  "test_source_sha256": {
+    "test_dsg_address_space.py": "8b4de6be5c264a767246a3b5aa2c1da352ea0eeec3d03bb2a974710533b6a021",
+    "test_dsg_address_space_source.py": "7630ea21e35551f43a14a761048b7b40a08cc5a5cffdc0777653936113e974af",
+    "test_dsg_admission.py": "4dd3991cbddc1aa7e969ffa6a84913219642635b3763d2305a7a758a7c65c7f3",
+    "test_dsg_admission_closure.py": "dd2ec7cad25c7fd7fa6f0a598c6a429e3a2d39c25cbf028e886dfc5f1754dcc0",
+    "test_dsg_admission_frames.py": "c3383782a9be2c62238a8ad35205ef9ed756fcf944bcaa88a84b29bc53f4815d",
+    "test_dsg_admission_lease.py": "a18bbead265be6ca03a73467f6965f882f863bcd04e161174de667a2e04341ee",
+    "test_dsg_admission_status.py": "57c0a9eaa957c644c61c3ed5832d14bca31c7279854ddafee261790de737a969",
+    "test_dsg_connection_gate.py": "d549b437a90268b2f4bd5ab47bb1520554f38996f08ed49091de5d5adc8bb9ea",
+    "test_dsg_control.py": "c3ef19c59de43050c91884a8c03c7355f826c8271d11af661268592f5212a749",
+    "test_dsg_creation_plan.py": "023950ee5e9b810159623fa289422ef77a0a653f9e72d3edfbd0b84849752f8b",
+    "test_dsg_dsm.py": "14ada83757ab72fbf65cdf7e2a1f41f6e7ac2791e7e07c22454aa1afb9b59d25",
+    "test_dsg_early_arrays.py": "4258a472100b34a6a2f4c91655e7d3db7277d8bd56c197269a8422c18c3825de",
+    "test_dsg_neon_admission.py": "a14f9dcd8c88ebb882126293daf9185c2bcd50d844ba2cf80adb468098c1f6d4",
+    "test_dsg_neon_control.py": "0967465f26df6fe6639b6104414c934b50223ff922c7e5cb74a1fac61cf5d520",
+    "test_dsg_neon_extension.py": "67bbff772779fab1d927bedeabb8d808db9ab79918dbaa89d0ef56f23a0c744a",
+    "test_dsg_nonshmem_child.py": "ce01aa946e2a28b42486fcf422de5901ddcf4a9a2fff0b984f808785a1df0446",
+    "test_dsg_postgres.py": "46b4824475a8ef608d222a4583aa9b54c093fa9cf2d149e6127c7b587070a91b",
+    "test_dsg_prepared.py": "b1851b4e519feacca4ecf2339475d4c1aceb846166d20116680132da49680e15",
+    "test_dsg_prestart.py": "bd3046ced386aac7bce0cfcd6aa75786ab86d07b1b771ddbe9ff5ae3747a91b5",
+    "test_dsg_renderer.py": "2ea818fb47db8ddc36b1cb9088f6c0a2aa87b496db2a3802f820af7ad7f64cc7",
+    "test_dsg_replication.py": "45a7dbb9ec30f20371352944e3341937a37d7823c17eea4f620db950d24d1b4e",
+    "test_dsg_shared_cost.py": "245417abfed571f7faa2b90afb2dc8266007ed446d2f89bb2329b799ca22f285",
+    "test_dsg_transaction_finish.py": "83c0d644137211eb67b7a3a4c80ca542fcd7a33493726cfa7ff1f3596a8053f8",
+    "test_dsg_twophase_checkpoint.py": "787723f1a407cd6d70f9bb824533257d41e1ae49531aa43ab4726ebed74edde5",
+    "test_dsg_upstream_partition_index.py": "c9ea5251802769d16c910b2b5dab24c2bbcefed521fd9bb9fc0060ece2ea4b77",
+    "test_dsg_work.py": "3a3c0db8e824fc5f5cc1aa91fdc89ae5235ffab56acc1dd520b6359f56f907f3"
+  },
+  "catalog_sha256": "b95cc20cda69bd12733a534ff75179aca611c55efe559970c9acf62e6e564981",
+  "runner_sha256": "71c4cf30474f613dd065a63957113f4a923c56b77a7ee9c9a21dd48a7e831e51",
+  "not_proven": [
+    "KVM",
+    "guest cgroup/HugeTLB物理归还",
+    "owner到VM端到端",
+    "Kubernetes",
+    "Root出生封存",
+    "seccomp/syscall边界",
+    "完整持续收费包络",
+    "安全normal降限"
+  ],
+  "tests": [
+    {
+      "id": "PG17-U-BIRTH-001",
+      "test": "test_dsg_early_arrays.EarlyArrays.test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+      "result": "PASS",
+      "details": [],
+      "subtests": 10,
+      "layer": "unit-native",
+      "elapsed_seconds": 0.075471
+    },
+    {
+      "id": "PG17-U-BIRTH-002",
+      "test": "test_dsg_early_arrays.EarlyArrays.test_PG17_U_BIRTH_002_no_nnp_cannot_enable",
+      "result": "PASS",
+      "details": [],
+      "subtests": 0,
+      "layer": "unit-native",
+      "elapsed_seconds": 0.003422
+    },
+    {
+      "id": "PG17-S-BIRTH-001",
+      "test": "test_dsg_early_arrays.EarlyArrays.test_PG17_S_BIRTH_001_default_disabled_real_pg",
+      "result": "PASS",
+      "details": [],
+      "subtests": 0,
+      "layer": "single-service",
+      "elapsed_seconds": 1.168079
+    },
+    {
+      "id": "PG17-S-BIRTH-002",
+      "test": "test_dsg_early_arrays.EarlyArrays.test_PG17_S_BIRTH_002_configuration_cannot_drift",
+      "result": "PASS",
+      "details": [],
+      "subtests": 2,
+      "layer": "single-service",
+      "elapsed_seconds": 1.517397
+    },
+    {
+      "id": "PG17-S-BIRTH-003",
+      "test": "test_dsg_early_arrays.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r",
+      "result": "PASS",
+      "details": [],
+      "subtests": 0,
+      "layer": "single-service",
+      "elapsed_seconds": 5.548788
+    },
+    {
+      "id": "PG17-S-BIRTH-004",
+      "test": "test_dsg_early_arrays.EarlyArrays.test_PG17_S_BIRTH_004_extension_and_native_acl",
+      "result": "PASS",
+      "details": [],
+      "subtests": 0,
+      "layer": "single-service",
+      "elapsed_seconds": 1.249673
+    }
+  ],
+  "tests_run": 6,
+  "expected_tests": 6,
+  "passed": true,
+  "skipped": 0,
+  "errors": 0,
+  "failures": 0,
+  "native_test_source_sha256": {
+    "vendor/postgres-v17/src/test/modules/test_dsg_region/t/test_early_arrays.py": "86c7f8d59eb75c0470b60cf05102bed695f9f4ae7b81ff5fae57eca756ad2065"
+  }
+}

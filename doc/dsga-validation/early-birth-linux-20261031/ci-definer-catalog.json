@@ -1,0 +1,50 @@
+{
+  "neon_base_head": "8a0f29b85928d33a88850062fcbf302e72e8d34a",
+  "pg_base_head": "58d989d711775241b7b46b7f2d7848684eef16b3",
+  "source_sha256": {
+    "ci/test_dsg_early_arrays.py": "4258a472100b34a6a2f4c91655e7d3db7277d8bd56c197269a8422c18c3825de",
+    "ci/test-dsg-postgres.sh": "18f8d0af80b7fe7bafd051aeed7424125bf1ec186d2c7a24b25f11ebdee10be9",
+    "ci/pg17_memory_cases.json": "b95cc20cda69bd12733a534ff75179aca611c55efe559970c9acf62e6e564981",
+    "ci/run_pg17_memory_cases.py": "71c4cf30474f613dd065a63957113f4a923c56b77a7ee9c9a21dd48a7e831e51",
+    "vendor/postgres-v17/src/test/modules/test_dsg_region/t/test_early_arrays.py": "86c7f8d59eb75c0470b60cf05102bed695f9f4ae7b81ff5fae57eca756ad2065"
+  },
+  "runner_result": "result.json",
+  "frontend_negative_checks": [
+    {
+      "case": "nnp-parent",
+      "expected_exit": 2,
+      "actual_exit": 2,
+      "qualified_output_absent": true,
+      "log": "nnp-parent.log"
+    },
+    {
+      "case": "missing-case",
+      "expected_exit": 2,
+      "actual_exit": 2,
+      "qualified_output_absent": true,
+      "log": "missing-case.log"
+    },
+    {
+      "case": "old-suite-layer",
+      "expected_exit": 2,
+      "actual_exit": 2,
+      "qualified_output_absent": true,
+      "log": "old-suite-layer.log"
+    }
+  ],
+  "native_artifact": "127.0.0.1:5001/neon/pg17-native-birth:79367196-v2@sha256:b3211e400cc1034d71903d6039abe542136a2c74ced0e85e55091694ee56b103",
+  "native_compile_receipt": "/data/neon-build/validation/pg17-native-birth-acl-v2-20261030T162729Z",
+  "native_code_unchanged": true,
+  "pure_head_build": false,
+  "note": "复用ACL v2实际编译C；本轮runtime挂载PG test增加definer，仅精确early-birth六根正式入口；未执行全CI/全旧矩阵",
+  "not_proven": [
+    "KVM",
+    "guest cgroup/HugeTLB物理归还",
+    "owner到VM端到端",
+    "Kubernetes",
+    "Root出生封存",
+    "seccomp/syscall边界",
+    "完整持续收费包络",
+    "安全normal降限"
+  ]
+}

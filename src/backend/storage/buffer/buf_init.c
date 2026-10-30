@@ -18,6 +18,7 @@
 #include "storage/bufmgr.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/dsg_envelope_birth.h"
+#include "storage/dsg_native_birth_wire.h"
 #include "storage/ipc.h"
 #include "storage/proc.h"
 
@@ -230,6 +231,9 @@ InitBufferPool(void)
 		if (!enable_dynamic_shared_buffers)
 			elog(FATAL, "DSGA early arrays require dynamic shared buffers");
 		DsgBirthArraysCheckMaximum(GetMaxNBuffers());
+		/* 初次与内部恢复都先核原M/N0，再导入或触页；不从GUC扩大原出生。 */
+		if (!DsgNativeBirthWireCheckConfiguration(GetMaxNBuffers(), NBuffers))
+			elog(FATAL, "DSGA root birth M/N0 or final audit gate differs");
 		if (DynamicBufferMappings[0].state == DSG_ARRAY_MAPPING_EMPTY)
 		{
 			DsgBirthArraysImport(regions, GetMaxNBuffers());

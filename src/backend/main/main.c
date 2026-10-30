@@ -22,6 +22,8 @@
 
 #include "storage/dsg_envelope_birth.h"
 #include "storage/dsg_envelope_filter.h"
+#include "storage/dsg_native_birth_wire.h"
+#include "storage/dsg_filter_audit.h"
 
 #include <unistd.h>
 
@@ -173,13 +175,20 @@ main(int argc, char *argv[])
 {
 	bool		do_check_root = true;
 
+	/* root-only纯编译必须早于AS、PG内存、GUC与任何插件；准确argv中无env输入。 */
+	if (argc > 1 && strcmp(argv[1], DSG_FILTER_AUDIT_ARG) == 0)
+		DsgFilterAuditMain(argc, argv);
+
 	reached_main = true;
 	dsg_apply_inherited_address_space();
 	/* 显式测试profile也必须在AS之后、任何PG分配之前建立完整占位。 */
 	DsgBirthArraysEarlyInit();
+	DsgNativeBirthWirePrepare();
 	DsgBirthFilterEarlyInit();
-	/* test-v1无Root出生；以后root-v1必须在两阶段filter之间完成真实屏障。 */
+	DsgNativeBirthWireExchange();
 	DsgBirthFilterSealPostmaster();
+	/* PMfinal之后不可越过Root独立实际复核、持久化与detach停点。 */
+	DsgNativeBirthWireFinish();
 
 	/*
 	 * If supported on the current platform, set up a handler to be called if

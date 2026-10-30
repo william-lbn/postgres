@@ -1,7 +1,7 @@
 /*-
  * dsg_envelope_birth.h -- 最早四数组VA占位，独立增量ABI1。
  *
- * 首批只有显式test-v1，默认关闭且永远未绑定Root。地址空间占位不是RSS、
+ * 显式test-v1/root-v1，默认关闭；本占位接口本身永远不授予Root资格。占位不是RSS、
  * 持续收费包络、seccomp或normal降限许可；不得据本接口解除既有拒绝。
  */
 #ifndef DSG_ENVELOPE_BIRTH_H

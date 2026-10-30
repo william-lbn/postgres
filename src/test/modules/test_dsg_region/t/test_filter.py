@@ -39,7 +39,8 @@ class Filter(unittest.TestCase):
                 result=subprocess.run([str(early.BIN/'postgres'),'--version'],env=env,
                     preexec_fn=early.nnp,text=True,capture_output=True,timeout=10)
                 self.assertEqual(result.returncode,1);self.assertEqual(result.stdout,'')
-                self.assertIn('DSGA birth filter could not establish',result.stderr)
+                expected='DSGA native birth wire:' if mode=='root-v1' else 'DSGA birth filter could not establish'
+                self.assertIn(expected,result.stderr)
         pg=self.cluster(filtered=False);self.assertFalse(self.fact(pg)['enabled'])
         self.assertNotEqual(pg.sql("SELECT test_dsg_filter_probe('private-outside')",check=False).returncode,0)
     def test_PG17_S_FILTER_001_actual_syscall_boundaries_and_threads(self):

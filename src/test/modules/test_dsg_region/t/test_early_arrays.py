@@ -119,10 +119,13 @@ class EarlyArrays(unittest.TestCase):
     def test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as(self):
         for mode in ('','test-v1:','test-v1:0','test-v1:08192','test-v1:+8192',
                      'test-v1:8192 ','test-v1:2147483648','test-v1:'+'9'*128,
-                     'root-v1:8192','other-v1:8192'):
+                     'other-v1:8192'):
             with self.subTest(mode=mode):
                 r=self.invoke(mode);self.assertEqual(r.returncode,1);self.assertEqual(r.stdout,'')
                 self.assertIn('DSGA early arrays:',r.stderr)
+        r=self.invoke('root-v1:8192')
+        self.assertEqual(r.returncode,1);self.assertEqual(r.stdout,'')
+        self.assertIn('DSGA native birth wire:',r.stderr)
         r=self.invoke('test-v1:8192',None)
         self.assertEqual(r.returncode,1);self.assertIn('canonical positive decimal',r.stderr)
         r=self.invoke('test-v1:8192',65536)

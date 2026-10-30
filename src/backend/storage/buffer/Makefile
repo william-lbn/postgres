@@ -23,6 +23,8 @@ OBJS = \
 	dsg_work.o \
 	dsg_envelope_birth.o \
 	dsg_envelope_filter.o \
+	dsg_native_birth_wire.o \
+	dsg_filter_audit.o \
 	freelist.o \
 	localbuf.o
 

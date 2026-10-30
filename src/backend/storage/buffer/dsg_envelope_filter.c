@@ -19,6 +19,8 @@
 #include <unistd.h>
 #include "storage/dsg_envelope_birth.h"
 #include "storage/dsg_envelope_filter.h"
+#include "storage/dsg_native_birth_wire.h"
+#include "storage/dsg_filter_audit.h"
 
 static DsgBirthFilterSnapshot state = {.protocol_version = NEON_DSG_BIRTH_FILTER_API_VERSION};
 static pid_t postmaster_pid;
@@ -204,7 +206,7 @@ ExactReplacement(DsgFilterBuilder *b, const DsgRegion *r, unsigned allow, unsign
 }
 
 static unsigned
-Build(DsgFilterBuilder *b, bool child, bool birth_open)
+Build(DsgFilterBuilder *b, bool child, bool birth_open, const DsgBirthArraysSnapshot *input)
 {
 	DsgBirthArraysSnapshot arrays;
 	unsigned arch=NewLabel(b), nr=NewLabel(b), native=NewLabel(b);
@@ -232,7 +234,9 @@ Build(DsgFilterBuilder *b, bool child, bool birth_open)
 		MADV_WILLNEED,MADV_DONTNEED,MADV_FREE,MADV_DONTDUMP,MADV_DODUMP,
 		MADV_NOHUGEPAGE,MADV_DONTFORK,MADV_DOFORK,MADV_WIPEONFORK,
 		MADV_KEEPONFORK,MADV_POPULATE_READ,-1};
-	DsgBirthArraysGetSnapshot(&arrays);
+	if (input == NULL)
+		DsgFilterFail();
+	arrays = *input;
 	if (!arrays.enabled || arrays.page_size_bytes>UINT_MAX)
 		DsgFilterFail();
 	Emit(b,BPF_LD|BPF_W|BPF_ABS,offsetof(struct seccomp_data,arch));
@@ -354,7 +358,9 @@ Install(bool child, bool birth_open)
 {
 	DsgFilterBuilder builder={0};
 	struct sock_fprog program;
-	program.len=Build(&builder,child,birth_open);
+	DsgBirthArraysSnapshot arrays;
+	DsgBirthArraysGetSnapshot(&arrays);
+	program.len=Build(&builder,child,birth_open,&arrays);
 	program.filter=builder.code;
 	if(prctl(PR_GET_NO_NEW_PRIVS,0L,0L,0L,0L)!=1 ||
 	   prctl(PR_SET_SECCOMP,(unsigned long)SECCOMP_MODE_FILTER,&program,0L,0L)!=0)
@@ -372,7 +378,9 @@ DsgBirthFilterEarlyInit(void)
 	early_seen=true;
 	if(raw==NULL)
 		return;
-	if(strcmp(raw,"test-v1")!=0 || !DsgBirthArraysEnabled())
+	if ((strcmp(raw,"test-v1")!=0 && strcmp(raw,"root-v1")!=0) || !DsgBirthArraysEnabled())
+		DsgFilterFail();
+	if (strcmp(raw,"root-v1")==0 && !DsgNativeBirthWireRootPrepared())
 		DsgFilterFail();
 #if defined(__linux__) && defined(__x86_64__)
 	postmaster_pid=getpid();
@@ -391,6 +399,8 @@ DsgBirthFilterSealPostmaster(void)
 		return;
 #if defined(__linux__) && defined(__x86_64__)
 	if(getpid()!=postmaster_pid || state.finalized)
+		DsgFilterFail();
+	if (strcmp(getenv(DSG_BIRTH_FILTER_ENV),"root-v1")==0 && !DsgNativeBirthWireRootACKClosed())
 		DsgFilterFail();
 	state.final_postmaster_instructions=Install(false,false);
 	state.finalized=true;
@@ -624,6 +634,32 @@ DsgBirthFilterReinitializeEnd(void)
 	if(!OriginalLeader() || !reinitializing || fork_active || pending_pid!=0)
 		DsgFilterFail();
 	reinitializing=false;
+#else
+	DsgFilterFail();
+#endif
+}
+
+/* 纯编译入口与Install共用唯一Build；绝不将输出当内核已安装证明。
+ * 只允许OS真实root，调用者仍须锁定本二进制和ELF/FS来源并逐完整指令复核。
+ */
+void
+DsgBirthFilterCompileAudit(const DsgBirthArraysSnapshot *arrays,
+		bool child, bool birth_open, DsgFilterAuditProgram *program)
+{
+#if defined(__linux__) && defined(__x86_64__)
+	DsgFilterBuilder builder = {0};
+	uint32 i;
+	StaticAssertStmt(FILTER_MAX == DSG_FILTER_AUDIT_MAX_INSTRUCTIONS, "audit builder capacity must match");
+	if (getuid() != 0 || geteuid() != 0 || program == NULL)
+		DsgFilterFail();
+	program->count = Build(&builder, child, birth_open, arrays);
+	for (i = 0; i < program->count; i++)
+	{
+		program->instructions[i].code = builder.code[i].code;
+		program->instructions[i].jt = builder.code[i].jt;
+		program->instructions[i].jf = builder.code[i].jf;
+		program->instructions[i].k = builder.code[i].k;
+	}
 #else
 	DsgFilterFail();
 #endif

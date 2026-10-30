@@ -11,6 +11,8 @@ backend_sources += files(
   'dsg_work.c',
   'dsg_envelope_birth.c',
   'dsg_envelope_filter.c',
+  'dsg_native_birth_wire.c',
+  'dsg_filter_audit.c',
   'freelist.c',
   'localbuf.c',
 )

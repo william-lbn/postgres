@@ -90,3 +90,6 @@ REVOKE ALL ON FUNCTION test_dsg_mapping_free(regclass) FROM PUBLIC;
 CREATE FUNCTION test_dsg_checkpoint_control(text) RETURNS boolean
 AS 'MODULE_PATHNAME' LANGUAGE C STRICT;
 REVOKE ALL ON FUNCTION test_dsg_checkpoint_control(text) FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_birth_arrays() RETURNS text AS 'MODULE_PATHNAME', 'test_dsg_birth_arrays' LANGUAGE C;
+REVOKE ALL ON FUNCTION test_dsg_birth_arrays() FROM PUBLIC;

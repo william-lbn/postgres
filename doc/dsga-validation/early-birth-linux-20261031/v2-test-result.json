@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "expected_roots": 6,
+  "tests_run": 6,
+  "tests": [
+    {
+      "test": "early_arrays_native.EarlyArrays.test_PG17_S_BIRTH_001_default_disabled_real_pg",
+      "result": "PASS",
+      "elapsed_seconds": 1.1032192450002185,
+      "detail": ""
+    },
+    {
+      "test": "early_arrays_native.EarlyArrays.test_PG17_S_BIRTH_002_configuration_cannot_drift",
+      "result": "PASS",
+      "elapsed_seconds": 1.5359562730009202,
+      "detail": ""
+    },
+    {
+      "test": "early_arrays_native.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r",
+      "result": "PASS",
+      "elapsed_seconds": 5.695410641001217,
+      "detail": ""
+    },
+    {
+      "test": "early_arrays_native.EarlyArrays.test_PG17_S_BIRTH_004_extension_and_native_acl",
+      "result": "PASS",
+      "elapsed_seconds": 1.4708527239999967,
+      "detail": ""
+    },
+    {
+      "test": "early_arrays_native.EarlyArrays.test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+      "result": "PASS",
+      "elapsed_seconds": 0.07491592799851787,
+      "detail": ""
+    },
+    {
+      "test": "early_arrays_native.EarlyArrays.test_PG17_U_BIRTH_002_no_nnp_cannot_enable",
+      "result": "PASS",
+      "elapsed_seconds": 0.0034239120031998027,
+      "detail": ""
+    }
+  ],
+  "kernel": "6.8.0-147-generic",
+  "test_source_sha256": "bf850ebf8571d5b1b119f70047c391bacf818eac75d22a78336ffb457208c3de",
+  "postgres_sha256": "ebf2ace2a471ac5be0422a7f48a378abfcbcddcfdb3efd392733c139bf008dc5",
+  "test_library_sha256": "7580dfb4413f0e3202c711f4e02ce1acb932b5a79bda70a7b4fc943573f0e647",
+  "not_proven": [
+    "Root enrollment",
+    "seccomp boundary",
+    "safe normal decrease",
+    "Guest cgroup memory",
+    "KVM",
+    "Kubernetes"
+  ]
+}

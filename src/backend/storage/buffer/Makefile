@@ -21,6 +21,7 @@ OBJS = \
 	dsg_buffer_control.o \
 	dsg_buffer_shrink.o \
 	dsg_work.o \
+	dsg_envelope_birth.o \
 	freelist.o \
 	localbuf.o
 

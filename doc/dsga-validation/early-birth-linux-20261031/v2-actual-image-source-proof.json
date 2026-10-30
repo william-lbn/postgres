@@ -1,0 +1,17 @@
+{
+  "image_digest": "sha256:b3211e400cc1034d71903d6039abe542136a2c74ced0e85e55091694ee56b103",
+  "compiled_image_source_file_count": 7165,
+  "all_current_sources_match_actual_image": true,
+  "all_nine": {
+    "src/backend/main/main.c": "4f7bbaf44dcc7732406b9329abd5d8790641c9e430b55c09abb8e5df48628534",
+    "src/backend/storage/buffer/Makefile": "2c94de99980a55d5b7f3f8833b6f00188908b4d14c6d756c9ad4833ea7a9c8df",
+    "src/backend/storage/buffer/buf_init.c": "7b68b8241b52f2a13c9a586d62a3a8cbebfe89cf1a05e763289658cf7449d956",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "a3d4098ad931f2fbb1dcff98a8326dc5959e8a2e77113f32b18b1b072d6e930b",
+    "src/backend/storage/buffer/meson.build": "f49935332ddf3e34f6138154768fedb5dd85153f279cb68f552ca26d600d752d",
+    "src/include/storage/dsg_envelope_birth.h": "c288258d28b155d5c0009d3cfad4d0898b1c73e14fca0b121fcdc72385915d1a",
+    "src/test/modules/test_dsg_region/t/test_early_arrays.py": "bf850ebf8571d5b1b119f70047c391bacf818eac75d22a78336ffb457208c3de",
+    "src/test/modules/test_dsg_region/test_dsg_region--1.0.sql": "9fd38b3d93a69b70290926d8e6b81486113abe85df6813d8124231e341a9294c",
+    "src/test/modules/test_dsg_region/test_dsg_region.c": "060e56b44e5a26ca72e7ae2039d03cdeac7c7f1082ec7ca819ecac4be764fdc9"
+  },
+  "full_audit_sha256": "419d05235f355170d86f0821558cf56cf83717e544ad0d623431a432f365df8e"
+}

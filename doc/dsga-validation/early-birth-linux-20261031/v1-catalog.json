@@ -1,0 +1,123 @@
+{
+  "scope": "PG17 native early four-array reservation; explicit unbound test-v1 only",
+  "base_pg_head": "79367196a74eef82e67cac917877d2e6271d3e70",
+  "source_files_sha256": {
+    "src/backend/main/main.c": "4f7bbaf44dcc7732406b9329abd5d8790641c9e430b55c09abb8e5df48628534",
+    "src/backend/storage/buffer/Makefile": "2c94de99980a55d5b7f3f8833b6f00188908b4d14c6d756c9ad4833ea7a9c8df",
+    "src/backend/storage/buffer/buf_init.c": "7b68b8241b52f2a13c9a586d62a3a8cbebfe89cf1a05e763289658cf7449d956",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "a3d4098ad931f2fbb1dcff98a8326dc5959e8a2e77113f32b18b1b072d6e930b",
+    "src/backend/storage/buffer/meson.build": "f49935332ddf3e34f6138154768fedb5dd85153f279cb68f552ca26d600d752d",
+    "src/include/storage/dsg_envelope_birth.h": "c288258d28b155d5c0009d3cfad4d0898b1c73e14fca0b121fcdc72385915d1a",
+    "src/test/modules/test_dsg_region/t/test_early_arrays.py": "45791fdb0a46eb476b70d64fece8fdf5deb7dac1fc2af27112d745099d06dc82",
+    "src/test/modules/test_dsg_region/test_dsg_region--1.0.sql": "946e4f6aa4333ee68fa4d56358d3ef86bba1bba5d9779edb3312752f25268e8a",
+    "src/test/modules/test_dsg_region/test_dsg_region.c": "c72d01d314cf2b69d433e20f016d85458187c5b29e94c1b0ee8542e2fe8e93c1"
+  },
+  "image_manifest": "sha256:5271a703d94fbeb48cfed5813f0b2378869ee039231e4b63828cba66cc1eb74c",
+  "build_exit_code": 0,
+  "new_roots": {
+    "passed": true,
+    "expected_roots": 5,
+    "tests_run": 5,
+    "tests": [
+      {
+        "test": "early_arrays_native.EarlyArrays.test_PG17_S_BIRTH_001_default_disabled_real_pg",
+        "result": "PASS",
+        "elapsed_seconds": 1.202774016001058,
+        "detail": ""
+      },
+      {
+        "test": "early_arrays_native.EarlyArrays.test_PG17_S_BIRTH_002_configuration_cannot_drift",
+        "result": "PASS",
+        "elapsed_seconds": 1.4387062940004398,
+        "detail": ""
+      },
+      {
+        "test": "early_arrays_native.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r",
+        "result": "PASS",
+        "elapsed_seconds": 6.02285111600213,
+        "detail": ""
+      },
+      {
+        "test": "early_arrays_native.EarlyArrays.test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+        "result": "PASS",
+        "elapsed_seconds": 0.06838302600226598,
+        "detail": ""
+      },
+      {
+        "test": "early_arrays_native.EarlyArrays.test_PG17_U_BIRTH_002_no_nnp_cannot_enable",
+        "result": "PASS",
+        "elapsed_seconds": 0.003440946002228884,
+        "detail": ""
+      }
+    ],
+    "kernel": "6.8.0-147-generic",
+    "test_source_sha256": "45791fdb0a46eb476b70d64fece8fdf5deb7dac1fc2af27112d745099d06dc82",
+    "postgres_sha256": "ebf2ace2a471ac5be0422a7f48a378abfcbcddcfdb3efd392733c139bf008dc5",
+    "test_library_sha256": "0713ec20df06750d82a3a3fdcc2f6de4a371747fdc7853f032ac908a6021716a",
+    "not_proven": [
+      "Root enrollment",
+      "seccomp boundary",
+      "safe normal decrease",
+      "Guest cgroup memory",
+      "KVM",
+      "Kubernetes"
+    ]
+  },
+  "direct_regression_roots": {
+    "passed": true,
+    "expected_roots": 5,
+    "tests_run": 5,
+    "tests": [
+      {
+        "test": "test_dsg_nonshmem_child.DsgNonShmemChildLifecycle.test_initial_logger_detaches_only_its_arrays",
+        "result": "PASS",
+        "elapsed_seconds": 1.4024198269980843,
+        "detail": ""
+      },
+      {
+        "test": "test_dsg_nonshmem_child.DsgNonShmemChildLifecycle.test_restarted_logger_after_real_grow_does_not_inherit_arrays",
+        "result": "PASS",
+        "elapsed_seconds": 1.4323174430028303,
+        "detail": ""
+      },
+      {
+        "test": "test_dsg_nonshmem_child.DsgNonShmemChildLifecycle.test_logger_survives_internal_pg_boot_without_stale_array_backing",
+        "result": "PASS",
+        "elapsed_seconds": 5.699877734001348,
+        "detail": ""
+      },
+      {
+        "test": "test_dsg_address_space.DsgAddressSpaceStartup.test_noncanonical_or_unbounded_values_fail_before_any_mode",
+        "result": "PASS",
+        "elapsed_seconds": 0.11203644700071891,
+        "detail": ""
+      },
+      {
+        "test": "test_dsg_address_space.DsgAddressSpaceStartup.test_absent_source_still_runs_real_pg_and_survives_restart",
+        "result": "PASS",
+        "elapsed_seconds": 1.3805160200026876,
+        "detail": ""
+      }
+    ],
+    "kernel": "6.8.0-147-generic",
+    "test_source_sha256": "ce01aa946e2a28b42486fcf422de5901ddcf4a9a2fff0b984f808785a1df0446",
+    "postgres_sha256": "ebf2ace2a471ac5be0422a7f48a378abfcbcddcfdb3efd392733c139bf008dc5",
+    "test_library_sha256": "0713ec20df06750d82a3a3fdcc2f6de4a371747fdc7853f032ac908a6021716a",
+    "not_proven": [
+      "Root enrollment",
+      "seccomp boundary",
+      "safe normal decrease",
+      "Guest cgroup memory",
+      "KVM",
+      "Kubernetes"
+    ]
+  },
+  "not_proven": [
+    "Root enrollment and trusted profile",
+    "seccomp or syscall protection",
+    "complete continuous envelope",
+    "safe normal cap decrease",
+    "physical Guest/KVM/Kubernetes E2E"
+  ],
+  "source_frozen": true
+}

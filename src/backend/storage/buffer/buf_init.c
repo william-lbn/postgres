@@ -17,6 +17,7 @@
 #include "storage/buf_internals.h"
 #include "storage/bufmgr.h"
 #include "storage/dynamic_shared_buffers.h"
+#include "storage/dsg_envelope_birth.h"
 #include "storage/ipc.h"
 #include "storage/proc.h"
 
@@ -111,8 +112,24 @@ DsgBufferDetachInheritedArrays(void)
 		 * DSBCtrl已为空时也要清理恢复期间继承的PROT_NONE占位。 */
 		if (DynamicBufferMappings[i].state == DSG_ARRAY_MAPPING_TRANSITION)
 			elog(FATAL, "cannot detach unconfirmed DSGA array mapping");
-		DsgRegionDestroy(&DynamicBufferMappings[i].region);
-		DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_EMPTY;
+		if (DsgBirthArraysEnabled())
+		{
+			/* 统一R测试profile不能把logger的VA腾给私有分配，也不能只
+			 * mprotect后继续持有旧backing；Park同步替换为全新无访问占位。 */
+			if (DynamicBufferMappings[i].state == DSG_ARRAY_MAPPING_SHARED)
+			{
+				DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_TRANSITION;
+				DsgRegionPark(&DynamicBufferMappings[i].region);
+				DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_PARKED;
+			}
+			else if (DynamicBufferMappings[i].state != DSG_ARRAY_MAPPING_PARKED)
+				elog(FATAL, "DSGA early array child lost its original reservation");
+		}
+		else
+		{
+			DsgRegionDestroy(&DynamicBufferMappings[i].region);
+			DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_EMPTY;
+		}
 	}
 	ClearDynamicBufferAliases();
 }
@@ -205,6 +222,26 @@ InitBufferPool(void)
 				foundIOCV = false,
 				foundBufCkpt = false;
 
+	if (DsgBirthArraysEnabled())
+	{
+		DsgRegion regions[DSG_BUFFER_ARRAY_COUNT];
+		int i;
+
+		if (!enable_dynamic_shared_buffers)
+			elog(FATAL, "DSGA early arrays require dynamic shared buffers");
+		DsgBirthArraysCheckMaximum(GetMaxNBuffers());
+		if (DynamicBufferMappings[0].state == DSG_ARRAY_MAPPING_EMPTY)
+		{
+			DsgBirthArraysImport(regions, GetMaxNBuffers());
+			for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; ++i)
+			{
+				if (DynamicBufferMappings[i].state != DSG_ARRAY_MAPPING_EMPTY)
+					elog(FATAL, "DSGA early arrays have mixed mapping ownership");
+				DynamicBufferMappings[i].region = regions[i];
+				DynamicBufferMappings[i].state = DSG_ARRAY_MAPPING_PARKED;
+			}
+		}
+	}
 	if (enable_dynamic_shared_buffers)
 	{
 		DynamicSharedBuffersInit();

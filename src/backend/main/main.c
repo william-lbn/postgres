@@ -20,6 +20,8 @@
  */
 #include "postgres.h"
 
+#include "storage/dsg_envelope_birth.h"
+
 #include <unistd.h>
 
 #if defined(__linux__)
@@ -172,6 +174,8 @@ main(int argc, char *argv[])
 
 	reached_main = true;
 	dsg_apply_inherited_address_space();
+	/* 显式测试profile也必须在AS之后、任何PG分配之前建立完整占位。 */
+	DsgBirthArraysEarlyInit();
 
 	/*
 	 * If supported on the current platform, set up a handler to be called if

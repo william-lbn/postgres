@@ -1,0 +1,8 @@
+FROM 127.0.0.1:5001/neon/pg17-native-test:79367196-injection-v1
+WORKDIR /home/nonroot
+COPY --chown=1000:1000 vendor/postgres-v17 vendor/postgres-v17
+RUN --mount=type=cache,id=neon-ccache-amd64,target=/home/nonroot/.cache/ccache,uid=1000,gid=1000,sharing=locked \
+ sha256sum vendor/postgres-v17/src/backend/storage/buffer/dsg_envelope_birth.c vendor/postgres-v17/src/include/storage/dsg_envelope_birth.h vendor/postgres-v17/src/backend/main/main.c vendor/postgres-v17/src/backend/storage/buffer/buf_init.c vendor/postgres-v17/src/test/modules/test_dsg_region/test_dsg_region.c && \
+ mold -run make -C build/v17 -j3 -s && make -C build/v17 -s install && \
+ make -C build/v17/src/test/modules/test_dsg_region -j3 -s install
+WORKDIR /workspace/neon

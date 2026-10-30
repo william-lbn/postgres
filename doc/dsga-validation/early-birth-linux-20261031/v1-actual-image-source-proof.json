@@ -1,0 +1,24 @@
+{
+  "classification": "actual compiled-image PG source plus mounted runtime Python verification; not another test/E2E",
+  "image_digest": "sha256:5271a703d94fbeb48cfed5813f0b2378869ee039231e4b63828cba66cc1eb74c",
+  "compiled_image_source_file_count": 7164,
+  "all_compiled_image_source_files_match_frozen_tree": true,
+  "compiled_image_changed_files": [],
+  "full_image_audit_manifest_sha256": "07c06cb4887b508e43b6cbd8adb406e9005f528c8e344ead34a691129985c2f7",
+  "compiled_changed_eight": {
+    "src/backend/main/main.c": "4f7bbaf44dcc7732406b9329abd5d8790641c9e430b55c09abb8e5df48628534",
+    "src/backend/storage/buffer/Makefile": "2c94de99980a55d5b7f3f8833b6f00188908b4d14c6d756c9ad4833ea7a9c8df",
+    "src/backend/storage/buffer/buf_init.c": "7b68b8241b52f2a13c9a586d62a3a8cbebfe89cf1a05e763289658cf7449d956",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "a3d4098ad931f2fbb1dcff98a8326dc5959e8a2e77113f32b18b1b072d6e930b",
+    "src/backend/storage/buffer/meson.build": "f49935332ddf3e34f6138154768fedb5dd85153f279cb68f552ca26d600d752d",
+    "src/include/storage/dsg_envelope_birth.h": "c288258d28b155d5c0009d3cfad4d0898b1c73e14fca0b121fcdc72385915d1a",
+    "src/test/modules/test_dsg_region/test_dsg_region--1.0.sql": "946e4f6aa4333ee68fa4d56358d3ef86bba1bba5d9779edb3312752f25268e8a",
+    "src/test/modules/test_dsg_region/test_dsg_region.c": "c72d01d314cf2b69d433e20f016d85458187c5b29e94c1b0ee8542e2fe8e93c1"
+  },
+  "runtime_test": {
+    "path": "src/test/modules/test_dsg_region/t/test_early_arrays.py",
+    "sha256": "45791fdb0a46eb476b70d64fece8fdf5deb7dac1fc2af27112d745099d06dc82",
+    "source": "readonly live source mount, explicitly hashed by actual runner; written after image build and absent in compiled image"
+  },
+  "initial_audit_note": "First audit required all nine files in image and exited on missing Python; second retained per-file results and classified sole runtime-only Python correctly; no compiled source mismatch"
+}

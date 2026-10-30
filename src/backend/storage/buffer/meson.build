@@ -10,6 +10,7 @@ backend_sources += files(
   'dsg_buffer_shrink.c',
   'dsg_work.c',
   'dsg_envelope_birth.c',
+  'dsg_envelope_filter.c',
   'freelist.c',
   'localbuf.c',
 )

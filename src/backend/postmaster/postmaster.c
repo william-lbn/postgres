@@ -65,6 +65,8 @@
 
 #include "postgres.h"
 
+#include "storage/dsg_envelope_filter.h"
+
 #include <unistd.h>
 #include <signal.h>
 #include <time.h>
@@ -1053,7 +1055,7 @@ PostmasterMain(int argc, char *argv[])
 	/*
 	 * If enabled, start up syslogger collection subprocess
 	 */
-	SysLoggerPID = SysLogger_Start();
+	DsgBirthFilterForkRegistered(SysLoggerPID = SysLogger_Start());
 
 	/*
 	 * Reset whereToSendOutput from DestDebug (its starting state) to
@@ -1358,14 +1360,14 @@ PostmasterMain(int argc, char *argv[])
 
 	/* Start bgwriter and checkpointer so they can help with recovery */
 	if (CheckpointerPID == 0)
-		CheckpointerPID = StartChildProcess(B_CHECKPOINTER);
+		DsgBirthFilterForkRegistered(CheckpointerPID = StartChildProcess(B_CHECKPOINTER));
 	if (BgWriterPID == 0)
-		BgWriterPID = StartChildProcess(B_BG_WRITER);
+		DsgBirthFilterForkRegistered(BgWriterPID = StartChildProcess(B_BG_WRITER));
 
 	/*
 	 * We're ready to rock and roll...
 	 */
-	StartupPID = StartChildProcess(B_STARTUP);
+	DsgBirthFilterForkRegistered(StartupPID = StartChildProcess(B_STARTUP));
 	Assert(StartupPID != 0);
 	StartupStatus = STARTUP_RUNNING;
 	pmState = PM_STARTUP;
@@ -1690,7 +1692,7 @@ ServerLoop(void)
 
 		/* If we have lost the log collector, try to start a new one */
 		if (SysLoggerPID == 0 && Logging_collector)
-			SysLoggerPID = SysLogger_Start();
+			DsgBirthFilterForkRegistered(SysLoggerPID = SysLogger_Start());
 
 		/*
 		 * If no background writer process is running, and we are not in a
@@ -1701,9 +1703,9 @@ ServerLoop(void)
 			pmState == PM_HOT_STANDBY || pmState == PM_STARTUP)
 		{
 			if (CheckpointerPID == 0)
-				CheckpointerPID = StartChildProcess(B_CHECKPOINTER);
+				DsgBirthFilterForkRegistered(CheckpointerPID = StartChildProcess(B_CHECKPOINTER));
 			if (BgWriterPID == 0)
-				BgWriterPID = StartChildProcess(B_BG_WRITER);
+				DsgBirthFilterForkRegistered(BgWriterPID = StartChildProcess(B_BG_WRITER));
 		}
 
 		/*
@@ -1712,7 +1714,7 @@ ServerLoop(void)
 		 * be writing any new WAL).
 		 */
 		if (WalWriterPID == 0 && pmState == PM_RUN)
-			WalWriterPID = StartChildProcess(B_WAL_WRITER);
+			DsgBirthFilterForkRegistered(WalWriterPID = StartChildProcess(B_WAL_WRITER));
 
 		/*
 		 * If we have lost the autovacuum launcher, try to start a new one. We
@@ -1724,14 +1726,14 @@ ServerLoop(void)
 			(AutoVacuumingActive() || start_autovac_launcher) &&
 			pmState == PM_RUN)
 		{
-			AutoVacPID = StartChildProcess(B_AUTOVAC_LAUNCHER);
+			DsgBirthFilterForkRegistered(AutoVacPID = StartChildProcess(B_AUTOVAC_LAUNCHER));
 			if (AutoVacPID != 0)
 				start_autovac_launcher = false; /* signal processed */
 		}
 
 		/* If we have lost the archiver, try to start a new one. */
 		if (PgArchPID == 0 && PgArchStartupAllowed())
-			PgArchPID = StartChildProcess(B_ARCHIVER);
+			DsgBirthFilterForkRegistered(PgArchPID = StartChildProcess(B_ARCHIVER));
 
 		/* If we need to start a slot sync worker, try to do that now */
 		MaybeStartSlotSyncWorker();
@@ -2447,11 +2449,11 @@ process_pm_child_exit(void)
 			 * if this fails, we'll just try again later.
 			 */
 			if (CheckpointerPID == 0)
-				CheckpointerPID = StartChildProcess(B_CHECKPOINTER);
+				DsgBirthFilterForkRegistered(CheckpointerPID = StartChildProcess(B_CHECKPOINTER));
 			if (BgWriterPID == 0)
-				BgWriterPID = StartChildProcess(B_BG_WRITER);
+				DsgBirthFilterForkRegistered(BgWriterPID = StartChildProcess(B_BG_WRITER));
 			if (WalWriterPID == 0)
-				WalWriterPID = StartChildProcess(B_WAL_WRITER);
+				DsgBirthFilterForkRegistered(WalWriterPID = StartChildProcess(B_WAL_WRITER));
 			MaybeStartWalSummarizer();
 
 			/*
@@ -2459,9 +2461,9 @@ process_pm_child_exit(void)
 			 * situation, some of them may be alive already.
 			 */
 			if (!IsBinaryUpgrade && AutoVacuumingActive() && AutoVacPID == 0)
-				AutoVacPID = StartChildProcess(B_AUTOVAC_LAUNCHER);
+				DsgBirthFilterForkRegistered(AutoVacPID = StartChildProcess(B_AUTOVAC_LAUNCHER));
 			if (PgArchStartupAllowed() && PgArchPID == 0)
-				PgArchPID = StartChildProcess(B_ARCHIVER);
+				DsgBirthFilterForkRegistered(PgArchPID = StartChildProcess(B_ARCHIVER));
 			MaybeStartSlotSyncWorker();
 
 			/* workers may be scheduled to start now */
@@ -2617,7 +2619,7 @@ process_pm_child_exit(void)
 				HandleChildCrash(pid, exitstatus,
 								 _("archiver process"));
 			if (PgArchStartupAllowed())
-				PgArchPID = StartChildProcess(B_ARCHIVER);
+				DsgBirthFilterForkRegistered(PgArchPID = StartChildProcess(B_ARCHIVER));
 			continue;
 		}
 
@@ -2626,7 +2628,7 @@ process_pm_child_exit(void)
 		{
 			SysLoggerPID = 0;
 			/* for safety's sake, launch new logger *first* */
-			SysLoggerPID = SysLogger_Start();
+			DsgBirthFilterForkRegistered(SysLoggerPID = SysLogger_Start());
 			if (!EXIT_STATUS_0(exitstatus))
 				LogChildExit(LOG, _("system logger process"),
 							 pid, exitstatus);
@@ -3222,7 +3224,7 @@ PostmasterStateMachine(void)
 				Assert(Shutdown > NoShutdown);
 				/* Start the checkpointer if not running */
 				if (CheckpointerPID == 0)
-					CheckpointerPID = StartChildProcess(B_CHECKPOINTER);
+					DsgBirthFilterForkRegistered(CheckpointerPID = StartChildProcess(B_CHECKPOINTER));
 				/* And tell it to shut down */
 				if (CheckpointerPID != 0)
 				{
@@ -3359,6 +3361,9 @@ PostmasterStateMachine(void)
 	 */
 	if (FatalError && pmState == PM_NO_CHILDREN)
 	{
+		/* active覆盖fork syscall、child ready及真实PID登记；未结清不得Park旧R。 */
+		if (!DsgBirthFilterReinitializeBegin())
+			elog(FATAL, "DSGA reinitialization lacks the original idle leader gate");
 		ereport(LOG,
 				(errmsg("all server processes terminated; reinitializing")));
 
@@ -3376,8 +3381,9 @@ PostmasterStateMachine(void)
 
 		/* re-create shared memory and semaphores */
 		CreateSharedMemoryAndSemaphores();
+		DsgBirthFilterReinitializeEnd();
 
-		StartupPID = StartChildProcess(B_STARTUP);
+		DsgBirthFilterForkRegistered(StartupPID = StartChildProcess(B_STARTUP));
 		Assert(StartupPID != 0);
 		StartupStatus = STARTUP_RUNNING;
 		pmState = PM_STARTUP;
@@ -3632,6 +3638,7 @@ BackendStartup(ClientSocket *client_sock)
 	if (!bn->dead_end)
 		ShmemBackendArrayAdd(bn);
 #endif
+	DsgBirthFilterForkRegistered(pid);
 
 	return STATUS_OK;
 }
@@ -3735,7 +3742,7 @@ process_pm_pmsignal(void)
 		 */
 		Assert(PgArchPID == 0);
 		if (XLogArchivingAlways())
-			PgArchPID = StartChildProcess(B_ARCHIVER);
+			DsgBirthFilterForkRegistered(PgArchPID = StartChildProcess(B_ARCHIVER));
 
 		/*
 		 * If we aren't planning to enter hot standby mode later, treat
@@ -4013,6 +4020,7 @@ StartAutovacuumWorker(void)
 #ifdef EXEC_BACKEND
 				ShmemBackendArrayAdd(bn);
 #endif
+				DsgBirthFilterForkRegistered(bn->pid);
 				/* all OK */
 				return;
 			}
@@ -4066,7 +4074,7 @@ MaybeStartWalReceiver(void)
 		 pmState == PM_HOT_STANDBY) &&
 		Shutdown <= SmartShutdown)
 	{
-		WalReceiverPID = StartChildProcess(B_WAL_RECEIVER);
+		DsgBirthFilterForkRegistered(WalReceiverPID = StartChildProcess(B_WAL_RECEIVER));
 		if (WalReceiverPID != 0)
 			WalReceiverRequested = false;
 		/* else leave the flag set, so we'll try again later */
@@ -4083,7 +4091,7 @@ MaybeStartWalSummarizer(void)
 	if (summarize_wal && WalSummarizerPID == 0 &&
 		(pmState == PM_RUN || pmState == PM_HOT_STANDBY) &&
 		Shutdown <= SmartShutdown)
-		WalSummarizerPID = StartChildProcess(B_WAL_SUMMARIZER);
+		DsgBirthFilterForkRegistered(WalSummarizerPID = StartChildProcess(B_WAL_SUMMARIZER));
 }
 
 
@@ -4102,7 +4110,7 @@ MaybeStartSlotSyncWorker(void)
 	if (SlotSyncWorkerPID == 0 && pmState == PM_HOT_STANDBY &&
 		Shutdown <= SmartShutdown && sync_replication_slots &&
 		ValidateSlotSyncParams(LOG) && SlotSyncWorkerCanRestart())
-		SlotSyncWorkerPID = StartChildProcess(B_SLOTSYNC_WORKER);
+		DsgBirthFilterForkRegistered(SlotSyncWorkerPID = StartChildProcess(B_SLOTSYNC_WORKER));
 }
 
 /*
@@ -4303,6 +4311,7 @@ do_start_bgworker(RegisteredBgWorker *rw)
 #ifdef EXEC_BACKEND
 	ShmemBackendArrayAdd(rw->rw_backend);
 #endif
+	DsgBirthFilterForkRegistered(worker_pid);
 	return true;
 }
 

@@ -21,6 +21,7 @@
 #include "postgres.h"
 
 #include "storage/dsg_envelope_birth.h"
+#include "storage/dsg_envelope_filter.h"
 
 #include <unistd.h>
 
@@ -176,6 +177,9 @@ main(int argc, char *argv[])
 	dsg_apply_inherited_address_space();
 	/* 显式测试profile也必须在AS之后、任何PG分配之前建立完整占位。 */
 	DsgBirthArraysEarlyInit();
+	DsgBirthFilterEarlyInit();
+	/* test-v1无Root出生；以后root-v1必须在两阶段filter之间完成真实屏障。 */
+	DsgBirthFilterSealPostmaster();
 
 	/*
 	 * If supported on the current platform, set up a handler to be called if

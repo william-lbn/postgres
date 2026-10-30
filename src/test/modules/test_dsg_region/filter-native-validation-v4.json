@@ -1,0 +1,163 @@
+{
+  "protocol_version": 1,
+  "status": "default-disabled test-only component verified; no normal/Birth authorization",
+  "source_branch": "codex/dsga-pg17-v3-20261019",
+  "source_head_before_commit": "dab1681c096d2b438dcacfe1fa877b3aba90792d",
+  "source_dirty_at_validation": true,
+  "frozen_source_count": 14,
+  "frozen_source_sha256": {
+    "src/backend/main/main.c": "1b8a11c7e5957cad88b475adbfcc62817f07a95db08447ac90824525a4f8c419",
+    "src/backend/postmaster/fork_process.c": "031d8dc4d803851a70b90e914d3efd6a57018784659e72d1cc1dba81b9b631d4",
+    "src/backend/postmaster/launch_backend.c": "6797ca511483270b1c4ac8df01b901da0576437e6bdb25240b81dc504b62bb44",
+    "src/backend/postmaster/postmaster.c": "dd071ad014df2b06c31c0c38aeab9e929bb5ed1f69a6678e341347ea31eecbf6",
+    "src/backend/storage/buffer/Makefile": "07b8d850e43a44e64a4befce920bfcb59389209593f8d8a708a474e179c2e20c",
+    "src/backend/storage/buffer/meson.build": "0f893fbad10fe2e2b68a0a4ef6d3b84a5ae72dfbb96cec80a5713d1b4c62d0e8",
+    "src/test/modules/test_dsg_region/Makefile": "7487fcaaff50c08145f151b8f0dd55e7ab9477183c7b9be6f6f88b8ce43ed1e0",
+    "src/test/modules/test_dsg_region/meson.build": "993b31bbd4e52c65027583880482d59af3dd101614b7644591a516c77744f3aa",
+    "src/test/modules/test_dsg_region/test_dsg_region--1.0.sql": "9b22ea18c13b769ba435307432f6a08d8662c76d4ec728039ea2098f23a598ba",
+    "src/test/modules/test_dsg_region/test_dsg_region.c": "cb9702872e5a7bbcd786373349b78db86e40a847f3d861446c8ea363ecea008a",
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "cd8f4b824f472adc57b580ee0357f0cd3c4877babd5664a5322d272d8d35e693",
+    "src/include/storage/dsg_envelope_filter.h": "f54d19b2e193522618e740adfb770fccc471683948401e7eeb4a7a2397ead42e",
+    "src/test/modules/test_dsg_region/t/test_filter.py": "2c22bd40b115a16302dae951ba7963862ae485a74a8ddb37ae626c391454c25d",
+    "src/test/modules/test_dsg_region/test_dsg_filter.c": "e8bb41faeae8ff724033baf5b22c9b47d668a7aa878754c965c6ebdf05ffd821"
+  },
+  "image": "127.0.0.1:5001/neon/pg17-native-filter:dab1681-d-v4",
+  "image_digest": "sha256:63673c260fefb1ae65860554456a99ae7dff2ce3babeb291a4b82888cde346aa",
+  "image_id": "sha256:352e786a6fe6911b3ac2ac67c7a757f77f8a4ba36ef9522fc1b05c197dbb025a",
+  "host_kernel": "6.8.0-147-generic",
+  "postgres_sha256": "d8aad6711ac8fe838d6bb622aaa5aa416f678b0b1cc0716d0944d5f1b46ec56e",
+  "test_library_sha256": "00b967d942b53adad84c86e9205a98ac0a35f5fd4e958ae12231f5ad09b9ad23",
+  "binary_version_stamp_note": "Cached configure extra-version remains original79367196; actual tested content is dab1681+the14SHA, not a clean793 release build.",
+  "build_exit": 0,
+  "filter_test_exit": 0,
+  "regression_exit": 0,
+  "filter_cases": [
+    {
+      "id": "PG17-S-FILTER-001",
+      "layer": "single-service",
+      "function": "test_PG17_S_FILTER_001_actual_syscall_boundaries_and_threads",
+      "result": "PASS",
+      "elapsed_seconds": 1.594137549000152
+    },
+    {
+      "id": "PG17-S-FILTER-002",
+      "layer": "single-service",
+      "function": "test_PG17_S_FILTER_002_real_logger_and_internal_recovery",
+      "result": "PASS",
+      "elapsed_seconds": 8.567630161000125
+    },
+    {
+      "id": "PG17-S-FILTER-003",
+      "layer": "single-service",
+      "function": "test_PG17_S_FILTER_003_actual_extension_acl_and_definer",
+      "result": "PASS",
+      "elapsed_seconds": 1.5235426090002875
+    },
+    {
+      "id": "PG17-S-FILTER-004",
+      "layer": "single-service",
+      "function": "test_PG17_S_FILTER_004_ready_edge_failures_reaped",
+      "result": "PASS",
+      "elapsed_seconds": 11.214165434001188
+    },
+    {
+      "id": "PG17-U-FILTER-001",
+      "layer": "unit-native",
+      "function": "test_PG17_U_FILTER_001_explicit_mode_and_missing_r_fail",
+      "result": "PASS",
+      "elapsed_seconds": 1.29184857999644
+    }
+  ],
+  "filter_seconds": 24.192,
+  "regression": {
+    "suite": "early-birth",
+    "cases": [
+      {
+        "id": "PG17-U-BIRTH-001",
+        "layer": "unit-native",
+        "result": "PASS"
+      },
+      {
+        "id": "PG17-U-BIRTH-002",
+        "layer": "unit-native",
+        "result": "PASS"
+      },
+      {
+        "id": "PG17-S-BIRTH-001",
+        "layer": "single-service",
+        "result": "PASS"
+      },
+      {
+        "id": "PG17-S-BIRTH-002",
+        "layer": "single-service",
+        "result": "PASS"
+      },
+      {
+        "id": "PG17-S-BIRTH-003",
+        "layer": "single-service",
+        "result": "PASS"
+      },
+      {
+        "id": "PG17-S-BIRTH-004",
+        "layer": "single-service",
+        "result": "PASS"
+      }
+    ],
+    "seconds": 11.543,
+    "skipped": 0
+  },
+  "tested_commands": {
+    "build": "bash /data/neon-build/validation/pg17-native-filter-d-v4-20261030T175305Z/build.sh",
+    "filter": "bash /data/neon-build/validation/pg17-native-filter-d-v4-20261030T175305Z/run.sh",
+    "regression": "bash /data/neon-build/validation/pg17-native-filter-d-v4-20261030T175305Z/run-regression.sh"
+  },
+  "evidence_root": "/data/neon-build/validation/pg17-native-filter-d-v4-20261030T175305Z",
+  "evidence_sha256": {
+    "Dockerfile": "d07c85d36a722d0d5a20700960bd9a0a995e1b053d6a032fc127ab77ba4b67ec",
+    "build.sh": "fd4b8e783de64e7408deb350fdfaec52dda6ba4af20965c37c22d5d7bb9168a3",
+    "build.log": "bb9ff9c1d1bba5f703f0d1fe48f086ec3119be5fa6d8d1369c723da4dd0f6b3c",
+    "build-metadata.json": "fddc5e3e85f50ddc9362b6564bf462213ccccf64e7898826523e885469e5e694",
+    "run.sh": "9844173a121693cd21abf65b8b52c1c169ea86208ba80b57415718b9da77ee0d",
+    "runner.py": "7a9980d8928427eaf0df85929995a6d0e838e719c803d6b721b5da77866bc6e5",
+    "test.log": "874a1f1f553f860e3294e64f71d4cda1144bb3e88b2b10649ead8310a0cf702e",
+    "test-result.json": "9d5bce07c95e01e546a02bfa366dfee5af1f922c8cc1d17f11af4202b833491c",
+    "run-regression.sh": "0a7353ff7ffac03dccdd6cd71602bed76ed16394ec5fd262fb821d21433c1a1e",
+    "regression.log": "45f1cc5595e7980d485dab26a03e0510dff1078cd45bb1f0e33410809eafde90",
+    "regression-result.json": "709d48d93bcbfa0f016110765d815e271e62f44bbce96518acf1fa6dbf95c5fd",
+    "source-hashes-before.json": "8eaa68f91af007ef57f65770e2e0ae0bda9bc162706566936a3e1c3a4eafe624",
+    "source-hashes-actual-image.json": "bf7121719dd13c0bae4739af605058242bb9e7428cfd0fdbd2a4974960248f59",
+    "source-hashes-final.json": "8eaa68f91af007ef57f65770e2e0ae0bda9bc162706566936a3e1c3a4eafe624",
+    "artifact-sha256.json": "e588fbf35cf52825c16ee33f84d7111fe732af7cb7c8d8f53343815c75f7c998"
+  },
+  "prior_functional_failure": {
+    "path": "/data/neon-build/validation/pg17-native-filter-20261030T170816Z",
+    "build_exit": 0,
+    "test_exit": 1,
+    "tests": 4,
+    "failed": 2,
+    "reason": "Parent seccomp filters inherit by AND; initial PM ban of CLONE_THREAD also denied valid child pthread. D native leader+active/ready+registration gates preserve valid pthread.",
+    "test_log_sha256": "2306f9b876a30c206060c1d0957029eb668a8daf3da8e56bb4acdcdddbebbc78",
+    "not_rewritten_as_pass": true
+  },
+  "draft_syntax_history": {
+    "root": "/data/neon-build/dev/native-filter-draft",
+    "syntax.log": "ccache temp/cache permission failure; not a code pass",
+    "syntax-v2.log": "CLONE/O_DIRECT GNU declarations absent, fixed explicit _GNU_SOURCE",
+    "syntax-v3.log": "syntax-only exit0, not seccomp or real PG validation"
+  },
+  "existing_entry": "t/test_filter.py: unittest.main(verbosity=2), exact five current test roots",
+  "entry_checked_against_receipt": true,
+  "formal_neon_filter_suite": "not wired in this component commit; separate following batch, no claim of official FILTER CI completion",
+  "not_proven": [
+    "Root-v1 binary birth wire/ACK consumer, maps and complete cBPF readback, OriginalProfile enrollment",
+    "production FS/SQL/startup/plugin immutable manifest restriction (required for no raw fork/pre-filter atfork bypass)",
+    "normal decrease envelope and resourceguard five release gates (unchanged)",
+    "Guest 6.12.26 memcg kernel profile and memory.max decrease",
+    "KVM/Guest/VM/Kubernetes/Helm E2E",
+    "injected EINTR branch: source handles EINTR, original BlockSig prevents ordinary SIGCHLD reentry; no claim of signal-error branch injection",
+    "actual fork syscall failure due EAGAIN/ENOMEM; current real failures are after successful fork and before ready",
+    "formal FILTER CI adapter/catalog registration; current exact five-root harness and receipt are complete, official entry wiring is a following batch",
+    "non-amd64/EXEC_BACKEND filter support: test-v1 does not claim these platforms"
+  ],
+  "archive_only_update": "14 source files unchanged; no tests repeated for documentation-only reconciliation"
+}

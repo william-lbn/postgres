@@ -82,6 +82,7 @@ PG_FUNCTION_INFO_V1(test_dsg_dsm_probe);
 PG_FUNCTION_INFO_V1(test_dsg_dsm_control);
 
 void		_PG_init(void);
+extern void test_dsg_filter_pm_init(void);
 
 static DsgRegion inherited_region;
 
@@ -328,6 +329,7 @@ test_dsg_fast_drop(const char *name, const void *private_data)
 void
 _PG_init(void)
 {
+	test_dsg_filter_pm_init();
 	if (process_shared_preload_libraries_in_progress && !IsUnderPostmaster)
 	{
 		DsgTestSharedState *state;

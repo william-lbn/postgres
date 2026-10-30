@@ -93,3 +93,7 @@ REVOKE ALL ON FUNCTION test_dsg_checkpoint_control(text) FROM PUBLIC;
 
 CREATE FUNCTION test_dsg_birth_arrays() RETURNS text AS 'MODULE_PATHNAME', 'test_dsg_birth_arrays' LANGUAGE C;
 REVOKE ALL ON FUNCTION test_dsg_birth_arrays() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_birth_filter() RETURNS text AS 'MODULE_PATHNAME','test_dsg_birth_filter' LANGUAGE C;
+CREATE FUNCTION test_dsg_filter_probe(text) RETURNS text AS 'MODULE_PATHNAME','test_dsg_filter_probe' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_birth_filter(),test_dsg_filter_probe(text) FROM PUBLIC;

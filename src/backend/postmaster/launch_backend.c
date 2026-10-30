@@ -31,6 +31,8 @@
 
 #include "postgres.h"
 
+#include "storage/dsg_envelope_filter.h"
+
 #include <unistd.h>
 
 #include "access/xlog.h"
@@ -263,6 +265,12 @@ postmaster_child_launch(BackendType child_type,
 			DsgBufferDetachInheritedArrays();
 			PGSharedMemoryDetach();
 		}
+
+		/* 非共享child先Park弃旧backing，再叠不能替换R/exec/fork的实际策略。
+		 * 发生在任何child Main及其业务线程之前；默认关闭完全保留原路径。 */
+		DsgBirthFilterInstallChild();
+		/* 先Park/filter再通知母PM，logger未调度不得被恢复路径误当已脱离。 */
+		DsgBirthFilterChildReady();
 
 		/*
 		 * Enter the Main function with TopMemoryContext.  The startup data is

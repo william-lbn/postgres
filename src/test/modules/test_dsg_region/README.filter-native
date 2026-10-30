@@ -1,0 +1,65 @@
+PG17 原生 FILTER / D 组件（默认关闭，显式 test-v1）
+
+本组件保护四数组固定范围，并在受信原生路径上串行fork/ready/PID登记/reinit。
+它不是Root出生资格、持续成本包络、normal降限许可或Guest/KVM/Kubernetes验收。
+root-v1尚不支持。未设置filter环境时沿原路径；不得借本模块放宽已有normal拒绝。
+
+启用与既有用例入口
+NEON_DSGA_EARLY_ARRAYS_PROFILE=test-v1:<规范maximum_buffers>
+NEON_DSGA_ADDRESS_SPACE_MAX_BYTES=<原AS硬上限>
+NEON_DSGA_EARLY_ARRAYS_FILTER=test-v1
+必须是真实非root/NNP1/既有完整早期R；未知/空/root-v1等模式原生拒绝。
+
+冻结测试入口为t/test_filter.py，已有unittest.main(verbosity=2)，当前恰五根：
+PG17-U-FILTER-001  显式模式/缺R拒绝、默认关闭真实PG。
+PG17-S-FILTER-001  真实PM/child syscall边界、合法PM和child pthread。
+PG17-S-FILTER-002  logger重启、三次真实内部恢复/几何与数据校验。
+PG17-S-FILTER-003  实际CREATE EXTENSION、REVOKE、GRANT及SECURITY DEFINER原会话ACL。
+PG17-S-FILTER-004  活child短/错/EOF/实际10秒timeout，精确kill+wait和无未登记child。
+没有E层通过。正式Neon FILTER suite/adapter是后继接线，不在此提交冒称完成。
+
+直接入口调用示例（说明命令；v4实际命令另见下述收据）：
+  env -u NEON_DSGA_EARLY_ARRAYS_PROFILE -u NEON_DSGA_ADDRESS_SPACE_MAX_BYTES \
+  -u NEON_DSGA_EARLY_ARRAYS_FILTER -u NEON_DSGA_FILTER_PM_PROBE \
+  NEON_TEST_PG_BIN=/absolute/pg/bin \
+  NEON_TEST_DSG_LIBRARY=/absolute/test_dsg_region.so \
+  python3 -B src/test/modules/test_dsg_region/t/test_filter.py
+上列启用变量属于被测PG；测试父环境不能先export它们，fixture自行给临时PG设置。
+要求Linux amd64、实际编好的PG/extension、非root用户，且ready负例须
+--enable-injection-points构建；无skip或放宽夹具。测试只启动自己创建的临时PG。
+其self.maps读取方式是同UID测试证据，不是Root真实全cBPF读回或生产出生验证。
+
+D顺序与信任范围
+main原AS/R之后安装PMbase和PMfinal；test-v1没有Root握手。
+fork_process先真实gettid/getpid核原PM leader，置active再fork。child非共享场景先
+Park四数组/Detach主共享段，再安装不可放宽child filter、写私有4B ready，之后才Main。
+母PM成功收到ready仍保持active/pending，直到辅助全局PID或真实BackendList登记后才清。
+登记前新fork/reinit返回EBUSY。短/错/EOF/timeout必须kill并wait确切未登记child。
+重要共享child退出、logger已先Park后，原leader且无active/pending才进入Park/reset/reinit。
+普通SIGCHLD handler只设pending标志；不在handler重入恢复。
+
+seccomp按AND继承，PM必须保留合法pthread，不能PM禁线程后由child放行。
+D是受信原生leader门禁，不是纯内核对任意PM代码的fork身份隔离；生产资格还必须
+冻结PG/Neon/依赖插件来源并排除其他raw fork及child filter前atfork回调旁路。
+这些生产来源尚未闭合。wait/reap证明本child用户态不再执行，不证明所有旧mm/pin/
+late_put已清空；kernel退出/层级计费边际及完整normal包络另需来源，不能省略。
+
+真实收据与失败历史
+filter-native-validation-v4.json归档精确14源SHA、实际image内COPY匹配、镜像/二进制、
+命令/日志SHA和5FILTER+6early-birth结果。原完整收据在Linux：
+/data/neon-build/validation/pg17-native-filter-d-v4-20261030T175305Z/
+  bash .../build.sh            实际构建exit0
+  bash .../run.sh              五根24.192s PASS，exit0
+  bash .../run-regression.sh   直接受影响early-birth正式CI六根11.543s PASS，exit0
+实际宿主kernel6.8.0-147-generic；不得写成精确6.12.26 Guest/KVM通过。
+配置版本字符串仍带原79367196，实际测试源码是dab1681+已锁14SHA，不能假装是干净793构建。
+
+保留原失败，未重写为PASS：
+/data/neon-build/validation/pg17-native-filter-20261030T170816Z/
+  build0，四根中两FAIL：继承PM filter误拒合法child pthread，后按D修正并实测。
+/data/neon-build/dev/native-filter-draft/
+  syntax.log缓存权限失败；syntax-v2.log GNU常量声明失败；syntax-v3.log仅语法通过。
+v2/v3成功轮次也保留，最终采用v4更严格live-child/pending断言的独立镜像。
+
+未完成项保持清楚：真实Root-v1/最终audit停点、完整物理/FS/kernel成本来源、normal安全
+降限、精确Guest/KVM和Helm/K8s E2E。没有为文档归档重新跑未变的业务用例。

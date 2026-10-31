@@ -1,0 +1,31 @@
+{
+  "PGbase": "053d1c3c4f6126a418e05229a1fa1149d3d6cb6d",
+  "branch": "codex/dsga-pg17-v3-20261019",
+  "current_source7": {
+    "src/backend/storage/buffer/dsg_array_root.c": "600d4fa887c157510943e9f9fd437970c7c0907c90ecfe70f29400abef756a1d",
+    "src/include/storage/dsg_array_root.h": "d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445",
+    "src/backend/storage/buffer/Makefile": "baa0d787d8411c0773d56a2c1ac62bdda84135620fa68e72e1db551c57550a04",
+    "src/backend/storage/buffer/meson.build": "dd357a014aa5a42bda5e8e5992269dbcc00e11e81ea0463662335b671b64e1c2",
+    "src/backend/storage/buffer/buf_init.c": "e6989fce13c38d2cc5bdef5e9e2f3e17301eecb0b6482bc4c8f52fffafee1d2f",
+    "src/backend/storage/buffer/dsg_buffer_grow.c": "809595650a07731ea103b2c084f1fed173f875d7dcd2fd811d8f2f5c462699a2",
+    "src/test/modules/test_dsg_region/t/test_array_root.py": "7e87d4d52e2e64709f383d21341995d9e676c126f33e5c796a18311dec4d7277"
+  },
+  "compiled6_equal_current": true,
+  "actual_compiled_source_count": 7221,
+  "build_source_lock_sha256": "ff13be979995763f5437f619817c6fea84372edab9ac192e0a50649e64d66c32",
+  "binary_hashes": "2ae266f7dd0f042d64a53a15b3198187f57f557d1972d8b2a72b4f3629a30763  /home/nonroot/pg_install/v17/bin/postgres\n00b967d942b53adad84c86e9205a98ac0a35f5fd4e958ae12231f5ad09b9ad23  /home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so\n",
+  "runtime_image": {
+    "new_image": "sha256:03eb8233c39de4fd838873095b6d8bf21f92769eb51dd60cf3328b8a3dc6072c",
+    "tag": "neon-test-only/pg17-array-root:37ab5c-runtime",
+    "actual_entrypoint": [
+      "/usr/bin/env"
+    ],
+    "actual_cmd": [
+      "bash"
+    ],
+    "source_and_ELF_unchanged": true
+  },
+  "prior_source7_and_74_archive": "HISTORICAL_ONLY doc/dsga-validation/array-root-20261101; its referenced original source hashes are intentionally not current; snapshots retained",
+  "old_archive_manifest_sha256": "71678847eafda13bdd6982504463ba4f5b4e5698f682a2c1d74e162b4353871f",
+  "new_platform_claim": "Linux full actual build/tests only; !__linux__ guarded old default-off stub, explicit enable FATAL; not a Mac cross build certification"
+}

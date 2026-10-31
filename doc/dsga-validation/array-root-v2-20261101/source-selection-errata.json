@@ -1,0 +1,14 @@
+{
+  "scope": "read-only receipt clarification; original source-lock bytes retained",
+  "stale_field": "native-four-arrays/source-lock.json.prior_native21",
+  "not_authoritative_for_current_binary": true,
+  "current_PG_ELF_prefix": "2ae266f7",
+  "current_extension_prefix": "00b967d9",
+  "current_build_nonce_suffix": "37ab5c",
+  "current_new_four_native_nonce_suffix": "d96127",
+  "current_direct_regression_nonce_suffix": "6911e3",
+  "isolated_original_BIRTH003_rerun_suffix": "047460",
+  "selected_evidence": "joint catalog/direct locks and independent actual image hashes; never the stale prior_native21 pointer",
+  "bounded_tmpfs": "512MiB /tmp only in native protocol fixture, fsync remains enabled, no disk durability or normal qualification",
+  "E_pass": 0
+}

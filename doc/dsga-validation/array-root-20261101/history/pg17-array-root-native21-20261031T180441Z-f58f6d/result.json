@@ -1,0 +1,17 @@
+[
+  {
+    "cohort": "root9",
+    "exit": 126,
+    "seconds": 0.8674092439905507
+  },
+  {
+    "cohort": "compatibility11",
+    "exit": 126,
+    "seconds": 0.9170604399987496
+  },
+  {
+    "cohort": "mechanism13",
+    "exit": 0,
+    "seconds": 3.525467845000094
+  }
+]

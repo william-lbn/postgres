@@ -1,0 +1,9 @@
+2026-10-31 18:25:46.273 GMT [22] LOG:  redirecting log output to logging collector process
+2026-10-31 18:25:46.273 GMT [22] HINT:  Future log output will appear in directory "owned-log".
+2026-10-31 18:25:46.273 GMT [22] LOG:  starting PostgreSQL 17.11 (79367196a74eef82e67cac917877d2e6271d3e70) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-10-31 18:25:46.278 GMT [22] LOG:  listening on Unix socket "/tmp/pg17-array-root-5f49c4dt/s/.s.PGSQL.55432"
+2026-10-31 18:25:46.292 GMT [28] LOG:  database system was shut down at 2026-10-31 18:25:46 GMT
+2026-10-31 18:25:46.293 GMT [28] LOG:  Continue writing WAL at 0/14EAF60
+2026-10-31 18:25:46.390 GMT [22] LOG:  database system is ready to accept connections
+2026-10-31 18:25:46.427 GMT [26] LOG:  checkpoint starting: immediate force wait
+2026-10-31 18:25:46.797 GMT [26] LOG:  checkpoint complete: wrote 47 buffers (18.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.017 s, sync=0.335 s, total=0.370 s; sync files=32, longest=0.100 s, average=0.011 s; distance=247 kB, estimate=247 kB; lsn=0/1528C28, redo lsn=0/1528B88

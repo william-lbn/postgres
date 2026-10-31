@@ -1,0 +1,7 @@
+{
+  "image": "sha256:03eb8233c39de4fd838873095b6d8bf21f92769eb51dd60cf3328b8a3dc6072c",
+  "fixture": "/data/neon-build/src/neon/vendor/postgres-v17/src/test/modules/test_dsg_region/t/test_early_arrays.py",
+  "fixture_sha256": "f23b43d6be6a21d829a3d01b83461a1572e065c6d79e136a1457efef0ecd0ee1",
+  "previous_failure": "pg17-array-root-native21-20261031T190403Z-6911e3/compatibility11",
+  "change": "bounded512MiB ephemeral fixture tmpfs; keep real PG fsync and original15s assertion, no source change; no disk-power-loss proof"
+}

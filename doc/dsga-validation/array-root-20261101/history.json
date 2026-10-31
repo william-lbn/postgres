@@ -1,0 +1,93 @@
+[
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-build-20261031T175048Z-e9fe5c",
+    "reason": "ENV: inherited image lacks23 Git docs and2 original test fixtures; source check failed before compile",
+    "files": {
+      "result.json": "054e5add9c5f2b501f79c4489a7dc491d87c04afac4eefc2814f1a3410891311",
+      "metadata.json": "9af98b99566f98f1c143ca9631f72d153b1676ce17d027b8f5c984e7c36b4b96",
+      "build.log": "eb16e1f942897f86fd987d19320725dd8c6728958223f6636999d92bac0c2cf0"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-build-20261031T175349Z-0e0b91",
+    "reason": "ENV: old ccache directory not writable; compile did not start; dedicated cache added, no prune",
+    "files": {
+      "result.json": "1246bb6eecf1f34d3cad8245fc75ae18257d7756324a1e6b3941bbcafa41d18b",
+      "metadata.json": "ec9b0a771a2e27f77e05babf04a2a89232a4a56e1bd8241767aa8527d8def516",
+      "build.log": "0b862cb711e20a70376d01bbf94bb18381f66f6d70556fe3335869cb4bb16234",
+      "source.exitcode": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-build-20261031T175624Z-9a868f",
+    "reason": "ENV: actual make/install succeeded but receipt expected incorrect extension path, outer failed",
+    "files": {
+      "result.json": "1fb8b819c382e05560360334a2ddbe0586bcd0f6457070c8e57d87563fb42a89",
+      "metadata.json": "70534b1504206f204fd8ec48769bf9cae83c77187b27e1ad106094c2e7de4013",
+      "build.log": "0cb555081adfe0558ab9b5629d89e4b9fa935478f3403bed041343d02117bf12",
+      "source.exitcode": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-native21-20261031T180315Z-62a16b",
+    "reason": "ENV: docker commit inherited bash entrypoint; root9/compat11 exit126, mechanism pass",
+    "files": {
+      "result.json": "d21b3f9f6801bbbc6e8e7cd0b6250a6acb3928d2ffd9f49bd30c31ab0cad2a8d"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-native21-20261031T180441Z-f58f6d",
+    "reason": "ENV: Docker commit ENTRYPOINT [] ignored; entrypoint inspect caught unchanged bash",
+    "files": {
+      "result.json": "a25ac574aa33fa7de549776bbdb8714e876a2555f0e972fefe931d6454657800"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-functional-20261031T181846Z-552d1c",
+    "reason": "CODE: startup PM CurrentResourceOwner null; pg_cryptohash_create OpenSSL wrapper segfault",
+    "files": {
+      "result.json": "aeb294d692fef3928646cae2bf0a3cf39c61d28c10a5a40c8c6176b8eb810a00",
+      "stderr.log": "32d8e8802c0050ad0f9369c02701e7a25686ba2d033b04ed2e38219d44f7b469"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-functional-20261031T181912Z-fa9dba",
+    "reason": "CODE diagnostic rerun records exact exit=-11; no success",
+    "files": {
+      "result.json": "c2ac9a8393f21d9810cde178010db8a6acd5228f7bf12500f37f0d1a52eff649",
+      "stderr.log": "aa346c9267798a45f442942e0d121dec6f871f8eb0998aaa5055d90c0e3fc516"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-functional-20261031T182132Z-b85c4e",
+    "reason": "FIXTURE: server bound wrong fixed socket name; no Root request reached server",
+    "files": {
+      "result.json": "01c44e2d5a9cd550fbccbe1ac2211856a3c0d2768e11d0236138b149df15880f",
+      "stderr.log": "d2c2932ecd9ac55525355396061d507ceb24f71104088b476c9e6edfb117013f"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-functional-20261031T182145Z-698728",
+    "reason": "FIXTURE: socket mismatch still present; preserved independently",
+    "files": {
+      "result.json": "42f22b0b48efbdfdefc17bb435c6e974782ebeca1590fb94f133da05477216ba",
+      "stderr.log": "3ed5f9fea64ef4efb801de1eed04d340d40a447f254eb3af74a721910ef7279c"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-functional-20261031T182335Z-f1c101",
+    "reason": "FIXTURE: shrink128 below original NBuffers256 rejected; other3 tests passed",
+    "files": {
+      "result.json": "ac6999c47bd8d6415f0c15cc6be8fc538e2b5dd573c884cfeb62b70c3e30e0cb",
+      "stderr.log": "f480aa4fd1802a9c4a3dadbcc6b3d11212aaeadd02edf0af2607573297f6eba0"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-functional-20261031T182507Z-3dc637",
+    "reason": "FIXTURE diagnostic confirms disposition9 at target128; changed test to actual original minimum256",
+    "files": {
+      "result.json": "7f63a1eff4e2c31dffaa32294d80d9f7efa3416e19e98d2fcb7ece25f30b255e",
+      "stderr.log": "8dfdcb4187611a4f64bd9c14c31a029ecbcb508119e9be90a0cbbb7eb97775fc"
+    }
+  }
+]

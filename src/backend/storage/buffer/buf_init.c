@@ -18,6 +18,7 @@
 #include "storage/bufmgr.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/dsg_envelope_birth.h"
+#include "storage/dsg_array_root.h"
 #include "storage/dsg_native_birth_wire.h"
 #include "storage/ipc.h"
 #include "storage/proc.h"
@@ -78,6 +79,7 @@ DestroyDynamicBufferRegions(int code, Datum arg)
 {
 	int			i;
 
+	DsgArrayRootRetire();
 	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
 	{
 		if (DynamicBufferMappings[i].state == DSG_ARRAY_MAPPING_TRANSITION)
@@ -136,7 +138,7 @@ DsgBufferDetachInheritedArrays(void)
 }
 
 static void *
-ReserveDynamicBufferArray(DsgBufferArrayId id, Size element_bytes)
+ReserveDynamicBufferArray(DsgBufferArrayId id, Size element_bytes, bool map_only)
 {
 	DsgBufferArray *array = &DSBCtrl->arrays[id];
 	Size		initial_bytes = mul_size(NBuffers, element_bytes);
@@ -160,7 +162,9 @@ ReserveDynamicBufferArray(DsgBufferArrayId id, Size element_bytes)
 		DynamicBufferMappings[id].state = DSG_ARRAY_MAPPING_SHARED;
 	}
 	array->region = DynamicBufferMappings[id].region;
-	result = DsgRegionPopulate(&array->region, 0, initial_bytes);
+	if (map_only)
+		return array->region.address;
+	result = DsgBufferPopulateArray(id, &array->region, 0, initial_bytes, NULL, 30000);
 	if (result.status != DSG_MEMORY_OK)
 	{
 		errno = result.system_errno;
@@ -223,6 +227,9 @@ InitBufferPool(void)
 				foundIOCV = false,
 				foundBufCkpt = false;
 
+	/* 即使static buffer配置，也拒绝显式但不受支持/不完整的Root模式；
+	 * 不能因未进入dynamic分支而静默忽略启用。缺省仍零网络副作用。 */
+	(void) DsgArrayRootEnabled();
 	if (DsgBirthArraysEnabled())
 	{
 		DsgRegion regions[DSG_BUFFER_ARRAY_COUNT];
@@ -255,12 +262,33 @@ InitBufferPool(void)
 		 */
 		on_shmem_exit(DestroyDynamicBufferRegions, (Datum) 0);
 		BufferDescriptors = ReserveDynamicBufferArray(DSG_BUFFER_DESCRIPTORS,
-													  sizeof(BufferDescPadded));
-		BufferBlocks = ReserveDynamicBufferArray(DSG_BUFFER_BLOCKS, BLCKSZ);
+													  sizeof(BufferDescPadded), DsgArrayRootEnabled());
+		BufferBlocks = ReserveDynamicBufferArray(DSG_BUFFER_BLOCKS, BLCKSZ, DsgArrayRootEnabled());
 		BufferIOCVArray = ReserveDynamicBufferArray(DSG_BUFFER_IOCV,
-													sizeof(ConditionVariableMinimallyPadded));
+													sizeof(ConditionVariableMinimallyPadded), DsgArrayRootEnabled());
 		CkptBufferIds = ReserveDynamicBufferArray(DSG_BUFFER_CHECKPOINT,
-												  sizeof(CkptSortItem));
+												  sizeof(CkptSortItem), DsgArrayRootEnabled());
+		if (DsgArrayRootEnabled())
+		{
+			int i;
+			/* 四backing全部存在后才允许Root注册/预触；此前没有数组对象触页。 */
+			DsgArrayRootRegisterAll();
+			for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; ++i)
+			{
+				DsgBufferArray *a = &DSBCtrl->arrays[i];
+				Size initial = mul_size(NBuffers, a->element_bytes);
+				DsgMemoryResult result;
+				a->committed_upper_bytes = TYPEALIGN(a->region.page_bytes, initial);
+				a->allocation_unknown = true;
+				result = DsgBufferPopulateArray((DsgBufferArrayId) i, &a->region, 0, initial, NULL, 30000);
+				if (result.status != DSG_MEMORY_OK)
+				{
+					errno = result.system_errno;
+					ereport(FATAL, (errcode(ERRCODE_OUT_OF_MEMORY), errmsg("DSGA initial Root array populate unknown: %m")));
+				}
+				a->allocation_unknown = false;
+			}
+		}
 		if ((uintptr_t) BufferBlocks % PG_IO_ALIGN_SIZE != 0)
 			ereport(FATAL,
 					(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),

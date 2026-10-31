@@ -1,0 +1,8 @@
+{
+  "PG_source_lock": "/data/neon-build/validation/pg17-array-root-build-20261031T181946Z-995b8e/source-lock.json",
+  "PG_source_lock_sha256": "f3338a340acfa4bc789d5d9a5fc7a5836145ba6888e1e6bb127ce9b39a93110d",
+  "actual_full_image": "sha256:3f9839cc4a38ab25247a34c6e7612bce01da088fbe367228e4adaf58d07079b0",
+  "scope": "DIRECT_ROOT21_COMPATIBILITY_REGRESSION_NEW_ARRAY_MODULE_DEFAULT_OFF_NOT_NEW_ROOT_ARRAY_FUNCTIONAL_EVIDENCE",
+  "new_environment": false,
+  "base": "053d1c3c4f6126a418e05229a1fa1149d3d6cb6d"
+}

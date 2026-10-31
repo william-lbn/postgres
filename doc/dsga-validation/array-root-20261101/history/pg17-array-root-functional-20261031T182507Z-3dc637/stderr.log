@@ -1,0 +1,18 @@
+test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing) ... FAIL
+test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) ... ok
+test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost) ... ok
+test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration) ... ok
+
+======================================================================
+FAIL: test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 162, in test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing
+    fact=pg.resize(target,rev,gen,kind);self.assertIsNotNone(fact['result'],(target,rev,gen,kind,fact));self.assertEqual(fact['result']['phase'],2,fact);self.assertEqual(fact['observed']['high'],target)
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None : (128, 2, 2, 1, {'key': {'hi': '0', 'lo': '2', 'boot': '10524657441117958605', 'epoch': '1', 'revision': '2'}, 'result': None, 'observed': {'hi': '0', 'lo': '1', 'low': 1024, 'boot': '10524657441117958605', 'high': 1024, 'kind': 0, 'epoch': '1', 'phase': 2, 'arrays': [{'hi': '0', 'lo': '0', 'epoch': '0', 'state': 0, 'upper': '65536', 'unknown': False, 'revision': '0', 'generation': '0'}, {'hi': '0', 'lo': '0', 'epoch': '0', 'state': 0, 'upper': '8388608', 'unknown': False, 'revision': '0', 'generation': '0'}, {'hi': '0', 'lo': '0', 'epoch': '0', 'state': 0, 'upper': '16384', 'unknown': False, 'revision': '0', 'generation': '0'}, {'hi': '0', 'lo': '0', 'epoch': '0', 'state': 0, 'upper': '20480', 'unknown': False, 'revision': '0', 'generation': '0'}], 'reason': 0, 'replayed': False, 'revision': '1', 'generation': '2', 'issuer_floor': '1', 'cancel_closed': True, 'cancel_requested': False}, 'has_result': False, 'disposition': 9})
+
+----------------------------------------------------------------------
+Ran 4 tests in 10.078s
+
+FAILED (failures=1)

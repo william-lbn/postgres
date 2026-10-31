@@ -1,0 +1,206 @@
+/*-
+ * dsg_array_root.c -- 四数组固定Root服务注册/预触页；缺省不调用。
+ *
+ * 启用后不回退本地madvise。Root按原Birth/WAL/实际peer及map_files授权，
+ * packet中的M/boot/Key/区间仅为比对值，不得提升预算。响应丢失保未知成本。
+ */
+#include "postgres.h"
+#include <errno.h>
+#include <limits.h>
+#include <poll.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/un.h>
+#include "common/cryptohash.h"
+#ifdef USE_OPENSSL
+#include <openssl/evp.h>
+#endif
+#include "miscadmin.h"
+#include "storage/dsg_array_root.h"
+#include "storage/dsg_envelope_birth.h"
+#include "storage/dsg_native_birth_wire.h"
+
+static bool initialized;
+static bool enabled;
+static bool test_only;
+static bool registered;
+static uint64 mapping_generation;
+static uint64 registered_boot;
+static int original_maximum;
+static int original_startup;
+static uint8 source_sha[32],birth_nonce[32],profile_sha[32];
+static uint8 mapping_nonce[32],registration_nonce[32];
+static DsgRegion regions[DSG_BUFFER_ARRAY_COUNT];
+static Size elements[DSG_BUFFER_ARRAY_COUNT];
+
+static void Put64(uint8 *p,uint64 n){int i;for(i=7;i>=0;--i){p[i]=(uint8)n;n>>=8;}}
+static void Put32(uint8 *p,uint32 n){p[0]=n>>24;p[1]=n>>16;p[2]=n>>8;p[3]=n;}
+static uint64 Get64(const uint8 *p){uint64 n=0;int i;for(i=0;i<8;++i)n=(n<<8)|p[i];return n;}
+static uint32 Get32(const uint8 *p){return ((uint32)p[0]<<24)|((uint32)p[1]<<16)|((uint32)p[2]<<8)|p[3];}
+static bool Zero(const uint8 *p,Size n){Size i;for(i=0;i<n;++i)if(p[i])return false;return true;}
+static int64 NowMS(void){struct timespec t;if(clock_gettime(CLOCK_MONOTONIC,&t)!=0)elog(FATAL,"DSGA Root monotonic clock unavailable");return (int64)t.tv_sec*1000+t.tv_nsec/1000000;}
+static bool WaitSocket(int fd,short events,int64 deadline)
+{
+ struct pollfd p;int n;int64 left;
+ p.fd=fd;p.events=events;p.revents=0;
+ for(;;){
+  if(IsUnderPostmaster)CHECK_FOR_INTERRUPTS();
+  left=deadline-NowMS();if(left<=0){errno=ETIMEDOUT;return false;}
+  n=poll(&p,1,(int)Min(left,(int64)INT_MAX));
+  if(n<0 && errno==EINTR)continue;
+  if(n<=0){if(n==0)errno=ETIMEDOUT;return false;}
+  if(p.revents&events)return true;
+  errno=ECONNRESET;return false;
+ }
+}
+
+bool DsgArrayRootEnabled(void)
+{
+ const char *mode;
+ DsgNativeBirthWireSnapshot birth;
+ if(initialized)return enabled;
+ initialized=true;mode=getenv(DSG_ARRAY_ROOT_PROFILE_ENV);
+ if(mode==NULL)return false;
+ if(strcmp(mode,"test-v1")!=0 && strcmp(mode,"root-v1")!=0)
+  elog(FATAL,"DSGA array Root profile is unsupported");
+ if(!DsgBirthArraysEnabled())elog(FATAL,"DSGA array Root requires original early reservations");
+ test_only=strcmp(mode,"test-v1")==0;
+ DsgNativeBirthWireGetSnapshot(&birth);
+ if(test_only){
+  /* 仅显式原生fixture；生产launcher删除caller全部NEON_DSGA_*，不得当原Source。 */
+  memset(source_sha,0x11,32);memset(birth_nonce,0x22,32);memset(profile_sha,0x33,32);
+ }else{
+  if(!birth.root_enrolled_non_authorizing || !birth.final_audit_released_non_authorizing ||
+   Zero(birth.source_sha256,32)||Zero(birth.nonce,32)||Zero(birth.profile_sha256,32))
+   elog(FATAL,"DSGA array Root lacks original native birth final gate");
+  memcpy(source_sha,birth.source_sha256,32);memcpy(birth_nonce,birth.nonce,32);memcpy(profile_sha,birth.profile_sha256,32);
+ }
+ enabled=true;return true;
+}
+
+static void BuildRequest(uint8 raw[DSG_ARRAY_ROOT_REQUEST_BYTES],uint32 op,int array,
+ Size offset,Size bytes,const DsgBufferResizeRequest *request)
+{
+ int i;
+ MemSet(raw,0,DSG_ARRAY_ROOT_REQUEST_BYTES);memcpy(raw,"NDSGARR1",8);
+ Put32(raw+8,1);Put32(raw+12,op);Put64(raw+16,registered_boot);
+ Put64(raw+24,request?request->expected_generation:pg_atomic_read_u64(&DSBCtrl->generation));
+ Put64(raw+32,original_maximum);Put64(raw+40,original_startup);
+ if(request){
+  Put64(raw+48,request->issuer_epoch);Put64(raw+56,request->revision);
+  Put64(raw+64,request->operation_id_high);Put64(raw+72,request->operation_id_low);
+  memcpy(raw+240,request->context_hash,32);Put64(raw+464,request->target_buffers);
+ }
+ Put64(raw+80,array);Put64(raw+88,offset);Put64(raw+96,bytes);Put64(raw+104,mapping_generation);
+ memcpy(raw+112,source_sha,32);memcpy(raw+144,birth_nonce,32);memcpy(raw+176,profile_sha,32);memcpy(raw+208,mapping_nonce,32);
+ for(i=0;i<DSG_BUFFER_ARRAY_COUNT;++i){uint8 *p=raw+272+i*40;Put64(p,(uint64)(uintptr_t)regions[i].address);Put64(p+8,regions[i].maximum_bytes);Put64(p+16,regions[i].mapped_bytes);Put64(p+24,elements[i]);Put64(p+32,regions[i].page_bytes);}
+ if(op!=1)memcpy(raw+432,registration_nonce,32);
+ Put64(raw+472,GetHighNBuffers());
+}
+
+/* 固定短连接，不继承跨fork共享的回复流；PG不接收ancillary/导入FD。
+ * Root自行打开原map_files，不能把任意客户端传来的FD当数组身份。
+ * resizeX可以贯穿此调用，但accessX/status spin不得持有；Root不得SQL回调。
+ */
+static bool Exchange(const uint8 request[DSG_ARRAY_ROOT_REQUEST_BYTES],uint8 reply[DSG_ARRAY_ROOT_REPLY_BYTES],int remaining_ms)
+{
+ volatile int fd=-1;
+ bool success=false;
+ int64 deadline=NowMS()+Min(Max(remaining_ms,1),30000);
+ struct sockaddr_un address;
+ struct stat st;
+ uint8 digest[32];
+ /* 初次InitBufferPool的PM尚无CurrentResourceOwner。OpenSSL的PG wrapper
+  * 会无条件ResourceOwnerEnlarge(NULL)，不能在此阶段调用。一次性EVP接口
+  * 自行释放内部ctx；非OpenSSL fallback本来只用MemoryContext，不依赖owner。 */
+#ifdef USE_OPENSSL
+ unsigned int digest_length=0;
+ if(EVP_Digest(request,DSG_ARRAY_ROOT_REQUEST_BYTES,digest,&digest_length,EVP_sha256(),NULL)!=1 || digest_length!=sizeof(digest)){errno=EIO;return false;}
+#else
+ pg_cryptohash_ctx *hash;
+ hash=pg_cryptohash_create(PG_SHA256);
+ if(hash==NULL || pg_cryptohash_init(hash)<0 || pg_cryptohash_update(hash,request,DSG_ARRAY_ROOT_REQUEST_BYTES)<0 || pg_cryptohash_final(hash,digest,sizeof(digest))<0){if(hash)pg_cryptohash_free(hash);errno=EIO;return false;}
+ pg_cryptohash_free(hash);
+#endif
+ if(lstat("/run/neon-dsga",&st)!=0 || !S_ISDIR(st.st_mode)||st.st_uid!=0||(st.st_mode&0022)!=0){errno=EPERM;return false;}
+ if(lstat(DSG_ARRAY_ROOT_SOCKET,&st)!=0 || !S_ISSOCK(st.st_mode)||st.st_uid!=0){errno=EPERM;return false;}
+ MemSet(&address,0,sizeof(address));address.sun_family=AF_UNIX;strlcpy(address.sun_path,DSG_ARRAY_ROOT_SOCKET,sizeof(address.sun_path));
+ fd=socket(AF_UNIX,SOCK_SEQPACKET|SOCK_CLOEXEC|SOCK_NONBLOCK,0);if(fd<0)return false;
+ PG_TRY();
+ {
+  int e=0;socklen_t length=sizeof(e);struct ucred peer;socklen_t peer_length=sizeof(peer);ssize_t n;
+  if(connect(fd,(struct sockaddr*)&address,sizeof(address))!=0 && errno!=EINPROGRESS && errno!=EAGAIN)goto done;
+  if(!WaitSocket(fd,POLLOUT,deadline))goto done;
+  if(getsockopt(fd,SOL_SOCKET,SO_ERROR,&e,&length)!=0 || length!=sizeof(e)||e!=0){if(e)errno=e;goto done;}
+  if(getsockopt(fd,SOL_SOCKET,SO_PEERCRED,&peer,&peer_length)!=0 || peer_length!=sizeof(peer)||peer.uid!=0||peer.pid<=1){errno=EPERM;goto done;}
+  /* 单次原语义发送；任何短写/错误都不重发，未知不能洗成NoEffect。 */
+  n=send(fd,request,DSG_ARRAY_ROOT_REQUEST_BYTES,MSG_NOSIGNAL);
+  if(n!=DSG_ARRAY_ROOT_REQUEST_BYTES){if(n>=0)errno=EIO;goto done;}
+  for(;;){
+   if(!WaitSocket(fd,POLLIN,deadline))goto done;
+   n=recv(fd,reply,DSG_ARRAY_ROOT_REPLY_BYTES,MSG_TRUNC);
+   if(n<0 && (errno==EAGAIN||errno==EINTR))continue;
+   break;
+  }
+  if(n!=DSG_ARRAY_ROOT_REPLY_BYTES || memcmp(reply,"NDSGARA1",8)!=0 || Get32(reply+8)!=1 || Get32(reply+20)!=0 || memcmp(reply+40,digest,32)!=0 || Get64(reply+104)==0 || Get64(reply+112)!=mapping_generation || Get64(reply+120)!=0 || !Zero(reply+128,32)) {errno=EPROTO;goto done;}
+  if(Get32(reply+12)!=0){e=(int)Get32(reply+16);errno=e>0&&e<4096?e:EIO;goto done;}
+  if(Get32(reply+16)!=0 || Zero(reply+72,32)){errno=EPROTO;goto done;}
+  if(Get32(request+12)!=1 && memcmp(reply+72,registration_nonce,32)!=0){errno=EPROTO;goto done;}
+  success=true;
+ done:;
+ }
+ PG_FINALLY();
+ {
+  int saved=errno;close(fd);errno=saved;
+ }
+ PG_END_TRY();
+ return success;
+}
+
+void DsgArrayRootRegisterAll(void)
+{
+ int i;uint8 request[DSG_ARRAY_ROOT_REQUEST_BYTES],reply[DSG_ARRAY_ROOT_REPLY_BYTES];
+ if(!DsgArrayRootEnabled())return;
+ if(IsUnderPostmaster || DSBCtrl==NULL || registered || mapping_generation==PG_UINT64_MAX)
+  elog(FATAL,"DSGA array Root registration lifetime differs");
+ ++mapping_generation;registered_boot=DSBCtrl->boot_id;original_maximum=DSBCtrl->maximum;original_startup=NBuffers;
+ if(!pg_strong_random(mapping_nonce,32)||Zero(mapping_nonce,32))elog(FATAL,"DSGA array mapping nonce unavailable");
+ MemSet(registration_nonce,0,32);
+ for(i=0;i<DSG_BUFFER_ARRAY_COUNT;++i){regions[i]=DSBCtrl->arrays[i].region;elements[i]=DSBCtrl->arrays[i].element_bytes;if(regions[i].address==NULL || elements[i]==0 || regions[i].mapped_bytes==0)elog(FATAL,"DSGA array registration precedes complete mappings");}
+ BuildRequest(request,1,0,0,0,NULL);
+ if(!Exchange(request,reply,30000)||Get64(reply+24)!=0||Get64(reply+32)!=0)
+  ereport(FATAL,(errcode(ERRCODE_OUT_OF_MEMORY),errmsg("DSGA array Root registration unknown: %m")));
+ memcpy(registration_nonce,reply+72,32);registered=true;
+}
+
+DsgMemoryResult DsgBufferPopulateArray(DsgBufferArrayId id,DsgRegion *region,Size offset,Size bytes,const DsgBufferResizeRequest *operation,int remaining_ms)
+{
+ DsgMemoryResult result;Size start,end;uint8 request[DSG_ARRAY_ROOT_REQUEST_BYTES],reply[DSG_ARRAY_ROOT_REPLY_BYTES];
+ if(!DsgArrayRootEnabled())return DsgRegionPopulate(region,offset,bytes);
+ MemSet(&result,0,sizeof(result));result.requested_offset=offset;result.requested_bytes=bytes;
+ result.status=DSG_MEMORY_FAILED;result.allocation_may_be_partial=true;
+ if(!registered || DSBCtrl==NULL || registered_boot!=DSBCtrl->boot_id || id<0 || id>=DSG_BUFFER_ARRAY_COUNT || region==NULL || region->address!=regions[id].address || region->maximum_bytes!=regions[id].maximum_bytes || region->mapped_bytes!=regions[id].mapped_bytes || region->page_bytes!=regions[id].page_bytes || offset>region->maximum_bytes || bytes>region->maximum_bytes-offset){result.system_errno=EPERM;return result;}
+ if(bytes==0){result.status=DSG_MEMORY_NOOP;result.allocation_may_be_partial=false;return result;}
+ start=TYPEALIGN_DOWN(region->page_bytes,offset);end=TYPEALIGN(region->page_bytes,offset+bytes);
+ BuildRequest(request,2,id,start,end-start,operation);
+ if(!Exchange(request,reply,remaining_ms)){result.system_errno=errno;return result;}
+ if(Get64(reply+24)!=start||Get64(reply+32)!=end-start){result.system_errno=EPROTO;return result;}
+ result.status=DSG_MEMORY_OK;result.affected_offset=start;result.affected_bytes=end-start;result.allocation_may_be_partial=false;return result;
+}
+
+/* 仅PM全旧共享子进程退出后的Destroy回调调用。logger Park不调用本函数。
+ * op3只是Root封闭旧代进入RETIRING；Root必须继续持旧FD，直到独立看见新
+ * inode全量注册或原PM真实退出才能退FD/结算，不能凭本ACK记物理释放。
+ * 失败不继续Rearm复用身份；Root仍保原FD/代次/未知费用，不能因PM清表记零。 */
+void DsgArrayRootRetire(void)
+{
+ uint8 request[DSG_ARRAY_ROOT_REQUEST_BYTES],reply[DSG_ARRAY_ROOT_REPLY_BYTES];
+ if(!DsgArrayRootEnabled()||!registered)return;
+ if(IsUnderPostmaster || DSBCtrl==NULL || DSBCtrl->boot_id!=registered_boot)elog(FATAL,"DSGA array Root retire outside original PM lifetime");
+ BuildRequest(request,3,0,0,0,NULL);
+ if(!Exchange(request,reply,30000)||Get64(reply+24)!=0||Get64(reply+32)!=0)
+  elog(FATAL,"DSGA array Root retirement unknown");
+ registered=false;MemSet(registration_nonce,0,32);
+}

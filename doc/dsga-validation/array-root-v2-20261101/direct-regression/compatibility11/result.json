@@ -1,0 +1,68 @@
+{
+  "passed": false,
+  "expectedRoots": 11,
+  "testsRun": 11,
+  "tests": [
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_001_default_disabled_real_pg",
+      "result": "PASS",
+      "seconds": 2.2686964700114913
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_002_configuration_cannot_drift",
+      "result": "PASS",
+      "seconds": 1.5711942249909043
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r",
+      "result": "FAIL",
+      "detail": "Traceback (most recent call last):\n  File \"/evidence/test_early_arrays.py\", line 218, in test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r\n    self.assertIsNotNone(new);self.assertNotEqual(new['boot_id'],old['boot_id'])\n    ^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: unexpectedly None\n"
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_004_extension_and_native_acl",
+      "result": "PASS",
+      "seconds": 2.188216651993571
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+      "result": "PASS",
+      "seconds": 0.0782637939992128
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_002_no_nnp_cannot_enable",
+      "result": "PASS",
+      "seconds": 0.004284360999008641
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_001_actual_syscall_boundaries_and_threads",
+      "result": "PASS",
+      "seconds": 1.7997442399937427
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_002_real_logger_and_internal_recovery",
+      "result": "PASS",
+      "seconds": 7.869620519995806
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_003_actual_extension_acl_and_definer",
+      "result": "PASS",
+      "seconds": 4.684980869991705
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_004_ready_edge_failures_reaped",
+      "result": "PASS",
+      "seconds": 12.154232383996714
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_U_FILTER_001_explicit_mode_and_missing_r_fail",
+      "result": "PASS",
+      "seconds": 1.8659993709879927
+    }
+  ],
+  "scope": "DEFAULT_OFF_AND_TEST_V1_COMPATIBILITY_NOT_NORMAL",
+  "sourceSHA256": {
+    "test_early_arrays.py": "f23b43d6be6a21d829a3d01b83461a1572e065c6d79e136a1457efef0ecd0ee1",
+    "test_filter.py": "27c1f376a23b9dfed030f1b53868b7f47eb6579f294887f362a99a0fd4797ef8"
+  },
+  "postgresSHA256": "2ae266f7dd0f042d64a53a15b3198187f57f557d1972d8b2a72b4f3629a30763"
+}

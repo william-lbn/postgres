@@ -12,6 +12,7 @@
 #include "portability/instr_time.h"
 #include "storage/buf_internals.h"
 #include "storage/dynamic_shared_buffers.h"
+#include "storage/dsg_array_root.h"
 #include "storage/ipc.h"
 #include "utils/injection_point.h"
 #include "utils/wait_event.h"
@@ -272,7 +273,16 @@ DsgGrowPrepareAndPublish(const DsgBufferGrowRequest *request,
 			array->committed_upper_bytes = Max(previous_upper, upper);
 			array->allocation_unknown = true;
 			SpinLockRelease(&DSBCtrl->status_lock);
-			result = DsgRegionPopulate(&array->region, start, end - start);
+			{
+				instr_time now;
+				double elapsed;
+				int remaining;
+				INSTR_TIME_SET_CURRENT(now);
+				INSTR_TIME_SUBTRACT(now, started);
+				elapsed = INSTR_TIME_GET_MILLISEC(now);
+				remaining = elapsed >= timeout_ms ? 1 : timeout_ms - (int) elapsed;
+				result = DsgBufferPopulateArray((DsgBufferArrayId) i, &array->region, start, end - start, request, remaining);
+			}
 			if (result.status != DSG_MEMORY_OK)
 			{
 				DsgGrowDeny(DSG_REASON_POPULATE_FAILED);

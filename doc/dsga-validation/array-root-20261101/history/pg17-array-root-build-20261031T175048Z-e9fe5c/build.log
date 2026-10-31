@@ -1,0 +1,25 @@
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/Dockerfile: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/README.txt: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/actual-image-source-and-elf.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/artifact-manifest.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/build-command.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/build-exit.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/catalog.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/cohort-exits.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/compatibility11-command.sh: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/compatibility11-result.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/image.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-binary.sha256: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-command.sh: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-compiler.txt: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-inside.sh: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-observations.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-probe.c: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-result.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/mechanism13-runner.py: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/old-home-node-allowed-observations.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/prior-readonly-role-review.json: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/root9-command.sh: No such file or directory
+sha256sum: doc/dsga-validation/filter-numa-deny-20261031/root9-result.json: No such file or directory
+sha256sum: WARNING: 23 listed files could not be read
+sha256sum: WARNING: 2 computed checksums did NOT match

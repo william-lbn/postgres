@@ -1,0 +1,20 @@
+[
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-build-20261031T185222Z-934e03",
+    "reason": "superseded before native test: broad text anchor placed explicit-mode check in logger detach; immediate source inspection moved it into InitBufferPool, current compiled source is37ab5c",
+    "files": {
+      "result.json": "2c3c8133d6f047374c1995cb688cc0f6e8939ef1674183be0b55efeb8a9fb2d0",
+      "source-lock.json": "166a77232edfb77f402a46317e8e2b93fc62c9ec8cbb6f90c431ef99be6568e9",
+      "superseded-before-test.json": "02e40603ff01f309a5032b341ff16dad65eec8b7dfd805ae137b8220c046a6e3"
+    }
+  },
+  {
+    "path": "/data/neon-build/validation/pg17-array-root-functional-20261031T190403Z-6f8ea4",
+    "reason": "real PG reinit fsync took longer than existing15s under parallel overlay IO; diagnostic used unset new variable; new fixture initializes it and boundedtmpfs avoids Host overlay IO; timeout assertion not widened",
+    "files": {
+      "result.json": "3b724134d26543142cda85513d897ca8eacfd150e5fd3b207273a8de942d4a10",
+      "stderr.log": "0f19285d708d49cc56e6563a4e5b016e6edf6cc727ea4575f18b72275762f68c",
+      "source-lock.json": "7ad98e80484fb29821ea0fd583f32c46ce9186cb7ed7329cd0e806cef9e5252b"
+    }
+  }
+]

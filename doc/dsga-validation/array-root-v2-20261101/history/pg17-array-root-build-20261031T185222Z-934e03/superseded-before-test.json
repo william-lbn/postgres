@@ -1,0 +1,1 @@
+{"reason":"early enable check was initially inserted in logger detach by broad anchor, caught by immediate source inspection; correctly moved to InitBufferPool before new final build; no native result is reused","tested_or_certified":false}

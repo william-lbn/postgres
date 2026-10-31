@@ -1,0 +1,71 @@
+test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing) ... ERROR
+test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) ... 
+  test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) (fault='bad_digest') ... FAIL
+  test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) (fault='startup_drop') ... FAIL
+test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost) ... ERROR
+test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration) ... ERROR
+
+======================================================================
+ERROR: test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 157, in test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing
+    root,pg=self.fixture();pg.start();pg.functions();root.assert_clean()
+                           ^^^^^^^^^^
+  File "/test/test_array_root.py", line 140, in start
+    if check:raise RuntimeError(f'actual PG exit={self.process.returncode}; '+self.logs()[-9000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: actual PG exit=1; 2026-10-31 18:21:33.348 GMT [21] FATAL:  DSGA array Root registration unknown: Operation not permitted
+2026-10-31 18:21:33.348 GMT [21] LOG:  database system is shut down
+
+
+======================================================================
+ERROR: test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 173, in test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost
+    root,pg=self.fixture('grow_drop');pg.start();pg.functions();before=pg.state();fact=pg.resize(1024,1,1)
+                                      ^^^^^^^^^^
+  File "/test/test_array_root.py", line 140, in start
+    if check:raise RuntimeError(f'actual PG exit={self.process.returncode}; '+self.logs()[-9000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: actual PG exit=1; 2026-10-31 18:21:36.550 GMT [71] FATAL:  DSGA array Root registration unknown: Operation not permitted
+2026-10-31 18:21:36.551 GMT [71] LOG:  database system is shut down
+
+
+======================================================================
+ERROR: test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 178, in test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration
+    root,pg=self.fixture();pg.start();pg.functions();peer=pg.peer();logger=pg.logger();old=pg.state()['boot']
+                           ^^^^^^^^^^
+  File "/test/test_array_root.py", line 140, in start
+    if check:raise RuntimeError(f'actual PG exit={self.process.returncode}; '+self.logs()[-9000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: actual PG exit=1; 2026-10-31 18:21:37.496 GMT [88] FATAL:  DSGA array Root registration unknown: Operation not permitted
+2026-10-31 18:21:37.496 GMT [88] LOG:  database system is shut down
+
+
+======================================================================
+FAIL: test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) (fault='bad_digest')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 170, in test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed
+    self.assertFalse(pg.start(check=False));self.assertNotEqual(pg.process.returncode,0);self.assertIn('Root',pg.logs());self.assertTrue(root.fault_used);root.assert_clean()
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) (fault='startup_drop')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 170, in test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed
+    self.assertFalse(pg.start(check=False));self.assertNotEqual(pg.process.returncode,0);self.assertIn('Root',pg.logs());self.assertTrue(root.fault_used);root.assert_clean()
+                                                                                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 4 tests in 5.018s
+
+FAILED (failures=2, errors=3)

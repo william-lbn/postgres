@@ -6,6 +6,7 @@ backend_sources += files(
   'bufmgr.c',
   'dynamic_shared_buffers.c',
   'dsg_buffer_grow.c',
+  'dsg_array_root.c',
   'dsg_buffer_control.c',
   'dsg_buffer_shrink.c',
   'dsg_work.c',

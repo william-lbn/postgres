@@ -1,0 +1,14 @@
+{
+  "unit": "neon-pg17-array-root-build-20261031t181946z-995b8e",
+  "nonce": "20261031T181946Z-995b8e",
+  "source_count": 7221,
+  "source_lock_sha256": "f3338a340acfa4bc789d5d9a5fc7a5836145ba6888e1e6bb127ce9b39a93110d",
+  "PGbase": "053d1c3c4f6126a418e05229a1fa1149d3d6cb6d",
+  "Docker_hard_limits": {
+    "cpus": 4,
+    "memory": "5g",
+    "memory_swap": "5g"
+  },
+  "source_path": "/data/neon-build/src/neon/vendor/postgres-v17",
+  "compiled_new_module_default_off_not_production_qualified": true
+}

@@ -18,6 +18,7 @@ OBJS = \
 	bufmgr.o \
 	dynamic_shared_buffers.o \
 	dsg_buffer_grow.o \
+	dsg_array_root.o \
 	dsg_buffer_control.o \
 	dsg_buffer_shrink.o \
 	dsg_work.o \

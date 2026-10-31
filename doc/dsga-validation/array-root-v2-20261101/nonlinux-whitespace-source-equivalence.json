@@ -1,0 +1,10 @@
+{
+  "scope": "two indentation-only lines in excluded non-Linux fallback; no Linux behavior change",
+  "before_actual_tested_source_sha256": "600d4fa887c157510943e9f9fd437970c7c0907c90ecfe70f29400abef756a1d",
+  "final_source_sha256": "eb3ac9c925e3618561e243bb0b9392fb7cc11eb21fd2099d8cbd56096d1ce19b",
+  "linux_selected_prefix_byte_identical": true,
+  "linux_selected_prefix_sha256": "567f18ff47705dae77b00b80930cfe07b283ce7053aba6f03db6b6edbbd1029b",
+  "line_count_unchanged": true,
+  "diff": "--- exact-tested-600d\n+++ final-tabs\n@@ -230,8 +230,8 @@\n }\n DsgMemoryResult\n DsgBufferPopulateArray(DsgBufferArrayId id, DsgRegion *region, Size offset,\n-                      Size bytes, const DsgBufferResizeRequest *operation,\n-                      int remaining_ms)\n+\t\t\t\t\t  Size bytes, const DsgBufferResizeRequest *operation,\n+\t\t\t\t\t  int remaining_ms)\n {\n  (void) DsgArrayRootEnabled();\n  return DsgRegionPopulate(region, offset, bytes);\n",
+  "evidence_rule": "37ab5c source receipts remain exact600d, never relabeled as final C hash; native behavior unchanged because same Linux selected source. Final no-RUNPATH formal image will check final actual source again. No Mac build or normal certificate inferred."
+}

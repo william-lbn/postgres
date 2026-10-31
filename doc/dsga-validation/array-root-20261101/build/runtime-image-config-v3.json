@@ -1,0 +1,11 @@
+{
+  "new_image": "sha256:3f9839cc4a38ab25247a34c6e7612bce01da088fbe367228e4adaf58d07079b0",
+  "tag": "neon-test-only/pg17-array-root:995b8e-runtime",
+  "actual_entrypoint": [
+    "/usr/bin/env"
+  ],
+  "actual_cmd": [
+    "bash"
+  ],
+  "source_and_ELF_unchanged": true
+}

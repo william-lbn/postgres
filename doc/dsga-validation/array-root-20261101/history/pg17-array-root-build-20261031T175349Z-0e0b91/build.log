@@ -1,0 +1,11 @@
+ccache: error: Failed to create temporary file for /home/nonroot/.cache/ccache/tmp/cpp_stdout.tmp.sGpvSs.i: Permission denied
+ccache: error: Failed to create temporary file for /home/nonroot/.cache/ccache/tmp/cpp_stdout.tmp.dT7fc6.i: Permission denied
+ccache: error: Failed to create temporary file for /home/nonroot/.cache/ccache/tmp/cpp_stdout.tmp.nfL0GK.i: Permission denied
+make[4]: *** [<builtin>: dsg_array_root.o] Error 1
+make[4]: *** Waiting for unfinished jobs....
+make[4]: *** [<builtin>: dsg_buffer_grow.o] Error 1
+make[4]: *** [<builtin>: buf_init.o] Error 1
+make[3]: *** [/home/nonroot//vendor/postgres-v17/src/backend/common.mk:37: buffer-recursive] Error 2
+make[2]: *** [/home/nonroot//vendor/postgres-v17/src/backend/common.mk:37: storage-recursive] Error 2
+make[1]: *** [Makefile:42: all-backend-recurse] Error 2
+make: *** [GNUmakefile:11: all-src-recurse] Error 2

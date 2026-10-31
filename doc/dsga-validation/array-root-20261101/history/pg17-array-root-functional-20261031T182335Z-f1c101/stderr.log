@@ -1,0 +1,18 @@
+test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing) ... ERROR
+test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) ... ok
+test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost) ... ok
+test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration) ... ok
+
+======================================================================
+ERROR: test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 162, in test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing
+    fact=pg.resize(target,rev,gen,kind);self.assertEqual(fact['result']['phase'],2,fact);self.assertEqual(fact['observed']['high'],target)
+                                                         ~~~~~~~~~~~~~~^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable
+
+----------------------------------------------------------------------
+Ran 4 tests in 9.959s
+
+FAILED (errors=1)

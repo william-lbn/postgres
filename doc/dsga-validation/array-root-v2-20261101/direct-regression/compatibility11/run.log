@@ -1,0 +1,25 @@
+test_PG17_S_BIRTH_001_default_disabled_real_pg (test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_001_default_disabled_real_pg) ... ok
+test_PG17_S_BIRTH_002_configuration_cannot_drift (test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_002_configuration_cannot_drift) ... ok
+test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r (test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r) ... FAIL
+test_PG17_S_BIRTH_004_extension_and_native_acl (test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_004_extension_and_native_acl) ... ok
+test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as (test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as) ... ok
+test_PG17_U_BIRTH_002_no_nnp_cannot_enable (test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_002_no_nnp_cannot_enable) ... ok
+test_PG17_S_FILTER_001_actual_syscall_boundaries_and_threads (test_filter.Filter.test_PG17_S_FILTER_001_actual_syscall_boundaries_and_threads) ... ok
+test_PG17_S_FILTER_002_real_logger_and_internal_recovery (test_filter.Filter.test_PG17_S_FILTER_002_real_logger_and_internal_recovery) ... ok
+test_PG17_S_FILTER_003_actual_extension_acl_and_definer (test_filter.Filter.test_PG17_S_FILTER_003_actual_extension_acl_and_definer) ... ok
+test_PG17_S_FILTER_004_ready_edge_failures_reaped (test_filter.Filter.test_PG17_S_FILTER_004_ready_edge_failures_reaped) ... ok
+test_PG17_U_FILTER_001_explicit_mode_and_missing_r_fail (test_filter.Filter.test_PG17_U_FILTER_001_explicit_mode_and_missing_r_fail) ... ok
+
+======================================================================
+FAIL: test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r (test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/evidence/test_early_arrays.py", line 218, in test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r
+    self.assertIsNotNone(new);self.assertNotEqual(new['boot_id'],old['boot_id'])
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 11 tests in 62.903s
+
+FAILED (failures=1)

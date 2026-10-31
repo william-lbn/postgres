@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "expectedRoots": 11,
+  "testsRun": 11,
+  "tests": [
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_001_default_disabled_real_pg",
+      "result": "PASS",
+      "seconds": 1.194460500992136
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_002_configuration_cannot_drift",
+      "result": "PASS",
+      "seconds": 1.8437791900068987
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r",
+      "result": "PASS",
+      "seconds": 2.9735451269953046
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_004_extension_and_native_acl",
+      "result": "PASS",
+      "seconds": 1.4365415899956133
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+      "result": "PASS",
+      "seconds": 0.07665973900293466
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_002_no_nnp_cannot_enable",
+      "result": "PASS",
+      "seconds": 0.0031844080076552927
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_001_actual_syscall_boundaries_and_threads",
+      "result": "PASS",
+      "seconds": 1.3370346309966408
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_002_real_logger_and_internal_recovery",
+      "result": "PASS",
+      "seconds": 5.768253518996062
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_003_actual_extension_acl_and_definer",
+      "result": "PASS",
+      "seconds": 3.381367883994244
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_004_ready_edge_failures_reaped",
+      "result": "PASS",
+      "seconds": 11.999942327995086
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_U_FILTER_001_explicit_mode_and_missing_r_fail",
+      "result": "PASS",
+      "seconds": 2.580060885011335
+    }
+  ],
+  "scope": "DEFAULT_OFF_AND_TEST_V1_COMPATIBILITY_NOT_NORMAL",
+  "sourceSHA256": {
+    "test_early_arrays.py": "f23b43d6be6a21d829a3d01b83461a1572e065c6d79e136a1457efef0ecd0ee1",
+    "test_filter.py": "27c1f376a23b9dfed030f1b53868b7f47eb6579f294887f362a99a0fd4797ef8"
+  },
+  "postgresSHA256": "a078b1fe6bb8f19cb4a06a674dea61f79cf70374556d53ea7ff742819c7fda33"
+}

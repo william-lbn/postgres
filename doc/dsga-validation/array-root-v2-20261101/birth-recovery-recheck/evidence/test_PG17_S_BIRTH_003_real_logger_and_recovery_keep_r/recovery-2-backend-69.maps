@@ -1,0 +1,75 @@
+6502c828e000-6502ca2d4000 r--p 00000000 00:9a 8390408                    /home/nonroot/pg_install/v17/bin/postgres
+6502ca2d4000-6502caa0c000 r-xp 02045000 00:9a 8390408                    /home/nonroot/pg_install/v17/bin/postgres
+6502caa0c000-6502caa40000 r--p 0277c000 00:9a 8390408                    /home/nonroot/pg_install/v17/bin/postgres
+6502caa40000-6502caa5b000 rw-p 027af000 00:9a 8390408                    /home/nonroot/pg_install/v17/bin/postgres
+6502caa5b000-6502caa95000 rw-p 00000000 00:00 0 
+6502d1b88000-6502d1c32000 rw-p 00000000 00:00 0                          [heap]
+6502d1c32000-6502d1cb4000 rw-p 00000000 00:00 0                          [heap]
+72a1269a8000-72a126a6a000 rw-p 00000000 00:00 0 
+72a126a6a000-72a126b6a000 rw-s 00000000 00:b1 16                         /dev/shm/PostgreSQL.2745624788
+72a126b6a000-72a127000000 rw-s 00000000 00:01 1609                       /dev/zero (deleted)
+72a127000000-72a12b000000 rw-s 00000000 00:01 1612                       /dev/zero (deleted)
+72a12b022000-72a12b043000 rw-p 00000000 00:00 0 
+72a12b043000-72a12b046000 rw-s 00000000 00:b1 15                         /dev/shm/PostgreSQL.3835232156
+72a12b046000-72a12b04b000 r--p 00000000 00:9a 8391293                    /home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so
+72a12b04b000-72a12b053000 r-xp 00005000 00:9a 8391293                    /home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so
+72a12b053000-72a12b059000 r--p 0000d000 00:9a 8391293                    /home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so
+72a12b059000-72a12b05a000 r--p 00012000 00:9a 8391293                    /home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so
+72a12b05a000-72a12b05b000 rw-p 00013000 00:9a 8391293                    /home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so
+72a12b05b000-72a12b062000 r--s 00000000 00:9a 5252736                    /usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache
+72a12b062000-72a12b0b9000 r--p 00000000 00:9a 5252434                    /usr/lib/locale/C.utf8/LC_CTYPE
+72a12b0b9000-72a12b0e1000 rw-s 00000000 00:01 1614                       /dev/zero (deleted)
+72a12b0e1000-72a12b101000 rw-s 00000000 00:01 1613                       /dev/zero (deleted)
+72a12b101000-72a12b181000 rw-s 00000000 00:01 1611                       /dev/zero (deleted)
+72a12b181000-72a12b185000 rw-p 00000000 00:00 0 
+72a12b185000-72a12b1ab000 r--p 00000000 00:9a 5252894                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72a12b1ab000-72a12b301000 r-xp 00026000 00:9a 5252894                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72a12b301000-72a12b354000 r--p 0017c000 00:9a 5252894                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72a12b354000-72a12b358000 r--p 001cf000 00:9a 5252894                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72a12b358000-72a12b35a000 rw-p 001d3000 00:9a 5252894                    /usr/lib/x86_64-linux-gnu/libc.so.6
+72a12b35a000-72a12b367000 rw-p 00000000 00:00 0 
+72a12b367000-72a12b36a000 r--p 00000000 00:9a 5252941                    /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+72a12b36a000-72a12b381000 r-xp 00003000 00:9a 5252941                    /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+72a12b381000-72a12b385000 r--p 0001a000 00:9a 5252941                    /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+72a12b385000-72a12b386000 r--p 0001d000 00:9a 5252941                    /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+72a12b386000-72a12b387000 rw-p 0001e000 00:9a 5252941                    /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+72a12b387000-72a12b389000 rw-p 00000000 00:00 0 
+72a12b389000-72a12b422000 r--p 00000000 00:9a 5253109                    /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30
+72a12b422000-72a12b523000 r-xp 00099000 00:9a 5253109                    /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30
+72a12b523000-72a12b592000 r--p 0019a000 00:9a 5253109                    /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30
+72a12b592000-72a12b59d000 r--p 00209000 00:9a 5253109                    /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30
+72a12b59d000-72a12b5a0000 rw-p 00214000 00:9a 5253109                    /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30
+72a12b5a0000-72a12b5a3000 rw-p 00000000 00:00 0 
+72a12b5a3000-72a12b5b3000 r--p 00000000 00:9a 5253014                    /usr/lib/x86_64-linux-gnu/libm.so.6
+72a12b5b3000-72a12b627000 r-xp 00010000 00:9a 5253014                    /usr/lib/x86_64-linux-gnu/libm.so.6
+72a12b627000-72a12b681000 r--p 00084000 00:9a 5253014                    /usr/lib/x86_64-linux-gnu/libm.so.6
+72a12b681000-72a12b682000 r--p 000dd000 00:9a 5253014                    /usr/lib/x86_64-linux-gnu/libm.so.6
+72a12b682000-72a12b683000 rw-p 000de000 00:9a 5253014                    /usr/lib/x86_64-linux-gnu/libm.so.6
+72a12b683000-72a12b686000 r--p 00000000 00:9a 5245040                    /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
+72a12b686000-72a12b699000 r-xp 00003000 00:9a 5245040                    /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
+72a12b699000-72a12b6a0000 r--p 00016000 00:9a 5245040                    /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
+72a12b6a0000-72a12b6a1000 r--p 0001c000 00:9a 5245040                    /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
+72a12b6a1000-72a12b6a2000 rw-p 0001d000 00:9a 5245040                    /usr/lib/x86_64-linux-gnu/libz.so.1.2.13
+72a12b6a2000-72a12b767000 r--p 00000000 00:9a 5252908                    /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+72a12b767000-72a12b9e6000 r-xp 000c5000 00:9a 5252908                    /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+72a12b9e6000-72a12bac4000 r--p 00344000 00:9a 5252908                    /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+72a12bac4000-72a12bb26000 r--p 00421000 00:9a 5252908                    /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+72a12bb26000-72a12bb29000 rw-p 00483000 00:9a 5252908                    /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+72a12bb29000-72a12bb2c000 rw-p 00000000 00:00 0 
+72a12bb2c000-72a12bb4b000 r--p 00000000 00:9a 5253107                    /usr/lib/x86_64-linux-gnu/libssl.so.3
+72a12bb4b000-72a12bba8000 r-xp 0001f000 00:9a 5253107                    /usr/lib/x86_64-linux-gnu/libssl.so.3
+72a12bba8000-72a12bbc7000 r--p 0007c000 00:9a 5253107                    /usr/lib/x86_64-linux-gnu/libssl.so.3
+72a12bbc7000-72a12bbd1000 r--p 0009a000 00:9a 5253107                    /usr/lib/x86_64-linux-gnu/libssl.so.3
+72a12bbd1000-72a12bbd5000 rw-p 000a4000 00:9a 5253107                    /usr/lib/x86_64-linux-gnu/libssl.so.3
+72a12bbd6000-72a12bbd7000 rw-s 00000000 00:01 7                          /SYSV00000004 (deleted)
+72a12bbd7000-72a12bbd8000 rw-s 00000000 00:01 1602                       /dev/zero (deleted)
+72a12bbd8000-72a12bbda000 rw-p 00000000 00:00 0 
+72a12bbda000-72a12bbdb000 r--p 00000000 00:9a 5252765                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72a12bbdb000-72a12bc01000 r-xp 00001000 00:9a 5252765                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72a12bc01000-72a12bc0b000 r--p 00027000 00:9a 5252765                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72a12bc0b000-72a12bc0d000 r--p 00031000 00:9a 5252765                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+72a12bc0d000-72a12bc0f000 rw-p 00033000 00:9a 5252765                    /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+7ffd8edf0000-7ffd8ee11000 rw-p 00000000 00:00 0                          [stack]
+7ffd8ee79000-7ffd8ee7d000 r--p 00000000 00:00 0                          [vvar]
+7ffd8ee7d000-7ffd8ee7f000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]

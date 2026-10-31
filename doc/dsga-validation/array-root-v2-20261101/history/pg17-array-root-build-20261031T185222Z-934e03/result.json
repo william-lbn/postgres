@@ -1,0 +1,14 @@
+{
+  "build_exit": 0,
+  "seconds": 121.76035120600136,
+  "actual_limits": {
+    "cpus": 4,
+    "memory": "5g",
+    "memory_swap": "5g",
+    "pids": 512
+  },
+  "base_image": "127.0.0.1:5001/neon/pg17-native-filter@sha256:7e602e1cd6f958a78caae91df93545919cb6de124d65db035550ef06d8cdf30b",
+  "image_commit_exit": 0,
+  "image": "sha256:13ffc80f3e1b972d9594d924de30e2a81dc72f1cb68569c143a400e1cc884a7b",
+  "tag": "neon-test-only/pg17-array-root:934e03"
+}

@@ -1,0 +1,18 @@
+test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing) ... ok
+test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed) ... ok
+test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost) ... ok
+test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration) ... ERROR
+
+======================================================================
+ERROR: test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration (__main__.ArrayRootNative.test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/test/test_array_root.py", line 189, in test_PG17_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration
+    self.assertNotEqual(new,old);old=new
+                        ^^^
+UnboundLocalError: cannot access local variable 'new' where it is not associated with a value
+
+----------------------------------------------------------------------
+Ran 4 tests in 38.121s
+
+FAILED (errors=1)

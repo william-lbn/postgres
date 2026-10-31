@@ -1,0 +1,22 @@
+{
+  "image": "sha256:03eb8233c39de4fd838873095b6d8bf21f92769eb51dd60cf3328b8a3dc6072c",
+  "PG_HEAD": "053d1c3c4f6126a418e05229a1fa1149d3d6cb6d",
+  "test_inputs": [
+    {
+      "path": "src/test/modules/test_dsg_region/t/test_array_root.py",
+      "sha256": "7e87d4d52e2e64709f383d21341995d9e676c126f33e5c796a18311dec4d7277"
+    },
+    {
+      "path": "src/test/modules/test_dsg_region/t/test_early_arrays.py",
+      "sha256": "f23b43d6be6a21d829a3d01b83461a1572e065c6d79e136a1457efef0ecd0ee1"
+    }
+  ],
+  "scope": "TEST_ONLY real map_files+PG; fixture Root source, not Root normal authorization",
+  "resources": {
+    "cpus": 4,
+    "memory": "5g",
+    "memory_swap": "5g",
+    "pids_limit": 512
+  },
+  "prior_native21": "pg17-array-root-native21-20261031T181208Z-8a046c"
+}

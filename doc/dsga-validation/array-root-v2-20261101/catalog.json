@@ -1,0 +1,28 @@
+{
+  "new_S_roots": 4,
+  "same_stable_ids": [
+    "PG17-S-ARRAY-ROOT-001",
+    "PG17-S-ARRAY-ROOT-002",
+    "PG17-S-ARRAY-ROOT-003",
+    "PG17-S-ARRAY-ROOT-004"
+  ],
+  "E": 0,
+  "new_U": 0,
+  "direct_regression_roots": 21,
+  "cohorts": {
+    "Root9": "native21-6911e3:9PASS",
+    "compatibility11": "native21-6911e3:10PASS+S_BIRTH003 real fsync deadline FAIL, preserved; same unmodified original S_BIRTH003 passed in047460 boundedtmpfs, no extra root counted",
+    "mechanism": "native21-6911e3:1root13casePASS",
+    "new4": "d96127:4PASS/zeroSkip"
+  },
+  "fixture_fs": "ephemeral512MiB /tmp tmpfs, PG fsync remains enabled, original15s assertions unchanged; NOT physical-disk durability/power-loss validation",
+  "Root_authorization_source": "TEST_ONLY Root fixture, not production original Birth/Key/Node budget",
+  "unrun": [
+    "production Root registry activation+server+helper+StartCAS issuer joint chain",
+    "normal decrease",
+    "realPG369KVM",
+    "PG18",
+    "K8s",
+    "nonLinux fullbuild"
+  ]
+}

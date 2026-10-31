@@ -1,0 +1,34 @@
+{
+  "PGbase": "053d1c3c4f6126a418e05229a1fa1149d3d6cb6d",
+  "branch": "codex/dsga-pg17-v3-20261019",
+  "owned": {
+    "src/backend/storage/buffer/dsg_array_root.c": "d898a00b09079c440c2de16b29c4903d58ff033415ed781348693869743fbb2b",
+    "src/include/storage/dsg_array_root.h": "d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445",
+    "src/backend/storage/buffer/Makefile": "baa0d787d8411c0773d56a2c1ac62bdda84135620fa68e72e1db551c57550a04",
+    "src/backend/storage/buffer/meson.build": "dd357a014aa5a42bda5e8e5992269dbcc00e11e81ea0463662335b671b64e1c2",
+    "src/backend/storage/buffer/buf_init.c": "163b6623f0bb5eaa14fd4c85ab2c87f551b210d230cdcefe5ac8b36e6b94b340",
+    "src/backend/storage/buffer/dsg_buffer_grow.c": "809595650a07731ea103b2c084f1fed173f875d7dcd2fd811d8f2f5c462699a2",
+    "src/test/modules/test_dsg_region/t/test_array_root.py": "f7a6c850032a10cfeddc494466daa2c59447d880493e22f617ad7fce111fec69"
+  },
+  "compiled_input_count": 7221,
+  "build_source_lock_sha256": "f3338a340acfa4bc789d5d9a5fc7a5836145ba6888e1e6bb127ce9b39a93110d",
+  "actual_installed_binary_hashes": "a078b1fe6bb8f19cb4a06a674dea61f79cf70374556d53ea7ff742819c7fda33  /home/nonroot/pg_install/v17/bin/postgres\n00b967d942b53adad84c86e9205a98ac0a35f5fd4e958ae12231f5ad09b9ad23  /home/nonroot/pg_install/v17/lib/postgresql/test_dsg_region.so\n",
+  "test_image": {
+    "new_image": "sha256:3f9839cc4a38ab25247a34c6e7612bce01da088fbe367228e4adaf58d07079b0",
+    "tag": "neon-test-only/pg17-array-root:995b8e-runtime",
+    "actual_entrypoint": [
+      "/usr/bin/env"
+    ],
+    "actual_cmd": [
+      "bash"
+    ],
+    "source_and_ELF_unchanged": true
+  },
+  "source_from_Linux_GitHub_checkout_only": true,
+  "Mac_business_copy": false,
+  "default_mode": "disabled",
+  "public_Buffer_API": 6,
+  "public_Work_API": 2,
+  "root_mode": "requires original native final gate; missing real Root service fails closed",
+  "E_passed": 0
+}

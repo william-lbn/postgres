@@ -1,0 +1,47 @@
+PG17 数组 Root v2 独立只读审查（2026-11-01）
+审查者：helm_scope_review，非本批作者。结论：限定本组件与准确下列证据组合，未发现阻断提交的问题。没有执行构建/业务测试、修改业务源码、Git index、提交或推送；额外只在禁网只读低资源容器运行sha256sum读取已存在镜像。
+
+1. 冻结及来源
+Linux repo /data/neon-build/src/neon/vendor/postgres-v17，base053d1c3c4f6126a418e05229a1fa1149d3d6cb6d。
+stage-paths.txt SHA308057099a4a2229014a8a3aff6aa7dbc0679877c31894cd29185e2d29a6700e：144项，144唯一。
+joint-artifact-manifest.json SHA26069ac436eac025066daffb426cb4d62d373dfdb9b44ff07adc250fe6916842：143受hash文件全部与当前Linux文件相同；自身明确不自hash。当前7源全部等于freeze和v2 source snapshots。
+src/backend/storage/buffer/dsg_array_root.c 600d4fa887c157510943e9f9fd437970c7c0907c90ecfe70f29400abef756a1d
+src/include/storage/dsg_array_root.h d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445
+src/backend/storage/buffer/Makefile baa0d787d8411c0773d56a2c1ac62bdda84135620fa68e72e1db551c57550a04
+src/backend/storage/buffer/meson.build dd357a014aa5a42bda5e8e5992269dbcc00e11e81ea0463662335b671b64e1c2
+src/backend/storage/buffer/buf_init.c e6989fce13c38d2cc5bdef5e9e2f3e17301eecb0b6482bc4c8f52fffafee1d2f
+src/backend/storage/buffer/dsg_buffer_grow.c 809595650a07731ea103b2c084f1fed173f875d7dcd2fd811d8f2f5c462699a2
+src/test/modules/test_dsg_region/t/test_array_root.py 7e87d4d52e2e64709f383d21341995d9e676c126f33e5c796a18311dec4d7277
+
+2. 实际构建与产物
+37ab5c/7221输入，实际source-check有且仅7221条OK，无非OK；source.exitcode/build_exit/image_commit_exit均0。GNU12.2，4CPU/5GiB/零额外swap，145.711901秒。
+source-lock SHAff13be979995763f5437f619817c6fea84372edab9ac192e0a50649e64d66c32（六生产overlay）。新test_array_root.py不在本次编译镜像源集合；实际测试用外部挂载的7e87脚本，不能称其已编入镜像。
+build image b5ad306d5caec15316540507aa742de5a796002ef7eba4657c9aa0d4d67543f9；仅调整EntryPoint/Cmd的runtime image03eb8233c39de4fd838873095b6d8bf21f92769eb51dd60cf3328b8a3dc6072c。实际inspect为/usr/bin/env、bash。
+独立禁网只读sha256sum重算runtime镜像内六生产源（真实路径/home/nonroot/vendor/postgres-v17），全部与上列当前冻结相同。
+独立镜像内PG ELF2ae266f7dd0f042d64a53a15b3198187f57f557d1972d8b2a72b4f3629a30763；扩展00b967d942b53adad84c86e9205a98ac0a35f5fd4e958ae12231f5ad09b9ad23。均等于实际build收据。
+第一次只读源码hash查询误用/workspace/neon/vendor路径，rc1（两二进制hash已读出，六源路径不存在）；读取真实build.sh后改为原/home/nonroot/vendor路径，rc0。该读取错误不是业务测试或构建失败，也未补写/更改镜像。
+
+3. 代码边界
+完整读新C/H及buf_init/grow/build接入diff、测试201行；新旧C差异仅Linux实现的#ifdef保护和非Linux默认关闭stub。Linux具体协议未被该guard改变。!Linux时仅包含通用postgres/header；缺省DsgBufferPopulateArray走原Provider，显式任何该profile值FATAL。没有声称非Linux全构建已跑。
+InitBufferPool232行明确前置DsgArrayRootEnabled，即static配置也不静默吞显式不完整Root请求；无环境profile默认false，未引入网络调用。M/N0仍经原early birth/check gate，不移除旧约束。
+四backing全部完成才RegisterAll，然后逐数组先置保守committed_upper和allocation_unknown，Root回复完整匹配后才清unknown；不预先本地populate。Grow原resizeX贯穿，status spin在RPC前释放，accessX不贯穿；未知失败不推进H/generation且保成本。Root服务不能SQL回调仍是后续生产执行者合同。
+Register/populate固定/run/neon-dsga/array-populate.sock短seqpacket连接、root SO_PEERCRED、精确512B/160B、request SHA/nonce/generation/geometry核验，无重发或本地fallback。PG不导入客户端/回复FD；实际Root registry必须独立从原peer/map_files取身份，不把request字段本身当授权。
+Destroy只在PM共享子进程退出后的原清理回调调用Retire；logger Park路径不调用全局Retire。op3明确RETIRING意图，不证明物理释放；Root须保旧FD直到完整新四inode注册或原PM真实退出。ACK不能清账。失败FATAL、不继续Rearm复用不确定身份。
+v2 test唯一逻辑变化是先new=None再原15秒循环，新增明确非None断言；没有放宽恢复deadline。
+
+4. 准确测试组合，不转签旧产物
+d96127：runtime03eb+PG2ae266+test_array_root7e87+early_arrays f23b43d6be6a21d829a3d01b83461a1572e065c6d79e136a1457efef0ecd0ee1。4个稳定新S根全部PASS，原始stderr Ran4/OK/零skip，outer exit0，12.812242秒（unittest4.149秒）；仅计4个稳定根。
+001 真实四anonymous shmem inode/完整map_files几何；Root真实MADV_POPULATE_WRITE；256→1024→256→768 SQL数据完整。
+002 坏request摘要回复和丢初始populate回复均启动失败，无本地fallback。
+003 Root真实预触后丢grow回复，H/generation不变，至少一数组unknown真且保原upper；raw event确实标actual_populated+dropped_reply。
+004 logger死亡不发送全局op3；真实三次共享内存恢复，每代四新inode；事件op序列为初始1+四2，继以三轮3→1+四2，Root失败列表空。fixture在完整新inode核完之前保旧FD，不凭op3关旧FD。
+6911e3：同runtime03eb/PG2ae266，Root9全PASS，compatibility11真实10PASS+S_BIRTH003 FAIL（原15秒内未完成恢复），mechanism13为一个root/13case PASS。原FAIL不能改称该整批全绿。
+047460：相同未改early_arrays f23b、相同PG2ae266/runtime03eb，只对旧S_BIRTH003单根在512MiB/tmp tmpfs重跑，真实PASS，outer0/4.391827秒；原日志Ran1/OK/零skip。因此本组件最终直接回归覆盖是Root9+compat10+mechanism1+同旧S3重跑1=21稳定旧根；没有新增第22根，也没有转签旧a078 ELF。
+旧array-root-20261101的source7/ELF a078/旧运行仍严格历史；joint把它们作为历史文件hash保存，不称当前源证据。
+
+5. 适用范围与历史
+新4S和旧S3都使用原15秒断言；PG fsync保持启用，但/tmp512MiB tmpfs是隔离IO干扰的协议fixture，不是物理磁盘fsync、断电恢复或真实Root WAL耐久认证。
+旧ENV/CurrentResourceOwner导致SIGSEGV/socket名/下限夹具/中间锚点/实际超时失败都在archive中保留；不将其抹为PASS。
+一项非阻断元数据陈旧：native-four-arrays/source-lock.json.prior_native21仍写早期8a046c路径；本次不依据该字段认证回归。准确当前回归来源以direct-regression/source-lock.json、catalog及6911e3实际结果为准，三者与03eb/2ae266一致。可由唯一归档者明确标历史或修正指针；不影响实际执行/源码/ELF证明。
+test-v1 Root仍显式TEST_ONLY fixture，使用测试source/nonce，不是原生产Birth/Key/Host预算/签名/WAL/helper。root-v1的原NativeFinal gate未等于生产数组服务已经存在。
+未跑/未授资格：生产Root registry+body签名+WAL/helper真实退出/持久前缀+cap写者屏障、369KVM新PG链、真实PG normal硬降限、磁盘断电耐久、PG18移植、K8s E2E、非Linux全构建。U0新增/E0；不能用本审查或这些S替代最终normal/Source或VM许可。

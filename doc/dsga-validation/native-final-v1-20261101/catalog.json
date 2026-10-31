@@ -1,0 +1,93 @@
+{
+  "new_U": 4,
+  "new_S": 10,
+  "new_total": 14,
+  "direct_prior_roots": 41,
+  "E": 0,
+  "same_stable_ids_across_future_platforms": true,
+  "actual_Host_selected_roots": 55,
+  "actual_Host_results": "55PASS/zeroSkip/outer0/source0/build0",
+  "groups": {
+    "filter5": "1U4S new",
+    "root9": "3U6S new",
+    "birth6": "old6 direct",
+    "new4": "old4 arrays Root direct",
+    "old30": "old30 direct",
+    "uring1": "old1 unprotected io_uring direct"
+  },
+  "cases": [
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_003_actual_extension_acl_and_definer",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_002_no_tracer_and_cont_cannot_release",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_003_same_uid_sigcont_cannot_release",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_004_wrong_tracer_tgid_and_tracer_death",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_005_actual_ack_timeout",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_006_actual_buffer_M_N0_mismatch",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_001_audit_exact_root_geometry",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_002_invalid_original_fields_and_198",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_003_ack_frames_ancillary_and_peer",
+      "result": "PASS"
+    }
+  ],
+  "scope": "actual C kernel/ptrace component only; fixture Root, not production Root Source/WAL/normal",
+  "protected_io_methods": [
+    "sync",
+    "worker"
+  ],
+  "protected_unsupported": [
+    "io_uring"
+  ],
+  "default_off_uring_implementation_preserved_and_directly_regressed": true,
+  "Guest369": "NOT_RUN in this immutable Host archive; future separate evidence not duplicate coverage",
+  "unrun": [
+    "PG18 production Go source policy/real Root issuer/private WAL",
+    "PG18 System/FI/RO ELF release qualification",
+    "true safe normal hard decrease",
+    "Guest369KVM",
+    "multi-version Kubernetes E2E"
+  ]
+}

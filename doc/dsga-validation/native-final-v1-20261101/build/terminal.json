@@ -1,0 +1,20 @@
+{
+  "exit": 0,
+  "phases": {
+    "build": 0,
+    "filter5": 0,
+    "root9": 0,
+    "birth6": 0,
+    "new4": 0,
+    "old30": 0,
+    "uring1": 0
+  },
+  "not_proven": [
+    "production PG18 original Source/private WAL/authorization",
+    "original Root Source registry/budget/WAL",
+    "physical disk durability",
+    "safe normal decrease",
+    "KVM",
+    "K8s E2E"
+  ]
+}

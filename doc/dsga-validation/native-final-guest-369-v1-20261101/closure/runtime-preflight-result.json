@@ -1,0 +1,6 @@
+{
+  "exit": 0,
+  "stdout": "{\"python_runtime_imports\": true, \"uid1000\": \"nonroot\"}\n",
+  "stderr": "",
+  "scope": "chroot runtime dependency preflight only, not Guest kernel/Source test"
+}

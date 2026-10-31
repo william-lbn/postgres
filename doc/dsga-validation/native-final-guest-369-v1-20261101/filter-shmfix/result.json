@@ -1,0 +1,26 @@
+{
+  "status": "PASS_COMPONENT_ONLY",
+  "host_qemu_exit": 0,
+  "Guest_markers": [
+    "0"
+  ],
+  "actual_kvm": {
+    "enabled": true,
+    "present": true
+  },
+  "Guest_roots": {
+    "filter5": {
+      "pass": true,
+      "tests_run": 5,
+      "skip": 0
+    }
+  },
+  "expected_same_stable_roots": 5,
+  "new_coverage_count": 0,
+  "E": 0,
+  "Source_or_normal_qualified": false,
+  "seconds": 24.34061574700172,
+  "errors": [],
+  "console_sha256": "243d61c85e3b2804579a7e7c7082b010753e15be7fb87e65cb84f64fc16a190e",
+  "scope": "actual accurate369 Guest C native component only; same5 filter IDs multi-platform; earlier9 Root Guest receipts retained; no production Source/System/FI/normal"
+}

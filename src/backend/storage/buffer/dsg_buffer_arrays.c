@@ -11,6 +11,9 @@
 #include "storage/dsg_buffer_arrays.h"
 #include "storage/dsg_array_root.h"
 #include "storage/dsg_envelope_birth.h"
+#include "storage/dsg_envelope_filter.h"
+#include "storage/dsg_native_birth_wire.h"
+#include "storage/aio.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/lwlock.h"
@@ -44,6 +47,12 @@ DsgBufferArraysEnabled(void)
  const char *p;
  DsgBirthArraysSnapshot birth;
  uint64 value=0;
+ /* protected profile保原安全uring拒绝；不切换用户配置或裁掉AIO实现。
+  * 即使模式已缓存，恢复时也重新核实际io_method，不能靠旧采样绕过。 */
+#ifdef IOMETHOD_IO_URING_ENABLED
+ if(DsgBirthFilterEnabled() && io_method==IOMETHOD_IO_URING)
+  ereport(FATAL,(errmsg("PG18 protected birth profile does not support io_uring")));
+#endif
  if(mode_read) return mode_enabled;
  mode_read=true;
  raw=getenv(DSG_NATIVE_ARRAYS_ENV);
@@ -127,6 +136,8 @@ DsgBufferArraysInit(void)
  if(DsgBirthArraysEnabled()) {
   DsgRegion original[DSG_BUFFER_ARRAY_COUNT];
   DsgBirthArraysCheckMaximum(maximum_buffers);
+  if(!DsgNativeBirthWireCheckConfiguration(maximum_buffers,NBuffers))
+   elog(FATAL,"PG18 original root birth M/N0 or final audit gate differs");
   if(mappings[0].state==ARRAY_EMPTY) {
    for(i=0;i<DSG_NATIVE_ARRAY_COUNT;i++)
 	if(mappings[i].state!=ARRAY_EMPTY)elog(FATAL,"PG18 mixed early array ownership");

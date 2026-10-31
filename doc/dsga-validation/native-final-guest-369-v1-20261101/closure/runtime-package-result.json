@@ -1,0 +1,5 @@
+{
+  "exit": 0,
+  "stdout": "{\"scope\": \"TEST_ONLY Guest runtime; preserves logical leaf symlink chains; parent usrmerge directories materialized as direct dirs, not production alias/RO Source qualification\", \"file_count\": 625, \"runtime_tar_sha256\": \"4bc3dabe2ab01b3668a4e77f153c8ec4b7c069e14eeebbc0f51237235db56e24\", \"runtime_tar_bytes\": 38676480, \"discovery_sha256\": \"6d5fa3ed2f9b722ea808e96f148cd796ca4ec0c55d4cd9bcd47cc1a164d323e3\"}\n",
+  "stderr": ""
+}

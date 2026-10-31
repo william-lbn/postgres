@@ -1,0 +1,14 @@
+test_PG18_S_ROOTWIRE_001_real_exact_chain_detach (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach) ... ok
+test_PG18_S_ROOTWIRE_002_no_tracer_and_cont_cannot_release (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_002_no_tracer_and_cont_cannot_release) ... ok
+test_PG18_S_ROOTWIRE_003_same_uid_sigcont_cannot_release (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_003_same_uid_sigcont_cannot_release) ... ok
+test_PG18_S_ROOTWIRE_004_wrong_tracer_tgid_and_tracer_death (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_004_wrong_tracer_tgid_and_tracer_death) ... ok
+test_PG18_S_ROOTWIRE_005_actual_ack_timeout (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_005_actual_ack_timeout) ... ok
+test_PG18_S_ROOTWIRE_006_actual_buffer_M_N0_mismatch (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_006_actual_buffer_M_N0_mismatch) ... ok
+test_PG18_U_ROOTWIRE_001_audit_exact_root_geometry (test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_001_audit_exact_root_geometry) ... ok
+test_PG18_U_ROOTWIRE_002_invalid_original_fields_and_198 (test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_002_invalid_original_fields_and_198) ... ok
+test_PG18_U_ROOTWIRE_003_ack_frames_ancillary_and_peer (test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_003_ack_frames_ancillary_and_peer) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 31.929s
+
+OK

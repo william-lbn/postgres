@@ -24,6 +24,15 @@
 #include <sys/wait.h>
 
 PG_MODULE_MAGIC;
+
+void test_dsg_filter_pm_init18(void);
+PGDLLEXPORT void _PG_init(void);
+/* 仅测试模块的原PM preload观察/故障fixture；生产core不读该probe环境。 */
+void
+_PG_init(void)
+{
+	test_dsg_filter_pm_init18();
+}
 PG_FUNCTION_INFO_V1(test_dsg_region18_abi);
 PG_FUNCTION_INFO_V1(test_dsg_region18_run);
 

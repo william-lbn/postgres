@@ -24,3 +24,7 @@ REVOKE ALL ON FUNCTION test_dsg_arrays18_pause_before_unpin(boolean) FROM PUBLIC
 CREATE FUNCTION test_dsg_birth_arrays18() RETURNS text
 AS 'MODULE_PATHNAME','test_dsg_birth_arrays18' LANGUAGE C STRICT;
 REVOKE ALL ON FUNCTION test_dsg_birth_arrays18() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_birth_filter18() RETURNS text AS 'MODULE_PATHNAME','test_dsg_birth_filter18' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_filter_probe18(text) RETURNS text AS 'MODULE_PATHNAME','test_dsg_filter_probe18' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_birth_filter18(),test_dsg_filter_probe18(text) FROM PUBLIC;

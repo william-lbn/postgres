@@ -1,0 +1,127 @@
+{
+  "status": "PASS_COMPONENT_ONLY_SPLIT_EXACT_EVIDENCE",
+  "same_stable_ids": 14,
+  "new_coverage_count": 0,
+  "E": 0,
+  "cases": [
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_002_no_tracer_and_cont_cannot_release",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_003_same_uid_sigcont_cannot_release",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_004_wrong_tracer_tgid_and_tracer_death",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_005_actual_ack_timeout",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_006_actual_buffer_M_N0_mismatch",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_001_audit_exact_root_geometry",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_002_invalid_original_fields_and_198",
+      "result": "PASS"
+    },
+    {
+      "root": "test_root_birth18.RootBirth18.test_PG18_U_ROOTWIRE_003_ack_frames_ancillary_and_peer",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_003_actual_extension_acl_and_definer",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped",
+      "result": "PASS"
+    },
+    {
+      "root": "test_filter18.Filter18.test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail",
+      "result": "PASS"
+    }
+  ],
+  "root9_actual": {
+    "Guest": "/data/neon-build/validation/pg18-native-guest-369-20261031T212059Z-7abd16",
+    "test_result_path": "/data/neon-build/validation/pg18-native-guest-369-20261031T212059Z-7abd16/export/evidence/test-result.json",
+    "actual_pass": true,
+    "roots": 9,
+    "skip": 0,
+    "test_result_sha256": "c1d1186f5c51f2549f7bc2e4ea75984ebbe2a7d231f275399421515c93f6729c",
+    "overall_first_Guest_failure_unchanged": true
+  },
+  "filter5_actual": {
+    "Guest": "/data/neon-build/validation/pg18-native-guest-369-shmfix-20261031T213246Z-9abaad",
+    "test_result_path": "/data/neon-build/validation/pg18-native-guest-369-shmfix-20261031T213246Z-9abaad/export/evidence/filter5/test-result.json",
+    "actual_pass": true,
+    "roots": 5,
+    "skip": 0,
+    "test_result_sha256": "8978e1969bd9bf99be5d31c0b1c73c29a4cc42c8e2d575100ed315d3da293fdc"
+  },
+  "kernel": {
+    "path": "/data/neon-build/validation/normal-split-kernel-20261030T224843Z/export",
+    "hashes": {
+      "vmlinuz": "3693200bb10997988129955750382e586d13eef75e06f46aa3b9f56c6f8833f0",
+      "kernel.config": "11344757b0f979c7fee35e354bd706616c4283deaa67cc30c50747e4bca855be",
+      "kernel-notes.bin": "7cf45ced24c800ec8390fc7f04f07b8dc9e73ac0efa4bf8abd11d8513c8eb828"
+    },
+    "release": "6.12.26-william-normal-split-v1-e210f5e3ee94"
+  },
+  "same_PG_ELF": "65107494edf4b376c3dbe7960247d37d84c96b2e546bd791e3d3aefe5344d530",
+  "same_test_DSO": "3ac1cab277327eb5fe75637d7bb30810d3a2e80c9ca0affbbfdaf1f1e5aa74e1",
+  "source24": {
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "2e792c22155c0ea22c08d5f185a1941c52095264505e913ec50817d2075e29a1",
+    "src/include/storage/dsg_envelope_filter.h": "f54d19b2e193522618e740adfb770fccc471683948401e7eeb4a7a2397ead42e",
+    "src/backend/storage/buffer/dsg_native_birth_wire.c": "a39d91d90fe536a1a1c3199f77905b1be122cbb5363a6f9dde028985ec4afefe",
+    "src/include/storage/dsg_native_birth_wire.h": "9e22682ca423165eda27be010e3cd2b3d3a2ee54e33901dbafd00226456c52ef",
+    "src/backend/storage/buffer/dsg_filter_audit.c": "724d8e3f9fec7a146b3b99ffd6d5f657ae3b4929d3073782a73ad898e8ac3591",
+    "src/include/storage/dsg_filter_audit.h": "d0aa6afa22913e6ce05290a3f3202958186c998c3d7534a179952a5cf8f4c053",
+    "src/backend/main/main.c": "0e7044e41b17957f5e425153d9693176b0fd45ab1f82bdfd097f6e01b79d8378",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "c306e67bfb5780db925a483873a2b0c3c72edc0b3d9acab727b1e9d52692006f",
+    "src/include/storage/dsg_envelope_birth.h": "ccb20e2cf9d143ac8886fd6e6b4ff5ec67e8a0981f773f035bcebbc677e7af2b",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "ca2037e2bcc48b18ddae80d84d292f3e6a284abaff1e1148e67b8bdfeb2a998a",
+    "src/backend/storage/buffer/dsg_array_root.c": "8e637c1d001badea8d6e9e42492d11913192b28d953cb595b640f4649c61a82e",
+    "src/backend/storage/buffer/Makefile": "b8aee7c7d54342810c72e6f558a50f280cd22b8ae7b5a52e2ee1486895a3255c",
+    "src/backend/storage/buffer/meson.build": "030e185c59cf795c8962a10cdbc3922efe45d7c2d84f80247414121d6b2917fb",
+    "src/backend/postmaster/fork_process.c": "c4bbb80c865c56b73ba52c53d439a82bb37ffc339a657483187963baf982fd58",
+    "src/backend/postmaster/launch_backend.c": "460b8a73584e76adc19ef1c6aa831749b0dc916ffef2df297e2f4dbfea2cd7f3",
+    "src/backend/postmaster/postmaster.c": "add6c52b6261bc11aefb4844c52f55ac0aa0b91d43535b39f72d85ce93bf1b26",
+    "src/test/modules/test_dsg_region18/test_dsg_filter18.c": "3f8d66043450b199e5775ead8163f4446f09a068e14b7dd01c281fdde5e01b84",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "ee79a823d3e1367eacc52268fd79c7ac2959e410997a6b764bdfc7855ae3a70e",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "3eaf2a7dd7dac4f699fac648cec6327604cba2f14846c1946f274faa9012bf81",
+    "src/test/modules/test_dsg_region18/Makefile": "578c38064653ec1e60cd0dd9dd43a2f2f1395cb759971e01ad95dff3e944c478",
+    "src/test/modules/test_dsg_region18/meson.build": "59d274dbb8bd6f4c5a98caea824e0a61acd3a0b491b1b9d51290ab67ca99d0f7",
+    "src/test/modules/test_dsg_region18/t/test_birth18.py": "ddc689d45984f33d52cbbf1d100d394085775e59c1fcbc5128ec43b39b2e13da",
+    "src/test/modules/test_dsg_region18/t/test_filter18.py": "0cc43ae9db8e86e2eb87e58991e37b45c30478db5975633509389f51b38a550a",
+    "src/test/modules/test_dsg_region18/t/test_root_birth18.py": "dad2c6f02d7f6f5ff84ff5434e8273df9f85bd00b5cc552332ca25ae7e43fd1f"
+  },
+  "Host_frozen_input_manifest_sha256": "ead31677a15fc76c4959fe7ac9b778234957c9deeb09b464a9ca5551a6efcbee",
+  "Guest_returned_test_source_all_match_frozen": true,
+  "KVM_no_TCG": true,
+  "cpus": 2,
+  "Guest_memory_bytes": 2147483648,
+  "outer_memory_bytes": 4294967296,
+  "network": "none",
+  "all_actual_Guest_artifact_hashes_match": true,
+  "normal_Source_System_FI_qualified": false
+}

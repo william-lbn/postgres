@@ -30,6 +30,7 @@
  */
 
 #include "postgres.h"
+#include "storage/dsg_envelope_filter.h"
 
 #include <unistd.h>
 
@@ -270,6 +271,11 @@ postmaster_child_launch(BackendType child_type, int child_slot,
 			DsgBufferArraysDetachInherited();
 			PGSharedMemoryDetach();
 		}
+
+		/* 非共享先Park弃backing，全部子类（含IO worker）叠真实child策略，
+		 * 再告ready；PID仍待原父进程PMChild登记，不能在此提前清pending。 */
+		DsgBirthFilterInstallChild();
+		DsgBirthFilterChildReady();
 
 		/*
 		 * Enter the Main function with TopMemoryContext.  The startup data is

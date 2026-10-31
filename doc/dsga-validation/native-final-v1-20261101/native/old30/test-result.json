@@ -1,0 +1,140 @@
+{
+  "pass": true,
+  "scope": "TEST_ONLY actual PG18 native component; actual native filter/wire component only; no original Source/WAL/FS/I/normal/VM/K8s qualification",
+  "cohort": "old30",
+  "expected_roots": 30,
+  "tests_run": 30,
+  "skip": 0,
+  "rows": [
+    {
+      "root": "test_region18.Region.test_PG18_S_AIO_001_stock_sync_and_worker_data",
+      "result": "PASS"
+    },
+    {
+      "root": "test_region18.Region.test_PG18_S_REGION_001_true_shared_fork",
+      "result": "PASS"
+    },
+    {
+      "root": "test_region18.Region.test_PG18_S_REGION_002_boundary_and_padding",
+      "result": "PASS"
+    },
+    {
+      "root": "test_region18.Region.test_PG18_S_REGION_003_park_failure_rearm_three_cycles",
+      "result": "PASS"
+    },
+    {
+      "root": "test_region18.Region.test_PG18_S_REGION_004_original_session_acl",
+      "result": "PASS"
+    },
+    {
+      "root": "test_region18.Region.test_PG18_U_ABI_001_actual_native_sizes",
+      "result": "PASS"
+    },
+    {
+      "root": "test_region18.Region.test_PG18_U_REGION_001_invalid_geometry_cleanup",
+      "result": "PASS"
+    },
+    {
+      "root": "test_arrays18.Arrays.test_PG18_S_ARRAYS_001_actual_four_native_arrays",
+      "result": "PASS"
+    },
+    {
+      "root": "test_arrays18.Arrays.test_PG18_S_ARRAYS_002_worker_AIO_data_and_completion",
+      "result": "PASS"
+    },
+    {
+      "root": "test_arrays18.Arrays.test_PG18_S_ARRAYS_003_actual_completion_window_excludes_drain",
+      "result": "PASS"
+    },
+    {
+      "root": "test_arrays18.Arrays.test_PG18_S_ARRAYS_004_original_PM_recovery_three_times",
+      "result": "PASS"
+    },
+    {
+      "root": "test_arrays18.Arrays.test_PG18_S_ARRAYS_005_default_off_and_new_API_ACL",
+      "result": "PASS"
+    },
+    {
+      "root": "test_arrays18.Arrays.test_PG18_S_ARRAYS_006_restarted_logger_drops_actual_inherited_backing",
+      "result": "PASS"
+    },
+    {
+      "root": "test_arrays18.Arrays.test_PG18_U_ARRAYS_001_strict_profile_rejects",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_001_real_grow_dirty_shrink_regrow",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_002_actual_tail_pin_denies_then_retry",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_003_live_worker_read_stream_and_checkpoint",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_004_new_API_original_session_ACL",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_005_real_worker_IO_pin_denies_then_retry",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_006_after_unpin_completion_lease_denies_then_retry",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_007_checkpoint_lease_retains_backing_across_regrow",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_008_original18_eviction_entrypoints_keep_scope",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_S_RESIZE_009_unlogged_sequence_releases_relation_scan_scope",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize18.Resize.test_PG18_U_RESIZE_001_replay_is_historical_not_current",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Failures.test_PG18_S_FAILURE_001_cancel_shrink_restores_L_and_retry",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Failures.test_PG18_S_FAILURE_002_ERROR_after_populate_same_backend_retains_cost",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Failures.test_PG18_S_FAILURE_003_FATAL_backend_releases_locks_without_PM_reinit",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Failures.test_PG18_S_FAILURE_004_SIGKILL_preparing_backend_PM_reinitializes",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Failures.test_PG18_S_FAILURE_005_SIGKILL_PM_cold_recovery_then_new_resize",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Failures.test_PG18_S_FAILURE_006_ERROR_after_H_publish_keeps_commit_and_pending_cost",
+      "result": "PASS"
+    }
+  ],
+  "test_inputs": {
+    "src/test/modules/test_dsg_region18/t/test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+    "src/test/modules/test_dsg_region18/t/test_resize_failures18.py": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+    "src/test/modules/test_dsg_region18/t/test_filter18.py": "0cc43ae9db8e86e2eb87e58991e37b45c30478db5975633509389f51b38a550a",
+    "src/test/modules/test_dsg_region18/t/test_birth18.py": "ddc689d45984f33d52cbbf1d100d394085775e59c1fcbc5128ec43b39b2e13da",
+    "src/test/modules/test_dsg_region18/t/test_resize18.py": "e030a1bb23501375961ae6ec531a3ee52611fe0ea79938209b619206308df37f",
+    "src/test/modules/test_dsg_region18/t/test_region18.py": "d48fb9bc6285c831381008402ed4c2964537cc46e1d380ff9077dce6f7bb4263",
+    "src/test/modules/test_dsg_region18/t/test_array_root18.py": "5bd78e752c462b47262071262b8625b6cbcdb1ecbd6fd2b4704ef67f698f697b",
+    "src/test/modules/test_dsg_region18/t/test_root_birth18.py": "dad2c6f02d7f6f5ff84ff5434e8273df9f85bd00b5cc552332ca25ae7e43fd1f"
+  }
+}

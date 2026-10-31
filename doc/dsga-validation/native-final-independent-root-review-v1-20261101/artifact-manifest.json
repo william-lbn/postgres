@@ -1,0 +1,8 @@
+{
+  "files": {
+    "doc/dsga-validation/native-final-independent-root-review-v1-20261101/README.txt": "b059a0e44ae8764fd3c50efc856346cdc8ee98ff827f0a0a021970e93e0ce479",
+    "doc/dsga-validation/native-final-independent-root-review-v1-20261101/review.json": "c5629121b3e6bff0b609d52b800763d1a76a3c4bcae100d527deb99be6e2572a",
+    "doc/dsga-validation/native-final-independent-root-review-v1-20261101/source24.json": "cb894e69d40aff54dc0c54943b84fe3c9ff454c1b3144f497d59a440d3fffbd5"
+  },
+  "scope": "read-only independent review; no new execution"
+}

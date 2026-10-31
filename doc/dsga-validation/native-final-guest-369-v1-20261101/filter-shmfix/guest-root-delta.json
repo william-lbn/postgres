@@ -1,0 +1,11 @@
+{
+  "old_root_manifest_sha256": "737caee551e4f94b36ed3fb312658c592e09c91217b48373800682951868b700",
+  "new_root_manifest_sha256": "7c50d32c2dd89d38bd95fa4a5da7cc73e5b3068e759f2a9d21ea860e2aef3b40",
+  "only_changed_files": [
+    "fixture/runner.py",
+    "init"
+  ],
+  "production24_source_unchanged": true,
+  "all_test_methods_unchanged": true,
+  "scope": "mount/output paths only; not production Source closure"
+}

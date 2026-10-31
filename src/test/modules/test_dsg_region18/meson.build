@@ -1,5 +1,5 @@
 test_dsg_region18 = shared_module('test_dsg_region18',
-  files('test_dsg_region18.c'),
+  files('test_dsg_region18.c', 'test_dsg_filter18.c'),
   kwargs: pg_test_mod_args,
 )
 test_install_libs += test_dsg_region18

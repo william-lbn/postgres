@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "command": [
+    "mkfs.ext4",
+    "-q",
+    "-F",
+    "-E",
+    "lazy_itable_init=0,lazy_journal_init=0",
+    "-d",
+    "/data/neon-build/validation/pg18-native-guest-369-shmfix-20261031T213246Z-9abaad/root",
+    "/data/neon-build/validation/pg18-native-guest-369-shmfix-20261031T213246Z-9abaad/guest.ext4"
+  ],
+  "stdout": "",
+  "stderr": ""
+}

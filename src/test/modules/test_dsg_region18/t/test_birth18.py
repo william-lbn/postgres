@@ -70,7 +70,7 @@ class Birth18(unittest.TestCase):
             ('test-v1:0','2147483648','DSGA early arrays'),
             ('test-v1:02048','2147483648','DSGA early arrays'),
             ('test-v1:2147483648','2147483648','DSGA early arrays'),
-            ('root-v1:2048','2147483648','PG18 root-v1'),
+            ('root-v1:2048','2147483648','DSGA native birth wire'),
             ('test-v1:2048',None,'DSGA early arrays'),
             ('test-v1:2048','65536','reserved arrays'),
             ('test-v1:2048','0','invalid DSGA'),

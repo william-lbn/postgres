@@ -1,0 +1,10 @@
+test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO (test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO) ... ok
+test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers (test_filter18.Filter18.test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers) ... ok
+test_PG18_S_FILTER_003_actual_extension_acl_and_definer (test_filter18.Filter18.test_PG18_S_FILTER_003_actual_extension_acl_and_definer) ... ok
+test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped (test_filter18.Filter18.test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped) ... ok
+test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail (test_filter18.Filter18.test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 16.997s
+
+OK

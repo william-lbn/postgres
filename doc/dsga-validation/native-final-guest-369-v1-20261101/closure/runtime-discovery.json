@@ -1,0 +1,958 @@
+{
+  "python_version": "3.11.2 (main, Oct  7 2026, 12:35:07) [GCC 12.2.0]",
+  "python_executable": "/usr/bin/python3",
+  "python_realpath": "/usr/bin/python3.11",
+  "stdlib": "/usr/lib/python3.11",
+  "ELF_count": 130,
+  "elfs": [
+    "/opt/pg18/bin/clusterdb",
+    "/opt/pg18/bin/createdb",
+    "/opt/pg18/bin/createuser",
+    "/opt/pg18/bin/dropdb",
+    "/opt/pg18/bin/dropuser",
+    "/opt/pg18/bin/ecpg",
+    "/opt/pg18/bin/initdb",
+    "/opt/pg18/bin/pg_amcheck",
+    "/opt/pg18/bin/pg_archivecleanup",
+    "/opt/pg18/bin/pg_basebackup",
+    "/opt/pg18/bin/pg_checksums",
+    "/opt/pg18/bin/pg_combinebackup",
+    "/opt/pg18/bin/pg_config",
+    "/opt/pg18/bin/pg_controldata",
+    "/opt/pg18/bin/pg_createsubscriber",
+    "/opt/pg18/bin/pg_ctl",
+    "/opt/pg18/bin/pg_dump",
+    "/opt/pg18/bin/pg_dumpall",
+    "/opt/pg18/bin/pg_isready",
+    "/opt/pg18/bin/pg_receivewal",
+    "/opt/pg18/bin/pg_recvlogical",
+    "/opt/pg18/bin/pg_resetwal",
+    "/opt/pg18/bin/pg_restore",
+    "/opt/pg18/bin/pg_rewind",
+    "/opt/pg18/bin/pg_test_fsync",
+    "/opt/pg18/bin/pg_test_timing",
+    "/opt/pg18/bin/pg_upgrade",
+    "/opt/pg18/bin/pg_verifybackup",
+    "/opt/pg18/bin/pg_waldump",
+    "/opt/pg18/bin/pg_walsummary",
+    "/opt/pg18/bin/pgbench",
+    "/opt/pg18/bin/postgres",
+    "/opt/pg18/bin/psql",
+    "/opt/pg18/bin/reindexdb",
+    "/opt/pg18/bin/vacuumdb",
+    "/opt/pg18/lib/libecpg.so",
+    "/opt/pg18/lib/libecpg.so.6",
+    "/opt/pg18/lib/libecpg.so.6.18",
+    "/opt/pg18/lib/libecpg_compat.so",
+    "/opt/pg18/lib/libecpg_compat.so.3",
+    "/opt/pg18/lib/libecpg_compat.so.3.18",
+    "/opt/pg18/lib/libpgtypes.so",
+    "/opt/pg18/lib/libpgtypes.so.3",
+    "/opt/pg18/lib/libpgtypes.so.3.18",
+    "/opt/pg18/lib/libpq.so",
+    "/opt/pg18/lib/libpq.so.5",
+    "/opt/pg18/lib/libpq.so.5.18",
+    "/opt/pg18/lib/postgresql/cyrillic_and_mic.so",
+    "/opt/pg18/lib/postgresql/dict_snowball.so",
+    "/opt/pg18/lib/postgresql/euc2004_sjis2004.so",
+    "/opt/pg18/lib/postgresql/euc_cn_and_mic.so",
+    "/opt/pg18/lib/postgresql/euc_jp_and_sjis.so",
+    "/opt/pg18/lib/postgresql/euc_kr_and_mic.so",
+    "/opt/pg18/lib/postgresql/euc_tw_and_big5.so",
+    "/opt/pg18/lib/postgresql/injection_points.so",
+    "/opt/pg18/lib/postgresql/latin2_and_win1250.so",
+    "/opt/pg18/lib/postgresql/latin_and_mic.so",
+    "/opt/pg18/lib/postgresql/libpqwalreceiver.so",
+    "/opt/pg18/lib/postgresql/pg_buffercache.so",
+    "/opt/pg18/lib/postgresql/pgoutput.so",
+    "/opt/pg18/lib/postgresql/pgxs/src/test/isolation/isolationtester",
+    "/opt/pg18/lib/postgresql/pgxs/src/test/isolation/pg_isolation_regress",
+    "/opt/pg18/lib/postgresql/pgxs/src/test/regress/pg_regress",
+    "/opt/pg18/lib/postgresql/plpgsql.so",
+    "/opt/pg18/lib/postgresql/test_aio.so",
+    "/opt/pg18/lib/postgresql/test_dsg_region18.so",
+    "/opt/pg18/lib/postgresql/utf8_and_big5.so",
+    "/opt/pg18/lib/postgresql/utf8_and_cyrillic.so",
+    "/opt/pg18/lib/postgresql/utf8_and_euc2004.so",
+    "/opt/pg18/lib/postgresql/utf8_and_euc_cn.so",
+    "/opt/pg18/lib/postgresql/utf8_and_euc_jp.so",
+    "/opt/pg18/lib/postgresql/utf8_and_euc_kr.so",
+    "/opt/pg18/lib/postgresql/utf8_and_euc_tw.so",
+    "/opt/pg18/lib/postgresql/utf8_and_gb18030.so",
+    "/opt/pg18/lib/postgresql/utf8_and_gbk.so",
+    "/opt/pg18/lib/postgresql/utf8_and_iso8859.so",
+    "/opt/pg18/lib/postgresql/utf8_and_iso8859_1.so",
+    "/opt/pg18/lib/postgresql/utf8_and_johab.so",
+    "/opt/pg18/lib/postgresql/utf8_and_sjis.so",
+    "/opt/pg18/lib/postgresql/utf8_and_sjis2004.so",
+    "/opt/pg18/lib/postgresql/utf8_and_uhc.so",
+    "/opt/pg18/lib/postgresql/utf8_and_win.so",
+    "/usr/bin/python3",
+    "/usr/bin/python3.11",
+    "/usr/lib/python3.11/lib-dynload/_asyncio.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_bz2.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_codecs_cn.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_codecs_hk.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_codecs_iso2022.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_codecs_jp.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_codecs_kr.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_codecs_tw.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_contextvars.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_crypt.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_ctypes.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_ctypes_test.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_curses.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_curses_panel.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_dbm.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_decimal.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_hashlib.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_json.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_lsprof.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_lzma.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_multibytecodec.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_multiprocessing.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_posixshmem.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_queue.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_sqlite3.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_ssl.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_testbuffer.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_testcapi.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_testclinic.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_testimportmultiple.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_testinternalcapi.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_testmultiphase.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_typing.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_uuid.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_xxsubinterpreters.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_xxtestfuzz.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/_zoneinfo.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/audioop.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/mmap.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/nis.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/ossaudiodev.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/readline.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/resource.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/termios.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/xxlimited.cpython-311-x86_64-linux-gnu.so",
+    "/usr/lib/python3.11/lib-dynload/xxlimited_35.cpython-311-x86_64-linux-gnu.so"
+  ],
+  "dependencies": [
+    "/lib/x86_64-linux-gnu/libbz2.so.1.0",
+    "/lib/x86_64-linux-gnu/libc.so.6",
+    "/lib/x86_64-linux-gnu/libcom_err.so.2",
+    "/lib/x86_64-linux-gnu/libcrypt.so.1",
+    "/lib/x86_64-linux-gnu/libcrypto.so.3",
+    "/lib/x86_64-linux-gnu/libdb-5.3.so",
+    "/lib/x86_64-linux-gnu/libexpat.so.1",
+    "/lib/x86_64-linux-gnu/libffi.so.8",
+    "/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/lib/x86_64-linux-gnu/libgssapi_krb5.so.2",
+    "/lib/x86_64-linux-gnu/libk5crypto.so.3",
+    "/lib/x86_64-linux-gnu/libkeyutils.so.1",
+    "/lib/x86_64-linux-gnu/libkrb5.so.3",
+    "/lib/x86_64-linux-gnu/libkrb5support.so.0",
+    "/lib/x86_64-linux-gnu/liblzma.so.5",
+    "/lib/x86_64-linux-gnu/libm.so.6",
+    "/lib/x86_64-linux-gnu/libncursesw.so.6",
+    "/lib/x86_64-linux-gnu/libnsl.so.2",
+    "/lib/x86_64-linux-gnu/libpanelw.so.6",
+    "/lib/x86_64-linux-gnu/libreadline.so.8",
+    "/lib/x86_64-linux-gnu/libresolv.so.2",
+    "/lib/x86_64-linux-gnu/libsqlite3.so.0",
+    "/lib/x86_64-linux-gnu/libssl.so.3",
+    "/lib/x86_64-linux-gnu/libstdc++.so.6",
+    "/lib/x86_64-linux-gnu/libtinfo.so.6",
+    "/lib/x86_64-linux-gnu/libtirpc.so.3",
+    "/lib/x86_64-linux-gnu/liburing.so.2",
+    "/lib/x86_64-linux-gnu/libuuid.so.1",
+    "/lib/x86_64-linux-gnu/libz.so.1",
+    "/lib64/ld-linux-x86-64.so.2",
+    "/opt/pg18/lib/libecpg.so.6",
+    "/opt/pg18/lib/libpgtypes.so.3",
+    "/opt/pg18/lib/libpq.so.5"
+  ],
+  "missing": [],
+  "ldd_raw": [
+    {
+      "elf": "/opt/pg18/bin/clusterdb",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc6b9bd000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007c81e4da1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007c81e4bbc000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007c81e4b13000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007c81e4689000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007c81e45a9000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007c81e4e1b000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/createdb",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff229a0000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x000070191fba3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000070191f9be000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000070191f915000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000070191f48b000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000070191f3ab000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000070191fc1d000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/createuser",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc2bde4000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007bba6f360000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007bba6f17b000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007bba6f0d2000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007bba6ec48000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007bba6eb68000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007bba6f3db000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/dropdb",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff4ff4e000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007e2b6003c000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007e2b5fe57000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007e2b5fdae000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007e2b5f924000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007e2b5f844000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007e2b600b5000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/dropuser",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffec27b2000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000720b11a36000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000720b11851000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000720b117a8000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000720b1131e000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000720b1123e000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000720b11aaf000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/ecpg",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffeab3d0000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000077e9c4cc5000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000077e9c4f88000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/initdb",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffccb7df000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x000075d43c92f000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x000075d43a9e6000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000075d43c84c000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x000075d43c82c000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000075d43a804000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000075d43c98f000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000075d43a75b000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000075d43a2d1000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_amcheck",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff7e584000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000796c91ba6000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000796c919c1000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000796c91918000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000796c9148e000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000796c913ae000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000796c91c28000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_archivecleanup",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe385e6000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000076b1a0e97000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000076b1a108b000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_basebackup",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc7a949000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007f123e4a5000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f123e483000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f123e2a1000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007f123e1f8000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007f123dd6e000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f123dc8c000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f123e535000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_checksums",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffea3f5f000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000073a6f2640000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000073a6f283f000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_combinebackup",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc9efdf000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000079d0a37be000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000079d0a35dc000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000079d0a3c79000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_config",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffedd5c1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000071e60858d000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000071e608781000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_controldata",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd4138d000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007e8babfe5000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007e8bac1dc000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_createsubscriber",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc2598c000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x000076e4140ad000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000076e413fca000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000076e413de8000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000076e413d3f000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000076e4138b5000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000076e41412f000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_ctl",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd711d1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ed515281000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ed51547d000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_dump",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffac952000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000745672d36000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007456728a9000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x000074567288a000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007456726a8000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007456725ff000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000074567251d000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000745672e10000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_dumpall",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffcc9ce000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000787ebf179000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000787ebecec000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x0000787ebeccd000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000787ebeaeb000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000787ebea42000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000787ebe960000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000787ebf21b000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_isready",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffcdb59c000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007cdb628e2000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007cdb626fd000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007cdb62654000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007cdb621ca000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007cdb620ea000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007cdb6295b000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_receivewal",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe581e2000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007728d0e02000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007728d0de0000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007728d0bfe000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007728d0b55000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007728d06cb000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007728d05e9000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007728d0e81000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_recvlogical",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff46583000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007cd3855d7000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007cd3855b5000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007cd3853d3000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007cd38532a000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007cd384ea0000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007cd384dbe000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007cd385654000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_resetwal",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff2ede2000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007d8cbe61a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007d8cbe815000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_restore",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffda89f000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007f91d1067000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007f91d0bda000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f91d0bbb000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f91d09d9000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007f91d0930000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f91d084e000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f91d1105000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_rewind",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd6694a000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000762efbee3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000762efbcfe000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000762efbc55000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000762efb7cb000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000762efb6eb000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000762efbf99000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_test_fsync",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffa6dd4000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007e55faada000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007e55f981e000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007e55fabbf000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_test_timing",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdb9b20000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000722f162b6000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000722f164a9000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_upgrade",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd4a3be000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000760fd34a1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000760fd32bc000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000760fd3213000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000760fd2d89000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000760fd2ca9000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000760fd353d000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_verifybackup",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe020eb000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000792218f7b000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x0000792218f5c000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000792218d7a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000079221942d000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_waldump",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff5cf9a000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000704bc5de6000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000704bc6014000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pg_walsummary",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc0f9cd000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007d0127f49000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007d0128143000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/pgbench",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdd30d1000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000723a4feb1000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000723a4fa24000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000723a4f944000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000723a4f762000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000723a4f6b9000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000723a4ff51000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/postgres",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd60e29000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007f6ad8546000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007f6ad5776000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f6ad8527000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f6ad5696000)\n\tlibstdc++.so.6 => /lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f6ad547c000)\n\tliburing.so.2 => /lib/x86_64-linux-gnu/liburing.so.2 (0x00007f6ad851e000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f6ad84fe000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f6ad529a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f6ad85f4000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/psql",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffffebf3000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x000074b19c429000)\n\tlibreadline.so.8 => /lib/x86_64-linux-gnu/libreadline.so.8 (0x000074b19c3ce000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000074b19c2ee000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074b19c10c000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000074b19c063000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000074b19bbd7000)\n\tlibtinfo.so.6 => /lib/x86_64-linux-gnu/libtinfo.so.6 (0x000074b19bba4000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000074b19c56a000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/reindexdb",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff3013f000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x000074a0706f4000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074a07050f000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000074a070466000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000074a06ffdc000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000074a06fefc000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000074a070771000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/bin/vacuumdb",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd70bdc000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007914e2851000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007914e266c000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007914e25c3000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007914e2139000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007914e2059000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007914e28d0000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libecpg.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffda8dbf000)\n\tlibpgtypes.so.3 => /opt/pg18/lib/libpgtypes.so.3 (0x000073880400d000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000738803faf000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000738803dca000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000738803d21000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000738803897000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007388037b5000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000073880403e000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libecpg.so.6",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd35b47000)\n\tlibpgtypes.so.3 => /opt/pg18/lib/libpgtypes.so.3 (0x0000708edc4c7000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000708edc469000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000708edc284000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000708edc1db000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000708edbd51000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000708edbc6f000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000708edc4f8000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libecpg.so.6.18",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff2d437000)\n\tlibpgtypes.so.3 => /opt/pg18/lib/libpgtypes.so.3 (0x000071f418d88000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x000071f418d2a000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000071f418b45000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000071f418a9c000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000071f418612000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000071f418530000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000071f418db9000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libecpg_compat.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdd6306000)\n\tlibecpg.so.6 => /opt/pg18/lib/libecpg.so.6 (0x000076721435e000)\n\tlibpgtypes.so.3 => /opt/pg18/lib/libpgtypes.so.3 (0x0000767214348000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000767214163000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000767214105000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000767214380000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000076721405c000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000767213bd0000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000767213af0000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libecpg_compat.so.3",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffc0fd3000)\n\tlibecpg.so.6 => /opt/pg18/lib/libecpg.so.6 (0x00007aebcc923000)\n\tlibpgtypes.so.3 => /opt/pg18/lib/libpgtypes.so.3 (0x00007aebcc90d000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007aebcc728000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007aebcc6ca000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007aebcc945000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007aebcc621000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007aebcc195000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007aebcc0b5000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libecpg_compat.so.3.18",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe05371000)\n\tlibecpg.so.6 => /opt/pg18/lib/libecpg.so.6 (0x000079051575c000)\n\tlibpgtypes.so.3 => /opt/pg18/lib/libpgtypes.so.3 (0x0000790515746000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000790515561000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000790515503000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000079051577e000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000079051545a000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000790514fce000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000790514eee000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libpgtypes.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc360e9000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007672fff13000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000767300110000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libpgtypes.so.3",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc4d977000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074624302c000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000746243229000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libpgtypes.so.3.18",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd857ac000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007b2ad1aa6000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007b2ad1ca3000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libpq.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd335d0000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000077b7a78ba000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000077b7a7430000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000077b7a7350000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000077b7a716e000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000077b7a79c6000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libpq.so.5",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffcf6bdc000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000783f6d26a000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000783f6cde0000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000783f6cd00000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000783f6cb1e000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000783f6d376000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/libpq.so.5.18",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffcd01f3000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007a7851573000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007a78510e9000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007a7851009000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007a7850e27000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007a785167f000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/cyrillic_and_mic.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/dict_snowball.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdd7943000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000073ab07c24000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000073ab07ed2000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/euc2004_sjis2004.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/euc_cn_and_mic.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/euc_jp_and_sjis.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/euc_kr_and_mic.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/euc_tw_and_big5.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/injection_points.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe600df000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007886a9b27000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007886a9d16000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/latin2_and_win1250.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/latin_and_mic.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/libpqwalreceiver.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff1154b000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x0000793418f58000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000793418d73000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000793418cca000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000793418840000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000793418760000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000793418fc2000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/pg_buffercache.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd61ffb000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007a260ef9c000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007a260f18a000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/pgoutput.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdbed63000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000790274ab1000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000790274ca3000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/pgxs/src/test/isolation/isolationtester",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffa43b8000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007fa831118000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa830f33000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007fa830e8a000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007fa830a00000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fa830920000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fa831186000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/pgxs/src/test/isolation/pg_isolation_regress",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff7456c000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x000074539f54c000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074539f367000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x000074539f2be000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x000074539ee34000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000074539ed54000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000074539f5c7000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/pgxs/src/test/regress/pg_regress",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdf2b50000)\n\tlibpq.so.5 => /opt/pg18/lib/libpq.so.5 (0x00007c2c7ed71000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007c2c7eb8c000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x00007c2c7eae3000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007c2c7e659000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007c2c7e579000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007c2c7edeb000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/plpgsql.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffff9d6a000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007436b0eb0000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007436b10cc000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/test_aio.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdf89f9000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007cb7ccf84000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007cb7cd172000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/test_dsg_region18.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdc09cb000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000079c60d45d000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000079c60d64e000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_big5.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_cyrillic.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_euc2004.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_euc_cn.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_euc_jp.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_euc_kr.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_euc_tw.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_gb18030.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_gbk.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_iso8859.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffddf7f8000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007b18a640a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007b18a65fb000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_iso8859_1.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_johab.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_sjis.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_sjis2004.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_uhc.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/opt/pg18/lib/postgresql/utf8_and_win.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd64380000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ddbca2a1000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ddbca493000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/bin/python3",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffb9f57000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007ac34705f000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007ac347040000)\n\tlibexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x00007ac347012000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ac346e30000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ac347144000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/bin/python3.11",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd5b3b8000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000077d92ce49000)\n\tlibz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x000077d92ce2a000)\n\tlibexpat.so.1 => /lib/x86_64-linux-gnu/libexpat.so.1 (0x000077d92cdfc000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000077d92cc1a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000077d92cf2e000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_asyncio.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd2db47000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007cb93f91f000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007cb93fb18000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_bz2.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc38ba4000)\n\tlibbz2.so.1.0 => /lib/x86_64-linux-gnu/libbz2.so.1.0 (0x00007f865606d000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f8655e8b000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f865608d000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_codecs_cn.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe5adbd000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000070cd32d7f000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000070cd32f8c000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_codecs_hk.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffbd9f4000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074f55ec00000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000074f55ee0f000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_codecs_iso2022.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd5b3a3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007e92e31c1000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007e92e33b0000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_codecs_jp.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd385f3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000072b3a5f93000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000072b3a61bd000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_codecs_kr.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff45f67000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007780b29fe000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007780b2c09000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_codecs_tw.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc95d0e000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000079b5869c7000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000079b586bcb000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_contextvars.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_crypt.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff4659b000)\n\tlibcrypt.so.1 => /lib/x86_64-linux-gnu/libcrypt.so.1 (0x0000785ddca23000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000785ddc841000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000785ddca69000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_ctypes.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc971d0000)\n\tlibffi.so.8 => /lib/x86_64-linux-gnu/libffi.so.8 (0x00007ccd5cb73000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ccd5c991000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ccd5cba6000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_ctypes_test.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc14ff4000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007763616e1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007763614ff000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007763617cd000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_curses.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd0b590000)\n\tlibncursesw.so.6 => /lib/x86_64-linux-gnu/libncursesw.so.6 (0x00007926eb4eb000)\n\tlibtinfo.so.6 => /lib/x86_64-linux-gnu/libtinfo.so.6 (0x00007926eb4b8000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007926eb2d6000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007926eb548000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_curses_panel.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc897fa000)\n\tlibpanelw.so.6 => /lib/x86_64-linux-gnu/libpanelw.so.6 (0x00007754644c4000)\n\tlibncursesw.so.6 => /lib/x86_64-linux-gnu/libncursesw.so.6 (0x000077546448a000)\n\tlibtinfo.so.6 => /lib/x86_64-linux-gnu/libtinfo.so.6 (0x0000775464457000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000775464275000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007754644d6000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_dbm.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc18e57000)\n\tlibdb-5.3.so => /lib/x86_64-linux-gnu/libdb-5.3.so (0x00007653b5708000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007653b5526000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007653b58d6000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_decimal.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd86bfe000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000077a703925000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000077a703743000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000077a703a57000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_hashlib.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff4adb8000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x00007e5e6463e000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007e5e6445c000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007e5e64ade000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_json.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_lsprof.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_lzma.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc3f1ad000)\n\tliblzma.so.5 => /lib/x86_64-linux-gnu/liblzma.so.5 (0x000071b21bb18000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000071b21b936000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000071b21bb58000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_multibytecodec.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc08fdf000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007410e842a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007410e861e000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_multiprocessing.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc8f153000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007d2dcc95a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007d2dccb48000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_posixshmem.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdf91e6000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000727546bff000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000727546deb000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_queue.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_sqlite3.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff07b74000)\n\tlibsqlite3.so.0 => /lib/x86_64-linux-gnu/libsqlite3.so.0 (0x0000786b29e7e000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000786b29c9c000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x0000786b29bbc000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000786b2a002000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_ssl.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff4fb98000)\n\tlibssl.so.3 => /lib/x86_64-linux-gnu/libssl.so.3 (0x0000744351fea000)\n\tlibcrypto.so.3 => /lib/x86_64-linux-gnu/libcrypto.so.3 (0x0000744351b60000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074435197e000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007443520cd000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_testbuffer.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe6c4e6000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000771d7d660000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000771d7d855000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_testcapi.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd0d1fb000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fa2f0713000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fa2f0922000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_testclinic.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff68dbc000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000769c15b75000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000769c15d6c000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_testimportmultiple.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_testinternalcapi.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe068b9000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5cc1624000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f5cc1812000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_testmultiphase.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_typing.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_uuid.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe50ded000)\n\tlibuuid.so.1 => /lib/x86_64-linux-gnu/libuuid.so.1 (0x0000747636903000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000747636721000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000747636917000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_xxsubinterpreters.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe6ebb7000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007d55802d4000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007d55804c6000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_xxtestfuzz.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff3c1ed000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074aa991bb000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000074aa993a9000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/_zoneinfo.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fffbb7e5000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007b3684d09000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007b3684efc000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/audioop.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffdbc339000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x000075a8e0a09000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000075a8e0827000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000075a8e0afd000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/mmap.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffd56181000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007ee86b09a000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007ee86b28a000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/nis.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffe89b72000)\n\tlibnsl.so.2 => /lib/x86_64-linux-gnu/libnsl.so.2 (0x00007cc26ca9d000)\n\tlibtirpc.so.3 => /lib/x86_64-linux-gnu/libtirpc.so.3 (0x00007cc26ca6f000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007cc26c88d000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007cc26cac3000)\n\tlibgssapi_krb5.so.2 => /lib/x86_64-linux-gnu/libgssapi_krb5.so.2 (0x00007cc26c83a000)\n\tlibkrb5.so.3 => /lib/x86_64-linux-gnu/libkrb5.so.3 (0x00007cc26c760000)\n\tlibk5crypto.so.3 => /lib/x86_64-linux-gnu/libk5crypto.so.3 (0x00007cc26c731000)\n\tlibcom_err.so.2 => /lib/x86_64-linux-gnu/libcom_err.so.2 (0x00007cc26c72b000)\n\tlibkrb5support.so.0 => /lib/x86_64-linux-gnu/libkrb5support.so.0 (0x00007cc26c71d000)\n\tlibkeyutils.so.1 => /lib/x86_64-linux-gnu/libkeyutils.so.1 (0x00007cc26c716000)\n\tlibresolv.so.2 => /lib/x86_64-linux-gnu/libresolv.so.2 (0x00007cc26c705000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/ossaudiodev.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff028ec000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000790d137b4000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000790d139a4000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/readline.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffc896a9000)\n\tlibreadline.so.8 => /lib/x86_64-linux-gnu/libreadline.so.8 (0x000074850a8c2000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000074850a6e0000)\n\tlibtinfo.so.6 => /lib/x86_64-linux-gnu/libtinfo.so.6 (0x000074850a6ad000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000074850a929000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/resource.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007fff34d87000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x000071cbf43ba000)\n\t/lib64/ld-linux-x86-64.so.2 (0x000071cbf45a7000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/termios.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tlinux-vdso.so.1 (0x00007ffcb85b6000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x0000774a31258000)\n\t/lib64/ld-linux-x86-64.so.2 (0x0000774a31448000)\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/xxlimited.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    },
+    {
+      "elf": "/usr/lib/python3.11/lib-dynload/xxlimited_35.cpython-311-x86_64-linux-gnu.so",
+      "exit": 0,
+      "stdout": "\tstatically linked\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "TEST_ONLY Guest runtime closure discovery, not authenticated production Source or constructor proof"
+}

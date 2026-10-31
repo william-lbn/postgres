@@ -1,0 +1,11 @@
+[
+  {
+    "deterministicCompletePrograms": true,
+    "instructionCounts": [
+      798,
+      791,
+      531
+    ],
+    "negativeCases": 9
+  }
+]

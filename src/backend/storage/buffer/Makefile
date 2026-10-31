@@ -16,6 +16,9 @@ OBJS = \
 	dsg_buffer_arrays.o \
 	dsg_array_root.o \
 	dsg_envelope_birth.o \
+	dsg_envelope_filter.o \
+	dsg_native_birth_wire.o \
+	dsg_filter_audit.o \
 	dynamic_shared_buffers.o \
 	dsg_buffer_grow.o \
 	dsg_buffer_shrink.o \

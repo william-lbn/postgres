@@ -1,7 +1,7 @@
 /*-
  * dsg_envelope_birth.h -- 最早四数组VA占位，独立增量ABI1。
  *
- * PG18此批仅显式test-v1，root-v1在原NativeFinal接通前拒绝；默认关闭。占位不是RSS、
+ * 显式test-v1/root-v1，默认关闭；root-v1须完整NativeFinal，本接口永不授资格。占位不是RSS、
  * 持续收费包络、seccomp或normal降限许可；不得据本接口解除既有拒绝。
  */
 #ifndef DSG_ENVELOPE_BIRTH_H

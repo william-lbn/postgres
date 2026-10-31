@@ -1,0 +1,7 @@
+[
+  {
+    "actualNoACKTimeoutSeconds": 30.02477836899925,
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  }
+]

@@ -21,6 +21,7 @@
 #include "libpq/pqsignal.h"
 #include "miscadmin.h"
 #include "postmaster/fork_process.h"
+#include "storage/dsg_envelope_filter.h"
 
 #ifndef WIN32
 /*
@@ -33,6 +34,7 @@ pid_t
 fork_process(void)
 {
 	pid_t		result;
+	int			fork_errno;
 	const char *oomfilename;
 	sigset_t	save_mask;
 
@@ -43,6 +45,9 @@ fork_process(void)
 	/*
 	 * Flush stdio channels just before fork, to avoid double-output problems.
 	 */
+	/* 原leader建立唯一pending；失败不产生未登记child。默认关闭无副作用。 */
+	if (!DsgBirthFilterForkBegin())
+		return -1;
 	fflush(NULL);
 
 #ifdef LINUX_PROFILE
@@ -64,6 +69,9 @@ fork_process(void)
 	 */
 	sigprocmask(SIG_SETMASK, &BlockSig, &save_mask);
 	result = fork();
+	fork_errno = errno;
+	/* 仍在原阻塞信号区核child ready；失败必须kill+wait后才清门。 */
+	result = DsgBirthFilterForkFinish(result, fork_errno);
 	if (result == 0)
 	{
 		/* fork succeeded, in child */

@@ -1,5 +1,5 @@
 MODULE_big = test_dsg_region18
-OBJS = $(WIN32RES) test_dsg_region18.o
+OBJS = $(WIN32RES) test_dsg_region18.o test_dsg_filter18.o
 PGFILEDESC = "test_dsg_region18 - isolated PG18 ordinary-page provider and ABI tests"
 EXTENSION = test_dsg_region18
 DATA = test_dsg_region18--1.0.sql

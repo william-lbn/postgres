@@ -1,0 +1,24 @@
+{
+  "original_result_unchanged": "FAIL_COMPONENT",
+  "root9_actual_guest": {
+    "path": "/data/neon-build/validation/pg18-native-guest-369-20261031T212059Z-7abd16/export/evidence/test-result.json",
+    "pass": true,
+    "roots": 9,
+    "skip": 0,
+    "sha256": "c1d1186f5c51f2549f7bc2e4ea75984ebbe2a7d231f275399421515c93f6729c"
+  },
+  "filter5_actual_fail": {
+    "Guest_phase_exit": 1,
+    "raw_log": "/data/neon-build/validation/pg18-native-guest-369-20261031T212059Z-7abd16/export/evidence/filter5/run.log",
+    "raw_sha256": "60be1f78a81355bf63147608b84dc9e164ff1faae41bdf33546b373965bfa93d",
+    "reason": "minimal Guest missing /dev/shm; default-off PG also fails ENOENT"
+  },
+  "metadata_issue": "shared external runner wrote fixed /evidence/test-result.json for both groups, Root9 overwrote earlier filter summary; raw per-group logs and console retained. Original result used parent.name and is kept as failure. Future Guest runner isolates output using explicit phase env only, no assertion changes.",
+  "actual_Guest_artifacts_equal_input_lock": true,
+  "actual_pid_hard_limit": 512,
+  "query_kvm": {
+    "enabled": true,
+    "present": true
+  },
+  "normal_Source_qualified": false
+}

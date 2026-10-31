@@ -64,6 +64,7 @@
  */
 
 #include "postgres.h"
+#include "storage/dsg_envelope_filter.h"
 
 #include <unistd.h>
 #include <signal.h>
@@ -3201,6 +3202,9 @@ PostmasterStateMachine(void)
 	 */
 	if (FatalError && pmState == PM_NO_CHILDREN)
 	{
+		/* 原ready/实际PID登记未结清，不得Park旧R或重造共享内存。 */
+		if (!DsgBirthFilterReinitializeBegin())
+			elog(FATAL, "PG18 reinitialization lacks original idle leader gate");
 		ereport(LOG,
 				(errmsg("all server processes terminated; reinitializing")));
 
@@ -3218,6 +3222,8 @@ PostmasterStateMachine(void)
 
 		/* re-create shared memory and semaphores */
 		CreateSharedMemoryAndSemaphores();
+		/* PG18随后先拉IO worker；必须在其fork前关闭重建段，保真实登记门。 */
+		DsgBirthFilterReinitializeEnd();
 
 		UpdatePMState(PM_STARTUP);
 
@@ -3629,6 +3635,7 @@ BackendStartup(ClientSocket *client_sock)
 	 * of backends.
 	 */
 	bn->pid = pid;
+	DsgBirthFilterForkRegistered(pid);
 	return STATUS_OK;
 }
 
@@ -4004,6 +4011,7 @@ StartChildProcess(BackendType type)
 
 	/* in parent, successful fork */
 	pmchild->pid = pid;
+	DsgBirthFilterForkRegistered(pid);
 	return pmchild;
 }
 
@@ -4019,6 +4027,7 @@ StartSysLogger(void)
 	if (!SysLoggerPMChild)
 		elog(PANIC, "no postmaster child slot available for syslogger");
 	SysLoggerPMChild->pid = SysLogger_Start(SysLoggerPMChild->child_slot);
+	DsgBirthFilterForkRegistered(SysLoggerPMChild->pid);
 	if (SysLoggerPMChild->pid == 0)
 	{
 		ReleasePostmasterChildSlot(SysLoggerPMChild);
@@ -4180,6 +4189,7 @@ StartBackgroundWorker(RegisteredBgWorker *rw)
 	/* in postmaster, fork successful ... */
 	rw->rw_pid = worker_pid;
 	bn->pid = rw->rw_pid;
+	DsgBirthFilterForkRegistered(worker_pid);
 	ReportBackgroundWorkerPID(rw);
 	return true;
 }

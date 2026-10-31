@@ -1,7 +1,7 @@
 /*-
  * dsg_array_root.c -- 四数组固定Root服务注册/预触页；缺省不调用。
  *
- * PG18先仅显式test-v1；root-v1在原出生链闭合前拒绝。启用后无本地madvise回退。
+ * PG18 test-v1为fixture；root-v1须完整原生出生最终停点。启用后无本地madvise回退。
  * 后继生产Root仍须按原Birth/WAL/实际peer及map_files授权，
  * packet中的M/boot/Key/区间仅为比对值，不得提升预算。响应丢失保未知成本。
  */
@@ -23,6 +23,8 @@
 #endif
 #include "miscadmin.h"
 #include "storage/dsg_buffer_arrays.h"
+#include "storage/dsg_envelope_birth.h"
+#include "storage/dsg_native_birth_wire.h"
 
 static bool initialized;
 static bool enabled;
@@ -61,20 +63,27 @@ static bool WaitSocket(int fd,short events,int64 deadline)
 bool DsgArrayRootEnabled(void)
 {
  const char *mode;
+ DsgNativeBirthWireSnapshot birth;
  if(initialized)return enabled;
  initialized=true;mode=getenv(DSG_ARRAY_ROOT_PROFILE_ENV);
  if(mode==NULL)return false;
  if(strcmp(mode,"test-v1")!=0 && strcmp(mode,"root-v1")!=0)
   elog(FATAL,"DSGA array Root profile is unsupported");
  test_only=strcmp(mode,"test-v1")==0;
- /* PG18本批只有原生四数组组件，尚无原A/R及NativeFinal出生链。
-  * 同ABI认识root-v1但必须拒绝，不能把fixture字节提升为生产Root身份。 */
- if(!test_only)
-  elog(FATAL,"PG18 array Root root-v1 requires unsupported original native birth final gate");
  if(!DsgBufferArraysEnabled())
-  elog(FATAL,"PG18 array Root requires explicit original native arrays test profile");
- /* 明确TEST_ONLY来源；后继真实18出生链另批建立，不能从环境/请求造资格。 */
- memset(source_sha,0x11,32);memset(birth_nonce,0x22,32);memset(profile_sha,0x33,32);
+  elog(FATAL,"PG18 array Root requires explicit original native arrays profile");
+ DsgNativeBirthWireGetSnapshot(&birth);
+ if(test_only){
+  /* 保旧晚期四数组fixture兼容；这些字节不是原Source或预算身份。 */
+  memset(source_sha,0x11,32);memset(birth_nonce,0x22,32);memset(profile_sha,0x33,32);
+ }else{
+  /* root-v1绝不借legacy/test来源；必须原早期R+198关闭后的独立最终停点。 */
+  if(!DsgBirthArraysEnabled() || !birth.root_enrolled_non_authorizing ||
+   !birth.final_audit_released_non_authorizing || Zero(birth.source_sha256,32) ||
+   Zero(birth.nonce,32) || Zero(birth.profile_sha256,32))
+   elog(FATAL,"PG18 array Root lacks original native birth final gate");
+  memcpy(source_sha,birth.source_sha256,32);memcpy(birth_nonce,birth.nonce,32);memcpy(profile_sha,birth.profile_sha256,32);
+ }
  enabled=true;return true;
 }
 

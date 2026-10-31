@@ -1,0 +1,11 @@
+test_PG18_S_BIRTH_001_default_disabled_real_pg (test_birth18.Birth18.test_PG18_S_BIRTH_001_default_disabled_real_pg) ... ok
+test_PG18_S_BIRTH_002_actual_geometry_children_and_stale_inputs (test_birth18.Birth18.test_PG18_S_BIRTH_002_actual_geometry_children_and_stale_inputs) ... ok
+test_PG18_S_BIRTH_003_real_logger_and_recovery_keep_r (test_birth18.Birth18.test_PG18_S_BIRTH_003_real_logger_and_recovery_keep_r) ... ok
+test_PG18_S_BIRTH_004_extension_and_native_acl (test_birth18.Birth18.test_PG18_S_BIRTH_004_extension_and_native_acl) ... ok
+test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as (test_birth18.Birth18.test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as) ... ok
+test_PG18_U_BIRTH_002_no_nnp_cannot_enable (test_birth18.Birth18.test_PG18_U_BIRTH_002_no_nnp_cannot_enable) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 4.310s
+
+OK

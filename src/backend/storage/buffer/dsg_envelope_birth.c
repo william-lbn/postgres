@@ -1,7 +1,7 @@
 /*-
  * dsg_envelope_birth.c -- 在任何PG MemoryContext/配置/扩展前预留固定四数组VA。
  *
- * PG18本批仅接受显式test-v1:<规范maxBuffers>；root-v1待原NativeFinal，默认关闭。
+ * 显式test-v1/root-v1:<规范maxBuffers>；root-v1另须完整NativeFinal，默认关闭。
  * caller环境不具授权性，root-v1须另经真实Root握手和不可越过的ptrace停点，
  * 不宣称完整包络；Root生产launcher应删除该测试环境，不能把它当资格。
  * 后续真实出生协议必须另行核原Source、PID/start、映射和全部实际过滤规则。
@@ -76,10 +76,8 @@ DsgBirthArraysEarlyInit(void)
 		uint64 address_space;
 		int i;
 
-		if (strncmp(raw, "root-v1:", 8) == 0)
-			DsgBirthArraysFail("PG18 root-v1 requires unsupported original native final gate");
-		if (strncmp(raw, "test-v1:", 8) != 0)
-			DsgBirthArraysFail("only exact PG18 test-v1 mode is supported");
+		if (strncmp(raw, "test-v1:", 8) != 0 && strncmp(raw, "root-v1:", 8) != 0)
+			DsgBirthArraysFail("only exact test-v1 or root-v1 mode is supported");
 		birth.maximum_buffers = (int) DsgBirthArraysDecimal(raw + 8, INT_MAX);
 		/* 原AS环境由main先解析落实；这里再核真实hard/soft，不能只相信文本。 */
 		address_space = DsgBirthArraysDecimal(getenv("NEON_DSGA_ADDRESS_SPACE_MAX_BYTES"), PG_INT64_MAX);
@@ -122,7 +120,8 @@ DsgBirthArraysEarlyInit(void)
 		}
 		/* 只发布进程内测试事实；两个授权位始终为false，不用0/空SHA冒充绑定。 */
 		birth.enabled = true;
-		birth.phase = "reserved_unbound_test";
+		birth.phase = strncmp(raw, "root-v1:", 8) == 0 ?
+			"reserved_root_transport_pending_non_authorizing" : "reserved_unbound_test";
 	}
 #else
 	DsgBirthArraysFail("early array profile requires supported Linux AS/mmap");

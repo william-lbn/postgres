@@ -1,0 +1,41 @@
+{
+  "Image": "sha256:6c14341670c3e9a2c9826132836e3e7f6481b4fbb708e780ca20c35bc52e1621",
+  "State": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-10-31T21:27:39.653130332Z",
+    "FinishedAt": "2026-10-31T21:28:39.094206144Z"
+  },
+  "HostConfig": {
+    "Memory": 4294967296,
+    "MemorySwap": 4294967296,
+    "NanoCpus": 2000000000,
+    "NetworkMode": "none",
+    "ReadonlyRootfs": true,
+    "CapAdd": null,
+    "CapDrop": [
+      "ALL"
+    ],
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "Devices": [
+      {
+        "PathOnHost": "/dev/kvm",
+        "PathInContainer": "/dev/kvm",
+        "CgroupPermissions": "rwm"
+      }
+    ],
+    "PidsLimit": 128,
+    "Tmpfs": {
+      "/tmp": "rw,nosuid,nodev,noexec,size=16m"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+[
+  {
+    "mode": "short",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "long",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "nonce",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "source",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "profile",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "magic",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "rights",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "truncated_rights",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  },
+  {
+    "mode": "eof",
+    "returncode": 1,
+    "stderr": "DSGA native birth wire: root birth ACK missing, changed, oversized or ancillary\n"
+  }
+]

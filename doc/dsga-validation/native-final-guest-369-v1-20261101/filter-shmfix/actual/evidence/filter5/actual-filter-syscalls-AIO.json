@@ -1,0 +1,306 @@
+[
+  {
+    "method": "sync",
+    "filter": {
+      "protocol_version": 1,
+      "enabled": true,
+      "postmaster_installed": true,
+      "child_installed": true,
+      "finalized": true,
+      "postmaster_instructions": 798,
+      "final_postmaster_instructions": 791,
+      "child_instructions": 531,
+      "root_enrolled": false
+    },
+    "syscalls": [
+      {
+        "action": "mprotect-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mprotect-straddle",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "pkey-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "munmap-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "munmap-straddle",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "munmap-wrap",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "madv-dontfork-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "madv-wipe-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "madv-cold-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mmap-exact-park",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mmap-partial-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "anonymous-shared-outside",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "shmat-remap",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mremap-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "remap-file",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "fork",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "clone-nonthread",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "memfd",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "splice",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "zero-copy",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "set-zero-copy",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "direct-open",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "direct-fcntl",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "io-uring",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "dumpable",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "private-outside",
+        "result": 0,
+        "errno": 0
+      },
+      {
+        "action": "pthread",
+        "result": 0,
+        "errno": 0
+      }
+    ],
+    "logs": "2026-10-31 21:33:05.679 GMT [93] LOG:  DSGA_FILTER_PM_TEST_OK exact_rearm_park=4 leader_gate ready_reaped pthread_preserved no_clone3\n2026-10-31 21:33:05.689 GMT [93] LOG:  redirecting log output to logging collector process\n2026-10-31 21:33:05.689 GMT [93] HINT:  Future log output will appear in directory \"logs\".\n\n2026-10-31 21:33:05.689 GMT [93] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit\n2026-10-31 21:33:05.689 GMT [93] LOG:  listening on Unix socket \"/tmp/pg18-array-root-sirpa91l/s/.s.PGSQL.55438\"\n2026-10-31 21:33:05.692 GMT [101] LOG:  database system was shut down at 2026-10-31 21:33:05 GMT\n2026-10-31 21:33:05.693 GMT [101] LOG:  Continue writing WAL at 0/1516908\n2026-10-31 21:33:05.694 GMT [93] LOG:  database system is ready to accept connections\n2026-10-31 21:33:05.939 GMT [99] LOG:  checkpoint starting: immediate force wait\n2026-10-31 21:33:05.940 GMT [99] LOG:  checkpoint complete: wrote 106 buffers (20.7%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=43, longest=0.001 s, average=0.001 s; distance=783 kB, estimate=783 kB; lsn=0/15DA788, redo lsn=0/15DA6E8\n"
+  },
+  {
+    "method": "worker",
+    "filter": {
+      "protocol_version": 1,
+      "enabled": true,
+      "postmaster_installed": true,
+      "child_installed": true,
+      "finalized": true,
+      "postmaster_instructions": 798,
+      "final_postmaster_instructions": 791,
+      "child_instructions": 531,
+      "root_enrolled": false
+    },
+    "syscalls": [
+      {
+        "action": "mprotect-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mprotect-straddle",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "pkey-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "munmap-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "munmap-straddle",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "munmap-wrap",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "madv-dontfork-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "madv-wipe-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "madv-cold-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mmap-exact-park",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mmap-partial-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "anonymous-shared-outside",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "shmat-remap",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "mremap-r",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "remap-file",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "fork",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "clone-nonthread",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "memfd",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "splice",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "zero-copy",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "set-zero-copy",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "direct-open",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "direct-fcntl",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "io-uring",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "dumpable",
+        "result": -1,
+        "errno": 1
+      },
+      {
+        "action": "private-outside",
+        "result": 0,
+        "errno": 0
+      },
+      {
+        "action": "pthread",
+        "result": 0,
+        "errno": 0
+      }
+    ],
+    "logs": "2026-10-31 21:33:06.699 GMT [181] LOG:  DSGA_FILTER_PM_TEST_OK exact_rearm_park=4 leader_gate ready_reaped pthread_preserved no_clone3\n2026-10-31 21:33:06.707 GMT [181] LOG:  redirecting log output to logging collector process\n2026-10-31 21:33:06.707 GMT [181] HINT:  Future log output will appear in directory \"logs\".\n\n2026-10-31 21:33:06.707 GMT [181] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit\n2026-10-31 21:33:06.707 GMT [181] LOG:  listening on Unix socket \"/tmp/pg18-array-root-os9anczw/s/.s.PGSQL.55438\"\n2026-10-31 21:33:06.714 GMT [191] LOG:  database system was shut down at 2026-10-31 21:33:06 GMT\n2026-10-31 21:33:06.714 GMT [191] LOG:  Continue writing WAL at 0/1516908\n2026-10-31 21:33:06.716 GMT [181] LOG:  database system is ready to accept connections\n2026-10-31 21:33:06.928 GMT [189] LOG:  checkpoint starting: immediate force wait\n2026-10-31 21:33:06.929 GMT [189] LOG:  checkpoint complete: wrote 106 buffers (20.7%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=43, longest=0.001 s, average=0.001 s; distance=783 kB, estimate=783 kB; lsn=0/15DA788, redo lsn=0/15DA6E8\n"
+  }
+]

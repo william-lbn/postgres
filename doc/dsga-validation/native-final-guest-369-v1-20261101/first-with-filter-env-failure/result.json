@@ -1,0 +1,29 @@
+{
+  "status": "FAIL_COMPONENT",
+  "host_qemu_exit": 0,
+  "Guest_markers": [
+    "1"
+  ],
+  "actual_kvm": {
+    "enabled": true,
+    "present": true
+  },
+  "Guest_roots": {
+    "evidence": {
+      "pass": true,
+      "tests_run": 9,
+      "skip": 0
+    }
+  },
+  "expected_same_stable_roots": 14,
+  "new_coverage_count": 0,
+  "E": 0,
+  "Source_or_normal_qualified": false,
+  "seconds": 60.002834116021404,
+  "errors": [
+    "missing/failed exact Guest filter5",
+    "missing/failed exact Guest root9"
+  ],
+  "console_sha256": "7135330cce61d416fe225ce30f35caebfae007dd97ee6d9c2ce4bc7f5f0ea324",
+  "scope": "actual accurate369 Guest C native component only; same14 IDs multi-platform; no production Source/System/FI/normal"
+}

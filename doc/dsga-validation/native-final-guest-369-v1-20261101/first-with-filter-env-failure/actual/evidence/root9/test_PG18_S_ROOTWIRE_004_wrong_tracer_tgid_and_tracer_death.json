@@ -1,0 +1,13 @@
+[
+  {
+    "wrongTracerTGIDRejected": true,
+    "peerTGID": 510,
+    "wrongTracerTGID": 312,
+    "stderr": "DSGA native birth wire: actual tracer TGID differs from original Root peer\n"
+  },
+  {
+    "actualRootExitedAtFinalStop": true,
+    "kernelEXITKILL": true,
+    "returncode": -9
+  }
+]

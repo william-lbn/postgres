@@ -1,0 +1,23 @@
+{
+  "unit": "neon-pg18-guest-369-20261031t212059z-7abd16",
+  "runner_image": "127.0.0.1:5001/neon/neonvm-runner@sha256:f170364ea02fc54d08523226e8616b1ef1c4097a6a2cc5b3a66db7756ef5df9e",
+  "qemu_binary_sha256": "8d8d8ee83471749d0b882ce34344638e0ac0fa2390cd822b98d9b6314e2f9cb5  /usr/bin/qemu-system-x86_64\n",
+  "command_sha256": "d8e9dc707e1554e101703a9dfe29d1a765261e6d53e9fb577da99546a37983d3",
+  "driver_sha256": "99c767145f2891ba53d6fcc429069519a7a7bf88feb362403a4dc54739d2b8c0",
+  "kernel": {
+    "path": "/data/neon-build/validation/normal-split-kernel-20261030T224843Z/export",
+    "hashes": {
+      "vmlinuz": "3693200bb10997988129955750382e586d13eef75e06f46aa3b9f56c6f8833f0",
+      "kernel.config": "11344757b0f979c7fee35e354bd706616c4283deaa67cc30c50747e4bca855be",
+      "kernel-notes.bin": "7cf45ced24c800ec8390fc7f04f07b8dc9e73ac0efa4bf8abd11d8513c8eb828"
+    },
+    "release": "6.12.26-william-normal-split-v1-e210f5e3ee94"
+  },
+  "guest_cpu": 2,
+  "guest_memory_bytes": 2147483648,
+  "outer_memory_bytes": 4294967296,
+  "network": "none",
+  "no_tcg_fallback": true,
+  "timeout_seconds": 300,
+  "same_stable_component_roots": 14
+}

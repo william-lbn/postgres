@@ -21,6 +21,9 @@
 #include "postgres.h"
 
 #include "storage/dsg_envelope_birth.h"
+#include "storage/dsg_envelope_filter.h"
+#include "storage/dsg_native_birth_wire.h"
+#include "storage/dsg_filter_audit.h"
 #if defined(__linux__)
 #include <sys/resource.h>
 #include <sys/prctl.h>
@@ -187,10 +190,20 @@ main(int argc, char *argv[])
 	bool		do_check_root = true;
 	DispatchOption dispatch_option = DISPATCH_POSTMASTER;
 
+	/* root-only纯编译在任何AS/PG分配/GUC前；不是安装或授权证明。 */
+	if (argc > 1 && strcmp(argv[1], DSG_FILTER_AUDIT_ARG) == 0)
+		DsgFilterAuditMain(argc, argv);
+
 	reached_main = true;
 	/* 原生AS→四R必须先于任何PG内存/配置；这不是原Root/normal资格。 */
 	dsg_apply_inherited_address_space();
 	DsgBirthArraysEarlyInit();
+	DsgNativeBirthWirePrepare();
+	DsgBirthFilterEarlyInit();
+	DsgNativeBirthWireExchange();
+	DsgBirthFilterSealPostmaster();
+	/* close198+PMfinal后必须过原Root独立审计/WAL/DETACH停点才继续。 */
+	DsgNativeBirthWireFinish();
 
 	/*
 	 * If supported on the current platform, set up a handler to be called if

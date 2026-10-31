@@ -1,0 +1,10 @@
+{
+  "base18": "1197c33b49d17e5999a6cda0346f54352e43baa8",
+  "source17": "b95b142190cdc51de0d5603bfb9c46a0e0e7051f",
+  "source_from_git_only": true,
+  "core_count": 16,
+  "stage": "IMPLEMENTED_NOT_COMPILED_OR_TESTED",
+  "shared_ABI_unchanged": true,
+  "io_uring_denies_preserved": true,
+  "pending_owner": "native filter/Root fixtures and direct affected negative expectations"
+}

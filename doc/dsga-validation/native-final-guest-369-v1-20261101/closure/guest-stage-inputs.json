@@ -1,0 +1,18 @@
+{
+  "root": "/data/neon-build/validation/pg18-native-guest-369-20261031T212059Z-7abd16/root",
+  "PG_ELF": "65107494edf4b376c3dbe7960247d37d84c96b2e546bd791e3d3aefe5344d530",
+  "test_DSO": "3ac1cab277327eb5fe75637d7bb30810d3a2e80c9ca0affbbfdaf1f1e5aa74e1",
+  "runner_SHA256": "8405ea283f5ce2757e4239e197d7bd34db70478801ce9de9e9811cc2f9181b72",
+  "runner_only_delta": "filesystem fixture paths only; method selection/assertions unchanged",
+  "tests": {
+    "test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+    "test_resize_failures18.py": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+    "test_filter18.py": "0cc43ae9db8e86e2eb87e58991e37b45c30478db5975633509389f51b38a550a",
+    "test_birth18.py": "ddc689d45984f33d52cbbf1d100d394085775e59c1fcbc5128ec43b39b2e13da",
+    "test_resize18.py": "e030a1bb23501375961ae6ec531a3ee52611fe0ea79938209b619206308df37f",
+    "test_region18.py": "d48fb9bc6285c831381008402ed4c2964537cc46e1d380ff9077dce6f7bb4263",
+    "test_array_root18.py": "5bd78e752c462b47262071262b8625b6cbcdb1ecbd6fd2b4704ef67f698f697b",
+    "test_root_birth18.py": "dad2c6f02d7f6f5ff84ff5434e8273df9f85bd00b5cc552332ca25ae7e43fd1f"
+  },
+  "scope": "TEST_ONLY no final release or Source/normal qualification"
+}

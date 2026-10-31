@@ -1,0 +1,54 @@
+{
+  "unit": "neon-pg18-native-final-20261031t210303z-70b567",
+  "base18": "1197c33b49d17e5999a6cda0346f54352e43baa8",
+  "origin17": "b95b142190cdc51de0d5603bfb9c46a0e0e7051f",
+  "source24": {
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "2e792c22155c0ea22c08d5f185a1941c52095264505e913ec50817d2075e29a1",
+    "src/include/storage/dsg_envelope_filter.h": "f54d19b2e193522618e740adfb770fccc471683948401e7eeb4a7a2397ead42e",
+    "src/backend/storage/buffer/dsg_native_birth_wire.c": "a39d91d90fe536a1a1c3199f77905b1be122cbb5363a6f9dde028985ec4afefe",
+    "src/include/storage/dsg_native_birth_wire.h": "9e22682ca423165eda27be010e3cd2b3d3a2ee54e33901dbafd00226456c52ef",
+    "src/backend/storage/buffer/dsg_filter_audit.c": "724d8e3f9fec7a146b3b99ffd6d5f657ae3b4929d3073782a73ad898e8ac3591",
+    "src/include/storage/dsg_filter_audit.h": "d0aa6afa22913e6ce05290a3f3202958186c998c3d7534a179952a5cf8f4c053",
+    "src/backend/main/main.c": "0e7044e41b17957f5e425153d9693176b0fd45ab1f82bdfd097f6e01b79d8378",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "c306e67bfb5780db925a483873a2b0c3c72edc0b3d9acab727b1e9d52692006f",
+    "src/include/storage/dsg_envelope_birth.h": "ccb20e2cf9d143ac8886fd6e6b4ff5ec67e8a0981f773f035bcebbc677e7af2b",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "ca2037e2bcc48b18ddae80d84d292f3e6a284abaff1e1148e67b8bdfeb2a998a",
+    "src/backend/storage/buffer/dsg_array_root.c": "8e637c1d001badea8d6e9e42492d11913192b28d953cb595b640f4649c61a82e",
+    "src/backend/storage/buffer/Makefile": "b8aee7c7d54342810c72e6f558a50f280cd22b8ae7b5a52e2ee1486895a3255c",
+    "src/backend/storage/buffer/meson.build": "030e185c59cf795c8962a10cdbc3922efe45d7c2d84f80247414121d6b2917fb",
+    "src/backend/postmaster/fork_process.c": "c4bbb80c865c56b73ba52c53d439a82bb37ffc339a657483187963baf982fd58",
+    "src/backend/postmaster/launch_backend.c": "460b8a73584e76adc19ef1c6aa831749b0dc916ffef2df297e2f4dbfea2cd7f3",
+    "src/backend/postmaster/postmaster.c": "add6c52b6261bc11aefb4844c52f55ac0aa0b91d43535b39f72d85ce93bf1b26",
+    "src/test/modules/test_dsg_region18/test_dsg_filter18.c": "3f8d66043450b199e5775ead8163f4446f09a068e14b7dd01c281fdde5e01b84",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "ee79a823d3e1367eacc52268fd79c7ac2959e410997a6b764bdfc7855ae3a70e",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "3eaf2a7dd7dac4f699fac648cec6327604cba2f14846c1946f274faa9012bf81",
+    "src/test/modules/test_dsg_region18/Makefile": "578c38064653ec1e60cd0dd9dd43a2f2f1395cb759971e01ad95dff3e944c478",
+    "src/test/modules/test_dsg_region18/meson.build": "59d274dbb8bd6f4c5a98caea824e0a61acd3a0b491b1b9d51290ab67ca99d0f7",
+    "src/test/modules/test_dsg_region18/t/test_birth18.py": "ddc689d45984f33d52cbbf1d100d394085775e59c1fcbc5128ec43b39b2e13da",
+    "src/test/modules/test_dsg_region18/t/test_filter18.py": "0cc43ae9db8e86e2eb87e58991e37b45c30478db5975633509389f51b38a550a",
+    "src/test/modules/test_dsg_region18/t/test_root_birth18.py": "dad2c6f02d7f6f5ff84ff5434e8273df9f85bd00b5cc552332ca25ae7e43fd1f"
+  },
+  "actual_source_count": 7489,
+  "source_snapshot_sha256": "ead31677a15fc76c4959fe7ac9b778234957c9deeb09b464a9ca5551a6efcbee",
+  "tools_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+  "limits": {
+    "cpus": 4,
+    "memory": 5368709120,
+    "swap_extra": 0,
+    "tmpfs": 1073741824,
+    "network": "none"
+  },
+  "scope": "TEST_ONLY actual full C filter/wire/ptrace component, no production Source or normal authorization",
+  "new_selected_roots": {
+    "filter": 5,
+    "root": 9
+  },
+  "direct_prior_roots": 41,
+  "build_private_copy_from": "/data/neon-build/validation/pg18-birth-ar-attempt02-pg18-api-20261031T203550Z-aa236d/build",
+  "no_hardlink_to_prior": true,
+  "driver_hashes": {
+    "run.py": "6eb7bc4d443e846ca8a4ea2c8fd34bcb8520fe4b40b6a560c7cc8b98d705846c",
+    "runner.py": "72b54c6e6f71575e50f8a96d948328793fa2880fa35c41ae55babea9216454da",
+    "build.sh": "f1540a19e31965d90862a661ce4e01ea5a7f377546021a6b9fe021ba3c0e4a7c"
+  }
+}

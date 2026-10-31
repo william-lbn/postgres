@@ -1,0 +1,124 @@
+test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO (test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO) ... 
+  test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO (test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO) (method='sync') ... ERROR
+  test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO (test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO) (method='worker') ... ERROR
+test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers (test_filter18.Filter18.test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers) ... ERROR
+test_PG18_S_FILTER_003_actual_extension_acl_and_definer (test_filter18.Filter18.test_PG18_S_FILTER_003_actual_extension_acl_and_definer) ... ERROR
+test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped (test_filter18.Filter18.test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped) ... ERROR
+test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail (test_filter18.Filter18.test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail) ... ERROR
+
+======================================================================
+ERROR: test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO (test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO) (method='sync')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/fixture/tests/test_filter18.py", line 60, in test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO
+    pg=self.cluster(method=method);fact=self.fact(pg)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 36, in cluster
+    pg=Cluster(**kwargs);self.addCleanup(pg.close);pg.start();return pg
+                                                   ^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 24, in start
+    if check:raise RuntimeError('PG18 native filter startup '+self.logs()[-12000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: PG18 native filter startup 2026-10-31 21:27:49.566 GMT [92] LOG:  DSGA_FILTER_PM_TEST_OK exact_rearm_park=4 leader_gate ready_reaped pthread_preserved no_clone3
+2026-10-31 21:27:49.600 GMT [92] FATAL:  could not open shared memory segment "/PostgreSQL.203414278": No such file or directory
+2026-10-31 21:27:49.601 GMT [92] LOG:  database system is shut down
+
+
+======================================================================
+ERROR: test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO (test_filter18.Filter18.test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO) (method='worker')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/fixture/tests/test_filter18.py", line 60, in test_PG18_S_FILTER_001_actual_syscall_boundaries_threads_and_AIO
+    pg=self.cluster(method=method);fact=self.fact(pg)
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 36, in cluster
+    pg=Cluster(**kwargs);self.addCleanup(pg.close);pg.start();return pg
+                                                   ^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 24, in start
+    if check:raise RuntimeError('PG18 native filter startup '+self.logs()[-12000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: PG18 native filter startup 2026-10-31 21:27:51.132 GMT [104] LOG:  DSGA_FILTER_PM_TEST_OK exact_rearm_park=4 leader_gate ready_reaped pthread_preserved no_clone3
+2026-10-31 21:27:51.138 GMT [104] FATAL:  could not open shared memory segment "/PostgreSQL.157312440": No such file or directory
+2026-10-31 21:27:51.139 GMT [104] LOG:  database system is shut down
+
+
+======================================================================
+ERROR: test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers (test_filter18.Filter18.test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/fixture/tests/test_filter18.py", line 79, in test_PG18_S_FILTER_002_real_logger_internal_recovery_and_IO_workers
+    pg=self.cluster();original=pg.birth();old=pg.state()['boot']
+       ^^^^^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 36, in cluster
+    pg=Cluster(**kwargs);self.addCleanup(pg.close);pg.start();return pg
+                                                   ^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 24, in start
+    if check:raise RuntimeError('PG18 native filter startup '+self.logs()[-12000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: PG18 native filter startup 2026-10-31 21:27:52.415 GMT [116] LOG:  DSGA_FILTER_PM_TEST_OK exact_rearm_park=4 leader_gate ready_reaped pthread_preserved no_clone3
+2026-10-31 21:27:52.435 GMT [116] FATAL:  could not open shared memory segment "/PostgreSQL.3189947754": No such file or directory
+2026-10-31 21:27:52.436 GMT [116] LOG:  database system is shut down
+
+
+======================================================================
+ERROR: test_PG18_S_FILTER_003_actual_extension_acl_and_definer (test_filter18.Filter18.test_PG18_S_FILTER_003_actual_extension_acl_and_definer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/fixture/tests/test_filter18.py", line 103, in test_PG18_S_FILTER_003_actual_extension_acl_and_definer
+    pg=self.cluster();pg.sql('CREATE ROLE filter18_ordinary LOGIN')
+       ^^^^^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 36, in cluster
+    pg=Cluster(**kwargs);self.addCleanup(pg.close);pg.start();return pg
+                                                   ^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 24, in start
+    if check:raise RuntimeError('PG18 native filter startup '+self.logs()[-12000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: PG18 native filter startup 2026-10-31 21:27:53.313 GMT [128] LOG:  DSGA_FILTER_PM_TEST_OK exact_rearm_park=4 leader_gate ready_reaped pthread_preserved no_clone3
+2026-10-31 21:27:53.318 GMT [128] FATAL:  could not open shared memory segment "/PostgreSQL.18436640": No such file or directory
+2026-10-31 21:27:53.319 GMT [128] LOG:  database system is shut down
+
+
+======================================================================
+ERROR: test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped (test_filter18.Filter18.test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/fixture/tests/test_filter18.py", line 113, in test_PG18_S_FILTER_004_ready_edge_failures_exactly_reaped
+    start=time.monotonic();pg=self.cluster(probe='exercise-negative-v1')
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 36, in cluster
+    pg=Cluster(**kwargs);self.addCleanup(pg.close);pg.start();return pg
+                                                   ^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 24, in start
+    if check:raise RuntimeError('PG18 native filter startup '+self.logs()[-12000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: PG18 native filter startup DSGA_READY_CHILD_LIVE mode=short
+DSGA_READY_CHILD_LIVE mode=wrong
+DSGA_READY_CHILD_LIVE mode=eof
+DSGA_READY_CHILD_LIVE mode=timeout
+2026-10-31 21:28:04.291 GMT [140] LOG:  DSGA_FILTER_READY_NEGATIVE_OK short wrong eof timeout exact_reap=4
+2026-10-31 21:28:04.293 GMT [140] LOG:  DSGA_FILTER_PM_TEST_OK exact_rearm_park=4 leader_gate ready_reaped pthread_preserved no_clone3
+2026-10-31 21:28:04.296 GMT [140] FATAL:  could not open shared memory segment "/PostgreSQL.2709247934": No such file or directory
+2026-10-31 21:28:04.297 GMT [140] LOG:  database system is shut down
+
+
+======================================================================
+ERROR: test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail (test_filter18.Filter18.test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/fixture/tests/test_filter18.py", line 51, in test_PG18_U_FILTER_001_explicit_mode_missing_r_and_protected_uring_fail
+    pg=self.cluster(filtered=False);self.assertFalse(self.fact(pg)['enabled'])
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 36, in cluster
+    pg=Cluster(**kwargs);self.addCleanup(pg.close);pg.start();return pg
+                                                   ^^^^^^^^^^
+  File "/fixture/tests/test_filter18.py", line 24, in start
+    if check:raise RuntimeError('PG18 native filter startup '+self.logs()[-12000:])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: PG18 native filter startup 2026-10-31 21:28:05.130 GMT [507] FATAL:  could not open shared memory segment "/PostgreSQL.1497958182": No such file or directory
+2026-10-31 21:28:05.130 GMT [507] LOG:  database system is shut down
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 17.996s
+
+FAILED (errors=6)

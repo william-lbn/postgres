@@ -1,0 +1,55 @@
+{
+  "new_roots": 6,
+  "new_U": 2,
+  "new_S": 4,
+  "E": 0,
+  "cases": [
+    {
+      "root": "test_birth18.Birth18.test_PG18_S_BIRTH_001_default_disabled_real_pg",
+      "result": "PASS",
+      "actual_receipt": "native-original41/birth6/test-result.json"
+    },
+    {
+      "root": "test_birth18.Birth18.test_PG18_S_BIRTH_002_actual_geometry_children_and_stale_inputs",
+      "result": "PASS",
+      "actual_receipt": "native-original41/birth6/test-result.json"
+    },
+    {
+      "root": "test_birth18.Birth18.test_PG18_S_BIRTH_003_real_logger_and_recovery_keep_r",
+      "result": "PASS",
+      "actual_receipt": "native-original41/birth6/test-result.json"
+    },
+    {
+      "root": "test_birth18.Birth18.test_PG18_S_BIRTH_004_extension_and_native_acl",
+      "result": "PASS",
+      "actual_receipt": "native-original41/birth6/test-result.json"
+    },
+    {
+      "root": "test_birth18.Birth18.test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+      "result": "PASS",
+      "actual_receipt": "native-final-U001/test-result.json"
+    },
+    {
+      "root": "test_birth18.Birth18.test_PG18_U_BIRTH_002_no_nnp_cannot_enable",
+      "result": "PASS",
+      "actual_receipt": "native-original41/birth6/test-result.json"
+    }
+  ],
+  "same_binary_old_direct_regression_roots": 35,
+  "old_direct_breakdown": {
+    "array_root": 4,
+    "region_arrays_resize_failure": 30,
+    "io_uring_default_off": 1
+  },
+  "duplicate_runs_not_new_coverage": "original U001 run superseded for that method only by final U001; original other5+old35 remain exact same binary/methods",
+  "io_uring": "current A/R profile has no BPF; protected filter/wire future keeps17deny and requires independent18I/Source support",
+  "raw_fs": "bounded1GiB/tmp tmpfs; initdb --no-sync, runtimePG fsync remains enabled; no physicaldisk/powerloss certification",
+  "unrun": [
+    "full PG18 filter/fork ready/Root NativeFinal",
+    "original trusted Source/registry/private WAL/StartCAS authority",
+    "PG18 physical/I/FS qualifications",
+    "true safe normal decrease",
+    "Guest369KVM",
+    "three-node Kubernetes E2E"
+  ]
+}

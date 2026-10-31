@@ -1,0 +1,9 @@
+PG18最早AS/R九源：Root独立复审
+
+本批原生组件范围无提交阻断。108唯一冻结路径、原归档文件、当前9源全部重核SHA；真实编译快照和最终native快照各7377文件重新读hash，唯一区别为Python测试test_birth18.py。八个生产/测试API构建源与真实ELF91de及扩展a29daf一致。独立Python AST删除唯一改变的U001方法后整模块相同，支持原其他40根继续引用原实际执行，未说最终Python全体重跑。原41与最终单根的原JSON全部PASS/skip0，新增2U4S、旧35直接回归不计新增。
+
+读过main最早原生AS解析/真实NNP和UID检查、RLIMIT_AS hard=soft读回、checked四R PROT_NONE预留、一次性导入/原M冲突、logger等非共享子类Park和原共享恢复Rearm；不改18 AIO与末访问屏障。早期代码没有PG MemoryContext，不调用elog分配来报告早期错误；pg_noreturn适配实际18头。test-v1原事实source_bound/root_enrolled仍false；root-v1在完整filter/NativeFinal以前明确拒绝。测试API既REVOKE又核current/session管理员，单靠GRANT/definer不能暴露原地址。
+
+实际测试覆盖了root0+NNP1拒绝、NNP0拒绝、几何/AS/原M冲突、原PM与两IO worker/logger硬限、logger重启、三次真实共享恢复及数据校验。preexec混合UID失真假设FAIL、同PG exec后Uid全部1000/NNP1/AS有限的真实诊断、最终U001通过原文分档；C未放宽，不把preexec身份当exec后事实。首次声明API编译失败保留。
+
+未实施PG18完整filter/fork登记/198握手/ptrace最终停点、原生产Source/连续费用、normal安全降限、369Guest或K8s。E0。固定1GiB tmpfs与initdb --no-sync夹具不认证掉电耐久；不能据本组件解除现有五层拒绝。

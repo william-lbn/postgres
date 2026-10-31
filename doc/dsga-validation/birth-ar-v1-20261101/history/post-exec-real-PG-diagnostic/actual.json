@@ -1,0 +1,57 @@
+{
+  "pre_exec_kernel_calls": {
+    "real_effective_saved_uid": [
+      1000,
+      0,
+      0
+    ],
+    "real_effective_saved_gid": [
+      1000,
+      1000,
+      1000
+    ],
+    "nnp": 1
+  },
+  "post_exec_status": "Name:\tpostgres\nUmask:\t0077\nState:\tS (sleeping)\nTgid:\t22\nNgid:\t0\nPid:\t22\nPPid:\t8\nTracerPid:\t0\nUid:\t1000\t1000\t1000\t1000\nGid:\t1000\t1000\t1000\t1000\nFDSize:\t1024\nGroups:\t \nNStgid:\t22\nNSpid:\t22\nNSpgid:\t8\nNSsid:\t1\nKthread:\t0\nVmPeak:\t   75412 kB\nVmSize:\t   75396 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   20180 kB\nVmRSS:\t   20180 kB\nRssAnon:\t    1552 kB\nRssFile:\t   11772 kB\nRssShmem:\t    6856 kB\nVmData:\t    1264 kB\nVmStk:\t     132 kB\nVmExe:\t    7588 kB\nVmLib:\t    6124 kB\nVmPTE:\t     112 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nuntag_mask:\t0xffffffffffffffff\nThreads:\t1\nSigQ:\t0/95851\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000400000\nSigIgn:\t0000000001303000\nSigCgt:\t0000000000014a07\nCapInh:\t0000000000000000\nCapPrm:\t00000000002800eb\nCapEff:\t00000000002800eb\nCapBnd:\t00000000002800eb\nCapAmb:\t0000000000000000\nNoNewPrivs:\t1\nSeccomp:\t0\nSeccomp_filters:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nSpeculationIndirectBranch:\tconditional enabled\nCpus_allowed:\tffffffff,ffffffff,ffffffff\nCpus_allowed_list:\t0-95\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000003\nMems_allowed_list:\t0-1\nvoluntary_ctxt_switches:\t5\nnonvoluntary_ctxt_switches:\t2\nx86_Thread_features:\t\nx86_Thread_features_locked:\t\n",
+  "post_exec_limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            8388608              unlimited            bytes     \nMax core file size        unlimited            unlimited            bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             unlimited            unlimited            processes \nMax open files            1048576              1048576              files     \nMax locked memory         8388608              8388608              bytes     \nMax address space         2147483648           2147483648           bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       95851                95851                signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+  "birth": {
+    "protocol_version": 1,
+    "enabled": true,
+    "imported": true,
+    "phase": "reserved_unbound_test",
+    "root_enrolled": false,
+    "source_bound": false,
+    "maximum_buffers": 2048,
+    "address_space_max_bytes": "2147483648",
+    "page_size_bytes": "4096",
+    "reserved_total_bytes": "16982016",
+    "ranges": [
+      {
+        "name": "descriptors",
+        "base_address": "127934275203072",
+        "reserved_bytes": "131072",
+        "element_bytes": "64"
+      },
+      {
+        "name": "blocks",
+        "base_address": "127934257954816",
+        "reserved_bytes": "16777216",
+        "element_bytes": "8192"
+      },
+      {
+        "name": "iocv",
+        "base_address": "127934275170304",
+        "reserved_bytes": "32768",
+        "element_bytes": "16"
+      },
+      {
+        "name": "checkpoint",
+        "base_address": "127934275129344",
+        "reserved_bytes": "40960",
+        "element_bytes": "20"
+      }
+    ]
+  },
+  "PG_ready": true,
+  "scope": "diagnostic actual post-exec credentials only; no Source or normal auth"
+}

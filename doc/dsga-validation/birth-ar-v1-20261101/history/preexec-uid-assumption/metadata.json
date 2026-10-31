@@ -1,0 +1,24 @@
+{
+  "unit": "neon-pg18-birth-uid-20261031t204110z-8f50e1",
+  "original_cohort": "/data/neon-build/validation/pg18-birth-ar-attempt02-pg18-api-20261031T203550Z-aa236d",
+  "source9": {
+    "src/include/storage/dsg_envelope_birth.h": "b3a24715178bff8579c1c154effa1996f5936b100cfb4e3f156f286adf876f08",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "eaf12a04deeed1c80e616e7797081442c4d9cab6932be463fbb04949e1cedbfb",
+    "src/backend/main/main.c": "0afe50d5d5d068bf97bf7f103cd15121117222033af7e74f5a7f08413e7d4699",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "2a3f3b987d7717398e98470c85ae994cce40879729484f9969fdd39f235f2064",
+    "src/backend/storage/buffer/Makefile": "e4932d6bf361b0bb982b1c0392ce1bef6fd1f4f039cd9972a0442469f530df49",
+    "src/backend/storage/buffer/meson.build": "ad84cd2039c6f52561950bf02d7b8f5dd8bf44821077f37b3c25cc3ddeb871ef",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "a5949f06a3c5afa0af7c411708f47e73994348ee5b616efe58784c620b0ae984",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "edd04ea4de5d79b366c7b53a02d13fe223282f6b0603d3bcdfc32b8180e5fe3d",
+    "src/test/modules/test_dsg_region18/t/test_birth18.py": "0e3f4e31b3c5e110a3d02dc3542411e4ddcf6041a33e314700b35049702e78dd"
+  },
+  "source_count": 7377,
+  "all_source_sha256": "7e70c381f00be91fc0f8b47e1ce6c045d5dce7baede5d7bff4efe6399af57b65",
+  "same_production8_and_ELF_no_rebuild": true,
+  "postgres_sha256": "91de676e56c3ca200afb5dc4e986f3e0dd3679ec437fb4683e42ee45278d6d31",
+  "only_changed_root": [
+    "test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as"
+  ],
+  "parent_original_remaining40": "exact same methods and binary, preserve original evidence no rerun",
+  "scope": "TEST_ONLY actual PG18 AS/R; no filter/NativeFinal/Source/normal"
+}

@@ -20,3 +20,7 @@ REVOKE ALL ON FUNCTION test_dsg_resize18_find_tail(regclass) FROM PUBLIC;
 CREATE FUNCTION test_dsg_arrays18_pause_before_unpin(boolean) RETURNS void
 AS 'MODULE_PATHNAME', 'test_dsg_arrays18_pause_before_unpin' LANGUAGE C STRICT;
 REVOKE ALL ON FUNCTION test_dsg_arrays18_pause_before_unpin(boolean) FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_birth_arrays18() RETURNS text
+AS 'MODULE_PATHNAME','test_dsg_birth_arrays18' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_birth_arrays18() FROM PUBLIC;

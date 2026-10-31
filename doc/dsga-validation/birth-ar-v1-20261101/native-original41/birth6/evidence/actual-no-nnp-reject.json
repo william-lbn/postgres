@@ -1,0 +1,5 @@
+{
+  "exit": 1,
+  "stderr": "DSGA address space requires an unprivileged no-new-privileges birth\n",
+  "actual_parent_nnp": 0
+}

@@ -1,0 +1,36 @@
+{
+  "old_test_sha256": "de35b47af722972143249babaee49e74fd668d77230420962c19647cbdab64ee",
+  "new_test_sha256": "0e3f4e31b3c5e110a3d02dc3542411e4ddcf6041a33e314700b35049702e78dd",
+  "changed_only_method": [
+    "test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as"
+  ],
+  "old_methods": {
+    "cluster": "1955e95ec8020ca369d9c5889e993ba309c82bb0d5a987b7be125ac755aabae3",
+    "save": "b39e3d32858b94685f3ed293366d6de0570c98fd318acc1fa25f816a93f17f40",
+    "maps": "b82bf91bb1437f3481351ce3dc2898a2b4a9aaaba0637c5467f6efa17186e7e7",
+    "original_limits": "c192e37660483d8889592cf58737d0fa19bdd21aeeff2e9169e108b057e142d3",
+    "ranges": "8a6ccefd25f5a9deebceef6e00d43e53609bb5e87b5fd216d3d1ceb958dd1e52",
+    "held_backend": "5a37e13c07326e5dea0e3f652a2aad2abf92d790be2ebd3bb023caf79b49be6f",
+    "test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as": "6d3df22726d6856314c9625b0a0b7cb3d9a5bbe40faf1bcb79c635c1b18ef57e",
+    "test_PG18_U_BIRTH_002_no_nnp_cannot_enable": "1031dce8dab409a7bfdd3f1b132c79f4a4d6c43ef6e74d6343aecf2672fa9164",
+    "test_PG18_S_BIRTH_001_default_disabled_real_pg": "60673316a2b3d616b8e6a26716341eec56647f45f5021d222b7b55dd6525fc24",
+    "test_PG18_S_BIRTH_002_actual_geometry_children_and_stale_inputs": "435b736d6beda5e42a4cd78423adcdc4b14d681a6bf945007f43c316adc0dff1",
+    "test_PG18_S_BIRTH_003_real_logger_and_recovery_keep_r": "2c5cdd44b8e54e062632e11eb99df225825478fcb6b78b225d1338ddca992302",
+    "test_PG18_S_BIRTH_004_extension_and_native_acl": "b6d41f8d12e2190f1ae5a762f0f11f4c9aa002a02062f0d63925f7bfa63cb3c1"
+  },
+  "new_methods": {
+    "cluster": "1955e95ec8020ca369d9c5889e993ba309c82bb0d5a987b7be125ac755aabae3",
+    "save": "b39e3d32858b94685f3ed293366d6de0570c98fd318acc1fa25f816a93f17f40",
+    "maps": "b82bf91bb1437f3481351ce3dc2898a2b4a9aaaba0637c5467f6efa17186e7e7",
+    "original_limits": "c192e37660483d8889592cf58737d0fa19bdd21aeeff2e9169e108b057e142d3",
+    "ranges": "8a6ccefd25f5a9deebceef6e00d43e53609bb5e87b5fd216d3d1ceb958dd1e52",
+    "held_backend": "5a37e13c07326e5dea0e3f652a2aad2abf92d790be2ebd3bb023caf79b49be6f",
+    "test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as": "c1672e013d7f1b421d03a665170a35822473ca4e38e1a1f7074d5cf8a8d0afeb",
+    "test_PG18_U_BIRTH_002_no_nnp_cannot_enable": "1031dce8dab409a7bfdd3f1b132c79f4a4d6c43ef6e74d6343aecf2672fa9164",
+    "test_PG18_S_BIRTH_001_default_disabled_real_pg": "60673316a2b3d616b8e6a26716341eec56647f45f5021d222b7b55dd6525fc24",
+    "test_PG18_S_BIRTH_002_actual_geometry_children_and_stale_inputs": "435b736d6beda5e42a4cd78423adcdc4b14d681a6bf945007f43c316adc0dff1",
+    "test_PG18_S_BIRTH_003_real_logger_and_recovery_keep_r": "2c5cdd44b8e54e062632e11eb99df225825478fcb6b78b225d1338ddca992302",
+    "test_PG18_S_BIRTH_004_extension_and_native_acl": "b6d41f8d12e2190f1ae5a762f0f11f4c9aa002a02062f0d63925f7bfa63cb3c1"
+  },
+  "production8_unchanged": true
+}

@@ -1,0 +1,42 @@
+{
+  "unit": "neon-pg18-birth-ar-api-20261031t203550z-aa236d",
+  "base18": "3d6ac6f09cc45d265c7732a47202aa1ca9f219c5",
+  "origin17": "b95b142190cdc51de0d5603bfb9c46a0e0e7051f",
+  "source9": {
+    "src/include/storage/dsg_envelope_birth.h": "b3a24715178bff8579c1c154effa1996f5936b100cfb4e3f156f286adf876f08",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "eaf12a04deeed1c80e616e7797081442c4d9cab6932be463fbb04949e1cedbfb",
+    "src/backend/main/main.c": "0afe50d5d5d068bf97bf7f103cd15121117222033af7e74f5a7f08413e7d4699",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "2a3f3b987d7717398e98470c85ae994cce40879729484f9969fdd39f235f2064",
+    "src/backend/storage/buffer/Makefile": "e4932d6bf361b0bb982b1c0392ce1bef6fd1f4f039cd9972a0442469f530df49",
+    "src/backend/storage/buffer/meson.build": "ad84cd2039c6f52561950bf02d7b8f5dd8bf44821077f37b3c25cc3ddeb871ef",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "a5949f06a3c5afa0af7c411708f47e73994348ee5b616efe58784c620b0ae984",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "edd04ea4de5d79b366c7b53a02d13fe223282f6b0603d3bcdfc32b8180e5fe3d",
+    "src/test/modules/test_dsg_region18/t/test_birth18.py": "de35b47af722972143249babaee49e74fd668d77230420962c19647cbdab64ee"
+  },
+  "actual_source_count": 7377,
+  "source_snapshot_sha256": "8f1d2f37fceddf68ab75efe69871949f5ca68e721c98b83f54e1c3ff713211d5",
+  "image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+  "scope": "TEST_ONLY A/R6 new roots (2U4S); root-v1 unsupported; no filter/NativeFinal/Source or normal",
+  "limits": {
+    "cpus": 4,
+    "memory_bytes": 5368709120,
+    "swap_extra": 0,
+    "tmpfs_bytes": 1073741824,
+    "network": "none"
+  },
+  "build_copy_from": "/data/neon-build/validation/pg18-birth-ar-attempt01-20261031T202559Z-9dc6d4/build",
+  "copy_mode": "cp -a --reflink=auto; no hardlinks to old output",
+  "native_selection": [
+    "birth6",
+    "new4",
+    "old30",
+    "uring1"
+  ],
+  "driver_sha256": {
+    "build.sh": "f1540a19e31965d90862a661ce4e01ea5a7f377546021a6b9fe021ba3c0e4a7c",
+    "runner.py": "887fe9418b1546637c2d98c5a0a19c5e761a6956e8bb0a22715a5eab0355ff3c",
+    "run.py": "a6f583c275335f4801e6827ccca88dc8f41a8bd7efafb2250ea8459b43c278dd"
+  },
+  "prior_failed_cohort": "/data/neon-build/validation/pg18-birth-ar-attempt01-20261031T202559Z-9dc6d4",
+  "only_source_fix": "PG18 c.h exact pg_noreturn replaces removed pg_attribute_noreturn() in new EnvelopeC; no behavior/ABI relaxation"
+}

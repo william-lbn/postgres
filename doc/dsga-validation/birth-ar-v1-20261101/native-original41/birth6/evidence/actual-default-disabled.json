@@ -1,0 +1,13 @@
+{
+  "protocol_version": 1,
+  "enabled": false,
+  "imported": false,
+  "phase": "disabled",
+  "root_enrolled": false,
+  "source_bound": false,
+  "maximum_buffers": 0,
+  "address_space_max_bytes": "0",
+  "page_size_bytes": "0",
+  "reserved_total_bytes": "0",
+  "ranges": []
+}

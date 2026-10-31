@@ -1,0 +1,26 @@
+{
+  "status": "PASS_PRIVATE_AS_R_NATIVE_COMPONENT_REVIEW",
+  "source9": {
+    "src/include/storage/dsg_envelope_birth.h": "b3a24715178bff8579c1c154effa1996f5936b100cfb4e3f156f286adf876f08",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "eaf12a04deeed1c80e616e7797081442c4d9cab6932be463fbb04949e1cedbfb",
+    "src/backend/main/main.c": "0afe50d5d5d068bf97bf7f103cd15121117222033af7e74f5a7f08413e7d4699",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "2a3f3b987d7717398e98470c85ae994cce40879729484f9969fdd39f235f2064",
+    "src/backend/storage/buffer/Makefile": "e4932d6bf361b0bb982b1c0392ce1bef6fd1f4f039cd9972a0442469f530df49",
+    "src/backend/storage/buffer/meson.build": "ad84cd2039c6f52561950bf02d7b8f5dd8bf44821077f37b3c25cc3ddeb871ef",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "a5949f06a3c5afa0af7c411708f47e73994348ee5b616efe58784c620b0ae984",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "edd04ea4de5d79b366c7b53a02d13fe223282f6b0603d3bcdfc32b8180e5fe3d",
+    "src/test/modules/test_dsg_region18/t/test_birth18.py": "1f337682861b7ce2ec484ee87d050203f0d7b6389e1094c0a09e7b4f012a3ab5"
+  },
+  "compiled_source_files": 7377,
+  "independently_checked_final_source_files": 7377,
+  "same_exact_ELF": "91de676e56c3ca200afb5dc4e986f3e0dd3679ec437fb4683e42ee45278d6d31",
+  "original_41_roots": 41,
+  "final_changed_method_only": "test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+  "remaining_python_AST_identical": true,
+  "new_U": 2,
+  "new_S": 4,
+  "direct_old": 35,
+  "E": 0,
+  "root_v1_still_unsupported": true,
+  "Source_normal_or_KVM_qualified": false
+}

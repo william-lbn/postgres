@@ -1,5 +1,5 @@
 /*-
- * PG18独立core准备组件。只有显式test-v1:M启用；没有Root出生或生产resize调用。
+ * PG18独立core准备组件。显式test-v1:M或原早期test-v1出生启用；没有Root生产资格。
  * 共享目录/完成lease在原main段，四数组用同版本DsgRegion保留原固定VA。
  * AIO pin/wref清除不等于IOCV/WakePinCountWaiter已结束，完成lease必须覆盖最后访问。
  */
@@ -10,6 +10,7 @@
 #include "storage/buf_internals.h"
 #include "storage/dsg_buffer_arrays.h"
 #include "storage/dsg_array_root.h"
+#include "storage/dsg_envelope_birth.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/lwlock.h"
@@ -41,22 +42,28 @@ DsgBufferArraysEnabled(void)
 {
  const char *raw;
  const char *p;
+ DsgBirthArraysSnapshot birth;
  uint64 value=0;
  if(mode_read) return mode_enabled;
  mode_read=true;
  raw=getenv(DSG_NATIVE_ARRAYS_ENV);
- if(raw==NULL) return false;
+ DsgBirthArraysGetSnapshot(&birth);
+ if(raw==NULL && !birth.enabled) return false;
 #if !defined(__linux__) || defined(EXEC_BACKEND)
  ereport(FATAL,(errmsg("PG18 native arrays require supported Linux fork profile")));
 #endif
- if(strncmp(raw,"test-v1:",8)!=0 || raw[8]<'1'||raw[8]>'9')
-  ereport(FATAL,(errmsg("invalid explicit PG18 native arrays test profile")));
- if(raw[8]=='0')ereport(FATAL,(errmsg("invalid PG18 native arrays maximum")));
- for(p=raw+8;*p;p++) {
-  if(*p<'0'||*p>'9'||value>((uint64)INT_MAX-(*p-'0'))/10)
-   ereport(FATAL,(errmsg("invalid PG18 native arrays maximum")));
-  value=value*10+(*p-'0');
- }
+ if(raw!=NULL) {
+  if(strncmp(raw,"test-v1:",8)!=0 || raw[8]<'1'||raw[8]>'9')
+   ereport(FATAL,(errmsg("invalid explicit PG18 native arrays test profile")));
+  if(raw[8]=='0')ereport(FATAL,(errmsg("invalid PG18 native arrays maximum")));
+  for(p=raw+8;*p;p++) {
+   if(*p<'0'||*p>'9'||value>((uint64)INT_MAX-(*p-'0'))/10)
+	ereport(FATAL,(errmsg("invalid PG18 native arrays maximum")));
+   value=value*10+(*p-'0');
+  }
+ } else value=(uint64)birth.maximum_buffers;
+ if(birth.enabled && value!=(uint64)birth.maximum_buffers)
+  ereport(FATAL,(errmsg("PG18 native arrays maximum differs from original early reservations")));
  if(value<(uint64)NBuffers || value==0)
   ereport(FATAL,(errmsg("PG18 native arrays maximum is below startup shared_buffers")));
  maximum_buffers=(int)value;
@@ -97,7 +104,16 @@ DsgBufferArraysDetachInherited(void)
  /* 只改进程私有所有权表，不MemSet共享目录。非共享logger等不保留旧backing。 */
  for(i=0;i<DSG_NATIVE_ARRAY_COUNT;i++) {
   if(mappings[i].state==ARRAY_TRANSITION)elog(FATAL,"PG18 child inherited unknown array");
-  DsgRegionDestroy(&mappings[i].region);mappings[i].state=ARRAY_EMPTY;
+  if(DsgBirthArraysEnabled()) {
+   /* 非共享子类弃旧backing但保原R，不能腾给私有分配；只改本进程表。 */
+   if(mappings[i].state==ARRAY_SHARED) {
+	mappings[i].state=ARRAY_TRANSITION;
+	DsgRegionPark(&mappings[i].region);mappings[i].state=ARRAY_PARKED;
+   } else if(mappings[i].state!=ARRAY_PARKED)
+	elog(FATAL,"PG18 early array child lost original reservation");
+  } else {
+   DsgRegionDestroy(&mappings[i].region);mappings[i].state=ARRAY_EMPTY;
+  }
  }
  ClearAliases();
 }
@@ -108,6 +124,19 @@ DsgBufferArraysInit(void)
  int i;
  const Size elements[DSG_NATIVE_ARRAY_COUNT]={sizeof(BufferDescPadded),BLCKSZ,sizeof(ConditionVariableMinimallyPadded),sizeof(CkptSortItem)};
  if(!DsgBufferArraysEnabled())return;
+ if(DsgBirthArraysEnabled()) {
+  DsgRegion original[DSG_BUFFER_ARRAY_COUNT];
+  DsgBirthArraysCheckMaximum(maximum_buffers);
+  if(mappings[0].state==ARRAY_EMPTY) {
+   for(i=0;i<DSG_NATIVE_ARRAY_COUNT;i++)
+	if(mappings[i].state!=ARRAY_EMPTY)elog(FATAL,"PG18 mixed early array ownership");
+   /* 首次只导入pre-main原R一次；恢复只走已Park的同几何Rearm，不重造R。 */
+   DsgBirthArraysImport(original,maximum_buffers);
+   for(i=0;i<DSG_NATIVE_ARRAY_COUNT;i++) {
+	mappings[i].region=original[i];mappings[i].state=ARRAY_PARKED;
+   }
+  }
+ }
  DynamicSharedBuffersInit();
  array_control=ShmemInitStruct("DSGA PG18 native buffer arrays",sizeof(*array_control),&found);
  if(found)elog(FATAL,"PG18 native arrays cannot attach unowned shared directory");

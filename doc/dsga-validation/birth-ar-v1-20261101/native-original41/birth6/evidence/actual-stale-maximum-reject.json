@@ -1,0 +1,4 @@
+{
+  "exit": 1,
+  "log": "2026-10-31 20:37:09.392 GMT [93] FATAL:  PG18 native arrays maximum differs from original early reservations\n2026-10-31 20:37:09.392 GMT [93] LOG:  database system is shut down\n"
+}

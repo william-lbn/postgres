@@ -1,0 +1,74 @@
+[
+  {
+    "early": "bad",
+    "as": "2147483648",
+    "exit": 1,
+    "stderr": "DSGA early arrays: only exact PG18 test-v1 mode is supported\n"
+  },
+  {
+    "early": "test-v1:0",
+    "as": "2147483648",
+    "exit": 1,
+    "stderr": "DSGA early arrays: expected canonical positive decimal\n"
+  },
+  {
+    "early": "test-v1:02048",
+    "as": "2147483648",
+    "exit": 1,
+    "stderr": "DSGA early arrays: expected canonical positive decimal\n"
+  },
+  {
+    "early": "test-v1:2147483648",
+    "as": "2147483648",
+    "exit": 1,
+    "stderr": "DSGA early arrays: decimal exceeds supported range\n"
+  },
+  {
+    "early": "root-v1:2048",
+    "as": "2147483648",
+    "exit": 1,
+    "stderr": "DSGA early arrays: PG18 root-v1 requires unsupported original native final gate\n"
+  },
+  {
+    "early": "test-v1:2048",
+    "as": null,
+    "exit": 1,
+    "stderr": "DSGA early arrays: expected canonical positive decimal\n"
+  },
+  {
+    "early": "test-v1:2048",
+    "as": "65536",
+    "exit": 1,
+    "stderr": "DSGA early arrays: reserved arrays must be strictly smaller than original AS\n"
+  },
+  {
+    "early": "test-v1:2048",
+    "as": "0",
+    "exit": 1,
+    "stderr": "invalid DSGA original address space limit\n"
+  },
+  {
+    "early": "test-v1:2048",
+    "as": "02147483648",
+    "exit": 1,
+    "stderr": "invalid DSGA original address space limit\n"
+  },
+  {
+    "early": "test-v1:2048",
+    "as": "2147483649",
+    "exit": 1,
+    "stderr": "invalid DSGA original address space limit\n"
+  },
+  {
+    "early": "test-v1:2048",
+    "as": "9223372036854775808",
+    "exit": 1,
+    "stderr": "invalid DSGA original address space limit\n"
+  },
+  {
+    "actual_identity": "root",
+    "NNP": 1,
+    "exit": 1,
+    "stderr": "DSGA address space requires an unprivileged no-new-privileges birth\n"
+  }
+]

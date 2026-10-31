@@ -1,0 +1,20 @@
+{
+  "pre_exec": {
+    "real_effective_saved_uid": [
+      1000,
+      0,
+      0
+    ],
+    "real_effective_saved_gid": [
+      1000,
+      1000,
+      1000
+    ],
+    "nnp": 1
+  },
+  "post_exec_Uid": "Uid:\t1000\t1000\t1000\t1000",
+  "post_exec_Gid": "Gid:\t1000\t1000\t1000\t1000",
+  "NoNewPrivs": "NoNewPrivs:\t1",
+  "PG_ready": true,
+  "root_enrolled": false
+}

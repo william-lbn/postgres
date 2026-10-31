@@ -1,0 +1,11 @@
+{
+  "src/include/storage/dsg_envelope_birth.h": "b3a24715178bff8579c1c154effa1996f5936b100cfb4e3f156f286adf876f08",
+  "src/backend/storage/buffer/dsg_envelope_birth.c": "eaf12a04deeed1c80e616e7797081442c4d9cab6932be463fbb04949e1cedbfb",
+  "src/backend/main/main.c": "0afe50d5d5d068bf97bf7f103cd15121117222033af7e74f5a7f08413e7d4699",
+  "src/backend/storage/buffer/dsg_buffer_arrays.c": "2a3f3b987d7717398e98470c85ae994cce40879729484f9969fdd39f235f2064",
+  "src/backend/storage/buffer/Makefile": "e4932d6bf361b0bb982b1c0392ce1bef6fd1f4f039cd9972a0442469f530df49",
+  "src/backend/storage/buffer/meson.build": "ad84cd2039c6f52561950bf02d7b8f5dd8bf44821077f37b3c25cc3ddeb871ef",
+  "src/test/modules/test_dsg_region18/test_dsg_region18.c": "a5949f06a3c5afa0af7c411708f47e73994348ee5b616efe58784c620b0ae984",
+  "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "edd04ea4de5d79b366c7b53a02d13fe223282f6b0603d3bcdfc32b8180e5fe3d",
+  "src/test/modules/test_dsg_region18/t/test_birth18.py": "de35b47af722972143249babaee49e74fd668d77230420962c19647cbdab64ee"
+}

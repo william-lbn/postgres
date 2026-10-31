@@ -1,0 +1,16 @@
+test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as (test_birth18.Birth18.test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as) ... 
+  test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as (test_birth18.Birth18.test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as) (actual_identity='ruid1000-euid0') ... FAIL
+
+======================================================================
+FAIL: test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as (test_birth18.Birth18.test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as) (actual_identity='ruid1000-euid0')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/src/src/test/modules/test_dsg_region18/t/test_birth18.py", line 100, in test_PG18_U_BIRTH_001_explicit_invalid_modes_and_original_as
+    self.assertNotEqual(result.returncode,0);self.assertIn('unprivileged no-new-privileges birth',result.stderr)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 1 test in 0.083s
+
+FAILED (failures=1)

@@ -10,6 +10,7 @@
 #include "storage/buf_internals.h"
 #include "storage/dsg_region.h"
 #include "storage/dsg_buffer_arrays.h"
+#include "storage/dsg_envelope_birth.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/bufmgr.h"
 #include "storage/lockdefs.h"
@@ -309,4 +310,41 @@ Datum
 test_dsg_arrays18_pause_before_unpin(PG_FUNCTION_ARGS)
 {
  Admin();DsgBufferArraysTestPauseBeforeUnpin(PG_GETARG_BOOL(0));PG_RETURN_VOID();
+}
+
+/* 只读展示进程私有出生事实，不制造Root封存/normal许可。 */
+PG_FUNCTION_INFO_V1(test_dsg_birth_arrays18);
+Datum
+test_dsg_birth_arrays18(PG_FUNCTION_ARGS)
+{
+	DsgBirthArraysSnapshot snapshot;
+	StringInfoData out;
+	int i;
+	/* 地址和几何只供原管理员审查。SQL ACL之外再核当前/会话身份，
+	 * 防止其他SQL别名或显式GRANT把原生地址暴露给普通角色。 */
+	if (!superuser() || !superuser_arg(GetSessionUserId()))
+		ereport(ERROR, (errcode(ERRCODE_INSUFFICIENT_PRIVILEGE),
+					errmsg("birth array observation requires original administrator")));
+	DsgBirthArraysGetSnapshot(&snapshot);
+	initStringInfo(&out);
+	appendStringInfo(&out,
+		"{\"protocol_version\":%u,\"enabled\":%s,\"imported\":%s,"
+		"\"phase\":\"%s\",\"root_enrolled\":false,\"source_bound\":false,"
+		"\"maximum_buffers\":%d,\"address_space_max_bytes\":\"" UINT64_FORMAT "\","
+		"\"page_size_bytes\":\"%zu\",\"reserved_total_bytes\":\"%zu\",\"ranges\":[",
+		snapshot.protocol_version, snapshot.enabled ? "true" : "false",
+		snapshot.imported ? "true" : "false", snapshot.phase,
+		snapshot.maximum_buffers, snapshot.address_space_max_bytes,
+		snapshot.page_size_bytes, snapshot.reserved_total_bytes);
+	for (i = 0; snapshot.enabled && i < DSG_BUFFER_ARRAY_COUNT; ++i)
+	{
+		DsgBirthArrayRange *range = &snapshot.ranges[i];
+		appendStringInfo(&out,
+			"%s{\"name\":\"%s\",\"base_address\":\"" UINT64_FORMAT "\","
+			"\"reserved_bytes\":\"%zu\",\"element_bytes\":\"%zu\"}",
+			i ? "," : "", range->name, (uint64) (uintptr_t) range->region.address,
+			range->region.mapped_bytes, range->element_bytes);
+	}
+	appendStringInfoString(&out, "]}");
+	PG_RETURN_TEXT_P(cstring_to_text(out.data));
 }

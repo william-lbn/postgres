@@ -3,6 +3,7 @@
 backend_sources += files(
   'dsg_buffer_arrays.c',
   'dsg_array_root.c',
+  'dsg_envelope_birth.c',
   'dynamic_shared_buffers.c',
   'dsg_buffer_grow.c',
   'dsg_buffer_shrink.c',

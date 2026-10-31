@@ -1,0 +1,15 @@
+{
+  "commit": "4b8214fc4971e06172938a1f1554ccff6647ee80",
+  "url": "https://raw.githubusercontent.com/moby/profiles/4b8214fc4971e06172938a1f1554ccff6647ee80/seccomp/default.json",
+  "sha256": "6416b47770785a41ac59073cdc77d9fe98517df2799dc83ef207e622de3053f6",
+  "only_added_calls": [
+    "io_uring_setup",
+    "io_uring_enter",
+    "io_uring_register"
+  ],
+  "previous_matching_rules": [],
+  "proxy": "http://127.0.0.1:7890",
+  "derived_sha256": "dcc4a1e40b8b5e12c59951cd82ab5e76bce12135cfbe2061a73c717b986a766b",
+  "verified_only_appended_one_rule": true,
+  "use": "TEST_ONLY isolated PG18 io_uring service. Not a Root/normal production profile."
+}

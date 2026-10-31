@@ -1,0 +1,59 @@
+PG18 第四批：伸缩异常/恢复与真实io_uring后端验证（只有测试，无生产修改）
+
+准确clean基线495e15491784e38329c950ab983964d842fb7010；此批不改任何C/H、
+共享协议、PG17、Root Source/WAL或Neon发行锁。每个cohort以Linux Git archive
+加唯一新Python测试形成不可变/src:ro快照。逐17份原编译输入SHA与该基线/第三批
+实际编译快照完全一致，因此复用同PG ELF b3a1aa60...与test so 5cf4203c...，
+未制造无必要重编译；source-proof.json保留完整校验。容器4CPU/5GiB、capdropALL、
+NNP、无网、只读root/source/安装目录；只写自己/evidence和/tmp，无Host敏感挂载。
+
+新增最终7根全部为Linux原生S，零skip，不标E：
+PG18-S-FAILURE-001 真shrink L栅栏后pg_cancel_backend。ON_ERROR_STOP0保同backend，
+取消前后PID相同，原H/gen/成本恢复，随后同PID新revision成功shrink并核数据。
+PG18-S-FAILURE-002 Grow已populate、H发布前真实ERROR；同backend继续，原H/gen
+不变，已触过的更大数组成本不能回滚成原小值，后继新Grow+Shrink成功且数据一致。
+PG18-S-FAILURE-003 原生FATAL终止PREPARING backend；PM PID/boot不变，原L/H/gen/
+成本保持，实际新操作取得原锁并完成。与SIGKILL触发的全PG恢复区分。
+PG18-S-FAILURE-004 SIGKILL正在PREPARING的resize backend，原PM完成内部崩溃恢复；
+实际新boot/H=N0/gen1、固定VA，原数据仍一致，再prepare新原生测试epoch后grow/shrink。
+PG18-S-FAILURE-005 先为原PM持pidfd并SIGSTOP，waitid(P_PIDFD)确认停止后取其全部子任务pidfd；
+PM停止期间不能fork/reap，避免枚举到取得FD的回收窗口。随后只经原pidfd发SIGKILL/清理，
+以原pidfd POLLIN确认全部旧子任务终态后才冷启动，不用numeric PID或stat/starttime窗口作清理权限；
+新PM/新boot、启动N0容量、WAL数据一致，后继实际grow/shrink。此不冒称Root跨boot许可。
+PG18-S-FAILURE-006 Shrink已发布H之后真实ERROR；同backend看到COMMITTED、新H/gen，
+未跑物理释放的账仍PENDING/保原大上界，原请求回放保提交，新revision才释放降成本。
+PG18-S-URING-001 SHOW io_method必须io_uring，官方18低层AIO读取真实tail：先停
+原IOpin/wref清除前，pinned/io/wref均>0时shrink拒绝；放后成功。再grow后停清pin/wref
+后的completion末访问，三个tail计数全0而lease仍活，1536尾全drain仍拒绝；释放后
+新revision成功。逐段核H/gen/成本不错误下降及数据一致，不用availability布尔代替锁。
+
+真实io_uring运行资格：Docker默认io_uring_setup实际EPERM；另从官方Moby固定提交
+4b8214fc4971e06172938a1f1554ccff6647ee80读取默认JSON，经显式127.0.0.1:7890代理，
+冻结SHA6416b477...。测试profile严格保留所有原字段/规则，仅末尾追加一条allow
+io_uring_setup/enter/register，程序化证明其余字节语义未变。官方原JSON同样EPERM，
+只有此三调用增量后setup实际fd3成功；PG真实后端双阶段也通过。没有使用privileged、
+没有全面seccomp unconfined、没有改Host sysctl/PG17的uring deny。profile只作隔离
+TEST_ONLY，绝不用于PG18 Root/normal认证。上游来源/摘要见seccomp-uring3-source.json，
+许可证随LICENSE.moby-profiles保留。当前测试Host6.8，非369KVM。
+
+入口默认只加载Failures类6根，避免Uring继承导致重复/误在默认权限运行；uring需显式
+python3 t/test_resize_failures18.py Uring.test_PG18_S_URING_001_real_pin_and_post_unpin_drain
+并用上述profile/固定ELF与env。正式精确runner/完整docker命令已留本批两receipt，
+各自证据目录独立；无权限或无uring不能skip取绿。CI公共入口本批未改，交主执行按阶段接。
+
+失败/加强历史：首轮4/5过，cold PM重启夹具用普通start重复CREATE test_aio导致ERROR，
+真实PG已经启动而不是内核恢复失败。修为原base启动+重prepare，首次失败输入/结果不删。
+后续cancel从actor断开连接加强到同backend跨ERROR继续；最后修defaultTest入口为Failures避免继承重复，并加强冷PM旧task身份/退出门槛；均新nonce/不可变快照验证。无生产fix、没有靠关闭AIO或删除拒绝。
+
+未完成：不是所有可能cancel/ERROR/FATAL/crash交错矩阵；未覆盖uring Guest369、
+Root profile独立IO/force/I来源、Work/DSM/Neon18全扩展、完整Source/持续normal安全降限、
+KVM与三node K8s E2E。原生普通功能测试通过不提升Root生产资格；上层接口/恢复合同不变。
+
+独立复核后的v3夹具修正：旧v2的PID/starttime检查到os.kill之间仍有TOCTOU，原7S结果/
+frozen目录完整保留为历史，不宣称其消除该竞态。只改FAILURE005及select导入，Python3.11.2
+实际具备pidfd_open/pidfd_send_signal/waitid(P_PIDFD)，两个新不可变cohort同17编译输入、
+同ELF并行各4CPU/5GiB重跑：worker6与uring1全部PASS、零skip。新冷重启实际8个原子任务
+pidfd均POLLIN终态、无活跃旧FD才启动新PM；本轮子任务自然退出，未触发活任务强杀分支。
+原PM及子任务的正常/失败finally清理均仅发原pidfd；poll仅证明任务退出，不冒称所有内核
+late-put/物理free或Root normal资格完成。新来源/命令/unit/nonce/资源/终态及v2引用见
+validation-resize-failures-v1.json；v3最终冻结目录为/data/neon-build/validation/pg18-failures-final-v3-20261031。

@@ -1,0 +1,520 @@
+{
+  "base18": "495e15491784e38329c950ab983964d842fb7010",
+  "scope": "PG18 exact new failure/uring native tests, no C/H production changes",
+  "source": "src/test/modules/test_dsg_region18/t/test_resize_failures18.py",
+  "source_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+  "compiled_source_changed": false,
+  "artifact_reuse": "matched 17 actual compiler input source hashes; same b3a1aa60 postgres/5cf4203c module",
+  "aggregate": {
+    "roots": 7,
+    "unit_roots": 0,
+    "native_service_roots": 7,
+    "skips": 0,
+    "end_to_end_roots": 0
+  },
+  "cohorts": {
+    "worker6": {
+      "receipt": "/data/neon-build/validation/pg18-failures-attempt06-20261031T141347Z-1b2db6",
+      "source_proof": {
+        "base": "495e15491784e38329c950ab983964d842fb7010",
+        "actual_original_compiled_source_receipt": "/data/neon-build/validation/pg18-resize-native-attempt06-20261031T013226Z-da96a5",
+        "original_17_inputs_match_current": true,
+        "new_test_source": "src/test/modules/test_dsg_region18/t/test_resize_failures18.py",
+        "fixture_revision": "v3-original-pidfd",
+        "new_test_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+        "reused_binary": "b3a1aa6068158ccbcbf6e62ab66c1970b78f35d953d9c4b3ca27251de0ca5555  /opt/pg18/bin/postgres\n5cf4203c217aef27502dc69e04f5de2cd1e545ef2f0390e1f00c81ce7e5eacd6  /opt/pg18/lib/postgresql/test_dsg_region18.so\n"
+      },
+      "test_result": {
+        "pass": true,
+        "expected_roots": 6,
+        "tests_run": 6,
+        "tests": [
+          {
+            "test": "pg18_region.Failures.test_PG18_S_FAILURE_001_cancel_shrink_restores_L_and_retry",
+            "result": "PASS",
+            "seconds": 1.3780011839990038,
+            "detail": ""
+          },
+          {
+            "test": "pg18_region.Failures.test_PG18_S_FAILURE_002_ERROR_after_populate_same_backend_retains_cost",
+            "result": "PASS",
+            "seconds": 1.3325431489938637,
+            "detail": ""
+          },
+          {
+            "test": "pg18_region.Failures.test_PG18_S_FAILURE_003_FATAL_backend_releases_locks_without_PM_reinit",
+            "result": "PASS",
+            "seconds": 1.2868249189923517,
+            "detail": ""
+          },
+          {
+            "test": "pg18_region.Failures.test_PG18_S_FAILURE_004_SIGKILL_preparing_backend_PM_reinitializes",
+            "result": "PASS",
+            "seconds": 1.4952796440047678,
+            "detail": ""
+          },
+          {
+            "test": "pg18_region.Failures.test_PG18_S_FAILURE_005_SIGKILL_PM_cold_recovery_then_new_resize",
+            "result": "PASS",
+            "seconds": 1.3960634380055126,
+            "detail": ""
+          },
+          {
+            "test": "pg18_region.Failures.test_PG18_S_FAILURE_006_ERROR_after_H_publish_keeps_commit_and_pending_cost",
+            "result": "PASS",
+            "seconds": 1.3073264499980723,
+            "detail": ""
+          }
+        ],
+        "test_source_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+        "not_proven": [
+          "production Root/Source/normal qualification",
+          "full failure/cancel universe beyond this precise cohort",
+          "io_uring runtime/profile certification",
+          "DSM/Work/Root cost sources",
+          "Neon compute18 extensions",
+          "safe normal decrease",
+          "KVM/Kubernetes E2E"
+        ]
+      },
+      "exit": {
+        "exit": 0,
+        "seconds": 12.247096435006824
+      },
+      "command": [
+        "docker",
+        "run",
+        "--pull=never",
+        "--init",
+        "--name",
+        "pg18-failures-1b2db6",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--user",
+        "1000:1000",
+        "--cpus",
+        "4",
+        "--memory",
+        "5g",
+        "--memory-swap",
+        "5g",
+        "--pids-limit",
+        "256",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,size=1g",
+        "-v",
+        "/data/neon-build/validation/pg18-failures-attempt06-20261031T141347Z-1b2db6/source:/src:ro",
+        "-v",
+        "/data/neon-build/validation/pg18-failures-attempt06-20261031T141347Z-1b2db6:/report:ro",
+        "-v",
+        "/data/neon-build/validation/pg18-resize-native-attempt06-20261031T013226Z-da96a5/install:/opt/pg18:ro",
+        "-v",
+        "/data/neon-build/validation/pg18-failures-attempt06-20261031T141347Z-1b2db6/evidence:/evidence:rw",
+        "-e",
+        "NEON_TEST_PG_BIN=/opt/pg18/bin",
+        "-e",
+        "NEON_TEST_DSG_LIBRARY=/opt/pg18/lib/postgresql/test_dsg_region18.so",
+        "-e",
+        "NEON_PG18_EVIDENCE=/evidence",
+        "-e",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "--entrypoint",
+        "/usr/bin/python3",
+        "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+        "/report/runner.py"
+      ],
+      "source_test_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+      "async_unit": {
+        "unit": "neon-pg18-failures-attempt06-1b2db6",
+        "nonce": "20261031T141347Z-1b2db6",
+        "source_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+        "runner_sha256": "4b96b722f7f557d13d7acd8a93a34df443027a2dbf783bb4209cb297f8f101e1",
+        "fixture_revision": "v3-original-pidfd",
+        "container_cpus": 4,
+        "container_memory": "5GiB",
+        "root_receipt": "/data/neon-build/validation/pg18-failures-attempt06-20261031T141347Z-1b2db6",
+        "log": "/data/neon-build/validation/pg18-failures-attempt06-20261031T141347Z-1b2db6/test.log",
+        "start_exit": 0,
+        "start_stdout": "",
+        "start_stderr": "Running as unit: neon-pg18-failures-attempt06-1b2db6.service\n"
+      },
+      "python_pidfd_api": {
+        "version": "3.11.2 (main, Oct  7 2026, 12:35:07) [GCC 12.2.0]",
+        "pidfd_open": true,
+        "pidfd_send_signal": true,
+        "waitid_P_PIDFD": true
+      },
+      "evidence_sha256": {
+        "evidence/pg18-r-42gr4d8_-collector-pg.log": "52deb3987b415849db751255c51ed86e8646b40631e8d8b73115ee16735526aa",
+        "evidence/pg18-r-iypyxj_g.log": "543393f12829d1bbbc89af5142a93ef0ac483c0ebf49acaba6d35be85eb983e4",
+        "evidence/pg18-r-2a4bs7mi.log": "0819d91838047094bc81fb6d275056a624a0cf23d2a6953d4ab0354ab00d9453",
+        "evidence/ERROR-grow-same-backend-cost.json": "a96e567c6754417b9a682d72ffe876ced2971aa5755112c5cccd558e0ec39dfe",
+        "evidence/pg18-r-hed3xiws-collector-pg.log": "51c68184acb9e80cb637dbb9fcde7cb343db171dffd0e13b1a17e98b4415aab7",
+        "evidence/pg18-r-2a4bs7mi-collector-pg.log": "2401ad09fa029aabf6388bc1921f9939914e52c6e0203f180830a5e02df857b5",
+        "evidence/pg18-r-iypyxj_g-collector-pg.log": "2f6737b6c6b1afb623e3da5a40bab59727a7cfd0050e0ffc43963747548fc591",
+        "evidence/pg18-r-s7m_btn2-collector-pg.log": "3fc5560ec42b4da893a0f1cdafd766dca24f9c5c952fe57f2d349064a08c4782",
+        "evidence/pg18-r-hed3xiws.log": "321ea8c7232dc797ce0a2a48de80932ff0acae51a31e53983fe3ef466ca02a78",
+        "evidence/pg18-r-vglw5yil-collector-pg.log": "6e60129e26bf1b401f347e45bc5369c4bcf3354bf10081478496a86e7979ba55",
+        "evidence/python-pidfd-api.json": "dc4dd073e6022b597278ea7a10cff8f128ae9e5fced6908cf95f6bf90bacde40",
+        "evidence/pg18-r-s7m_btn2.log": "1a6930dce33ca9ce8e71e20562a81b0e3a6d8e4356b17e5a4496f66e12c67528",
+        "evidence/SIGKILL-PM-cold-recovery.json": "ec65c3b2a2187b65c1016cf2520f237b4eddb522df797d6098a9740b85ecff69",
+        "evidence/test-result.json": "4a60474f8abd36ac92fbc86fa526fb9cc6b169911757120e4505b769c93ef91e",
+        "evidence/ERROR-after-H-publish-pending-cost.json": "6a2acfbb72085a16bf58339c368c26161dbd470af10a6719a2937553814f0777",
+        "evidence/pg18-r-42gr4d8_.log": "965c7903807234da4fd1fc40124e43eba73bb01114bb0fba13f0482633391266",
+        "evidence/FATAL-shrink-retry.json": "da2d69954bd478e946f5ecaabfce3dffd07fb99a88fac353b0e60bcb0cf0d0c2",
+        "evidence/pg18-r-vglw5yil.log": "e5c2b27053d72f7db9993af61f473be9327e58ecdfc3b0673c80a3f9317481e0",
+        "evidence/cancel-shrink-retry.json": "f8a6c9e38111a700e19302fe46143cd5158b402994b8acff1ae9d7a3b9c7c7ff",
+        "evidence/SIGKILL-preparing-PM-recovery.json": "81e2ab177b1119cfd41192d32a9c45ea2c04af648029c654a1854d6d18bc175e",
+        "evidence/pg18-r-hed3xiws/pg.log": "51c68184acb9e80cb637dbb9fcde7cb343db171dffd0e13b1a17e98b4415aab7",
+        "evidence/pg18-r-s7m_btn2/pg.log": "3fc5560ec42b4da893a0f1cdafd766dca24f9c5c952fe57f2d349064a08c4782",
+        "evidence/pg18-r-42gr4d8_/pg.log": "52deb3987b415849db751255c51ed86e8646b40631e8d8b73115ee16735526aa",
+        "evidence/pg18-r-iypyxj_g/pg.log": "2f6737b6c6b1afb623e3da5a40bab59727a7cfd0050e0ffc43963747548fc591",
+        "evidence/pg18-r-2a4bs7mi/pg.log": "2401ad09fa029aabf6388bc1921f9939914e52c6e0203f180830a5e02df857b5",
+        "evidence/pg18-r-vglw5yil/pg.log": "6e60129e26bf1b401f347e45bc5369c4bcf3354bf10081478496a86e7979ba55"
+      }
+    },
+    "uring1": {
+      "receipt": "/data/neon-build/validation/pg18-uring-attempt05-20261031T141347Z-650100",
+      "source_proof": {
+        "base": "495e15491784e38329c950ab983964d842fb7010",
+        "actual_original_compiled_source_receipt": "/data/neon-build/validation/pg18-resize-native-attempt06-20261031T013226Z-da96a5",
+        "original_17_inputs_match_current": true,
+        "new_test_source": "src/test/modules/test_dsg_region18/t/test_resize_failures18.py",
+        "fixture_revision": "v3-original-pidfd",
+        "new_test_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+        "reused_binary": "b3a1aa6068158ccbcbf6e62ab66c1970b78f35d953d9c4b3ca27251de0ca5555  /opt/pg18/bin/postgres\n5cf4203c217aef27502dc69e04f5de2cd1e545ef2f0390e1f00c81ce7e5eacd6  /opt/pg18/lib/postgresql/test_dsg_region18.so\n"
+      },
+      "test_result": {
+        "pass": true,
+        "expected_roots": 1,
+        "tests_run": 1,
+        "tests": [
+          {
+            "test": "pg18_region.Uring.test_PG18_S_URING_001_real_pin_and_post_unpin_drain",
+            "result": "PASS",
+            "seconds": 1.6093059120030375,
+            "detail": ""
+          }
+        ],
+        "test_source_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+        "not_proven": [
+          "production Root/Source/normal qualification",
+          "full failure/cancel universe beyond this precise cohort",
+          "io_uring runtime/profile certification",
+          "DSM/Work/Root cost sources",
+          "Neon compute18 extensions",
+          "safe normal decrease",
+          "KVM/Kubernetes E2E"
+        ]
+      },
+      "exit": {
+        "exit": 0,
+        "seconds": 7.013674888003152
+      },
+      "command": [
+        "docker",
+        "run",
+        "--pull=never",
+        "--init",
+        "--name",
+        "pg18-failures-650100",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "seccomp=/data/neon-build/validation/pg18-uring-attempt05-20261031T141347Z-650100/seccomp-uring3.json",
+        "--security-opt",
+        "no-new-privileges",
+        "--user",
+        "1000:1000",
+        "--cpus",
+        "4",
+        "--memory",
+        "5g",
+        "--memory-swap",
+        "5g",
+        "--pids-limit",
+        "256",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,size=1g",
+        "-v",
+        "/data/neon-build/validation/pg18-uring-attempt05-20261031T141347Z-650100/source:/src:ro",
+        "-v",
+        "/data/neon-build/validation/pg18-uring-attempt05-20261031T141347Z-650100:/report:ro",
+        "-v",
+        "/data/neon-build/validation/pg18-resize-native-attempt06-20261031T013226Z-da96a5/install:/opt/pg18:ro",
+        "-v",
+        "/data/neon-build/validation/pg18-uring-attempt05-20261031T141347Z-650100/evidence:/evidence:rw",
+        "-e",
+        "NEON_TEST_PG_BIN=/opt/pg18/bin",
+        "-e",
+        "NEON_TEST_DSG_LIBRARY=/opt/pg18/lib/postgresql/test_dsg_region18.so",
+        "-e",
+        "NEON_PG18_EVIDENCE=/evidence",
+        "-e",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "--entrypoint",
+        "/usr/bin/python3",
+        "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+        "/report/runner.py"
+      ],
+      "source_test_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+      "async_unit": {
+        "unit": "neon-pg18-uring-attempt05-650100",
+        "nonce": "20261031T141347Z-650100",
+        "source_sha256": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+        "runner_sha256": "6a13fba84a1b38af9a75faeab768459508204e28eca41c646cf4afd648bc444f",
+        "fixture_revision": "v3-original-pidfd",
+        "container_cpus": 4,
+        "container_memory": "5GiB",
+        "root_receipt": "/data/neon-build/validation/pg18-uring-attempt05-20261031T141347Z-650100",
+        "log": "/data/neon-build/validation/pg18-uring-attempt05-20261031T141347Z-650100/test.log",
+        "start_exit": 0,
+        "start_stdout": "",
+        "start_stderr": "Running as unit: neon-pg18-uring-attempt05-650100.service; invocation ID: a33a1a4b2c644cc68dffa1a2ae6aa160\n"
+      },
+      "python_pidfd_api": {
+        "version": "3.11.2 (main, Oct  7 2026, 12:35:07) [GCC 12.2.0]",
+        "pidfd_open": true,
+        "pidfd_send_signal": true,
+        "waitid_P_PIDFD": true
+      },
+      "evidence_sha256": {
+        "evidence/actual-io-uring-both-drain-phases.json": "040f48db00fc2fd7645bc45234734ac7c7c9f1e6c118b626fcac7d31375b9ba5",
+        "evidence/python-pidfd-api.json": "dc4dd073e6022b597278ea7a10cff8f128ae9e5fced6908cf95f6bf90bacde40",
+        "evidence/pg18-r-27_8uep5-collector-pg.log": "4132eadabeafb35182d28f3f54ee374630c96706963d8162fcd6c6d3c6c97583",
+        "evidence/test-result.json": "1eea6c866537a8911453e595d088f19558fce56cd8e1956e7515e9f0ae60a35c",
+        "evidence/pg18-r-27_8uep5.log": "349e218b2513686a91d22dd017e7b6951d9f9bebfd55f8bd7f39ceafd2dedbfc",
+        "evidence/pg18-r-27_8uep5/pg.log": "4132eadabeafb35182d28f3f54ee374630c96706963d8162fcd6c6d3c6c97583"
+      }
+    }
+  },
+  "permission_probe": {
+    "receipt": "/data/neon-build/validation/pg18-uring-permission-probe-20261031T0202",
+    "source": {
+      "commit": "4b8214fc4971e06172938a1f1554ccff6647ee80",
+      "url": "https://raw.githubusercontent.com/moby/profiles/4b8214fc4971e06172938a1f1554ccff6647ee80/seccomp/default.json",
+      "sha256": "6416b47770785a41ac59073cdc77d9fe98517df2799dc83ef207e622de3053f6",
+      "only_added_calls": [
+        "io_uring_setup",
+        "io_uring_enter",
+        "io_uring_register"
+      ],
+      "previous_matching_rules": [],
+      "proxy": "http://127.0.0.1:7890",
+      "derived_sha256": "dcc4a1e40b8b5e12c59951cd82ab5e76bce12135cfbe2061a73c717b986a766b",
+      "verified_only_appended_one_rule": true,
+      "use": "TEST_ONLY isolated PG18 io_uring service. Not a Root/normal production profile."
+    },
+    "results": [
+      {
+        "name": "docker-default",
+        "exit": 0,
+        "stdout": "{\"result\": -1, \"errno\": 1, \"kernel\": \"6.8.0-147-generic\", \"seccomp\": [\"Seccomp:\\t2\", \"Seccomp_filters:\\t1\"]}\n",
+        "stderr": "",
+        "command": [
+          "docker",
+          "run",
+          "--rm",
+          "--pull=never",
+          "--network",
+          "none",
+          "--read-only",
+          "--cap-drop",
+          "ALL",
+          "--security-opt",
+          "no-new-privileges",
+          "--user",
+          "1000:1000",
+          "--cpus",
+          "1",
+          "--memory",
+          "256m",
+          "--entrypoint",
+          "/usr/bin/python3",
+          "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+          "-c",
+          "import ctypes,json,os;libc=ctypes.CDLL(None,use_errno=True);params=(ctypes.c_byte*256)();ctypes.set_errno(0);fd=libc.syscall(425,8,ctypes.byref(params));err=ctypes.get_errno();print(json.dumps({'result':fd,'errno':err,'kernel':os.uname().release,'seccomp':[x for x in open('/proc/self/status').read().splitlines()if x.startswith('Seccomp')]}));os.close(fd)if fd>=0 else None"
+        ]
+      },
+      {
+        "name": "official-default",
+        "exit": 0,
+        "stdout": "{\"result\": -1, \"errno\": 1, \"kernel\": \"6.8.0-147-generic\", \"seccomp\": [\"Seccomp:\\t2\", \"Seccomp_filters:\\t1\"]}\n",
+        "stderr": "",
+        "command": [
+          "docker",
+          "run",
+          "--rm",
+          "--pull=never",
+          "--network",
+          "none",
+          "--read-only",
+          "--cap-drop",
+          "ALL",
+          "--security-opt",
+          "no-new-privileges",
+          "--user",
+          "1000:1000",
+          "--cpus",
+          "1",
+          "--memory",
+          "256m",
+          "--security-opt",
+          "seccomp=/data/neon-build/validation/pg18-uring-permission-probe-20261031T0202/moby-default.json",
+          "--entrypoint",
+          "/usr/bin/python3",
+          "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+          "-c",
+          "import ctypes,json,os;libc=ctypes.CDLL(None,use_errno=True);params=(ctypes.c_byte*256)();ctypes.set_errno(0);fd=libc.syscall(425,8,ctypes.byref(params));err=ctypes.get_errno();print(json.dumps({'result':fd,'errno':err,'kernel':os.uname().release,'seccomp':[x for x in open('/proc/self/status').read().splitlines()if x.startswith('Seccomp')]}));os.close(fd)if fd>=0 else None"
+        ]
+      },
+      {
+        "name": "only-uring3-added",
+        "exit": 0,
+        "stdout": "{\"result\": 3, \"errno\": 0, \"kernel\": \"6.8.0-147-generic\", \"seccomp\": [\"Seccomp:\\t2\", \"Seccomp_filters:\\t1\"]}\n",
+        "stderr": "",
+        "command": [
+          "docker",
+          "run",
+          "--rm",
+          "--pull=never",
+          "--network",
+          "none",
+          "--read-only",
+          "--cap-drop",
+          "ALL",
+          "--security-opt",
+          "no-new-privileges",
+          "--user",
+          "1000:1000",
+          "--cpus",
+          "1",
+          "--memory",
+          "256m",
+          "--security-opt",
+          "seccomp=/data/neon-build/validation/pg18-uring-permission-probe-20261031T0202/moby-plus-uring3.json",
+          "--entrypoint",
+          "/usr/bin/python3",
+          "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+          "-c",
+          "import ctypes,json,os;libc=ctypes.CDLL(None,use_errno=True);params=(ctypes.c_byte*256)();ctypes.set_errno(0);fd=libc.syscall(425,8,ctypes.byref(params));err=ctypes.get_errno();print(json.dumps({'result':fd,'errno':err,'kernel':os.uname().release,'seccomp':[x for x in open('/proc/self/status').read().splitlines()if x.startswith('Seccomp')]}));os.close(fd)if fd>=0 else None"
+        ]
+      }
+    ],
+    "only_add_uring3_verified": true
+  },
+  "first_failure": {
+    "receipt": "/data/neon-build/validation/pg18-failures-attempt01-20261031T020157Z-44277e",
+    "test_result": {
+      "pass": false,
+      "expected_roots": 5,
+      "tests_run": 5,
+      "tests": [
+        {
+          "test": "pg18_region.Failures.test_PG18_S_FAILURE_001_cancel_shrink_restores_L_and_retry",
+          "result": "PASS",
+          "seconds": 2.1803457959977095,
+          "detail": ""
+        },
+        {
+          "test": "pg18_region.Failures.test_PG18_S_FAILURE_002_ERROR_after_populate_same_backend_retains_cost",
+          "result": "PASS",
+          "seconds": 1.3221353410044685,
+          "detail": ""
+        },
+        {
+          "test": "pg18_region.Failures.test_PG18_S_FAILURE_003_FATAL_backend_releases_locks_without_PM_reinit",
+          "result": "PASS",
+          "seconds": 1.2987600350024877,
+          "detail": ""
+        },
+        {
+          "test": "pg18_region.Failures.test_PG18_S_FAILURE_004_SIGKILL_preparing_backend_PM_reinitializes",
+          "result": "PASS",
+          "seconds": 1.4905585369997425,
+          "detail": ""
+        },
+        {
+          "test": "pg18_region.Failures.test_PG18_S_FAILURE_005_SIGKILL_PM_cold_recovery_then_new_resize",
+          "result": "ERROR",
+          "seconds": 1.2988046069949633,
+          "detail": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_resize_failures18.py\", line 85, in test_PG18_S_FAILURE_005_SIGKILL_PM_cold_recovery_then_new_resize\n    p.stream.close();p.process=None;p.start();after=p.state();self.assertNotEqual(p.process.pid,pm);self.assertNotEqual(after['boot'],before['boot']);self.assertEqual((after['low'],after['high']),(512,512));self.data(p)\n                                    ^^^^^^^^^\n  File \"/src/src/test/modules/test_dsg_region18/t/test_resize18.py\", line 14, in start\n    if self.aio:self.sql('CREATE EXTENSION test_aio;CREATE EXTENSION injection_points')\n                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/src/src/test/modules/test_dsg_region18/t/test_region18.py\", line 20, in sql\n    def sql(self,text,check=True):return self.run('psql','-h',self.sock,'-p','55438','-U',USER,'-d','postgres','-XqAt','-v','ON_ERROR_STOP=1','-c',text,check=check)\n                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/src/src/test/modules/test_dsg_region18/t/test_region18.py\", line 18, in run\n    if check and p.returncode:raise RuntimeError(p.stderr[-5000:])\n                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ERROR:  extension \"test_aio\" already exists\n\n"
+        }
+      ],
+      "test_source_sha256": "acd59a163aacda499ad15183dad9fd9aaa84169a92ac5e22d891f641326f1652",
+      "not_proven": [
+        "production Root/Source/normal qualification",
+        "full failure/cancel universe beyond this precise cohort",
+        "io_uring runtime/profile certification",
+        "DSM/Work/Root cost sources",
+        "Neon compute18 extensions",
+        "safe normal decrease",
+        "KVM/Kubernetes E2E"
+      ]
+    },
+    "reason": "test fixture recreated existing test_aio extension after actual cold server startup; not production failure"
+  },
+  "historical_strengthening_receipts": [
+    "/data/neon-build/validation/pg18-failures-attempt02-20261031T020326Z-0511c7",
+    "/data/neon-build/validation/pg18-failures-attempt03-20261031T020505Z-62e654",
+    "/data/neon-build/validation/pg18-uring-attempt01-20261031T020347Z-cc32a3",
+    "/data/neon-build/validation/pg18-uring-attempt02-20261031T020505Z-aee98d",
+    "/data/neon-build/validation/pg18-failures-attempt05-20261031T020819Z-12d489",
+    "/data/neon-build/validation/pg18-uring-attempt04-20261031T020819Z-d082c6"
+  ],
+  "not_proven": [
+    "complete universe of cancel/error/FATAL/crash interleavings",
+    "io_uring Guest369 mechanism",
+    "Root18/continuous force/I/normal qualification",
+    "Work/DSM/fullNeon18 extensions",
+    "KVM/Kubernetes end-to-end"
+  ],
+  "fixture_revision": "v3-original-pidfd",
+  "review_fix": {
+    "reason": "stat/starttime followed by numeric os.kill leaves a PID reuse TOCTOU; old PASS retained as history, not current exact source proof",
+    "changes": "Only FAILURE005 fixture and select import; hold original PM pidfd, SIGSTOP and waitid(P_PIDFD) before child pidfd capture; signal/cleanup only original pidfds; require child pidfd POLLIN before cold restart",
+    "production_changes": false,
+    "previous_frozen_directory": "/data/neon-build/validation/pg18-failures-final-v2-20261031",
+    "previous_manifest_sha256": "5d8d19924be79f8bce8ed6bf884b799d46ded77941bd96e78235c652f89fb8c3",
+    "previous_worker6": "/data/neon-build/validation/pg18-failures-attempt05-20261031T020819Z-12d489",
+    "previous_uring1": "/data/neon-build/validation/pg18-uring-attempt04-20261031T020819Z-d082c6"
+  },
+  "compiled_source_inputs_17": {
+    "src/backend/storage/buffer/Makefile": "6cd91761d9810ac875dae666dbcb909b86e526bb38ed34cc9511de3970fd7b80",
+    "src/backend/storage/buffer/bufmgr.c": "79045099021e465eb3349689d9c4f800dac01323d92c84c0b2c2bf28f2c9e482",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "a2d2ec423e21527a30a8d39fdabcb5610e0b13c6ed9e8929bca014290b798494",
+    "src/backend/storage/buffer/freelist.c": "8c5519231c46022c0fce78b59beda6f8765f7e8924df81fe609e51caecc73f3d",
+    "src/backend/storage/buffer/meson.build": "65ba224dbd2a8015abc6c76716e1656f17eb7505305dd11a3dc999ab2e1691bf",
+    "src/backend/storage/ipc/ipci.c": "ccf7722fb5db6650cecc62349565dd6f1a73976af56eb8512117ce5f2066c642",
+    "src/include/storage/buf_internals.h": "14d06111129ef7cd2c6e3b5d9b119554f5583c72d03c7ed5e2117ce7e6a895e6",
+    "src/include/storage/bufmgr.h": "cfeaeb793ec5df4fcb221d7f7db3c5f8b503b041ca3084bf9ae0daa763586f0c",
+    "src/include/storage/dsg_buffer_arrays.h": "fec5af7d7b5ade8e3a991de999c1447f396d33c23711f291e70001ee4e87cfb6",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "56b5719332a97b682e785a83b531b8f93ed71ee57634688f166b86b215874d02",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "bd88029658a554e9212ebca19e4a8e7ee7d16ea4c5eebad6344fc5a852cc622c",
+    "src/backend/storage/buffer/dsg_buffer_control.c": "1993a39deb7608bb95661ff6058e372f95ebdf0a6057c2e51d545e00b85f904e",
+    "src/backend/storage/buffer/dsg_buffer_grow.c": "43dc6b60f63d1cd1bbefe6bd4ab7ddc1b39d2adf4c015826500c979db73c0eab",
+    "src/backend/storage/buffer/dsg_buffer_shrink.c": "7f63ae0a85a7a0236f88025d49fc247d91c8746f4ccb07b5273312ffde83a97d",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "2c5cf5cac8e4c96f7b7edef9de62ef71a0d50aa72f8747b60c66a72e5abce6b2",
+    "src/include/storage/dynamic_shared_buffers.h": "831d0b224841f9fb33228b66759ab9b24262c0a86f2ccbc3df6fef3b3ccce813",
+    "src/test/modules/test_dsg_region18/t/test_resize18.py": "e030a1bb23501375961ae6ec531a3ee52611fe0ea79938209b619206308df37f"
+  },
+  "actual_reused_artifacts": {
+    "postgres": "b3a1aa6068158ccbcbf6e62ab66c1970b78f35d953d9c4b3ca27251de0ca5555",
+    "test_dsg_region18.so": "5cf4203c217aef27502dc69e04f5de2cd1e545ef2f0390e1f00c81ce7e5eacd6"
+  },
+  "pidfd_cold_restart_evidence": {
+    "captured_children": 8,
+    "all_original_pidfds_terminal_before_restart": true,
+    "numeric_pid_signal_cleanup": false,
+    "forced_live_child_kill_exercised": false,
+    "receipt": "/data/neon-build/validation/pg18-failures-attempt06-20261031T141347Z-1b2db6/evidence/SIGKILL-PM-cold-recovery.json"
+  }
+}

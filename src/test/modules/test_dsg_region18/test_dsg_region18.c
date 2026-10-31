@@ -10,6 +10,12 @@
 #include "storage/buf_internals.h"
 #include "storage/dsg_region.h"
 #include "storage/dsg_buffer_arrays.h"
+#include "storage/dynamic_shared_buffers.h"
+#include "storage/bufmgr.h"
+#include "storage/lockdefs.h"
+#include "access/relation.h"
+#include "utils/rel.h"
+#include "portability/instr_time.h"
 #include "utils/builtins.h"
 #include <errno.h>
 #include <stddef.h>
@@ -179,4 +185,128 @@ Datum
 test_dsg_arrays18_pause(PG_FUNCTION_ARGS)
 {
  Admin();DsgBufferArraysTestPause(PG_GETARG_BOOL(0));PG_RETURN_VOID();
+}
+
+/* Buffer protocol request layout is the exact17@99f7ff1 native ABI; wrappers are
+ * administrator-only TEST_ONLY calls, not Root source/budget or normal permits. */
+PG_FUNCTION_INFO_V1(test_dsg_resize18_state);
+PG_FUNCTION_INFO_V1(test_dsg_resize18_prepare);
+PG_FUNCTION_INFO_V1(test_dsg_resize18_request);
+PG_FUNCTION_INFO_V1(test_dsg_resize18_hold_tail);
+static text *
+Resize18JSON(const DsgBufferSnapshot *s,int disposition,const DsgBufferReceipt *receipt)
+{
+ StringInfoData out;
+ DsgBufferSharedCost cost;
+ DsgBufferAccess access;
+ int i;
+ int pins=0,io=0,wrefs=0;
+ DsgBufferGetSharedCost(&cost);
+ access=DsgBufferAccessBegin();
+ for(i=NBuffers;i<access.count;i++){
+  BufferDesc *b=GetBufferDescriptor(i);
+  uint32 state=LockBufHdr(b);
+  if(BUF_STATE_GET_REFCOUNT(state)>0)pins++;
+  if(state&BM_IO_IN_PROGRESS)io++;
+  if(pgaio_wref_valid(&b->io_wref))wrefs++;
+  UnlockBufHdr(b,state);
+ }
+ DsgBufferAccessEnd(&access);
+ initStringInfo(&out);
+ appendStringInfo(&out,"{\"boot\":\"" UINT64_FORMAT "\",\"generation\":\"" UINT64_FORMAT "\",\"floor\":\"" UINT64_FORMAT "\",\"revision\":\"" UINT64_FORMAT "\",\"low\":%d,\"high\":%d,\"maximum\":%d,\"phase\":%d,\"reason\":%d,\"disposition\":%d,\"replayed\":%s,\"main_upper\":\"%zu\",\"current_main_arrays_upper\":\"%zu\",\"tail_now\":{\"pinned\":%d,\"io\":%d,\"wref\":%d},\"normal_permit\":false,\"arrays\":[",s->boot_id,s->generation,s->issuer_floor_epoch,s->operation.request.revision,s->low,s->high,s->maximum,s->operation.phase,s->operation.reason,disposition,s->replayed?"true":"false",cost.startup_main_upper_bytes,cost.current_main_and_arrays_upper_bytes,pins,io,wrefs);
+ for(i=0;i<DSG_BUFFER_ARRAY_COUNT;i++){
+  if(i)appendStringInfoChar(&out,',');
+  appendStringInfo(&out,"{\"committed_upper\":\"%zu\",\"unknown\":%s,\"release_state\":%d,\"release_verified\":%s}",s->committed_upper_bytes[i],s->allocation_unknown[i]?"true":"false",s->release_state[i],s->release_result[i].physical_release_verified?"true":"false");
+ }
+ appendStringInfoString(&out,"],\"drain_counts\":[");
+ for(i=0;i<DSG_DRAIN_RESULT_COUNT;i++){if(i)appendStringInfoChar(&out,',');appendStringInfo(&out,"%u",s->operation.drain_counts[i]);}
+ appendStringInfo(&out,"],\"receipt_has_result\":%s,\"receipt_revision\":\"" UINT64_FORMAT "\",\"result_phase\":%d,\"result_high\":%d,\"result_generation\":\"" UINT64_FORMAT "\"}",receipt&&receipt->has_result?"true":"false",receipt?receipt->key.revision:0,receipt&&receipt->has_result?receipt->result.operation.phase:-1,receipt&&receipt->has_result?receipt->result.high:0,receipt&&receipt->has_result?receipt->result.generation:0);return cstring_to_text(out.data);
+}
+Datum
+test_dsg_resize18_state(PG_FUNCTION_ARGS)
+{
+ DsgBufferSnapshot s;
+ Admin();DsgBufferGetSnapshot(&s);PG_RETURN_TEXT_P(Resize18JSON(&s,-1,NULL));
+}
+Datum
+test_dsg_resize18_prepare(PG_FUNCTION_ARGS)
+{
+ DsgBufferSnapshot s;DsgBufferIssuerFenceResponse fence;
+ Admin();DsgBufferGetSnapshot(&s);
+ DsgBufferFenceIssuer(s.boot_id,1,&fence);
+ if(fence.disposition!=DSG_ISSUER_FENCED)elog(ERROR,"PG18 native test issuer not fenced");
+ DsgBufferSetAdmission(s.boot_id,1,s.generation,false);
+ PG_RETURN_VOID();
+}
+Datum
+test_dsg_resize18_request(PG_FUNCTION_ARGS)
+{
+ char *action;
+ int target,timeout;
+ int64 revision,expected;
+ DsgBufferSnapshot s;
+ DsgBufferResizeRequest request={0};
+ DsgBufferControlResponse response;
+ DsgBufferOperationKind kind;
+ Admin();action=text_to_cstring(PG_GETARG_TEXT_PP(0));target=PG_GETARG_INT32(1);revision=PG_GETARG_INT64(2);expected=PG_GETARG_INT64(3);timeout=PG_GETARG_INT32(4);
+ if(strcmp(action,"grow")==0)kind=DSG_OP_GROW;
+ else if(strcmp(action,"shrink")==0)kind=DSG_OP_SHRINK;
+ else ereport(ERROR,(errmsg("unknown native PG18 buffer operation")));
+ if(revision<=0||expected<=0)ereport(ERROR,(errmsg("positive native PG18 request identity required")));
+ DsgBufferGetSnapshot(&s);request.boot_id=s.boot_id;request.issuer_epoch=1;request.revision=revision;request.operation_id_high=0x18;request.operation_id_low=revision;request.expected_generation=expected;request.target_buffers=target;
+ /* Explicit test context, not a Root SHA/source/budget signature. Full request fields
+  * still participate in original replay/conflict identity comparisons. */
+ MemSet(request.context_hash,0x18,sizeof(request.context_hash));
+ DsgBufferControlResize(&request,kind,timeout,&response);
+ PG_RETURN_TEXT_P(Resize18JSON(&response.observed,response.receipt.disposition,&response.receipt));
+}
+Datum
+test_dsg_resize18_hold_tail(PG_FUNCTION_ARGS)
+{
+ Relation rel;
+ BlockNumber blocks,b;
+ volatile Buffer held=InvalidBuffer;
+ Buffer result=InvalidBuffer;
+ int hold=PG_GETARG_INT32(1);
+ instr_time begin,elapsed;
+ Admin();if(hold<1||hold>10000)elog(ERROR,"bounded native PG18 pin hold required");
+ rel=relation_open(PG_GETARG_OID(0),AccessShareLock);blocks=RelationGetNumberOfBlocks(rel);
+ PG_TRY();{
+  for(b=0;b<blocks;b++){
+   CHECK_FOR_INTERRUPTS();held=ReadBuffer(rel,b);
+   if(held>NBuffers)break;
+   ReleaseBuffer(held);held=InvalidBuffer;
+  }
+  if(!BufferIsValid(held))elog(ERROR,"native PG18 fixture did not actually pin dynamic tail");
+  result=held;INSTR_TIME_SET_CURRENT(begin);
+  for(;;){CHECK_FOR_INTERRUPTS();INSTR_TIME_SET_CURRENT(elapsed);INSTR_TIME_SUBTRACT(elapsed,begin);if(INSTR_TIME_GET_MILLISEC(elapsed)>=hold)break;pg_usleep(10000L);}
+  ReleaseBuffer(held);held=InvalidBuffer;
+ }PG_CATCH();{
+  if(BufferIsValid(held))ReleaseBuffer(held);
+  relation_close(rel,AccessShareLock);PG_RE_THROW();
+ }PG_END_TRY();
+ relation_close(rel,AccessShareLock);PG_RETURN_INT32(result);
+}
+
+PG_FUNCTION_INFO_V1(test_dsg_resize18_find_tail);
+Datum
+test_dsg_resize18_find_tail(PG_FUNCTION_ARGS)
+{
+ Relation rel;BlockNumber blocks,b;Buffer held=InvalidBuffer;StringInfoData out;
+ Admin();rel=relation_open(PG_GETARG_OID(0),AccessShareLock);blocks=RelationGetNumberOfBlocks(rel);
+ for(b=0;b<blocks;b++){
+  CHECK_FOR_INTERRUPTS();held=ReadBuffer(rel,b);
+  if(held>NBuffers)break;
+  ReleaseBuffer(held);held=InvalidBuffer;
+ }
+ if(!BufferIsValid(held)){relation_close(rel,AccessShareLock);elog(ERROR,"real dynamic tail fixture unavailable");}
+ initStringInfo(&out);appendStringInfo(&out,"{\"block\":%u,\"buffer\":%d}",b,held);
+ ReleaseBuffer(held);relation_close(rel,AccessShareLock);PG_RETURN_TEXT_P(cstring_to_text(out.data));
+}
+
+PG_FUNCTION_INFO_V1(test_dsg_arrays18_pause_before_unpin);
+Datum
+test_dsg_arrays18_pause_before_unpin(PG_FUNCTION_ARGS)
+{
+ Admin();DsgBufferArraysTestPauseBeforeUnpin(PG_GETARG_BOOL(0));PG_RETURN_VOID();
 }

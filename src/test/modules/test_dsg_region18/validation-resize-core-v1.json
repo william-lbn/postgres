@@ -1,0 +1,350 @@
+{
+  "stage": "PG18 native buffer core third batch TEST_ONLY default off",
+  "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+  "reference17": "99f7ff1dac70a28fab9a3980e9ad5eb07b042603",
+  "receipt": "/data/neon-build/validation/pg18-resize-native-attempt06-20261031T013226Z-da96a5",
+  "unit": "neon-pg18-resize-20261031t013226z-da96a5.service",
+  "nonce": "20261031T013226Z-da96a5",
+  "build": {
+    "exit": 0,
+    "seconds": 45.98067163399537,
+    "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+    "source_dirty": true,
+    "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6"
+  },
+  "binary_sha256": "b3a1aa6068158ccbcbf6e62ab66c1970b78f35d953d9c4b3ca27251de0ca5555  /opt/pg18/bin/postgres\n5cf4203c217aef27502dc69e04f5de2cd1e545ef2f0390e1f00c81ce7e5eacd6  /opt/pg18/lib/postgresql/test_dsg_region18.so\n",
+  "source_inputs": {
+    "src/backend/storage/buffer/Makefile": "6cd91761d9810ac875dae666dbcb909b86e526bb38ed34cc9511de3970fd7b80",
+    "src/backend/storage/buffer/bufmgr.c": "79045099021e465eb3349689d9c4f800dac01323d92c84c0b2c2bf28f2c9e482",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "a2d2ec423e21527a30a8d39fdabcb5610e0b13c6ed9e8929bca014290b798494",
+    "src/backend/storage/buffer/freelist.c": "8c5519231c46022c0fce78b59beda6f8765f7e8924df81fe609e51caecc73f3d",
+    "src/backend/storage/buffer/meson.build": "65ba224dbd2a8015abc6c76716e1656f17eb7505305dd11a3dc999ab2e1691bf",
+    "src/backend/storage/ipc/ipci.c": "ccf7722fb5db6650cecc62349565dd6f1a73976af56eb8512117ce5f2066c642",
+    "src/include/storage/buf_internals.h": "14d06111129ef7cd2c6e3b5d9b119554f5583c72d03c7ed5e2117ce7e6a895e6",
+    "src/include/storage/bufmgr.h": "cfeaeb793ec5df4fcb221d7f7db3c5f8b503b041ca3084bf9ae0daa763586f0c",
+    "src/include/storage/dsg_buffer_arrays.h": "fec5af7d7b5ade8e3a991de999c1447f396d33c23711f291e70001ee4e87cfb6",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "56b5719332a97b682e785a83b531b8f93ed71ee57634688f166b86b215874d02",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "bd88029658a554e9212ebca19e4a8e7ee7d16ea4c5eebad6344fc5a852cc622c",
+    "src/backend/storage/buffer/dsg_buffer_control.c": "1993a39deb7608bb95661ff6058e372f95ebdf0a6057c2e51d545e00b85f904e",
+    "src/backend/storage/buffer/dsg_buffer_grow.c": "43dc6b60f63d1cd1bbefe6bd4ab7ddc1b39d2adf4c015826500c979db73c0eab",
+    "src/backend/storage/buffer/dsg_buffer_shrink.c": "7f63ae0a85a7a0236f88025d49fc247d91c8746f4ccb07b5273312ffde83a97d",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "2c5cf5cac8e4c96f7b7edef9de62ef71a0d50aa72f8747b60c66a72e5abce6b2",
+    "src/include/storage/dynamic_shared_buffers.h": "831d0b224841f9fb33228b66759ab9b24262c0a86f2ccbc3df6fef3b3ccce813",
+    "src/test/modules/test_dsg_region18/t/test_resize18.py": "e030a1bb23501375961ae6ec531a3ee52611fe0ea79938209b619206308df37f"
+  },
+  "actual_container_input_hashes_match": true,
+  "source_mount": "immutable Git+overlay /src:ro bind, not source COPY in image",
+  "limits": {
+    "cpus": 4,
+    "memory_gib": 5,
+    "make_jobs": 4,
+    "ccache_max_gib": 1,
+    "network": "none",
+    "nnp": true,
+    "cap_drop": "ALL"
+  },
+  "new_cohort": {
+    "pass": true,
+    "expected_roots": 10,
+    "tests_run": 10,
+    "tests": [
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_001_real_grow_dirty_shrink_regrow",
+        "result": "PASS",
+        "seconds": 1.3765677400006098,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_002_actual_tail_pin_denies_then_retry",
+        "result": "PASS",
+        "seconds": 3.243261370000255,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_003_live_worker_read_stream_and_checkpoint",
+        "result": "PASS",
+        "seconds": 1.2663977799966233,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_004_new_API_original_session_ACL",
+        "result": "PASS",
+        "seconds": 0.850859231002687,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_005_real_worker_IO_pin_denies_then_retry",
+        "result": "PASS",
+        "seconds": 1.3832007349992637,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_006_after_unpin_completion_lease_denies_then_retry",
+        "result": "PASS",
+        "seconds": 1.388316432996362,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_007_checkpoint_lease_retains_backing_across_regrow",
+        "result": "PASS",
+        "seconds": 1.795503531000577,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_008_original18_eviction_entrypoints_keep_scope",
+        "result": "PASS",
+        "seconds": 1.2823128620002535,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_S_RESIZE_009_unlogged_sequence_releases_relation_scan_scope",
+        "result": "PASS",
+        "seconds": 0.8163143119963934,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Resize.test_PG18_U_RESIZE_001_replay_is_historical_not_current",
+        "result": "PASS",
+        "seconds": 0.842590032996668,
+        "detail": ""
+      }
+    ],
+    "test_source_sha256": "e030a1bb23501375961ae6ec531a3ee52611fe0ea79938209b619206308df37f",
+    "not_proven": [
+      "production dynamic shared_buffers resize and all ordinary buffer readers/pins",
+      "actual full shrink/retry controller (component tests completion exclusion only)",
+      "io_uring runtime/profile certification",
+      "DSM/Work/Root cost sources",
+      "Neon compute18 extensions",
+      "safe normal decrease",
+      "KVM/Kubernetes E2E"
+    ]
+  },
+  "direct_regressions": {
+    "pass": true,
+    "expected_roots": 8,
+    "tests_run": 8,
+    "tests": [
+      {
+        "test": "pg18_region.Arrays.test_PG18_S_ARRAYS_001_actual_four_native_arrays",
+        "result": "PASS",
+        "seconds": 1.1883861039968906,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Arrays.test_PG18_S_ARRAYS_002_worker_AIO_data_and_completion",
+        "result": "PASS",
+        "seconds": 2.360414378999849,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Arrays.test_PG18_S_ARRAYS_003_actual_completion_window_excludes_drain",
+        "result": "PASS",
+        "seconds": 1.2204310130036902,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Arrays.test_PG18_S_ARRAYS_004_original_PM_recovery_three_times",
+        "result": "PASS",
+        "seconds": 2.226035118001164,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Arrays.test_PG18_S_ARRAYS_005_default_off_and_new_API_ACL",
+        "result": "PASS",
+        "seconds": 0.8195501060035895,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Arrays.test_PG18_S_ARRAYS_006_restarted_logger_drops_actual_inherited_backing",
+        "result": "PASS",
+        "seconds": 1.22836603000178,
+        "detail": ""
+      },
+      {
+        "test": "pg18_region.Arrays.test_PG18_U_ARRAYS_001_strict_profile_rejects",
+        "result": "PASS",
+        "seconds": 4.2862179769945215,
+        "detail": ""
+      },
+      {
+        "test": "stock18.Region.test_PG18_S_AIO_001_stock_sync_and_worker_data",
+        "result": "PASS",
+        "seconds": 1.780117098998744,
+        "detail": ""
+      }
+    ],
+    "test_source_sha256": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+    "not_proven": [
+      "production Root/Source/normal qualification for resize",
+      "complete crash/cancel/error matrix with resized18 AIO",
+      "io_uring runtime/profile certification",
+      "DSM/Work/Root cost sources",
+      "Neon compute18 extensions",
+      "safe normal decrease",
+      "KVM/Kubernetes E2E"
+    ]
+  },
+  "direct_regressions_exit": {
+    "exit": 0,
+    "seconds": 16.966909732000204,
+    "same_binary_source_receipt": "/data/neon-build/validation/pg18-resize-native-attempt06-20261031T013226Z-da96a5",
+    "runner_sha256": "2804365f785042e95d3d39f9a66694fb2fcdd9141e84156713dc778e07eca5fe"
+  },
+  "aggregate": {
+    "roots": 18,
+    "unit_roots": 2,
+    "native_service_roots": 16,
+    "skips": 0,
+    "end_to_end_roots": 0
+  },
+  "previous_attempts": [
+    {
+      "receipt": "/data/neon-build/validation/pg18-resize-native-attempt01-20261031T010132Z-2762a8",
+      "files": {
+        "build-result.json": {
+          "sha256": "f4001be8cd6a0b22f7019679e920dc1a949f8c53732bcbf0372f8fb3ccbf36dc",
+          "value": {
+            "exit": 2,
+            "seconds": 96.44600486799754,
+            "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+            "source_dirty": true,
+            "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6"
+          }
+        }
+      }
+    },
+    {
+      "receipt": "/data/neon-build/validation/pg18-resize-native-attempt02-20261031T011022Z-d6c0b7",
+      "files": {
+        "build-result.json": {
+          "sha256": "f0ae6c1fc93c4a9eb77519465aafd27a1e1f3c1d2e6ccbf7b905068afacf9a29",
+          "value": {
+            "exit": 0,
+            "seconds": 90.06635973700031,
+            "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+            "source_dirty": true,
+            "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6"
+          }
+        },
+        "test-exit.json": {
+          "sha256": "501e4fc10fcd98ded60dfb1d7423f467f0200edd223a1ba9147647263c99fc58",
+          "value": {
+            "exit": 0,
+            "seconds": 14.206448750002892
+          }
+        },
+        "evidence/test-result.json": {
+          "sha256": "58c4e7b702052f37a58454d783bcb4879f42015671f0e9ebfee9fe6bcbf59297",
+          "value": {
+            "pass": true,
+            "tests_run": 7
+          }
+        }
+      }
+    },
+    {
+      "receipt": "/data/neon-build/validation/pg18-resize-native-attempt03-20261031T011631Z-56517f",
+      "files": {
+        "build-result.json": {
+          "sha256": "c5e66f956895cdab1eecea50fcff897451bc54e3bfcdf3254724e08826045b9a",
+          "value": {
+            "exit": 0,
+            "seconds": 45.512499008000304,
+            "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+            "source_dirty": true,
+            "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6"
+          }
+        },
+        "test-exit.json": {
+          "sha256": "e1c0f5068d72133a225e106d21e567589b48c20daf38b8cb683efb48558e4b29",
+          "value": {
+            "exit": 0,
+            "seconds": 8.032803075999254
+          }
+        },
+        "evidence/test-result.json": {
+          "sha256": "74b13ddf14e8ff9832fb180a06c9e666bf5e6454dcac2d4d738aba4dce28edf3",
+          "value": {
+            "pass": true,
+            "tests_run": 5
+          }
+        }
+      }
+    },
+    {
+      "receipt": "/data/neon-build/validation/pg18-resize-native-attempt04-20261031T012215Z-6dbca1",
+      "files": {
+        "build-result.json": {
+          "sha256": "b93200eb83cbf40d1c5978dd8699866b2ff4df8e8eeab8b26939fb71037c7abc",
+          "value": {
+            "exit": 0,
+            "seconds": 44.04777689799812,
+            "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+            "source_dirty": true,
+            "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6"
+          }
+        },
+        "test-exit.json": {
+          "sha256": "e9e68221df1ee5f987bdf145734ece4cbba5ce0a57a7e7843a73ad616a066444",
+          "value": {
+            "exit": 1,
+            "seconds": 10.953400447004242
+          }
+        },
+        "evidence/test-result.json": {
+          "sha256": "f93eb55f8bba8c8d4cc337eec049c9fd3171c361b28cea47cae923abc39ff791",
+          "value": {
+            "pass": false,
+            "tests_run": 7
+          }
+        }
+      }
+    },
+    {
+      "receipt": "/data/neon-build/validation/pg18-resize-native-attempt05-20261031T012850Z-d0691d",
+      "files": {
+        "build-result.json": {
+          "sha256": "39643df601267ea3deebdcec15fe0bdd1505638d3520d76a394607b9e95cdba5",
+          "value": {
+            "exit": 0,
+            "seconds": 44.01219895000395,
+            "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+            "source_dirty": true,
+            "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6"
+          }
+        },
+        "test-exit.json": {
+          "sha256": "9877a8143a35f51242d3b93a8ec9f35909db2dcc8748f1d9a3addd22090c0a95",
+          "value": {
+            "exit": 1,
+            "seconds": 13.956530768002267
+          }
+        },
+        "evidence/test-result.json": {
+          "sha256": "3ccbea0218669288aee0964edfc8f2bea39cec45f3f599e542f8d1b16a18b618",
+          "value": {
+            "pass": false,
+            "tests_run": 9
+          }
+        }
+      }
+    }
+  ],
+  "proven_before_fix_counterexample": {
+    "path": "/data/neon-build/validation/pg18-resize-native-attempt05-20261031T012850Z-d0691d/flush-regression-before-fix",
+    "actual_error": "DSGA control cannot run while holding buffer coordination locks",
+    "exit": 1,
+    "fixed_by": "normal DsgBufferAccessEnd at FlushRelationBuffers end; same backend successful after fix"
+  },
+  "raw_receipt_note": "attempt06 original runner inherited stale not_proven labels from arrays-only stage; files retained verbatim. Native Grow/Shrink/Retry is truly tested now; production Source/Root/normal qualification and full crash/cancel matrix remain unproven. The authoritative scope is README and this catalog, not renamed old log content.",
+  "not_proven": [
+    "Root split arrays helper production path; current TEST_ONLY PG direct population",
+    "Root birth/source/continuous F/I/K and normal decrease qualification",
+    "Work/DSM/required connection gate and complete Neon18 extensions",
+    "all resized cancel/ERROR/FATAL/crash interleavings",
+    "grown-tail extension statistics/autoprewarm adaptation",
+    "io_uring runtime and normal IO source",
+    "true KVM and Kubernetes end-to-end"
+  ]
+}

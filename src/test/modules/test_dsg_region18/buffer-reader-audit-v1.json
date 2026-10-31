@@ -1,0 +1,123 @@
+{
+  "scope": "PG18 TEST_ONLY native Buffer core, not whole normal qualification",
+  "base18": "ea00b20794e301e888717f9d97d71829600ef781",
+  "readonly_reference17": "99f7ff1dac70a28fab9a3980e9ad5eb07b042603",
+  "invariants": [
+    "resizeX串行整个操作和同步provider",
+    "accessX短持有且不得等待pin/IO/completion",
+    "pin/IOVEC/worker必须真实排空",
+    "checkpoint busy retained backing and committed upper",
+    "historical receipt separated from current observation",
+    "target>=startup N0; M geometry fixed; no protocol/schema change"
+  ],
+  "readers": [
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "ReadRecentBuffer",
+        "BufferAlloc",
+        "GetVictimBuffer"
+      ],
+      "contract": "accessS→mapping→header；无pin查到descriptor必须先保数组；正常pin建立后才可放accessS；victim/ring按L而不是M分配。"
+    },
+    {
+      "source": "src/backend/storage/buffer/freelist.c",
+      "functions": [
+        "ClockSweepTick",
+        "StrategyGetBuffer",
+        "StrategyFreeBuffer",
+        "StrategyFilterAllocationFence",
+        "GetBufferFromRing",
+        "StrategyAddBufferRange"
+      ],
+      "contract": "L是分配栅栏，H是已发布backing，M是预留上限。L下降后过滤free链与ring；tail不会成为新victim；Grow在resizeX下初始化后才能发布H/L。"
+    },
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "DropRelationBuffers",
+        "DropRelationsAllBuffers",
+        "FindAndDropRelationBuffers",
+        "DropDatabaseBuffers",
+        "FlushRelationBuffers",
+        "FlushRelationsAllBuffers",
+        "FlushDatabaseBuffers"
+      ],
+      "contract": "原tag/header语义保持；raw扫描统一accessS、候选按实际H；最后正常End与ERROR/FATAL原生LWLockReleaseAll成对；不在accessX里做存储IO。"
+    },
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "WaitIO",
+        "WaitIOImpl",
+        "WaitIOCancelSleep"
+      ],
+      "contract": "18原pgaio_wref拷贝/等待/重新CV Prepare保留。InvalidateBuffer无己pin时用独立ResourceOwner取得真实pin，清CV后才unpin；不向releasing owner注册、不伪造refcount。完整resize状态下ERROR/FATAL/取消矩阵仍后继验收。"
+    },
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "UnpinBuffer",
+        "UnpinBufferNoOwner"
+      ],
+      "contract": "neon_test_evict在自身最后pin仍有效时做；减最后共享引用前复制waiter procno并清标志；减后仅访问私有entry/保存的procno，不再读descriptor。"
+    },
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "CheckPointBuffers",
+        "BufferSync",
+        "SyncOneBuffer"
+      ],
+      "contract": "checkpointS保Ckpt排序区；单项候选需短accessS验证当前H和flag再pin；shrink checkpointX只能try，忙保旧backing/成本；regrow跳过已准备旧前缀。"
+    },
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "EvictUnpinnedBuffer",
+        "EvictAllUnpinnedBuffers",
+        "EvictRelUnpinnedBuffers",
+        "EvictUnpinnedBufferInternal"
+      ],
+      "contract": "保留18新增批量API和outparam；三个outer持scope，Internal只断言调用者已持access，不重复释放；实际pg_buffercache relation/all驱逐已测。"
+    },
+    {
+      "source": "src/backend/storage/aio/aio.c",
+      "functions": [
+        "pgaio_io_process_completion"
+      ],
+      "contract": "18原ioh状态/共享callback顺序保留；真实kernel IO结束后才进共享回调。该文件未修改。"
+    },
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "buffer_readv_complete_one",
+        "TerminateBufferIO"
+      ],
+      "contract": "提交前IO subsystem增加真实pin/wref；worker/backend callback先completionS，再清IO/pin/wref，再IOCV广播/最后WakePinCountWaiter，再释放completionS。shrink发布必须accessX→completionX try；忙原H/gen/账不动。"
+    },
+    {
+      "source": "src/backend/storage/buffer/bufmgr.c",
+      "functions": [
+        "GetPinLimit",
+        "InitBufferPoolBackend"
+      ],
+      "contract": "18 per-backend pin limit在native且原Neon get_pin_limit_hook未设置时按当前L刷新；保留hook；初始化N0值不是可回收上界。"
+    },
+    {
+      "source": "contrib/pg_buffercache/pg_buffercache_pages.c;contrib/pg_prewarm/autoprewarm.c",
+      "functions": [
+        "NBuffers prefix loops"
+      ],
+      "contract": "只读审查：仍扫不可低于N0的永久前缀，当前shrink拒target<N0故无已释放tail访问；这些视图尚未扩大到grown H，会少报tail，不称完整18扩展适配。未修改这两contrib。"
+    },
+    {
+      "source": "src/backend/storage/aio/read_stream.c;src/backend/storage/aio/method_worker.c",
+      "functions": [
+        "read_stream lifecycle",
+        "worker IO execution"
+      ],
+      "contract": "原普通caller pins/IO subsystem pins覆盖iovec指向页；未改18 AIO调度/worker或照搬17 PM生命周期；test worker始终2，未全局关闭AIO。Root对io_uring独立来源尚未认证。"
+    }
+  ]
+}

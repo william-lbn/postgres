@@ -19,6 +19,7 @@
 #include "port/atomics.h"
 #include "storage/buf_internals.h"
 #include "storage/bufmgr.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/proc.h"
 
 #define INT_ACCESS_ONCE(var)	((int)(*((volatile int *)&(var))))
@@ -35,12 +36,14 @@ typedef struct
 	/*
 	 * Clock sweep hand: index of next buffer to consider grabbing. Note that
 	 * this isn't a concrete buffer - we only ever increase the value. So, to
-	 * get an actual buffer, it needs to be used modulo NBuffers.
+	 * get an actual buffer, it needs to be used modulo the live allocation
+	 * limit.
 	 */
 	pg_atomic_uint32 nextVictimBuffer;
 
 	int			firstFreeBuffer;	/* Head of list of unused buffers */
 	int			lastFreeBuffer; /* Tail of list of unused buffers */
+	int			detachedFreeBuffer; /* DSGA固定共享游标，由resizeX+strategy锁保护 */
 
 	/*
 	 * NOTE: lastFreeBuffer is undefined when firstFreeBuffer is -1 (that is,
@@ -108,6 +111,12 @@ static inline uint32
 ClockSweepTick(void)
 {
 	uint32		victim;
+	uint32		low = GetLowNBuffers();
+
+	/*
+	 * L 只在数组独占保护下改变；此处读侧 Guard 保证整个选择过程边界稳定。
+	 */
+	Assert(DSBCtrl == NULL || LWLockHeldByMe(&DSBCtrl->access_lock));
 
 	/*
 	 * Atomically move hand ahead one buffer - if there's several processes
@@ -117,12 +126,12 @@ ClockSweepTick(void)
 	victim =
 		pg_atomic_fetch_add_u32(&StrategyControl->nextVictimBuffer, 1);
 
-	if (victim >= NBuffers)
+	if (victim >= low)
 	{
 		uint32		originalVictim = victim;
 
 		/* always wrap what we look up in BufferDescriptors */
-		victim = victim % NBuffers;
+		victim = victim % low;
 
 		/*
 		 * If we're the one that just caused a wraparound, force
@@ -150,7 +159,7 @@ ClockSweepTick(void)
 				 */
 				SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
 
-				wrapped = expected % NBuffers;
+				wrapped = expected % low;
 
 				success = pg_atomic_compare_exchange_u32(&StrategyControl->nextVictimBuffer,
 														 &expected, wrapped);
@@ -298,6 +307,13 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 			 * it before we got to it.  It's probably impossible altogether as
 			 * of 8.3, but we'd better check anyway.)
 			 */
+
+			/*
+			 * DRAINING 尾部不再分配；读取 freeNext 的阶段仍由外层
+			 * Guard 保护。
+			 */
+			if (buf->buf_id >= GetLowNBuffers())
+				continue;
 			local_buf_state = LockBufHdr(buf);
 			if (BUF_STATE_GET_REFCOUNT(local_buf_state) == 0
 				&& BUF_STATE_GET_USAGECOUNT(local_buf_state) == 0)
@@ -312,7 +328,7 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 	}
 
 	/* Nothing on the freelist, so run the "clock sweep" algorithm */
-	trycounter = NBuffers;
+	trycounter = GetLowNBuffers();
 	for (;;)
 	{
 		buf = GetBufferDescriptor(ClockSweepTick());
@@ -329,7 +345,7 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 			{
 				local_buf_state -= BUF_USAGECOUNT_ONE;
 
-				trycounter = NBuffers;
+				trycounter = GetLowNBuffers();
 			}
 			else
 			{
@@ -362,7 +378,21 @@ StrategyGetBuffer(BufferAccessStrategy strategy, uint32 *buf_state, bool *from_r
 void
 StrategyFreeBuffer(BufferDesc *buf)
 {
+	Size		index = ((char *) buf - (char *) BufferDescriptors) / sizeof(BufferDescPadded);
+
+	/*-
+	 * 调用者可能已放下最后 pin，也可能仍持 mapping 锁；这里不能再取
+	 * access 锁。先按稳定 VA 算索引，在 strategy 锁内检查 L 再解引用。
+	 * 所有 L 下降必须由下方 helper 在同一锁内发布并过滤，H 始终不小于 L。
+	 */
 	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	if (index >= (Size) GetLowNBuffers())
+	{
+		SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+		return;
+	}
+	/* 与 Grow 初始化完成后、发布 L 之前的写屏障配对。 */
+	pg_read_barrier();
 
 	/*
 	 * It is possible that we are told to put something in the freelist that
@@ -377,6 +407,107 @@ StrategyFreeBuffer(BufferDesc *buf)
 	}
 
 	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+}
+
+/*-
+ * 内部协调器的分配栅栏：只降低或恢复 L<=H，不发布 H，也不回收物理页。
+ * 调用者持 resize + access 独占锁，禁止携带 mapping/header 锁；锁序为
+ * access -> strategy -> status。status 只覆盖短发布，不包住链表遍历。
+ * L 下降必须与 freelist 摘链同锁，防止过滤后再次插入待回收尾部。
+ *
+ * 在accessX内只做常数次发布和摘链。游标放在固定共享控制区，FATAL在
+ * 原生放锁后可由下一协调者继续；禁止依赖退出进程栈上的旧链指针。
+ */
+void
+StrategyBeginAllocationFence(int limit)
+{
+	Assert(DSBCtrl != NULL && limit >= NBuffers && limit <= GetHighNBuffers());
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->access_lock, LW_EXCLUSIVE));
+	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	Assert(StrategyControl->detachedFreeBuffer < 0);
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	pg_atomic_write_u32(&DSBCtrl->low, limit);
+	SpinLockRelease(&DSBCtrl->status_lock);
+	StrategyControl->detachedFreeBuffer = StrategyControl->firstFreeBuffer;
+	StrategyControl->firstFreeBuffer = FREENEXT_END_OF_LIST;
+	StrategyControl->lastFreeBuffer = FREENEXT_END_OF_LIST;
+	pg_atomic_write_u32(&StrategyControl->nextVictimBuffer, 0);
+	StrategyControl->completePasses++;
+	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+}
+
+/*-
+ * 此时只需resizeX保持H/backing不变，不阻塞查询的短Guard。旧链节点在
+ * 处理前保留非NOT_IN_LIST标记，StrategyFreeBuffer不会改写next；Clock
+ * 可以使用对象但不改这个字段。每次在同strategy锁内推进共享游标、去掉
+ * 旧标记并重接低于L的节点，保证任何退出点都能继续且不会重复插入。
+ */
+bool
+StrategyFilterAllocationFence(int batch_size)
+{
+	int			i;
+
+	Assert(LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+	Assert(batch_size > 0);
+	for (i = 0; i < batch_size; i++)
+	{
+		int			current;
+		BufferDesc *buf;
+
+		SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+		current = StrategyControl->detachedFreeBuffer;
+		if (current < 0)
+		{
+			SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+			return true;
+		}
+		Assert(current < GetHighNBuffers());
+		buf = GetBufferDescriptor(current);
+		StrategyControl->detachedFreeBuffer = buf->freeNext;
+		buf->freeNext = FREENEXT_NOT_IN_LIST;
+		if (current < GetLowNBuffers())
+		{
+			buf->freeNext = StrategyControl->firstFreeBuffer;
+			if (buf->freeNext < 0)
+				StrategyControl->lastFreeBuffer = current;
+			StrategyControl->firstFreeBuffer = current;
+		}
+		SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+	}
+	return false;
+}
+
+/* 测试/原有内部同步接口；真正Shrink使用有界过滤，不长持accessX。 */
+void
+StrategySetAllocationLimit(int limit)
+{
+	StrategyBeginAllocationFence(limit);
+	while (!StrategyFilterAllocationFence(128))
+		;
+}
+
+/*-
+ * 未发布H时撤销分配栅栏。先只扩大已初始化前缀的可选择范围，再收尾旧链；
+ * 已过滤掉的尾部节点由Clock照常找到，尚未过滤的旧节点可重新接入freelist。
+ * 此处不等待accessX，保证取消/FATAL清理不会为回滚L无限等待长扫描Guard。
+ * resizeX保证H不变；同strategy锁串行所有插入者，按既有strategy->status锁序。
+ */
+void
+StrategyRestoreAllocationLimit(void)
+{
+	Assert(DSBCtrl != NULL && LWLockHeldByMeInMode(&DSBCtrl->resize_lock, LW_EXCLUSIVE));
+	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	pg_atomic_write_u32(&DSBCtrl->low, GetHighNBuffers());
+	SpinLockRelease(&DSBCtrl->status_lock);
+	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+	/*-
+	 * 错误清理必须完成尚未过滤的旧链，不能留下悬空的next引用。这里无
+	 * IO/长LWLock等待，H由resizeX固定；恢复L后所有旧节点都重新可选择。
+	 */
+	while (!StrategyFilterAllocationFence(128))
+		;
 }
 
 /*
@@ -395,10 +526,12 @@ StrategySyncStart(uint32 *complete_passes, uint32 *num_buf_alloc)
 {
 	uint32		nextVictimBuffer;
 	int			result;
+	uint32		low;
 
 	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
 	nextVictimBuffer = pg_atomic_read_u32(&StrategyControl->nextVictimBuffer);
-	result = nextVictimBuffer % NBuffers;
+	low = GetLowNBuffers();
+	result = nextVictimBuffer % low;
 
 	if (complete_passes)
 	{
@@ -408,7 +541,7 @@ StrategySyncStart(uint32 *complete_passes, uint32 *num_buf_alloc)
 		 * Additionally add the number of wraparounds that happened before
 		 * completePasses could be incremented. C.f. ClockSweepTick().
 		 */
-		*complete_passes += nextVictimBuffer / NBuffers;
+		*complete_passes += nextVictimBuffer / low;
 	}
 
 	if (num_buf_alloc)
@@ -441,6 +574,25 @@ StrategyNotifyBgWriter(int bgwprocno)
 }
 
 
+/*-
+ * 只在 resize 串行锁及数组独占锁内，把已初始化、尚未发布的新前缀
+ * 追加到 freelist。锁序是 access -> strategy；不允许调用者持 header
+ * 或 mapping 锁。H/L 发布在调用后完成，读侧选择器此时无法进入。
+ */
+void
+StrategyAddBufferRange(int first, int count)
+{
+	Assert(DSBCtrl != NULL && LWLockHeldByMeInMode(&DSBCtrl->access_lock, LW_EXCLUSIVE));
+	Assert(first == GetHighNBuffers() && count > 0 && count <= GetMaxNBuffers() - first);
+	SpinLockAcquire(&StrategyControl->buffer_strategy_lock);
+	if (StrategyControl->firstFreeBuffer < 0)
+		StrategyControl->firstFreeBuffer = first;
+	else
+		GetBufferDescriptor(StrategyControl->lastFreeBuffer)->freeNext = first;
+	StrategyControl->lastFreeBuffer = first + count - 1;
+	SpinLockRelease(&StrategyControl->buffer_strategy_lock);
+}
+
 /*
  * StrategyShmemSize
  *
@@ -455,7 +607,11 @@ StrategyShmemSize(void)
 	Size		size = 0;
 
 	/* size of lookup hash table ... see comment in StrategyInitialize */
-	size = add_size(size, BufTableShmemSize(NBuffers + NUM_BUFFER_PARTITIONS));
+
+	/*
+	 * Hash 上限固定为 M；在线扩容不得超出启动时的条目预算。
+	 */
+	size = add_size(size, BufTableShmemSize(GetMaxNBuffers() + NUM_BUFFER_PARTITIONS));
 
 	/* size of the shared replacement strategy control block */
 	size = add_size(size, MAXALIGN(sizeof(BufferStrategyControl)));
@@ -485,7 +641,7 @@ StrategyInitialize(bool init)
 	 * happening in each partition concurrently, so we could need as many as
 	 * NBuffers + NUM_BUFFER_PARTITIONS entries.
 	 */
-	InitBufTable(NBuffers + NUM_BUFFER_PARTITIONS);
+	InitBufTable(GetMaxNBuffers() + NUM_BUFFER_PARTITIONS);
 
 	/*
 	 * Get or create the shared strategy control block
@@ -510,6 +666,7 @@ StrategyInitialize(bool init)
 		 */
 		StrategyControl->firstFreeBuffer = 0;
 		StrategyControl->lastFreeBuffer = NBuffers - 1;
+		StrategyControl->detachedFreeBuffer = FREENEXT_END_OF_LIST;
 
 		/* Initialize the clock sweep pointer */
 		pg_atomic_init_u32(&StrategyControl->nextVictimBuffer, 0);
@@ -638,7 +795,7 @@ GetAccessStrategyWithSize(BufferAccessStrategyType btype, int ring_size_kb)
 		return NULL;
 
 	/* Cap to 1/8th of shared_buffers */
-	ring_buffers = Min(NBuffers / 8, ring_buffers);
+	ring_buffers = Min(GetLowNBuffers() / 8, ring_buffers);
 
 	/* NBuffers should never be less than 16, so this shouldn't happen */
 	Assert(ring_buffers > 0);
@@ -689,7 +846,7 @@ int
 GetAccessStrategyPinLimit(BufferAccessStrategy strategy)
 {
 	if (strategy == NULL)
-		return NBuffers;
+		return GetLowNBuffers();
 
 	switch (strategy->btype)
 	{
@@ -751,8 +908,15 @@ GetBufferFromRing(BufferAccessStrategy strategy, uint32 *buf_state)
 	 * slot by calling AddBufferToRing with the new buffer.
 	 */
 	bufnum = strategy->buffers[strategy->current];
-	if (bufnum == InvalidBuffer)
+
+	/*
+	 * 先拒绝旧环中的尾部 ID，再读取描述符；grow 后允许重新填充该槽。
+	 */
+	if (bufnum == InvalidBuffer || bufnum > GetLowNBuffers())
+	{
+		strategy->buffers[strategy->current] = InvalidBuffer;
 		return NULL;
+	}
 
 	/*
 	 * If the buffer is pinned we cannot use it under any circumstances.

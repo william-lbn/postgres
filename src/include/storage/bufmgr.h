@@ -334,7 +334,7 @@ extern int	GetAccessStrategyPinLimit(BufferAccessStrategy strategy);
 
 extern void FreeAccessStrategy(BufferAccessStrategy strategy);
 
-extern uint32 (*get_pin_limit_hook)(void);
+extern uint32 (*get_pin_limit_hook) (void);
 
 /* inline functions */
 
@@ -346,6 +346,8 @@ extern uint32 (*get_pin_limit_hook)(void);
  */
 
 #ifndef FRONTEND
+
+#include "storage/dynamic_shared_buffers.h"
 
 /*
  * BufferIsValid
@@ -369,7 +371,7 @@ extern uint32 (*get_pin_limit_hook)(void);
 static inline bool
 BufferIsValid(Buffer bufnum)
 {
-	Assert(bufnum <= NBuffers);
+	Assert(bufnum <= GetHighNBuffers());
 	Assert(bufnum >= -NLocBuffer);
 
 	return bufnum != InvalidBuffer;

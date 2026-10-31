@@ -452,6 +452,10 @@ extern bool StrategyRejectBuffer(BufferAccessStrategy strategy,
 
 extern int	StrategySyncStart(uint32 *complete_passes, uint32 *num_buf_alloc);
 extern void StrategyNotifyBgWriter(int bgwprocno);
+extern void StrategyAddBufferRange(int first, int count);
+extern void StrategySetAllocationLimit(int limit);
+extern void StrategyBeginAllocationFence(int limit);
+extern bool StrategyFilterAllocationFence(int batch_size);
 
 extern Size StrategyShmemSize(void);
 extern void StrategyInitialize(bool init);

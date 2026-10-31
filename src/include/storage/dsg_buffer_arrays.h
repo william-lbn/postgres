@@ -27,4 +27,7 @@ extern void DsgBufferCompletionEnter(DsgBufferCompletionLease *lease);
 extern void DsgBufferCompletionAfterUnpin(void);
 extern void DsgBufferCompletionLeave(DsgBufferCompletionLease *lease);
 extern void DsgBufferArraysTestPause(bool pause);
+extern void DsgBufferArraysTestPauseBeforeUnpin(bool pause);
+extern bool DsgBufferArraysTryCompletionBarrier(void);
+extern void DsgBufferArraysEndCompletionBarrier(void);
 #endif

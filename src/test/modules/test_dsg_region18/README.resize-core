@@ -1,0 +1,70 @@
+PG18 Buffer Grow/Shrink/Regrow 原生内核组件（第三批，默认关闭）
+
+本批只在Linux独立postgres-v18的codex/dsga-pg18-v1-20261031实现；准确基线
+为ea00b20794e301e888717f9d97d71829600ef781，维护源为Neon REL_18_STABLE_neon。
+只读参考PG17 99f7ff1dac70a28fab9a3980e9ad5eb07b042603；17首Buffer增量基线
+3e247b582b3f9139c523636bd4a69cf808c98d07，精确delta/拒绝hunk/人工18冲突处理
+留/data/neon-build/validation/pg18-buffer-core-reference-20261031。未复制Mac业务源、
+未改PG17/Neon gitlink/发行锁/公共Source-WAL-Buffer/Work布局。
+
+仍只支持显式NEON_DSGA_PG18_NATIVE_ARRAYS=test-v1:M测试profile，默认关闭，
+root-v1或无效M拒绝而不降级。M>=启动N0；逻辑target不得小于N0。test env和SQL
+管理员包装没有Root生产资格，快照normal_permit/resize_authorized仍false。新的
+Grow/Shrink入口仅由专用测试扩展调用，未接上层生产控制面。
+
+移植原17内核L/H/M、hash最大M、分批预触/目录、请求身份/epoch/revision/gen/floor、
+回放和未知成本账本；没有重定义共享协议。历史Receipt.result与当前Observed分别
+展示，旧Grow成功回包不表示后来Shrink之后当前仍Grow。main共享控制区与原18 AIO/
+共享插件成本以最终CalculateShmemSize(size)记录；Work/DSM与必需连接门禁未移植，
+required connection gate若意外打开明确失败，不伪造Ack。当前只有原17 disabled-gate
+分支；本批不称准入/私有持续成本来源已闭合。
+
+锁序为resizeX串行完整操作；短accessS保护无pin读者，mapping/header保tag/真实pin；
+Shrink先L栅栏/过滤free-ring再逐页写净撤tag排水，短accessX发布H/gen。所有IO在
+accessX外。18 AIO在最后pin/wref已清后仍触IOCV和waiter，因此新增发布最终条件：
+accessX下completionX仅conditional try，忙立即退出并恢复原L，H/gen/成本保持；不得
+持X等IO。取得后只做发布状态写，放completionX再放accessX，resizeX下再释放尾页。
+18 grow显式清新descriptor的io_wref。18 WaitIO原wref等待/CV重入和批量驱逐API保留，
+未照搬17不含AIO的函数体。普通无己pin的CV等待以真ResourceOwner pin保底，清CV
+先于pin；最后unpin后不再访问descriptor。逐入口矩阵见buffer-reader-audit-v1.json。
+
+Checkpoint只以checkpointS保排序区，逐buffer按当前H重新验证并pin；Shrink试不到
+checkpointX时逻辑H仍可提交，但保旧排序区backing及上界，regrow不清旧准备前缀。
+真实测试已让checkpointer停在scan后，2048→512→1536跨旧lease成功；结束后新revision
+才回收checkpoint尾。排序区lease从不冒充Buffer页pin。
+
+本轮真实新增10根（1U+9S）全部PASS、零skip：2048 grow→脏数据→512 shrink→
+regrow→再次shrink；历史回包分离/冲突/陈旧拒绝；真实tail pin；并行worker/read_stream/
+checkpoint；原session管理员ACL；官方18 test_aio真实IO pin/wref未清拒绝后重试；
+真实IO/pin/wref全0但completion仍停IOCV前时全部1536尾已drain仍拒绝后重试；
+checkpoint旧排序区跨regrow；18原pg_buffercache relation/all驱逐；同backend创建
+UNLOGGED SEQUENCE→FlushRelationBuffers→Shrink，不能靠断开连接释放遗漏scope。
+另外复用同一ELF输入产物，原arrays7根与默认off sync/worker数据1根全部PASS：同PM
+恢复3次、logger真实新PID不继承四数组旧inode、严格profile、默认能力均直接回归。
+合计18根（2U+16S），S均为Linux原生隔离服务，未标成KVM/K8s E。
+
+AIO停点只在已显式test profile的completion控制组件存在，保持原worker=2。pre-unpin/
+post-unpin两原子开关只延迟真实callback，固定单调5秒界、无PG分配/ERROR，不改BM_IO、
+pin或wref去模拟成功。SQL REVOKE PUBLIC且C同查当前/原session管理员；开关默认0。
+完成锁availability采样仅诊断，不作回收授权；真实shrink用锁和排水协议。
+
+已保留失败：attempt01缺18 latch include编译失败；attempt02虽build/旧7根过，但
+3个EvictInternal错误scope warning使其不被接受，已修outer拥有scope/inner不放锁；
+attempt03初始5根通过；attempt04官方test_aio预注册同名点导致attach前置失败；
+attempt05 generic wait替换后finally wakeup无wait槽，掩盖try内错误，具体原因未证实，
+不能称内核失败。最终用上述native bounded停点取得真实IO状态。旧collector输出
+当时仅保存重定向提示，实际collector日志缺失已注明；新test Cluster补保存collector。
+逐函数自审还发现本次移植漏掉FlushRelationBuffers末End；新增真实回归在attempt05
+原二进制确实ERROR“DSGA control cannot run while holding buffer coordination locks”，
+在修后attempt06同backend通过。旧输入、日志和负例从未被最终产物覆盖。
+
+最终精确运行目录、17份编译输入actual SHA、ELF和每根命令结果见validation-resize-core-v1.json。
+GNU GCC12工具image68c6仅readonly bind immutable Linux Git+overlay source，不说源码COPY
+进tools image。每轮4CPU/5GiB/j4、NNP/capdrop/networknone，自己的1GiB ccache。
+本轮编译零warning/error；git diff --check通过；没有commit/push，待独立review。
+
+未完成门槛：本native测试路径仍由PG自己populate，尚未接Root split arrays helper；
+Root出生/原Source/持续强制F/I/K/normal最终五拒绝均未放开；原18Work/DSM/准入必需门禁、
+Neon18扩展完整适配、resized状态全部cancel/ERROR/FATAL/crash交错、io_uring runtime与
+独立IO来源、KVM与三节点K8s E2E仍待后继。pg_buffercache/autoprewarm的N0前缀扫描
+安全但会少报grown tail，本批未称扩展统计完整；能力/恢复上层继续保持统一合同。

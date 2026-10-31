@@ -42,6 +42,7 @@
 #include "storage/aio.h"
 #endif
 #include "storage/bufmgr.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/dsm.h"
 #include "storage/dsm_registry.h"
 #include "storage/ipc.h"
@@ -211,6 +212,7 @@ CreateSharedMemoryAndSemaphores(void)
 
 	/* Compute the size of the shared-memory block */
 	size = CalculateShmemSize(&numSemas);
+	DsgBufferCheckStartupBudget(size);
 	elog(DEBUG3, "invoking IpcMemoryCreate(size=%zu)", size);
 
 	/*

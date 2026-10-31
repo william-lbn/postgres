@@ -1,0 +1,10 @@
+{
+  "src/backend/storage/buffer/dsg_array_root.c": "aed3180ef30a503b576bfe43377e4b2b919f9ec0aaa8473f0c179f0e4ec8a6c4",
+  "src/include/storage/dsg_array_root.h": "d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445",
+  "src/backend/storage/buffer/dsg_buffer_arrays.c": "e350839280092d657328784181b16b9f04bdb72ce8ca6daee2086ccf41e92ae5",
+  "src/backend/storage/buffer/buf_init.c": "75a314b8cf6eee591761d8a81eb0fd223d99a6235731629a3cbf289534c0097d",
+  "src/backend/storage/buffer/dsg_buffer_grow.c": "c97b31de938d21e733f03f01d82ec7ec604b4feb98b6f8a99a57cad8d6a3f8c8",
+  "src/backend/storage/buffer/Makefile": "65e4ee68bc3ec488addff57dabd65763603c17d8a140836a99e08b8e0bf547f5",
+  "src/backend/storage/buffer/meson.build": "4600b9c537bdea643efb2da37307381dc2dbd579618342fc68bef671385d42ce",
+  "src/test/modules/test_dsg_region18/t/test_array_root18.py": "5bd78e752c462b47262071262b8625b6cbcdb1ecbd6fd2b4704ef67f698f697b"
+}

@@ -1,0 +1,15 @@
+{
+  "exit": 0,
+  "phases": {
+    "build": 0,
+    "source_build_only_no_native_executed": 0
+  },
+  "not_proven": [
+    "production PG18 A/R+NativeFinal",
+    "original Root Source registry/budget/WAL",
+    "physical disk durability",
+    "safe normal decrease",
+    "KVM",
+    "K8s E2E"
+  ]
+}

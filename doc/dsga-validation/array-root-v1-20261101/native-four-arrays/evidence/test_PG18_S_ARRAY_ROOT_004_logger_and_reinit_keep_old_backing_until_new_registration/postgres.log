@@ -1,0 +1,51 @@
+2026-10-31 19:52:42.145 GMT [170] LOG:  redirecting log output to logging collector process
+2026-10-31 19:52:42.145 GMT [170] HINT:  Future log output will appear in directory "logs".
+
+2026-10-31 19:52:42.145 GMT [170] LOG:  starting PostgreSQL 18.2 (15cacfb3-array-root-v1-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-10-31 19:52:42.145 GMT [170] LOG:  listening on Unix socket "/tmp/pg18-array-root-8ruv76in/s/.s.PGSQL.55438"
+2026-10-31 19:52:42.147 GMT [177] LOG:  database system was shut down at 2026-10-31 19:52:42 GMT
+2026-10-31 19:52:42.148 GMT [177] LOG:  Continue writing WAL at 0/1516A30
+2026-10-31 19:52:42.150 GMT [170] LOG:  database system is ready to accept connections
+2026-10-31 19:52:42.205 GMT [175] LOG:  checkpoint starting: immediate force wait
+2026-10-31 19:52:42.206 GMT [175] LOG:  checkpoint complete: wrote 56 buffers (10.9%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=36, longest=0.001 s, average=0.001 s; distance=271 kB, estimate=271 kB; lsn=0/155A6C0, redo lsn=0/155A638
+2026-10-31 19:52:42.207 GMT [170] LOG:  system logger process (PID 172) was terminated by signal 9: Killed
+2026-10-31 19:52:42.247 GMT [170] LOG:  client backend (PID 192) was terminated by signal 9: Killed
+2026-10-31 19:52:42.247 GMT [170] DETAIL:  Failed process was running: SELECT pg_backend_pid(),pg_sleep(30)
+2026-10-31 19:52:42.247 GMT [170] LOG:  terminating any other active server processes
+2026-10-31 19:52:42.249 GMT [170] LOG:  all server processes terminated; reinitializing
+2026-10-31 19:52:42.258 GMT [197] LOG:  database system was interrupted; last known up at 2026-10-31 19:52:42 GMT
+2026-10-31 19:52:42.258 GMT [200] FATAL:  the database system is in recovery mode
+2026-10-31 19:52:42.269 GMT [197] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-10-31 19:52:42.269 GMT [197] LOG:  redo starts at 0/155A638
+2026-10-31 19:52:42.269 GMT [197] LOG:  invalid record length at 0/155A8D0: expected at least 24, got 0
+2026-10-31 19:52:42.269 GMT [197] LOG:  redo done at 0/155A738 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-10-31 19:52:42.269 GMT [197] LOG:  Continue writing WAL at 0/155A8D0
+2026-10-31 19:52:42.271 GMT [198] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-10-31 19:52:42.271 GMT [198] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/155A8D0, redo lsn=0/155A8D0
+2026-10-31 19:52:42.273 GMT [170] LOG:  database system is ready to accept connections
+2026-10-31 19:52:42.336 GMT [170] LOG:  client backend (PID 212) was terminated by signal 9: Killed
+2026-10-31 19:52:42.336 GMT [170] DETAIL:  Failed process was running: SELECT pg_backend_pid(),pg_sleep(30)
+2026-10-31 19:52:42.337 GMT [170] LOG:  terminating any other active server processes
+2026-10-31 19:52:42.338 GMT [170] LOG:  all server processes terminated; reinitializing
+2026-10-31 19:52:42.348 GMT [217] LOG:  database system was interrupted; last known up at 2026-10-31 19:52:42 GMT
+2026-10-31 19:52:42.349 GMT [220] FATAL:  the database system is in recovery mode
+2026-10-31 19:52:42.356 GMT [217] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-10-31 19:52:42.357 GMT [217] LOG:  invalid record length at 0/155A948: expected at least 24, got 0
+2026-10-31 19:52:42.357 GMT [217] LOG:  redo is not required
+2026-10-31 19:52:42.357 GMT [217] LOG:  Continue writing WAL at 0/155A948
+2026-10-31 19:52:42.358 GMT [218] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-10-31 19:52:42.358 GMT [218] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/155A948, redo lsn=0/155A948
+2026-10-31 19:52:42.359 GMT [170] LOG:  database system is ready to accept connections
+2026-10-31 19:52:42.418 GMT [170] LOG:  client backend (PID 232) was terminated by signal 9: Killed
+2026-10-31 19:52:42.418 GMT [170] DETAIL:  Failed process was running: SELECT pg_backend_pid(),pg_sleep(30)
+2026-10-31 19:52:42.418 GMT [170] LOG:  terminating any other active server processes
+2026-10-31 19:52:42.419 GMT [170] LOG:  all server processes terminated; reinitializing
+2026-10-31 19:52:42.427 GMT [237] LOG:  database system was interrupted; last known up at 2026-10-31 19:52:42 GMT
+2026-10-31 19:52:42.428 GMT [240] FATAL:  the database system is in recovery mode
+2026-10-31 19:52:42.434 GMT [237] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-10-31 19:52:42.435 GMT [237] LOG:  invalid record length at 0/155A9C0: expected at least 24, got 0
+2026-10-31 19:52:42.435 GMT [237] LOG:  redo is not required
+2026-10-31 19:52:42.435 GMT [237] LOG:  Continue writing WAL at 0/155A9C0
+2026-10-31 19:52:42.436 GMT [238] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-10-31 19:52:42.436 GMT [238] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/155A9C0, redo lsn=0/155A9C0
+2026-10-31 19:52:42.437 GMT [170] LOG:  database system is ready to accept connections

@@ -1,0 +1,42 @@
+{
+  "new_native_S_roots": 4,
+  "new_U": 0,
+  "E": 0,
+  "same_upper_protocol": "NEON_DSG_ARRAY_ROOT_API_VERSION=1,512B request/160B reply; header exactly PG17d62a",
+  "cases": [
+    {
+      "id": "PG18-S-ARRAY-ROOT-001",
+      "root": "test_array_root18.ArrayRootNative18.test_PG18_S_ARRAY_ROOT_001_initial_grow_shrink_regrow_real_backing",
+      "result": "PASS"
+    },
+    {
+      "id": "PG18-S-ARRAY-ROOT-002",
+      "root": "test_array_root18.ArrayRootNative18.test_PG18_S_ARRAY_ROOT_002_bad_or_lost_startup_reply_fails_closed",
+      "result": "PASS"
+    },
+    {
+      "id": "PG18-S-ARRAY-ROOT-003",
+      "root": "test_array_root18.ArrayRootNative18.test_PG18_S_ARRAY_ROOT_003_lost_grow_reply_retains_unknown_cost",
+      "result": "PASS"
+    },
+    {
+      "id": "PG18-S-ARRAY-ROOT-004",
+      "root": "test_array_root18.ArrayRootNative18.test_PG18_S_ARRAY_ROOT_004_logger_and_reinit_keep_old_backing_until_new_registration",
+      "result": "PASS"
+    }
+  ],
+  "direct_prior_unique_roots": 31,
+  "direct_prior_source": "old actual ELF c101; Source8 only leading whitespace in1file differs; all runtime ALLOC bytes/addresses except BuildID exactly equal to final c431",
+  "repeat_counts_not_new_coverage": "attempt02/final-native repeat same4 stable IDs; class Uring inherited6 failure copies excluded from unique count",
+  "root_v1": "explicitly FATAL unsupported, verified in startup negative subcase",
+  "fixture_root_source": "explicit TEST_ONLY magic11/22/33, actual socket peer/map_files+MADV_POPULATE_WRITE, no original Birth/Key/budget authority",
+  "fixture_filesystem": "bounded1GiB /tmp tmpfs; PG fsync on/initdb --no-sync; protocol+PG mechanism only, no physical-disk powerloss durability",
+  "unrun": [
+    "PG18 pre-MemoryContext AS+R native birth",
+    "PG18 BPF/fork/Root ptrace NativeFinal and corresponding original Source",
+    "production Root registry/private WAL/helper/authorization",
+    "normal hard decrease",
+    "Guest369KVM with PG18",
+    "multi-version Kubernetes E2E"
+  ]
+}

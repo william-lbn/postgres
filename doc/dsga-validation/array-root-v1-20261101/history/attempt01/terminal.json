@@ -1,0 +1,17 @@
+{
+  "exit": 1,
+  "phases": {
+    "build": 0,
+    "new4": 1,
+    "old30": 0,
+    "uring1": 1
+  },
+  "not_proven": [
+    "production PG18 A/R+NativeFinal",
+    "original Root Source registry/budget/WAL",
+    "physical disk durability",
+    "safe normal decrease",
+    "KVM",
+    "K8s E2E"
+  ]
+}

@@ -1,0 +1,693 @@
+{
+  "old_elf": "c101b47968838e0a362e05188f6fbce3e5eb12f3712d144de8c64cbddd23ab82",
+  "new_elf": "c431dc0dcffe68ff731d2ae08c1d173d67e3282619e077455794bfb101c8e7f7",
+  "all_differing_sections": [
+    ".debug_info",
+    ".debug_line",
+    ".note.gnu.build-id"
+  ],
+  "allocated_differing_sections": [
+    ".note.gnu.build-id"
+  ],
+  "all_allocated_except_build_id_equal": true,
+  "section_count_old": 48,
+  "section_count_new": 48,
+  "allocated_count": 34,
+  "old": {
+    "": {
+      "type": 0,
+      "flags": 0,
+      "address": 0,
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".interp": {
+      "type": 1,
+      "flags": 2,
+      "address": 680,
+      "size": 28,
+      "sha256": "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+    },
+    ".note.gnu.property": {
+      "type": 7,
+      "flags": 2,
+      "address": 712,
+      "size": 32,
+      "sha256": "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+    },
+    ".note.gnu.build-id": {
+      "type": 7,
+      "flags": 2,
+      "address": 744,
+      "size": 36,
+      "sha256": "a9084ecb35a412b296bb23fd64d6d9ce358672f7ea3ca1dee6df281bde188b8a"
+    },
+    ".note.ABI-tag": {
+      "type": 7,
+      "flags": 2,
+      "address": 780,
+      "size": 32,
+      "sha256": "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+    },
+    ".gnu.hash": {
+      "type": 1879048182,
+      "flags": 2,
+      "address": 816,
+      "size": 104888,
+      "sha256": "dbb2eedc6d561d07c811d1caa466b697a9084f93079dbb12ce5a1b85e4896b96"
+    },
+    ".dynsym": {
+      "type": 11,
+      "flags": 2,
+      "address": 105704,
+      "size": 394152,
+      "sha256": "f8f697679302bd3dc72ea7eedcf2ff9136eea0761a8342d822d0abf89ba6f8f1"
+    },
+    ".dynstr": {
+      "type": 3,
+      "flags": 2,
+      "address": 499856,
+      "size": 432971,
+      "sha256": "dc93a642bd5f03c5d5920947b1fed68c603eb29453edc34cce90bdd917076c5c"
+    },
+    ".gnu.version": {
+      "type": 1879048191,
+      "flags": 2,
+      "address": 932828,
+      "size": 32846,
+      "sha256": "a535bd3855b31b8b502308c969a3f7cfe9b9fb72fa4420233d9547b653a84ce7"
+    },
+    ".gnu.version_r": {
+      "type": 1879048190,
+      "flags": 2,
+      "address": 965680,
+      "size": 528,
+      "sha256": "602ef1480fd454657c7098e32cd133f2bfaed8a5f6413ebb8003c1b27e50820a"
+    },
+    ".rela.dyn": {
+      "type": 4,
+      "flags": 2,
+      "address": 966208,
+      "size": 439992,
+      "sha256": "279dbd871f3d766489319c7b748e1aa6363fe4cb4666804d2f7d02147a6e6fe4"
+    },
+    ".rela.plt": {
+      "type": 4,
+      "flags": 2,
+      "address": 1406200,
+      "size": 9240,
+      "sha256": "cb428e8fd17767d50b8b3a476479783fb9493bf5c678e7dca10e766e5692a5d6"
+    },
+    ".eh_frame": {
+      "type": 1,
+      "flags": 2,
+      "address": 1415440,
+      "size": 1105364,
+      "sha256": "52f48ad0c386c5728c375a6db245312a8aa7b251d71bd534c56ba74d97537511"
+    },
+    ".eh_frame_hdr": {
+      "type": 1,
+      "flags": 2,
+      "address": 2520804,
+      "size": 198036,
+      "sha256": "c8db332f4c23200e81727f61bc100ab82bb6a9bdbec641c9d198b4c897eb65cb"
+    },
+    ".gcc_except_table": {
+      "type": 1,
+      "flags": 2,
+      "address": 2718840,
+      "size": 18824,
+      "sha256": "30be457a7078ae8a43f1aff9724bbffdfa1ad2589c9826854d58d98666840256"
+    },
+    ".rodata": {
+      "type": 1,
+      "flags": 2,
+      "address": 2740224,
+      "size": 30217776,
+      "sha256": "facd4754febe8b17a2545e0b80367936be62cffe5054059b9484fd1cae3ee89e"
+    },
+    ".rodata.cst": {
+      "type": 1,
+      "flags": 18,
+      "address": 32958000,
+      "size": 7360,
+      "sha256": "a8d707a4de870b96247695ff62c7aaf6716b52fc42ff6853c8d71d2a3e301a49"
+    },
+    ".rodata.str": {
+      "type": 1,
+      "flags": 50,
+      "address": 32965360,
+      "size": 960832,
+      "sha256": "c1c89e4c7685e8ecb9e6cf5c645c004d2361ce8802076ad6da7786ecf1a98ec8"
+    },
+    ".plt": {
+      "type": 1,
+      "flags": 6,
+      "address": 33930288,
+      "size": 6192,
+      "sha256": "a5d226f76885c6a57ef48a4bb03733a4485ca5ba6a65aa274778f65f7429a664"
+    },
+    ".plt.got": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936480,
+      "size": 48,
+      "sha256": "05d652a6fd0b829e2cb6373e2a6654dea38327c204170ff24acb9ac932e04d0b"
+    },
+    ".fini": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936528,
+      "size": 9,
+      "sha256": "66e6f54550612182b4ad78f30b140dd08318b968db3878de2db65fef87dc04d7"
+    },
+    ".init": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936540,
+      "size": 23,
+      "sha256": "0ef0faefffcfc50fcf6a68f3e341aa2bc09e9cb16abe8474d8354f2461541ba5"
+    },
+    ".text": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936576,
+      "size": 7757918,
+      "sha256": "d8354795e892a06b0f0c3d53908d528483c973768a3dd8378a27d2695a44f250"
+    },
+    ".dynamic": {
+      "type": 6,
+      "flags": 3,
+      "address": 41698592,
+      "size": 624,
+      "sha256": "83330578363078b30df59e280d800a061a02285b1f7726508a9a1a89ba652c52"
+    },
+    ".data.rel.ro": {
+      "type": 1,
+      "flags": 3,
+      "address": 41699232,
+      "size": 212632,
+      "sha256": "27766c0cba5340491db9761e09f90ac7628292bbc0dd23ac8237e9d7874c0c7e"
+    },
+    ".fini_array": {
+      "type": 15,
+      "flags": 3,
+      "address": 41911864,
+      "size": 8,
+      "sha256": "e506894563194aa6285d56709b67e9b4c67a7326f2e4eb1557f59134d6299927"
+    },
+    ".init_array": {
+      "type": 14,
+      "flags": 3,
+      "address": 41911872,
+      "size": 8,
+      "sha256": "8eb4beb828e03b93daf4e1f04d6784dfea74cffc905900859f31555c74a5f425"
+    },
+    ".got": {
+      "type": 1,
+      "flags": 3,
+      "address": 41911880,
+      "size": 216,
+      "sha256": "e18d1660673f4ba53a512238e7a514ba72dd8343461814ee5e944b89d162294f"
+    },
+    ".copyrel.rel.ro": {
+      "type": 1,
+      "flags": 3,
+      "address": 41912096,
+      "size": 16,
+      "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+    },
+    ".relro_padding": {
+      "type": 8,
+      "flags": 3,
+      "address": 41912112,
+      "size": 2256,
+      "sha256": null
+    },
+    ".got.plt": {
+      "type": 1,
+      "flags": 3,
+      "address": 41916208,
+      "size": 3104,
+      "sha256": "ecb7f437e8d61f5a80e831c2af61080f7f9a3323270087bdaccec6d667bbab49"
+    },
+    ".data": {
+      "type": 1,
+      "flags": 3,
+      "address": 41919328,
+      "size": 107904,
+      "sha256": "c30bf20caee0c3b884405d3752221df36078d5b6b8e29ba7aafe0ef2dbfcf03e"
+    },
+    ".tm_clone_table": {
+      "type": 1,
+      "flags": 3,
+      "address": 42027232,
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".copyrel": {
+      "type": 8,
+      "flags": 3,
+      "address": 42027232,
+      "size": 108,
+      "sha256": null
+    },
+    ".bss": {
+      "type": 8,
+      "flags": 3,
+      "address": 42027360,
+      "size": 278624,
+      "sha256": null
+    },
+    ".strtab": {
+      "type": 3,
+      "flags": 0,
+      "address": 0,
+      "size": 9144816,
+      "sha256": "fc62e21086a09db089afe8ea4e62e3e998b40517a3dd81ac1b1fbb2458fbe965"
+    },
+    ".symtab": {
+      "type": 2,
+      "flags": 0,
+      "address": 0,
+      "size": 5463480,
+      "sha256": "5e18ce668def07d81cea6f5f0b47953899af467bdfcebb1072e23dc36de62b5e"
+    },
+    ".shstrtab": {
+      "type": 3,
+      "flags": 0,
+      "address": 0,
+      "size": 528,
+      "sha256": "bf83598b14f968582519d3f8308344fe0ed464561cd00d60002bf3e736675957"
+    },
+    ".comment": {
+      "type": 1,
+      "flags": 48,
+      "address": 0,
+      "size": 105,
+      "sha256": "82c319128a30a9d42e5f1f8bfdcdeb31c9e0046622ce63b080d851c744a56e56"
+    },
+    ".debug_abbrev": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 1173208,
+      "sha256": "8f6efa418bb1838c14f9e886a12325687961ba43e4e15b494b319ddbdc1c6a0b"
+    },
+    ".debug_aranges": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 53600,
+      "sha256": "46156f8126f2f19252063fdc8e812816a2d586bfb5b8f5224acc531378c4ee4e"
+    },
+    ".debug_info": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 24605976,
+      "sha256": "f9ef1392938352cd1deca56ed1299da361cc7549d94e5fbae7fee5a1b964baa6"
+    },
+    ".debug_line": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 6793406,
+      "sha256": "75170b299f5f34e87527d1ec0ac86ec1b316fba70a2f80ddbab7fd9ef07cd0c2"
+    },
+    ".debug_line_str": {
+      "type": 1,
+      "flags": 48,
+      "address": 0,
+      "size": 79573,
+      "sha256": "3fbdda5a5e65f26ed3f4cfd8c28e8d854995ddfd102de585ffcf7822f6ae15b5"
+    },
+    ".debug_loclists": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 7783470,
+      "sha256": "456c574fc4a65b7caa7c93d05be5bb6b02d7bcf27e8d0eaca4112affe307a9f4"
+    },
+    ".debug_macro": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 32942830,
+      "sha256": "483fd92fb13183799c6318532d78b9fd54bcbe0fc2b7adffa0c3d71c920f3aff"
+    },
+    ".debug_rnglists": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 1055106,
+      "sha256": "5e6c2a5204fbda27d07227200a2973715e4552990e609b7488ba5e9adc6f2f9b"
+    },
+    ".debug_str": {
+      "type": 1,
+      "flags": 48,
+      "address": 0,
+      "size": 2412733,
+      "sha256": "408633bab11340d8daf5b506a9c212ca82136262334e655b26fe14dd805f6c3b"
+    }
+  },
+  "new": {
+    "": {
+      "type": 0,
+      "flags": 0,
+      "address": 0,
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".interp": {
+      "type": 1,
+      "flags": 2,
+      "address": 680,
+      "size": 28,
+      "sha256": "9097c98ea70f6f3b01d50145eb72bf55ad1f4e9713bccf27bd6405d6254eed00"
+    },
+    ".note.gnu.property": {
+      "type": 7,
+      "flags": 2,
+      "address": 712,
+      "size": 32,
+      "sha256": "5978480398fc48bfa6c56246117c5bc1a40145463a2faca541e5e91d5067ff79"
+    },
+    ".note.gnu.build-id": {
+      "type": 7,
+      "flags": 2,
+      "address": 744,
+      "size": 36,
+      "sha256": "53dd67ce8372cc31504a438ac6f434c11ed61e50c0d99e3dba3e7253f62bf663"
+    },
+    ".note.ABI-tag": {
+      "type": 7,
+      "flags": 2,
+      "address": 780,
+      "size": 32,
+      "sha256": "6e48317ad93a8ac2dc04321465ede06d1274543fc8ab172e68171a9d684bb313"
+    },
+    ".gnu.hash": {
+      "type": 1879048182,
+      "flags": 2,
+      "address": 816,
+      "size": 104888,
+      "sha256": "dbb2eedc6d561d07c811d1caa466b697a9084f93079dbb12ce5a1b85e4896b96"
+    },
+    ".dynsym": {
+      "type": 11,
+      "flags": 2,
+      "address": 105704,
+      "size": 394152,
+      "sha256": "f8f697679302bd3dc72ea7eedcf2ff9136eea0761a8342d822d0abf89ba6f8f1"
+    },
+    ".dynstr": {
+      "type": 3,
+      "flags": 2,
+      "address": 499856,
+      "size": 432971,
+      "sha256": "dc93a642bd5f03c5d5920947b1fed68c603eb29453edc34cce90bdd917076c5c"
+    },
+    ".gnu.version": {
+      "type": 1879048191,
+      "flags": 2,
+      "address": 932828,
+      "size": 32846,
+      "sha256": "a535bd3855b31b8b502308c969a3f7cfe9b9fb72fa4420233d9547b653a84ce7"
+    },
+    ".gnu.version_r": {
+      "type": 1879048190,
+      "flags": 2,
+      "address": 965680,
+      "size": 528,
+      "sha256": "602ef1480fd454657c7098e32cd133f2bfaed8a5f6413ebb8003c1b27e50820a"
+    },
+    ".rela.dyn": {
+      "type": 4,
+      "flags": 2,
+      "address": 966208,
+      "size": 439992,
+      "sha256": "279dbd871f3d766489319c7b748e1aa6363fe4cb4666804d2f7d02147a6e6fe4"
+    },
+    ".rela.plt": {
+      "type": 4,
+      "flags": 2,
+      "address": 1406200,
+      "size": 9240,
+      "sha256": "cb428e8fd17767d50b8b3a476479783fb9493bf5c678e7dca10e766e5692a5d6"
+    },
+    ".eh_frame": {
+      "type": 1,
+      "flags": 2,
+      "address": 1415440,
+      "size": 1105364,
+      "sha256": "52f48ad0c386c5728c375a6db245312a8aa7b251d71bd534c56ba74d97537511"
+    },
+    ".eh_frame_hdr": {
+      "type": 1,
+      "flags": 2,
+      "address": 2520804,
+      "size": 198036,
+      "sha256": "c8db332f4c23200e81727f61bc100ab82bb6a9bdbec641c9d198b4c897eb65cb"
+    },
+    ".gcc_except_table": {
+      "type": 1,
+      "flags": 2,
+      "address": 2718840,
+      "size": 18824,
+      "sha256": "30be457a7078ae8a43f1aff9724bbffdfa1ad2589c9826854d58d98666840256"
+    },
+    ".rodata": {
+      "type": 1,
+      "flags": 2,
+      "address": 2740224,
+      "size": 30217776,
+      "sha256": "facd4754febe8b17a2545e0b80367936be62cffe5054059b9484fd1cae3ee89e"
+    },
+    ".rodata.cst": {
+      "type": 1,
+      "flags": 18,
+      "address": 32958000,
+      "size": 7360,
+      "sha256": "a8d707a4de870b96247695ff62c7aaf6716b52fc42ff6853c8d71d2a3e301a49"
+    },
+    ".rodata.str": {
+      "type": 1,
+      "flags": 50,
+      "address": 32965360,
+      "size": 960832,
+      "sha256": "c1c89e4c7685e8ecb9e6cf5c645c004d2361ce8802076ad6da7786ecf1a98ec8"
+    },
+    ".plt": {
+      "type": 1,
+      "flags": 6,
+      "address": 33930288,
+      "size": 6192,
+      "sha256": "a5d226f76885c6a57ef48a4bb03733a4485ca5ba6a65aa274778f65f7429a664"
+    },
+    ".plt.got": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936480,
+      "size": 48,
+      "sha256": "05d652a6fd0b829e2cb6373e2a6654dea38327c204170ff24acb9ac932e04d0b"
+    },
+    ".fini": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936528,
+      "size": 9,
+      "sha256": "66e6f54550612182b4ad78f30b140dd08318b968db3878de2db65fef87dc04d7"
+    },
+    ".init": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936540,
+      "size": 23,
+      "sha256": "0ef0faefffcfc50fcf6a68f3e341aa2bc09e9cb16abe8474d8354f2461541ba5"
+    },
+    ".text": {
+      "type": 1,
+      "flags": 6,
+      "address": 33936576,
+      "size": 7757918,
+      "sha256": "d8354795e892a06b0f0c3d53908d528483c973768a3dd8378a27d2695a44f250"
+    },
+    ".dynamic": {
+      "type": 6,
+      "flags": 3,
+      "address": 41698592,
+      "size": 624,
+      "sha256": "83330578363078b30df59e280d800a061a02285b1f7726508a9a1a89ba652c52"
+    },
+    ".data.rel.ro": {
+      "type": 1,
+      "flags": 3,
+      "address": 41699232,
+      "size": 212632,
+      "sha256": "27766c0cba5340491db9761e09f90ac7628292bbc0dd23ac8237e9d7874c0c7e"
+    },
+    ".fini_array": {
+      "type": 15,
+      "flags": 3,
+      "address": 41911864,
+      "size": 8,
+      "sha256": "e506894563194aa6285d56709b67e9b4c67a7326f2e4eb1557f59134d6299927"
+    },
+    ".init_array": {
+      "type": 14,
+      "flags": 3,
+      "address": 41911872,
+      "size": 8,
+      "sha256": "8eb4beb828e03b93daf4e1f04d6784dfea74cffc905900859f31555c74a5f425"
+    },
+    ".got": {
+      "type": 1,
+      "flags": 3,
+      "address": 41911880,
+      "size": 216,
+      "sha256": "e18d1660673f4ba53a512238e7a514ba72dd8343461814ee5e944b89d162294f"
+    },
+    ".copyrel.rel.ro": {
+      "type": 1,
+      "flags": 3,
+      "address": 41912096,
+      "size": 16,
+      "sha256": "374708fff7719dd5979ec875d56cd2286f6d3cf7ec317a3b25632aab28ec37bb"
+    },
+    ".relro_padding": {
+      "type": 8,
+      "flags": 3,
+      "address": 41912112,
+      "size": 2256,
+      "sha256": null
+    },
+    ".got.plt": {
+      "type": 1,
+      "flags": 3,
+      "address": 41916208,
+      "size": 3104,
+      "sha256": "ecb7f437e8d61f5a80e831c2af61080f7f9a3323270087bdaccec6d667bbab49"
+    },
+    ".data": {
+      "type": 1,
+      "flags": 3,
+      "address": 41919328,
+      "size": 107904,
+      "sha256": "c30bf20caee0c3b884405d3752221df36078d5b6b8e29ba7aafe0ef2dbfcf03e"
+    },
+    ".tm_clone_table": {
+      "type": 1,
+      "flags": 3,
+      "address": 42027232,
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    ".copyrel": {
+      "type": 8,
+      "flags": 3,
+      "address": 42027232,
+      "size": 108,
+      "sha256": null
+    },
+    ".bss": {
+      "type": 8,
+      "flags": 3,
+      "address": 42027360,
+      "size": 278624,
+      "sha256": null
+    },
+    ".strtab": {
+      "type": 3,
+      "flags": 0,
+      "address": 0,
+      "size": 9144816,
+      "sha256": "fc62e21086a09db089afe8ea4e62e3e998b40517a3dd81ac1b1fbb2458fbe965"
+    },
+    ".symtab": {
+      "type": 2,
+      "flags": 0,
+      "address": 0,
+      "size": 5463480,
+      "sha256": "5e18ce668def07d81cea6f5f0b47953899af467bdfcebb1072e23dc36de62b5e"
+    },
+    ".shstrtab": {
+      "type": 3,
+      "flags": 0,
+      "address": 0,
+      "size": 528,
+      "sha256": "bf83598b14f968582519d3f8308344fe0ed464561cd00d60002bf3e736675957"
+    },
+    ".comment": {
+      "type": 1,
+      "flags": 48,
+      "address": 0,
+      "size": 105,
+      "sha256": "82c319128a30a9d42e5f1f8bfdcdeb31c9e0046622ce63b080d851c744a56e56"
+    },
+    ".debug_abbrev": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 1173208,
+      "sha256": "8f6efa418bb1838c14f9e886a12325687961ba43e4e15b494b319ddbdc1c6a0b"
+    },
+    ".debug_aranges": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 53600,
+      "sha256": "46156f8126f2f19252063fdc8e812816a2d586bfb5b8f5224acc531378c4ee4e"
+    },
+    ".debug_info": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 24605976,
+      "sha256": "202ac6fa27f0ff286b5346fcfd09b19d4d9b77a3a48501abc2b80c208ccb4b1d"
+    },
+    ".debug_line": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 6793406,
+      "sha256": "6c25b6a6ecf2fbfec38dc3402332b8646d85d28fb9bf3ee2b4986d53d11b0f76"
+    },
+    ".debug_line_str": {
+      "type": 1,
+      "flags": 48,
+      "address": 0,
+      "size": 79573,
+      "sha256": "3fbdda5a5e65f26ed3f4cfd8c28e8d854995ddfd102de585ffcf7822f6ae15b5"
+    },
+    ".debug_loclists": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 7783470,
+      "sha256": "456c574fc4a65b7caa7c93d05be5bb6b02d7bcf27e8d0eaca4112affe307a9f4"
+    },
+    ".debug_macro": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 32942830,
+      "sha256": "483fd92fb13183799c6318532d78b9fd54bcbe0fc2b7adffa0c3d71c920f3aff"
+    },
+    ".debug_rnglists": {
+      "type": 1,
+      "flags": 0,
+      "address": 0,
+      "size": 1055106,
+      "sha256": "5e6c2a5204fbda27d07227200a2973715e4552990e609b7488ba5e9adc6f2f9b"
+    },
+    ".debug_str": {
+      "type": 1,
+      "flags": 48,
+      "address": 0,
+      "size": 2412733,
+      "sha256": "408633bab11340d8daf5b506a9c212ca82136262334e655b26fe14dd805f6c3b"
+    }
+  },
+  "scope": "actual ELF section byte+address comparison; no Root/normal qualification; previous native evidence stays original ELF"
+}

@@ -14,6 +14,7 @@ include $(top_builddir)/src/Makefile.global
 
 OBJS = \
 	dsg_buffer_arrays.o \
+	dsg_array_root.o \
 	dynamic_shared_buffers.o \
 	dsg_buffer_grow.o \
 	dsg_buffer_shrink.o \

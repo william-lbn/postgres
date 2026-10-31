@@ -1,0 +1,9 @@
+{
+  "origin_pg17_commit": "b95b142190cdc51de0d5603bfb9c46a0e0e7051f",
+  "origin_array_c_sha256": "eb3ac9c925e3618561e243bb0b9392fb7cc11eb21fd2099d8cbd56096d1ce19b",
+  "origin_header_sha256": "d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445",
+  "base18": "15cacfb3fe1efbb54ae65ac5454f0f61c2161c6e",
+  "scope": "TEST_ONLY ARRAY ABI1; root-v1 unsupported until original PG18 A/R+NativeFinal",
+  "source17_via_git_show_only": true,
+  "failed_materialize_before_any_writes": "first exact-anchor assertion failed at old buf_init indentation; clean rechecked before retry"
+}

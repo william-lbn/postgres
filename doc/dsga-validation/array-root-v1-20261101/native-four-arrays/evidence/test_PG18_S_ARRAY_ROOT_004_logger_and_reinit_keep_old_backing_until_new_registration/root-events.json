@@ -1,0 +1,385 @@
+{
+  "events": [
+    {
+      "op": 1,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "9919730342576502949",
+      "mapping_generation": 1,
+      "array": 0,
+      "offset": 0,
+      "bytes": 0,
+      "high": 512,
+      "target": 0,
+      "actual_backing": [
+        [
+          1,
+          902,
+          131072
+        ],
+        [
+          1,
+          903,
+          16777216
+        ],
+        [
+          1,
+          904,
+          32768
+        ],
+        [
+          1,
+          905,
+          40960
+        ]
+      ]
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "9919730342576502949",
+      "mapping_generation": 1,
+      "array": 0,
+      "offset": 0,
+      "bytes": 32768,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "9919730342576502949",
+      "mapping_generation": 1,
+      "array": 1,
+      "offset": 0,
+      "bytes": 4194304,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "9919730342576502949",
+      "mapping_generation": 1,
+      "array": 2,
+      "offset": 0,
+      "bytes": 8192,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "9919730342576502949",
+      "mapping_generation": 1,
+      "array": 3,
+      "offset": 0,
+      "bytes": 12288,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 3,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "9919730342576502949",
+      "mapping_generation": 1,
+      "array": 0,
+      "offset": 0,
+      "bytes": 0,
+      "high": 512,
+      "target": 0
+    },
+    {
+      "op": 1,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "6036573767930176957",
+      "mapping_generation": 2,
+      "array": 0,
+      "offset": 0,
+      "bytes": 0,
+      "high": 512,
+      "target": 0,
+      "actual_backing": [
+        [
+          1,
+          13666,
+          131072
+        ],
+        [
+          1,
+          13667,
+          16777216
+        ],
+        [
+          1,
+          13668,
+          32768
+        ],
+        [
+          1,
+          13669,
+          40960
+        ]
+      ]
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "6036573767930176957",
+      "mapping_generation": 2,
+      "array": 0,
+      "offset": 0,
+      "bytes": 32768,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "6036573767930176957",
+      "mapping_generation": 2,
+      "array": 1,
+      "offset": 0,
+      "bytes": 4194304,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "6036573767930176957",
+      "mapping_generation": 2,
+      "array": 2,
+      "offset": 0,
+      "bytes": 8192,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "6036573767930176957",
+      "mapping_generation": 2,
+      "array": 3,
+      "offset": 0,
+      "bytes": 12288,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 3,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "6036573767930176957",
+      "mapping_generation": 2,
+      "array": 0,
+      "offset": 0,
+      "bytes": 0,
+      "high": 512,
+      "target": 0
+    },
+    {
+      "op": 1,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "18435554471244860771",
+      "mapping_generation": 3,
+      "array": 0,
+      "offset": 0,
+      "bytes": 0,
+      "high": 512,
+      "target": 0,
+      "actual_backing": [
+        [
+          1,
+          6669,
+          131072
+        ],
+        [
+          1,
+          6670,
+          16777216
+        ],
+        [
+          1,
+          6671,
+          32768
+        ],
+        [
+          1,
+          6672,
+          40960
+        ]
+      ]
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "18435554471244860771",
+      "mapping_generation": 3,
+      "array": 0,
+      "offset": 0,
+      "bytes": 32768,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "18435554471244860771",
+      "mapping_generation": 3,
+      "array": 1,
+      "offset": 0,
+      "bytes": 4194304,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "18435554471244860771",
+      "mapping_generation": 3,
+      "array": 2,
+      "offset": 0,
+      "bytes": 8192,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "18435554471244860771",
+      "mapping_generation": 3,
+      "array": 3,
+      "offset": 0,
+      "bytes": 12288,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 3,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "18435554471244860771",
+      "mapping_generation": 3,
+      "array": 0,
+      "offset": 0,
+      "bytes": 0,
+      "high": 512,
+      "target": 0
+    },
+    {
+      "op": 1,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "3754284137454791567",
+      "mapping_generation": 4,
+      "array": 0,
+      "offset": 0,
+      "bytes": 0,
+      "high": 512,
+      "target": 0,
+      "actual_backing": [
+        [
+          1,
+          11145,
+          131072
+        ],
+        [
+          1,
+          11146,
+          16777216
+        ],
+        [
+          1,
+          11147,
+          32768
+        ],
+        [
+          1,
+          11148,
+          40960
+        ]
+      ]
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "3754284137454791567",
+      "mapping_generation": 4,
+      "array": 0,
+      "offset": 0,
+      "bytes": 32768,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "3754284137454791567",
+      "mapping_generation": 4,
+      "array": 1,
+      "offset": 0,
+      "bytes": 4194304,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "3754284137454791567",
+      "mapping_generation": 4,
+      "array": 2,
+      "offset": 0,
+      "bytes": 8192,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    },
+    {
+      "op": 2,
+      "pid": 170,
+      "uid": 1000,
+      "boot": "3754284137454791567",
+      "mapping_generation": 4,
+      "array": 3,
+      "offset": 0,
+      "bytes": 12288,
+      "high": 512,
+      "target": 0,
+      "actual_populated": true
+    }
+  ],
+  "failures": []
+}

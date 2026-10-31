@@ -1,0 +1,18 @@
+{
+  "original_attempt": "/data/neon-build/validation/pg18-array-root-attempt01-20261031T193446Z-7d88db",
+  "source8": {
+    "src/backend/storage/buffer/dsg_array_root.c": "aed3180ef30a503b576bfe43377e4b2b919f9ec0aaa8473f0c179f0e4ec8a6c4",
+    "src/include/storage/dsg_array_root.h": "d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "e350839280092d657328784181b16b9f04bdb72ce8ca6daee2086ccf41e92ae5",
+    "src/backend/storage/buffer/buf_init.c": "75a314b8cf6eee591761d8a81eb0fd223d99a6235731629a3cbf289534c0097d",
+    "src/backend/storage/buffer/dsg_buffer_grow.c": "c97b31de938d21e733f03f01d82ec7ec604b4feb98b6f8a99a57cad8d6a3f8c8",
+    "src/backend/storage/buffer/Makefile": "65e4ee68bc3ec488addff57dabd65763603c17d8a140836a99e08b8e0bf547f5",
+    "src/backend/storage/buffer/meson.build": "4600b9c537bdea643efb2da37307381dc2dbd579618342fc68bef671385d42ce",
+    "src/test/modules/test_dsg_region18/t/test_array_root18.py": "5bd78e752c462b47262071262b8625b6cbcdb1ecbd6fd2b4704ef67f698f697b"
+  },
+  "all_source_snapshot_sha256": "d18fffd7ca71638099e3d6b61b12e90e47097268602d85a17d0dcb8784e48f29",
+  "same_source_same_binary_no_recompile": true,
+  "binary_hashes": "c101b47968838e0a362e05188f6fbce3e5eb12f3712d144de8c64cbddd23ab82  /opt/pg18/bin/postgres\n9a9a99e71048cc6a288bec9c1ec913320fcefc52b1fa7f1cd24706e22a52fde9  /opt/pg18/lib/postgresql/test_dsg_region18.so\n",
+  "only_change": "Docker --init to keep actual root peer TGID>1; strict C unchanged",
+  "preserve_original_failure": "/data/neon-build/validation/pg18-array-root-attempt01-20261031T193446Z-7d88db/new4.log"
+}

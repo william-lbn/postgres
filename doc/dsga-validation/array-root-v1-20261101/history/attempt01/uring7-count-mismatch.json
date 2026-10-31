@@ -1,0 +1,45 @@
+{
+  "pass": false,
+  "scope": "TEST_ONLY actual PG18 native component; no A/R/NativeFinal/normal/VM/K8s qualification",
+  "cohort": "uring1",
+  "expected_roots": 1,
+  "tests_run": 7,
+  "skip": 0,
+  "rows": [
+    {
+      "root": "test_resize_failures18.Uring.test_PG18_S_FAILURE_001_cancel_shrink_restores_L_and_retry",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Uring.test_PG18_S_FAILURE_002_ERROR_after_populate_same_backend_retains_cost",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Uring.test_PG18_S_FAILURE_003_FATAL_backend_releases_locks_without_PM_reinit",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Uring.test_PG18_S_FAILURE_004_SIGKILL_preparing_backend_PM_reinitializes",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Uring.test_PG18_S_FAILURE_005_SIGKILL_PM_cold_recovery_then_new_resize",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Uring.test_PG18_S_FAILURE_006_ERROR_after_H_publish_keeps_commit_and_pending_cost",
+      "result": "PASS"
+    },
+    {
+      "root": "test_resize_failures18.Uring.test_PG18_S_URING_001_real_pin_and_post_unpin_drain",
+      "result": "PASS"
+    }
+  ],
+  "test_inputs": {
+    "src/test/modules/test_dsg_region18/t/test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+    "src/test/modules/test_dsg_region18/t/test_resize_failures18.py": "1a5ffaacaa0752c53ed3a9fa88fa0568846081f84489b0d9bd0decd21e71acf4",
+    "src/test/modules/test_dsg_region18/t/test_resize18.py": "e030a1bb23501375961ae6ec531a3ee52611fe0ea79938209b619206308df37f",
+    "src/test/modules/test_dsg_region18/t/test_region18.py": "d48fb9bc6285c831381008402ed4c2964537cc46e1d380ff9077dce6f7bb4263",
+    "src/test/modules/test_dsg_region18/t/test_array_root18.py": "5bd78e752c462b47262071262b8625b6cbcdb1ecbd6fd2b4704ef67f698f697b"
+  }
+}

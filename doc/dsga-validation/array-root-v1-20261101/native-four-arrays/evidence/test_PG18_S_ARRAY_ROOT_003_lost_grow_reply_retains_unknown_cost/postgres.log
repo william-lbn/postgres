@@ -1,0 +1,8 @@
+2026-10-31 19:52:41.269 GMT [135] LOG:  redirecting log output to logging collector process
+2026-10-31 19:52:41.269 GMT [135] HINT:  Future log output will appear in directory "logs".
+
+2026-10-31 19:52:41.269 GMT [135] LOG:  starting PostgreSQL 18.2 (15cacfb3-array-root-v1-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-10-31 19:52:41.270 GMT [135] LOG:  listening on Unix socket "/tmp/pg18-array-root-yeruqu1q/s/.s.PGSQL.55438"
+2026-10-31 19:52:41.272 GMT [142] LOG:  database system was shut down at 2026-10-31 19:52:41 GMT
+2026-10-31 19:52:41.273 GMT [142] LOG:  Continue writing WAL at 0/1516A30
+2026-10-31 19:52:41.274 GMT [135] LOG:  database system is ready to accept connections

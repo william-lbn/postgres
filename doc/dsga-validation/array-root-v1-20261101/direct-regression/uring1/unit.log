@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/data/neon-build/validation/pg18-array-root-attempt03-exact-uring-20261031T194323Z-6c39ea/run.py", line 10, in <module>
+    o=json.loads(x.stdout)[0];(v/'container.json').write_text(json.dumps({'Image':o['Image'],'State':o['State'],'HostConfig':{k:o['HostConfig'][k]for k in ['Init','Memory','MemorySwap','NanoCpus','NetworkMode','ReadonlyRootfs','CapAdd','CapDrop','SecurityOpt','Tmpfs']}},indent=2)+'\n')
+                                                                                                                                ~~~~~~~~~~~~~~~^^^
+KeyError: 'Init'

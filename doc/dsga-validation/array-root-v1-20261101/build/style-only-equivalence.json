@@ -1,0 +1,13 @@
+{
+  "old": "e350839280092d657328784181b16b9f04bdb72ce8ca6daee2086ccf41e92ae5",
+  "new": "8d96b9202b2bbd76f672d376118ce91ee47ba1d71ed3441d67b2bab973beb656",
+  "changed_lines": [
+    152,
+    154,
+    155
+  ],
+  "only_leading_whitespace": true,
+  "same_line_count": true,
+  "git_diff_check_exit": 0,
+  "original_compiled_snapshot": "/data/neon-build/validation/pg18-array-root-attempt01-20261031T193446Z-7d88db"
+}

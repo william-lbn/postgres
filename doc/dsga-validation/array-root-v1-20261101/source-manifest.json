@@ -1,0 +1,38 @@
+{
+  "PG18_base": "15cacfb3fe1efbb54ae65ac5454f0f61c2161c6e",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "PG17_origin_commit": "b95b142190cdc51de0d5603bfb9c46a0e0e7051f",
+  "origin_source": "Linux git show exact committed object, never active PG17 worktree/Mac business source",
+  "source8": {
+    "src/backend/storage/buffer/dsg_array_root.c": "aed3180ef30a503b576bfe43377e4b2b919f9ec0aaa8473f0c179f0e4ec8a6c4",
+    "src/include/storage/dsg_array_root.h": "d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "8d96b9202b2bbd76f672d376118ce91ee47ba1d71ed3441d67b2bab973beb656",
+    "src/backend/storage/buffer/buf_init.c": "75a314b8cf6eee591761d8a81eb0fd223d99a6235731629a3cbf289534c0097d",
+    "src/backend/storage/buffer/dsg_buffer_grow.c": "c97b31de938d21e733f03f01d82ec7ec604b4feb98b6f8a99a57cad8d6a3f8c8",
+    "src/backend/storage/buffer/Makefile": "65e4ee68bc3ec488addff57dabd65763603c17d8a140836a99e08b8e0bf547f5",
+    "src/backend/storage/buffer/meson.build": "4600b9c537bdea643efb2da37307381dc2dbd579618342fc68bef671385d42ce",
+    "src/test/modules/test_dsg_region18/t/test_array_root18.py": "5bd78e752c462b47262071262b8625b6cbcdb1ecbd6fd2b4704ef67f698f697b"
+  },
+  "actual_container_source_count": 7281,
+  "source_mechanism": "readonly /src mount from independent git archive + exact8 owned overlay; not COPY/image commit",
+  "all_source_manifest_sha256": "4e86ebeba0e0fc7bf95392195e5f5f865979965d0a7c475f2d2d0ef130ad5026",
+  "prior_actual_source_count": 7281,
+  "prior_source_manifest_sha256": "d18fffd7ca71638099e3d6b61b12e90e47097268602d85a17d0dcb8784e48f29",
+  "only_source_difference_from_prior_native": [
+    "src/backend/storage/buffer/dsg_buffer_arrays.c"
+  ],
+  "final_postgres_elf_sha256": "c431dc0dcffe68ff731d2ae08c1d173d67e3282619e077455794bfb101c8e7f7",
+  "prior_postgres_elf_sha256": "c101b47968838e0a362e05188f6fbce3e5eb12f3712d144de8c64cbddd23ab82",
+  "extension_sha256": "9a9a99e71048cc6a288bec9c1ec913320fcefc52b1fa7f1cd24706e22a52fde9",
+  "final_native4": "native-four-arrays c431; actual outer0/test4PASS/zeroSkip",
+  "prior_direct31": "old30 c101 actual0/30PASS + exact uring c101 actual DockerExit0/1PASS; old driver metadata KeyError kept original unit1",
+  "native4_repeated_for_final_ELF": true,
+  "direct31_not_repeated_under_final_ELF": true,
+  "prior_to_final_only_ELF_differences": [
+    ".debug_info",
+    ".debug_line",
+    ".note.gnu.build-id"
+  ],
+  "all_allocated_except_build_id_equal": true,
+  "auth": "NON_AUTHORIZING; root-v1 unsupported until PG18 own A/R+NativeFinal"
+}

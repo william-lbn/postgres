@@ -1,0 +1,7 @@
+PG18 Root 独立审查：本批四数组原生组件范围内无提交阻断。
+
+八源、97冻结路径及归档96文件逐SHA复核；7281个实际不可变源码输入重新读取并核对。新ELF c431 的四组服务用例是真实执行，均PASS、skip0；旧31组保留原ELF c101 的执行事实，不冒称新ELF执行。本审查独立解析两份原ELF64 section table，48节中34节带ALLOC，仅build-id的ALLOC变化；其余33节的类型/标志/地址/大小/内容SHA全部相同，非ALLOC差异仅debug_info/debug_line。等价证明只支撑本批空白修正，不替代将来的生产链回归。
+
+实际读过PG18与PG17的Root传输差异及数组生命周期diff：共享头与PG17 b95逐字节一致，API1/512请求/160响应；四个映射先建立，Root逐真实backing注册并预触全部成功后才清unknown，丢回执保守成本，RETIRE ACK不宣称backing已释放。原Grow在access/spin外但保持resizeX调用，PG18 AIO/末访问屏障未被跳过。default-off旧Provider保留。PG18当前只有显式test-v1，root-v1在没有真实A/R/NativeFinal前FATAL，固定fixture身份没有提升为生产资格。
+
+保留初次PID1环境失败、init修正及uring外层元数据失败原文；--init只修正fixture进程环境，不放松C peer PID门禁。此批S新增4/U新增0/E0，未运行PG18生产Birth、Root授权WAL/helper、369 Guest、normal降限或K8s。后续A/R/NativeFinal与保护profile的io_uring限制仍须独立完成。

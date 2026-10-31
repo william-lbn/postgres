@@ -1,0 +1,12 @@
+test_PG18_S_FAILURE_001_cancel_shrink_restores_L_and_retry (test_resize_failures18.Uring.test_PG18_S_FAILURE_001_cancel_shrink_restores_L_and_retry) ... ok
+test_PG18_S_FAILURE_002_ERROR_after_populate_same_backend_retains_cost (test_resize_failures18.Uring.test_PG18_S_FAILURE_002_ERROR_after_populate_same_backend_retains_cost) ... ok
+test_PG18_S_FAILURE_003_FATAL_backend_releases_locks_without_PM_reinit (test_resize_failures18.Uring.test_PG18_S_FAILURE_003_FATAL_backend_releases_locks_without_PM_reinit) ... ok
+test_PG18_S_FAILURE_004_SIGKILL_preparing_backend_PM_reinitializes (test_resize_failures18.Uring.test_PG18_S_FAILURE_004_SIGKILL_preparing_backend_PM_reinitializes) ... ok
+test_PG18_S_FAILURE_005_SIGKILL_PM_cold_recovery_then_new_resize (test_resize_failures18.Uring.test_PG18_S_FAILURE_005_SIGKILL_PM_cold_recovery_then_new_resize) ... ok
+test_PG18_S_FAILURE_006_ERROR_after_H_publish_keeps_commit_and_pending_cost (test_resize_failures18.Uring.test_PG18_S_FAILURE_006_ERROR_after_H_publish_keeps_commit_and_pending_cost) ... ok
+test_PG18_S_URING_001_real_pin_and_post_unpin_drain (test_resize_failures18.Uring.test_PG18_S_URING_001_real_pin_and_post_unpin_drain) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 9.863s
+
+OK

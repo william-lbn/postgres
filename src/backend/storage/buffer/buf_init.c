@@ -17,6 +17,7 @@
 #include "storage/aio.h"
 #include "storage/buf_internals.h"
 #include "storage/dsg_buffer_arrays.h"
+#include "storage/dsg_array_root.h"
 #include "storage/bufmgr.h"
 
 BufferDescPadded *BufferDescriptors;
@@ -81,6 +82,8 @@ BufferManagerShmemInit(void)
 				foundIOCV=false,
 				foundBufCkpt=false;
 
+ /* static/default配置也核显式Root模式；不允许忽略不受支持的请求。 */
+ (void)DsgArrayRootEnabled();
  if(DsgBufferArraysEnabled()) {
   DsgBufferArraysInit();
   BufferDescriptors=DsgBufferArrayAddress(0);

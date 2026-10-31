@@ -1,0 +1,9 @@
+{
+  "PG17_fixture_commit": "b95b142190cdc51de0d5603bfb9c46a0e0e7051f",
+  "PG17_fixture_sha256": "7e87d4d52e2e64709f383d21341995d9e676c126f33e5c796a18311dec4d7277",
+  "RootFixture_original_lines": [
+    24,
+    117
+  ],
+  "local_delta": "Root worker join terminal assertion; PG18 dedicated nonprivileged Cluster/test cases; no business Root source"
+}

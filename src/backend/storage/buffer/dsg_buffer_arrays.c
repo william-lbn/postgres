@@ -9,6 +9,7 @@
 #include "portability/instr_time.h"
 #include "storage/buf_internals.h"
 #include "storage/dsg_buffer_arrays.h"
+#include "storage/dsg_array_root.h"
 #include "storage/dynamic_shared_buffers.h"
 #include "storage/ipc.h"
 #include "storage/lwlock.h"
@@ -76,7 +77,9 @@ static void
 DestroyArrays(int code,Datum arg)
 {
  int i;
- /* 原18PM只在全部共享子类（含IO worker）退出后重建。子进程exit回调由PG重置。 */
+ /* 原18PM只在全部共享子类（含IO worker）退出后重建。子进程exit回调由PG重置。
+  * RETIRE只是封闭旧代意图；Root ACK不代表旧backing已释放或费用可清零。 */
+ DsgArrayRootRetire();
  for(i=0;i<DSG_NATIVE_ARRAY_COUNT;i++) {
   if(mappings[i].state==ARRAY_TRANSITION) elog(FATAL,"PG18 array ownership unknown");
   if(mappings[i].state!=ARRAY_SHARED) continue;
@@ -128,12 +131,31 @@ DsgBufferArraysInit(void)
    mappings[i].state=ARRAY_TRANSITION;DsgRegionRearm(&mappings[i].region);
   }
   mappings[i].state=ARRAY_SHARED;
-  result=DsgRegionPopulate(&mappings[i].region,0,initial);
-  if(result.status!=DSG_MEMORY_OK) {errno=result.system_errno;ereport(FATAL,(errcode(ERRCODE_OUT_OF_MEMORY),errmsg("could not populate PG18 native array: %m")));}
+  /* Root模式先只建立所有映射，不触数组页；缺省仍原Provider逐数组populate。 */
+  if(!DsgArrayRootEnabled()) {
+   result=DsgBufferPopulateArray((DsgBufferArrayId)i,&mappings[i].region,0,initial,NULL,30000);
+   if(result.status!=DSG_MEMORY_OK) {errno=result.system_errno;ereport(FATAL,(errcode(ERRCODE_OUT_OF_MEMORY),errmsg("could not populate PG18 native array: %m")));}
+  }
   array_control->committed[i]=TYPEALIGN(mappings[i].region.page_bytes,initial);
   DSBCtrl->arrays[i].region=mappings[i].region;
   DSBCtrl->arrays[i].element_bytes=elements[i];
   DSBCtrl->arrays[i].committed_upper_bytes=array_control->committed[i];
+  if(DsgArrayRootEnabled())DSBCtrl->arrays[i].allocation_unknown=true;
+ }
+ if(DsgArrayRootEnabled()) {
+  /* 四真实backing/几何写入目录后才注册；所有预触先保守记unknown，
+   * 原锁序不变，completion/AIO末访问屏障不因Root ACK而跳过。 */
+  DsgArrayRootRegisterAll();
+  for(i=0;i<DSG_NATIVE_ARRAY_COUNT;i++) {
+   DsgBufferArray *array=&DSBCtrl->arrays[i];
+   DsgMemoryResult result=DsgBufferPopulateArray((DsgBufferArrayId)i,&array->region,0,
+											   mul_size(NBuffers,array->element_bytes),NULL,30000);
+   if(result.status!=DSG_MEMORY_OK) {
+	errno=result.system_errno;
+	ereport(FATAL,(errcode(ERRCODE_OUT_OF_MEMORY),errmsg("PG18 initial Root array populate unknown: %m")));
+   }
+   array->allocation_unknown=false;
+  }
  }
  if((uintptr_t)mappings[1].region.address%PG_IO_ALIGN_SIZE!=0)elog(FATAL,"PG18 array I/O alignment unsupported");
 }

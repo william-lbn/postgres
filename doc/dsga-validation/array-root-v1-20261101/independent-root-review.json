@@ -1,0 +1,36 @@
+{
+  "status": "PASS_INDEPENDENT_FROZEN_COMPONENT_REVIEW",
+  "source8": {
+    "src/backend/storage/buffer/dsg_array_root.c": "aed3180ef30a503b576bfe43377e4b2b919f9ec0aaa8473f0c179f0e4ec8a6c4",
+    "src/include/storage/dsg_array_root.h": "d62a8b7f9040b31c434bb82b95b2c426ad21071dae7e902c6373c0b10ca36445",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "8d96b9202b2bbd76f672d376118ce91ee47ba1d71ed3441d67b2bab973beb656",
+    "src/backend/storage/buffer/buf_init.c": "75a314b8cf6eee591761d8a81eb0fd223d99a6235731629a3cbf289534c0097d",
+    "src/backend/storage/buffer/dsg_buffer_grow.c": "c97b31de938d21e733f03f01d82ec7ec604b4feb98b6f8a99a57cad8d6a3f8c8",
+    "src/backend/storage/buffer/Makefile": "65e4ee68bc3ec488addff57dabd65763603c17d8a140836a99e08b8e0bf547f5",
+    "src/backend/storage/buffer/meson.build": "4600b9c537bdea643efb2da37307381dc2dbd579618342fc68bef671385d42ce",
+    "src/test/modules/test_dsg_region18/t/test_array_root18.py": "5bd78e752c462b47262071262b8625b6cbcdb1ecbd6fd2b4704ef67f698f697b"
+  },
+  "checked_immutable_source_files": 7281,
+  "final_native4": {
+    "real_execution": true,
+    "roots": 4,
+    "skip": 0,
+    "postgres_sha256": "c431dc0dcffe68ff731d2ae08c1d173d67e3282619e077455794bfb101c8e7f7"
+  },
+  "direct_prior31": {
+    "original_execution_elf": "c101b47968838e0a362e05188f6fbce3e5eb12f3712d144de8c64cbddd23ab82",
+    "not_relabelled_as_final_execution": true,
+    "all_33_non_build_id_ALLOC_section_metadata_and_bytes_equal": true
+  },
+  "section_count": 48,
+  "allocated_count": 34,
+  "differing_sections": [
+    ".debug_info",
+    ".debug_line",
+    ".note.gnu.build-id"
+  ],
+  "same_header_as_PG17_b95": true,
+  "new_S": 4,
+  "E": 0,
+  "production_normal_qualified": false
+}

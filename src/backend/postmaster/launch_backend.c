@@ -48,6 +48,7 @@
 #include "replication/slotsync.h"
 #include "replication/walreceiver.h"
 #include "storage/dsm.h"
+#include "storage/dsg_buffer_arrays.h"
 #include "storage/io_worker.h"
 #include "storage/pg_shmem.h"
 #include "tcop/backend_startup.h"
@@ -266,6 +267,7 @@ postmaster_child_launch(BackendType child_type, int child_slot,
 		if (!child_process_kinds[child_type].shmem_attach)
 		{
 			dsm_detach_all();
+			DsgBufferArraysDetachInherited();
 			PGSharedMemoryDetach();
 		}
 

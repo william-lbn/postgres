@@ -53,6 +53,7 @@
 #include "postmaster/bgwriter.h"
 #include "storage/aio.h"
 #include "storage/buf_internals.h"
+#include "storage/dsg_buffer_arrays.h"
 #include "storage/bufmgr.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
@@ -6168,6 +6169,9 @@ TerminateBufferIO(BufferDesc *buf, bool clear_dirty, uint32 set_flag_bits,
 				  bool forget_owner, bool release_aio)
 {
 	uint32		buf_state;
+ DsgBufferCompletionLease completion={0};
+
+ if(release_aio)DsgBufferCompletionEnter(&completion);
 
 	buf_state = LockBufHdr(buf);
 
@@ -6190,6 +6194,7 @@ TerminateBufferIO(BufferDesc *buf, bool clear_dirty, uint32 set_flag_bits,
 
 	buf_state |= set_flag_bits;
 	UnlockBufHdr(buf, buf_state);
+ if(release_aio)DsgBufferCompletionAfterUnpin();
 
 	if (forget_owner)
 		ResourceOwnerForgetBufferIO(CurrentResourceOwner,
@@ -6207,6 +6212,9 @@ TerminateBufferIO(BufferDesc *buf, bool clear_dirty, uint32 set_flag_bits,
 	 */
 	if (release_aio && (buf_state & BM_PIN_COUNT_WAITER))
 		WakePinCountWaiter(buf);
+ /* pin/wref清除后仍访问IOCV和waiter，直到这里才可释放completion lease。 */
+ if(release_aio)DsgBufferCompletionLeave(&completion);
+
 }
 
 /*

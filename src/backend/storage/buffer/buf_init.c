@@ -16,6 +16,7 @@
 
 #include "storage/aio.h"
 #include "storage/buf_internals.h"
+#include "storage/dsg_buffer_arrays.h"
 #include "storage/bufmgr.h"
 
 BufferDescPadded *BufferDescriptors;
@@ -75,11 +76,18 @@ bool		am_wal_redo_postgres = false;
 void
 BufferManagerShmemInit(void)
 {
-	bool		foundBufs,
-				foundDescs,
-				foundIOCV,
-				foundBufCkpt;
+	bool		foundBufs=false,
+				foundDescs=false,
+				foundIOCV=false,
+				foundBufCkpt=false;
 
+ if(DsgBufferArraysEnabled()) {
+  DsgBufferArraysInit();
+  BufferDescriptors=DsgBufferArrayAddress(0);
+  BufferBlocks=DsgBufferArrayAddress(1);
+  BufferIOCVArray=DsgBufferArrayAddress(2);
+  CkptBufferIds=DsgBufferArrayAddress(3);
+ } else {
 	/* Align descriptors to a cacheline boundary. */
 	BufferDescriptors = (BufferDescPadded *)
 		ShmemInitStruct("Buffer Descriptors",
@@ -109,6 +117,8 @@ BufferManagerShmemInit(void)
 	CkptBufferIds = (CkptSortItem *)
 		ShmemInitStruct("Checkpoint BufferIds",
 						NBuffers * sizeof(CkptSortItem), &foundBufCkpt);
+
+ }
 
 	if (foundDescs || foundBufs || foundIOCV || foundBufCkpt)
 	{
@@ -170,6 +180,11 @@ Size
 BufferManagerShmemSize(void)
 {
 	Size		size = 0;
+
+ /* 显式native profile四数组在main段外；稳定控制/完成lease仍计main。
+  * 不改变StrategyShmemSize或AIO独立共享控制成本。 */
+ if(DsgBufferArraysEnabled())
+  return add_size(DsgBufferArraysShmemSize(),StrategyShmemSize());
 
 	/* size of buffer descriptors */
 	size = add_size(size, mul_size(NBuffers, sizeof(BufferDescPadded)));

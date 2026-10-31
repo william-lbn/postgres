@@ -1,0 +1,52 @@
+PG18 四数组与 AIO 末访问 lease 原生 core 组件（默认关闭）
+
+基线为自有原 PG18 分支 ca6d4765233be2af79eeeba3499c76ab95c0e603；其维护源为
+Neon REL_18_STABLE_neon a616eefea763784218a67f81395ba95bc2cf7c4d。只在Linux
+独立 postgres-v18 工作，不动PG17、Neon gitlink/发行锁、公共Buffer/Work协议。
+
+本批在 BufferManagerShmemInit/Size 接原DsgRegion，显式环境变量
+NEON_DSGA_PG18_NATIVE_ARRAYS=test-v1:M 才启用；M是canonical正int且不小于
+原NBuffers。默认沿原main共享段分配；未知/root-v1/无效M失败，不降级。
+这是隔离原生测试profile，不是Root可信配置、AS/R出生或normal资格。Root受管
+launcher会清调用者全部NEON_DSGA_*，不能从此test env偷带生产资格。
+
+启用时：四数组按PG18真实BufferDescPadded/BLCKSZ/IOCV/CkptSortItem几何预留M，
+只populate/初始化原N0。稳定目录/完成lease仍计main段；Strategy和AIO自身共享控制
+成本保持原计费路径。buf_init保留每个18 header的pgaio_wref_clear。PM的进程私有
+映射表在shmem_exit时Park，重建Rearm为新backing且保持VA；非shared child在18
+child_process_kinds[child_type].shmem_attach=false分支独立Destroy继承的映射，不
+MemSet共享目录。IO worker的shmem_attach=true原路径保留，未照搬17子PID登记。
+正常关机PM_WAIT_IO_WORKERS等io_worker_count=0；崩溃是PM_WAIT_DEAD_END等待除
+logger外所有子类退出→PM_NO_CHILDREN→shmem_exit→CreateSharedMemoryAndSemaphores，
+不能把正常关机的中间状态误当唯一崩溃恢复门槛。本批真实保同PM PID恢复3次。
+
+PG18 AIO增pin/io_wref不与17同构。TerminateBufferIO(release_aio=true)先取得共享
+completion lease，再清IO状态/释放AIO pin/io_wref，经过UnlockBufHdr、IOCV广播和
+最后WakePinCountWaiter，才释放lease。callback在critical section、可能运行于
+发起backend/其他backend/IO worker；lease里没有PG分配/ERROR。后继shrinker只可
+conditional独占该锁，不可持独占等待IO。本批尚无完整shrinker，所有普通reader/
+pin/read_stream/扫描路径都需继续移植/排空，因此snapshot中completion_lock_available
+只表示该瞬间completion锁可独占，绝不是允许回收数组。TestPause仅用于显式test
+profile实际完成窗口，固定单调5秒截止，未设置时不等待。
+
+真实测试7根（1U+6S）全部通过且零skip：strict profile、四数组真实native几何与
+数据、sync和worker两种冷读、IO worker数量2、真实after-unpin完成暂停窗口拒绝
+completion独占且放行后重试可得锁、同PM原恢复3次、默认off/原session管理员ACL，
+以及杀原logger后真实新logger的/proc/maps不包含PM四个共享匿名inode。最后一项
+覆盖logger在数组已创建后再fork的真实脱离路径，不仅首次早期logger无数组的情况。
+S为Linux原生容器服务组件，不是KVM或K8s E。真实数据/AS ABI与Source在JSON收据。
+
+首轮173.5秒构建core/安装完成，但新测试模块错写DsgRegion.reserved_bytes，真实
+字段为mapped_bytes而编译失败，完整输入body与日志保留。次轮构建38.9秒通过；
+sync子例错误期望无AIO callback而FAIL(实际3216次)，按18真实语义修测试：sync
+仍经pgaio handle/release_aio，只同步执行。复用同9个ELF输入仅重跑该根PASS。
+第三轮增加直接受影响logger重生证据、修准确模块说明，整批同源重建35.8秒并7根
+PASS13.5秒。最后git静态检查发现launch_backend新增一行空格缩进，改为原C tab，
+再次独立nonce同源重建并7根通过，确切耗时见JSON；未删除原失败/放宽拒绝。每轮nonce/源码锁/容器实际输入SHA/二进制
+均留/data独立目录；工具镜像只readonly bind实际Linux源码，不声称COPY入image。
+
+未完成门槛：普通buffer reader/pin访问lease、原Buffer Control/grow/shrink/replay/
+unknown账本与18 AIO持pin→release_aio→真实完整shrink retry；DSM/Work/Neon18
+扩展；Root出生与连续成本生产者；io_uring runtime/normal独立来源；安全normal降限、
+KVM和K8s E2E。本批不暴露数组释放入口、不修改NBuffers、不清任何normal拒绝，
+旧默认能力保持原路径。完整上层能力/恢复合同仍按统一协议后继适配。

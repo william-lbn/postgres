@@ -1,0 +1,160 @@
+{
+  "scope": "TEST_ONLY default-off native core arrays and AIO completion lease; non-authorizing",
+  "basePG18SHA": "ca6d4765233be2af79eeeba3499c76ab95c0e603",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "ownedSourceSHA256": {
+    "src/backend/postmaster/launch_backend.c": "fec27fb1ef4f834c062cda8a4c6a609654083aa8a3f1694b6f93ad0891f927cc",
+    "src/backend/storage/buffer/Makefile": "f7c9f9d98a206c621002091b53a0cb3cf57bc78eac22d18e0788693531f9f6ae",
+    "src/backend/storage/buffer/buf_init.c": "8f58efd0b46f0ed006bf914ec9dfa09c386d8103ddcb79c7cbf1e0c0f39e6718",
+    "src/backend/storage/buffer/bufmgr.c": "f79a6790a002227ce0b3ba91ed71bb3ab3bc68bfa0db2956a0c3ba61cc0f3f7e",
+    "src/backend/storage/buffer/meson.build": "eb32800d70e1b2e4e17543d8839f6806ba2a0a47984f4f35827e5218663f5bc6",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "afaaaaf7b9b1e5bd2144bbc0529cc13349c32fc80283f8863f605b996bacae17",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "31033a4db629e832fee7e526d99cbf9eb6f7feecec4209dbbd000c005cef27ad",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "271214b54b55a7147311baf5e610ed48b4746422f96adb0c0449da4f238bdbff",
+    "src/include/storage/dsg_buffer_arrays.h": "afdcbf7525e7f4265b5f4ce8de88dd34c84f80265e5e77dbd73a93ec11dbf3cf",
+    "src/test/modules/test_dsg_region18/t/test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a"
+  },
+  "actualCompiledContainerInputSHA256": {
+    "src/backend/postmaster/launch_backend.c": "fec27fb1ef4f834c062cda8a4c6a609654083aa8a3f1694b6f93ad0891f927cc",
+    "src/backend/storage/buffer/Makefile": "f7c9f9d98a206c621002091b53a0cb3cf57bc78eac22d18e0788693531f9f6ae",
+    "src/backend/storage/buffer/buf_init.c": "8f58efd0b46f0ed006bf914ec9dfa09c386d8103ddcb79c7cbf1e0c0f39e6718",
+    "src/backend/storage/buffer/bufmgr.c": "f79a6790a002227ce0b3ba91ed71bb3ab3bc68bfa0db2956a0c3ba61cc0f3f7e",
+    "src/backend/storage/buffer/meson.build": "eb32800d70e1b2e4e17543d8839f6806ba2a0a47984f4f35827e5218663f5bc6",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "afaaaaf7b9b1e5bd2144bbc0529cc13349c32fc80283f8863f605b996bacae17",
+    "src/test/modules/test_dsg_region18/test_dsg_region18.c": "31033a4db629e832fee7e526d99cbf9eb6f7feecec4209dbbd000c005cef27ad",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "271214b54b55a7147311baf5e610ed48b4746422f96adb0c0449da4f238bdbff",
+    "src/include/storage/dsg_buffer_arrays.h": "afdcbf7525e7f4265b5f4ce8de88dd34c84f80265e5e77dbd73a93ec11dbf3cf",
+    "src/test/modules/test_dsg_region18/t/test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a"
+  },
+  "fullObservedContainerInputCount": 12,
+  "metadataExcludedFromNativeSourceProof": [
+    "README.arrays-core",
+    "validation-arrays-core-v1.json"
+  ],
+  "sourceReadonlyBindNotCopiedIntoToolsImage": true,
+  "runtimePythonSHA256": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+  "build": {
+    "exit": 0,
+    "seconds": 38.498953823997,
+    "base18": "ca6d4765233be2af79eeeba3499c76ab95c0e603",
+    "source_dirty": true,
+    "tool_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6"
+  },
+  "binariesSHA256": {
+    "postgres": "f33af6c8e61773fb8c30df67afa58f676fcfcd489737f20fbb870bfb1fee4b10",
+    "test_dsg_region18.so": "01f88d69e7bdf4191deedee4be27c27d1b4dbe6b2302380233806c2c40990339"
+  },
+  "test": {
+    "status": "PASS_COMPONENT_ONLY",
+    "roots": 7,
+    "U": 1,
+    "S": 6,
+    "E": 0,
+    "skips": 0,
+    "seconds": 13.273,
+    "cases": [
+      {
+        "id": "PG18-S-ARRAYS-001",
+        "test": "test_PG18_S_ARRAYS_001_actual_four_native_arrays",
+        "layer": "native-service-component",
+        "status": "PASS",
+        "seconds": 1.219002272002399
+      },
+      {
+        "id": "PG18-S-ARRAYS-002",
+        "test": "test_PG18_S_ARRAYS_002_worker_AIO_data_and_completion",
+        "layer": "native-service-component",
+        "status": "PASS",
+        "seconds": 2.3945589020004263
+      },
+      {
+        "id": "PG18-S-ARRAYS-003",
+        "test": "test_PG18_S_ARRAYS_003_actual_completion_window_excludes_drain",
+        "layer": "native-service-component",
+        "status": "PASS",
+        "seconds": 1.2257476570011931
+      },
+      {
+        "id": "PG18-S-ARRAYS-004",
+        "test": "test_PG18_S_ARRAYS_004_original_PM_recovery_three_times",
+        "layer": "native-service-component",
+        "status": "PASS",
+        "seconds": 2.1933663499949034
+      },
+      {
+        "id": "PG18-S-ARRAYS-005",
+        "test": "test_PG18_S_ARRAYS_005_default_off_and_new_API_ACL",
+        "layer": "native-service-component",
+        "status": "PASS",
+        "seconds": 0.8211650570010534
+      },
+      {
+        "id": "PG18-S-ARRAYS-006",
+        "test": "test_PG18_S_ARRAYS_006_restarted_logger_drops_actual_inherited_backing",
+        "layer": "native-service-component",
+        "status": "PASS",
+        "seconds": 1.2241714359988691
+      },
+      {
+        "id": "PG18-U-ARRAYS-001",
+        "test": "test_PG18_U_ARRAYS_001_strict_profile_rejects",
+        "layer": "unit-native",
+        "status": "PASS",
+        "seconds": 4.194170160997601
+      }
+    ]
+  },
+  "receipt": "/data/neon-build/validation/pg18-arrays-native-attempt04-20261031T002547Z-d35ab7",
+  "unit": "neon-pg18-arrays-20261031t002125z-6349bc.service",
+  "resourceLimits": {
+    "CPUs": 4,
+    "MemoryGiB": 5,
+    "MemorySwapGiB": 5,
+    "Pids": 256,
+    "CcacheMaxGiB": 1
+  },
+  "sourceLockSHA256": "afe28c7545aa6c003491d91f0f8e5fe407a3d154bb5ec1506e588746f2410ba2",
+  "logger": {
+    "pmPid": 319,
+    "oldLoggerPid": 321,
+    "newLoggerPid": 338,
+    "actualPMArrayInodes": [
+      10508,
+      10509,
+      10510,
+      10511
+    ],
+    "noSharedArrayInNewLogger": true
+  },
+  "firstFailuresPreserved": [
+    {
+      "path": "/data/neon-build/validation/pg18-arrays-native-attempt01-20261031T001211Z-123fc4",
+      "status": "BUILD_FAIL",
+      "cause": "test C wrong reserved_bytes field; core built but testmodule not"
+    },
+    {
+      "path": "/data/neon-build/validation/pg18-arrays-native-attempt02-20261031T001537Z-1425ba",
+      "status": "BUILD_PASS_TEST_FAIL",
+      "cause": "sync test expected 0 callbacks; actual3216 and official18 pgaio path confirm expectation error"
+    },
+    {
+      "path": "/data/neon-build/validation/pg18-arrays-affected-runtime-20261031T001828Z-7be6bd",
+      "status": "PASS_AFFECTED_ROOT_ONLY",
+      "compiledBinaryReused": true,
+      "runtimePythonNotCompiledIntoELF": true
+    }
+  ],
+  "notRunOrProven": [
+    "production dynamic shared_buffers resize and all ordinary buffer readers/pins",
+    "actual full shrink/retry controller (component tests completion exclusion only)",
+    "io_uring runtime/profile certification",
+    "DSM/Work/Root cost sources",
+    "Neon compute18 extensions",
+    "safe normal decrease",
+    "KVM/Kubernetes E2E"
+  ],
+  "normalDecreasePermit": false,
+  "publicProtocolChanged": false,
+  "PG17OrSharedLocksModified": false,
+  "agentCommittedOrPushed": false
+}

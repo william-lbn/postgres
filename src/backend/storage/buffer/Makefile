@@ -13,6 +13,7 @@ top_builddir = ../../../..
 include $(top_builddir)/src/Makefile.global
 
 OBJS = \
+	dsg_buffer_arrays.o \
 	buf_init.o \
 	buf_table.o \
 	bufmgr.o \

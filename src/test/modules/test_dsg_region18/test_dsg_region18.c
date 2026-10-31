@@ -1,5 +1,5 @@
 /*-
- * PG18独立叶模块测试；不接buf_init、PG18 AIO/resize、公共协议或Root许可。
+ * PG18独立叶模块及显式TEST_ONLY四数组/AIO core测试；不授resize/Root许可。
  * 只显式管理员测试调用；真实映射/异常清理/数据观察，不输出VA供普通用户。
  */
 #include "postgres.h"
@@ -9,6 +9,7 @@
 #include "storage/aio.h"
 #include "storage/buf_internals.h"
 #include "storage/dsg_region.h"
+#include "storage/dsg_buffer_arrays.h"
 #include "utils/builtins.h"
 #include <errno.h>
 #include <stddef.h>
@@ -158,4 +159,24 @@ test_dsg_region18_run(PG_FUNCTION_ARGS)
 	}
 	PG_END_TRY();
 	PG_RETURN_TEXT_P(cstring_to_text("{\"ok\":true,\"normal_permit\":false}"));
+}
+
+/* 原生四数组core测试仍要求当前与原session管理员；不把test profile当Root资格。 */
+PG_FUNCTION_INFO_V1(test_dsg_arrays18_snapshot);
+PG_FUNCTION_INFO_V1(test_dsg_arrays18_pause);
+Datum
+test_dsg_arrays18_snapshot(PG_FUNCTION_ARGS)
+{
+ DsgBufferArraysSnapshot s;
+ StringInfoData out;
+ int i;
+ Admin();DsgBufferArraysSnapshotGet(&s);initStringInfo(&out);
+ appendStringInfo(&out,"{\"enabled\":%s,\"maximum_buffers\":%d,\"startup_buffers\":%d,\"active_completions\":%u,\"paused_completions\":%u,\"completed_aio\":\"" UINT64_FORMAT "\",\"released_aio_pins\":\"" UINT64_FORMAT "\",\"completion_lock_available\":%s,\"resize_authorized\":false,\"normal_permit\":false,\"arrays\":[",s.enabled?"true":"false",s.maximum_buffers,s.startup_buffers,s.active_completions,s.paused_completions,s.completed_aio,s.released_aio_pins,s.completion_lock_available?"true":"false");
+ for(i=0;i<DSG_NATIVE_ARRAY_COUNT;i++){if(i)appendStringInfoChar(&out,',');appendStringInfo(&out,"{\"base\":\"%zu\",\"maximum_bytes\":\"%zu\",\"reserved_bytes\":\"%zu\",\"committed_bytes\":\"%zu\"}",(Size)s.ranges[i].address,s.ranges[i].maximum_bytes,s.ranges[i].mapped_bytes,s.committed_bytes[i]);}
+ appendStringInfoString(&out,"]}");PG_RETURN_TEXT_P(cstring_to_text(out.data));
+}
+Datum
+test_dsg_arrays18_pause(PG_FUNCTION_ARGS)
+{
+ Admin();DsgBufferArraysTestPause(PG_GETARG_BOOL(0));PG_RETURN_VOID();
 }

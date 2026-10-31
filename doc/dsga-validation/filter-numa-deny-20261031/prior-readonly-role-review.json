@@ -1,0 +1,99 @@
+{
+  "reference17": "99f7ff1dac70a28fab9a3980e9ad5eb07b042603",
+  "source_sha256": {
+    "src/backend/main/main.c": "dd5dd0143f10f810afdbf58e6baa5097dccf3b0ada1bf81a951dfe897ba5b62f",
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "b2e1a793f4009fb51dde6c24a29b600f2a8d15bc8c73fdebbc51dfd18ea56f88",
+    "src/backend/storage/buffer/dsg_envelope_birth.c": "6cb4b482d21f8621c65d05a5d4727a19b1c2f9b0aa598b5be75af822fa724dc2",
+    "src/backend/storage/buffer/dsg_native_birth_wire.c": "4ba5b3aa7c33395678aeea95eddecfdb3a710b358e0a7d787f6d4bcc8e68ee71",
+    "src/backend/postmaster/launch_backend.c": "6797ca511483270b1c4ac8df01b901da0576437e6bdb25240b81dc504b62bb44",
+    "src/backend/postmaster/fork_process.c": "031d8dc4d803851a70b90e914d3efd6a57018784659e72d1cc1dba81b9b631d4",
+    "src/backend/storage/ipc/ipc.c": "b90a589ba9eda472123278d20a8898a03bda9ed6c972dc05acd22d31d602f8b8",
+    "src/backend/storage/ipc/dsm.c": "db141fdacc18aedfcabb6a89bce39e3478db3e7ae6665846fb4a9b3b1e1cfc49",
+    "src/backend/utils/init/miscinit.c": "976e73d856b8c480dd6711387067668d1bb2e0c2f1251e39bb946b9b5cfe64ff"
+  },
+  "kernel_mempolicy_sha256": "1ceb840fd09f2ca7105af55c0b3164e5c249b440c2d64a91a191fe1d625b66d7",
+  "roles": [
+    {
+      "role": "PG PMbase / PMfinal",
+      "migration_syscalls": [
+        "mbind",
+        "set_mempolicy",
+        "move_pages",
+        "migrate_pages"
+      ],
+      "decision": "unconditional EPERM before default allow, same Build for both birth_open values",
+      "proof": "filter.c223..250; main.c183..191; immutable source hashes",
+      "caller_set": "empty for threads actually inheriting this chain",
+      "qualification": "native install is per-thread prctl without TSYNC; Root final gate must independently establish original one-thread PM / exact chain, not merely test-v1 self-report"
+    },
+    {
+      "role": "PG forked backend / auxiliary / bgworker / logger",
+      "decision": "inherits PMbase+PMfinal immediately; Child is stacked before Main and ready",
+      "proof": "fork_process.c71..73; launch_backend.c247..273; child kinds187..214",
+      "caller_set": "same migration deny even in pre-Child window; Child later additionally forbids own fork/nonpthread clone and anonymous shared mapping",
+      "qualification": "libc atfork and fixed startup code before Child remain trusted manifest condition; not a claim that Child is installed at first fork instruction"
+    },
+    {
+      "role": "PG pthread descendants",
+      "decision": "allowed exact pthread flags inherit caller chain; no way to remove stacked seccomp",
+      "proof": "filter.c267..280",
+      "caller_set": "migration syscalls remain empty if original caller already filtered",
+      "qualification": "not evidence for any thread created before main/filter. PM raw permitted fork signature still relies native leader/trusted-source D gate"
+    },
+    {
+      "role": "RootArrayHelper",
+      "decision": "no production helper executor/filter found in current pkg/dsga source tree; existing map_files/memfd probes are TEST_ONLY",
+      "caller_set": "UNKNOWN, cannot count zero",
+      "required": "future helper fixed binary/source/exec/role gate, inherited fixed lockFD and exact charged stage, minimal syscall program denying migration/NUMA/ns/fork/uring/userfault/GUP paths, independently read back actual complete chain; do not infer from intended MADV_POPULATE_WRITE-only algorithm"
+    },
+    {
+      "role": "ordinary System / Root processes",
+      "decision": "not covered by PG native filter",
+      "caller_set": "UNKNOWN; cgroup private task cap does not forbid system migration requests",
+      "required": "fixed complete permitted caller set plus actual mechanism/manifest or conservative kernel batch bound; root may induce compaction/hotplug/remote mm access separately, must remain in P2 source proof"
+    },
+    {
+      "role": "kernel automatic/Root hotplug migration",
+      "decision": "not a PG syscall permission and cannot be excluded by PG seccomp",
+      "caller_set": "P2 exact kernel source responsibility",
+      "required": "NUMA balancing/profile/hotplug actual hard sources and full migration batch/old-source lifetime bound; PG results are not physicalfree/uncharge proof"
+    }
+  ],
+  "actual_omission": {
+    "syscall": "set_mempolicy_home_node",
+    "number_amd64": 450,
+    "current_filter": "ALLOW via default filter.c265",
+    "actual_native_probe_len0": {
+      "result": 0,
+      "errno": 0
+    },
+    "kernel_source_sha256": "1ceb840fd09f2ca7105af55c0b3164e5c249b440c2d64a91a191fe1d625b66d7",
+    "kernel_lines": "1540..1604",
+    "meaning": "updates only current mm existing BIND/PREFERRED_MANY VMA home_node by mbind_range; no direct migrate_pages call",
+    "impact": "not a direct 512 migration-shadow entry, but cannot claim all NUMA policy changes blocked; adding explicit deny is a later narrowly scoped owner change, not made here"
+  },
+  "mechanism_test": {
+    "id": "PG17-S-MIGFILTER-001",
+    "layer": "native-service-component",
+    "receipt": "/data/neon-build/validation/pg17-migration-filter-mechanism-20261031T014334Z-c5151b",
+    "pass": true,
+    "roots": 1,
+    "syscall_cases": 13,
+    "skip": 0,
+    "kernel": "6.8.0-147-generic",
+    "image_digest": "sha256:af97e387041b349d0138b39b9a7c90c9d612db3ef07906fe1271db7162ee414d",
+    "postgres_elf_sha256": "c990ed4251edb270d37894036c70d90e012fea2bb441a7a48faeb0ed6375be53",
+    "model": false,
+    "KVM": false,
+    "normal_permit": false,
+    "first_fixture_failure": "/data/neon-build/validation/pg17-migration-filter-mechanism-20261031T014317Z-f3d499"
+  },
+  "not_proven": [
+    "full Root/System/helper permitted-caller enforcement",
+    "exact6.12.26 syscall mechanism runtime",
+    "physicalfree/uncharge/migration512 batch bound",
+    "PM direct syscall runtime test",
+    "whole process no earlier unfiltered threads without final Root gate",
+    "normal qualification"
+  ]
+}

@@ -1,0 +1,18 @@
+[
+  "docker",
+  "buildx",
+  "build",
+  "--builder",
+  "neon-data",
+  "--network",
+  "none",
+  "--progress",
+  "plain",
+  "--metadata-file",
+  "/data/neon-build/validation/pg17-filter-numa-deny-20261031T014858Z-722edb/build-metadata.json",
+  "--output",
+  "type=image,name=127.0.0.1:5001/neon/pg17-native-filter:99f7ff1-numa-deny-722edb-TEST_ONLY,push=true,registry.insecure=true",
+  "-f",
+  "/data/neon-build/validation/pg17-filter-numa-deny-20261031T014858Z-722edb/Dockerfile",
+  "/data/neon-build/validation/pg17-filter-numa-deny-20261031T014858Z-722edb/context"
+]

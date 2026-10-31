@@ -1,0 +1,63 @@
+{
+  "passed": true,
+  "expectedRoots": 9,
+  "testsRun": 9,
+  "tests": [
+    {
+      "test": "__main__.RootBirth.test_PG17_S_ROOTWIRE_001_real_exact_chain_detach",
+      "result": "PASS",
+      "seconds": 0.042363446998933796
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_S_ROOTWIRE_002_no_tracer_and_cont_cannot_release",
+      "result": "PASS",
+      "seconds": 0.0359409910015529
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_S_ROOTWIRE_003_same_uid_sigcont_cannot_release",
+      "result": "PASS",
+      "seconds": 0.12409024799853796
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_S_ROOTWIRE_004_wrong_tracer_tgid_and_tracer_death",
+      "result": "PASS",
+      "seconds": 0.028914168004121166
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_S_ROOTWIRE_005_actual_ack_timeout",
+      "result": "PASS",
+      "seconds": 30.365682096002274
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_S_ROOTWIRE_006_actual_buffer_M_N0_mismatch",
+      "result": "PASS",
+      "seconds": 1.4797708799960674
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_U_ROOTWIRE_001_audit_exact_root_geometry",
+      "result": "PASS",
+      "seconds": 0.03973553400282981
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_U_ROOTWIRE_002_invalid_original_fields_and_198",
+      "result": "PASS",
+      "seconds": 0.049319853002089076
+    },
+    {
+      "test": "__main__.RootBirth.test_PG17_U_ROOTWIRE_003_ack_frames_ancillary_and_peer",
+      "result": "PASS",
+      "seconds": 0.06986669300385984
+    }
+  ],
+  "kernel": "6.8.0-147-generic",
+  "sourceSHA256": "59307d001cdf043bcf56d49fa894d035ff7059b880a1a8b43872d6c7dd5222f5",
+  "postgresSHA256": "62757f73eca3f7a401df5ddf73d281b2f6e93157b7152a8c8c71d9e5689a14bf",
+  "scope": "ISOLATED_COMPONENT_ROOT_FIXTURE_NOT_PRODUCTION_ROOT_WAL_OR_NORMAL",
+  "notProven": [
+    "production Root/source/WAL",
+    "full FS/I envelope",
+    "safe normal decrease",
+    "Guest KVM",
+    "Kubernetes E2E"
+  ]
+}

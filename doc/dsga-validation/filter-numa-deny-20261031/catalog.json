@@ -1,0 +1,64 @@
+{
+  "base17": "99f7ff1dac70a28fab9a3980e9ad5eb07b042603",
+  "production_change": {
+    "path": "src/backend/storage/buffer/dsg_envelope_filter.c",
+    "before_sha256": "b2e1a793f4009fb51dde6c24a29b600f2a8d15bc8c73fdebbc51dfd18ea56f88",
+    "after_sha256": "ed3fdb61f01ce4aa0da2a4f8baef2cacf3ce0eea813a1a0e015545bd71288f44",
+    "only_change": "common forbidden __NR_set_mempolicy_home_node + Chinese rationale"
+  },
+  "receipt": "/data/neon-build/validation/pg17-filter-numa-deny-20261031T014858Z-722edb",
+  "unit": "neon-pg17-numa-deny-722edb.service",
+  "nonce": "20261031T014858Z-722edb",
+  "image": {
+    "image": "127.0.0.1:5001/neon/pg17-native-filter@sha256:7e602e1cd6f958a78caae91df93545919cb6de124d65db035550ef06d8cdf30b",
+    "tag": "127.0.0.1:5001/neon/pg17-native-filter:99f7ff1-numa-deny-722edb-TEST_ONLY",
+    "base": "127.0.0.1:5001/neon/pg17-native-root-wire@sha256:af97e387041b349d0138b39b9a7c90c9d612db3ef07906fe1271db7162ee414d",
+    "source": "src/backend/storage/buffer/dsg_envelope_filter.c",
+    "source_sha256": "ed3fdb61f01ce4aa0da2a4f8baef2cacf3ce0eea813a1a0e015545bd71288f44",
+    "dockerfile_sha256": "e30ebf05f3637117dbafd83053180e39d6a8c856df510431da1f39f2b0f5c6c5"
+  },
+  "actual_image": {
+    "/home/nonroot/vendor/postgres-v17/src/backend/storage/buffer/dsg_envelope_filter.c": "ed3fdb61f01ce4aa0da2a4f8baef2cacf3ce0eea813a1a0e015545bd71288f44",
+    "/home/nonroot/vendor/postgres-v17/src/backend/postmaster/launch_backend.c": "6797ca511483270b1c4ac8df01b901da0576437e6bdb25240b81dc504b62bb44",
+    "/home/nonroot/vendor/postgres-v17/src/backend/postmaster/fork_process.c": "031d8dc4d803851a70b90e914d3efd6a57018784659e72d1cc1dba81b9b631d4",
+    "/home/nonroot/pg_install/v17/bin/postgres": "62757f73eca3f7a401df5ddf73d281b2f6e93157b7152a8c8c71d9e5689a14bf"
+  },
+  "build": {
+    "exit": 0,
+    "seconds": 45.09885313400446
+  },
+  "cohort_exits": [
+    {
+      "cohort": "root9",
+      "exit": 0,
+      "seconds": 33.20986998800072
+    },
+    {
+      "cohort": "compatibility11",
+      "exit": 0,
+      "seconds": 38.769208249002986
+    },
+    {
+      "cohort": "mechanism13",
+      "exit": 0,
+      "seconds": 3.023928958995384
+    }
+  ],
+  "aggregate": {
+    "roots": 21,
+    "unit_roots": 6,
+    "native_service_roots": 15,
+    "skips": 0,
+    "end_to_end_roots": 0,
+    "new_mechanism_syscall_cases": 13
+  },
+  "scope": "new PG native BPF TEST_ONLY component; not complete normal proof",
+  "not_proven": [
+    "RootGo tracer actual Host/new BPF and 369 Guest rerun",
+    "Root/System/helper permitted migration/GUP/IO caller enforcement",
+    "physicalfree/uncharge/migration512 bounds",
+    "whole continuous force/I sources",
+    "safe normal decrease",
+    "KVM/Kubernetes E2E"
+  ]
+}

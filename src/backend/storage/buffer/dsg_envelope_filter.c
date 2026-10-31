@@ -228,6 +228,8 @@ Build(DsgFilterBuilder *b, bool child, bool birth_open, const DsgBirthArraysSnap
 		__NR_vmsplice,__NR_splice,__NR_tee,__NR_sendfile,
 		__NR_mlock,__NR_mlock2,__NR_mlockall,__NR_recvmmsg,
 		__NR_mbind,__NR_set_mempolicy,__NR_move_pages,__NR_migrate_pages,
+		/* home_node不直接迁移，但仍改变未来NUMA策略；受限profile不能漂移。 */
+		__NR_set_mempolicy_home_node,
 		__NR_process_madvise,__NR_process_mrelease,
 		-1};
 	static const int other_advice[]={MADV_NORMAL,MADV_RANDOM,MADV_SEQUENTIAL,

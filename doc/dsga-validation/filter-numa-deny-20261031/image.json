@@ -1,0 +1,8 @@
+{
+  "image": "127.0.0.1:5001/neon/pg17-native-filter@sha256:7e602e1cd6f958a78caae91df93545919cb6de124d65db035550ef06d8cdf30b",
+  "tag": "127.0.0.1:5001/neon/pg17-native-filter:99f7ff1-numa-deny-722edb-TEST_ONLY",
+  "base": "127.0.0.1:5001/neon/pg17-native-root-wire@sha256:af97e387041b349d0138b39b9a7c90c9d612db3ef07906fe1271db7162ee414d",
+  "source": "src/backend/storage/buffer/dsg_envelope_filter.c",
+  "source_sha256": "ed3fdb61f01ce4aa0da2a4f8baef2cacf3ce0eea813a1a0e015545bd71288f44",
+  "dockerfile_sha256": "e30ebf05f3637117dbafd83053180e39d6a8c856df510431da1f39f2b0f5c6c5"
+}

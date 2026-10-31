@@ -1,0 +1,139 @@
+{
+  "baseline": {
+    "enabled": false,
+    "finalized": false,
+    "child_installed": false,
+    "calls": {
+      "mbind": {
+        "result": -1,
+        "errno": 22
+      },
+      "set_mempolicy": {
+        "result": -1,
+        "errno": 22
+      },
+      "migrate_pages": {
+        "result": -1,
+        "errno": 22
+      },
+      "move_pages": {
+        "result": 0,
+        "errno": 0
+      },
+      "unshare": {
+        "result": 0,
+        "errno": 0
+      },
+      "setns": {
+        "result": -1,
+        "errno": 9
+      },
+      "io_uring_setup": {
+        "result": -1,
+        "errno": 14
+      },
+      "io_uring_enter": {
+        "result": -1,
+        "errno": 9
+      },
+      "io_uring_register": {
+        "result": -1,
+        "errno": 22
+      },
+      "userfaultfd": {
+        "result": -1,
+        "errno": 22
+      },
+      "process_madvise": {
+        "result": -1,
+        "errno": 9
+      },
+      "process_mrelease": {
+        "result": -1,
+        "errno": 9
+      },
+      "set_mempolicy_home_node": {
+        "result": 0,
+        "errno": 0
+      }
+    },
+    "normal_permit": false
+  },
+  "actual_native_child": {
+    "enabled": true,
+    "finalized": true,
+    "child_installed": true,
+    "calls": {
+      "mbind": {
+        "result": -1,
+        "errno": 1
+      },
+      "set_mempolicy": {
+        "result": -1,
+        "errno": 1
+      },
+      "migrate_pages": {
+        "result": -1,
+        "errno": 1
+      },
+      "move_pages": {
+        "result": -1,
+        "errno": 1
+      },
+      "unshare": {
+        "result": -1,
+        "errno": 1
+      },
+      "setns": {
+        "result": -1,
+        "errno": 1
+      },
+      "io_uring_setup": {
+        "result": -1,
+        "errno": 1
+      },
+      "io_uring_enter": {
+        "result": -1,
+        "errno": 1
+      },
+      "io_uring_register": {
+        "result": -1,
+        "errno": 1
+      },
+      "userfaultfd": {
+        "result": -1,
+        "errno": 1
+      },
+      "process_madvise": {
+        "result": -1,
+        "errno": 1
+      },
+      "process_mrelease": {
+        "result": -1,
+        "errno": 1
+      },
+      "set_mempolicy_home_node": {
+        "result": -1,
+        "errno": 1
+      }
+    },
+    "normal_permit": false
+  },
+  "different_from_unfiltered": [
+    "mbind",
+    "set_mempolicy",
+    "migrate_pages",
+    "move_pages",
+    "unshare",
+    "setns",
+    "io_uring_setup",
+    "io_uring_enter",
+    "io_uring_register",
+    "userfaultfd",
+    "process_madvise",
+    "process_mrelease",
+    "set_mempolicy_home_node"
+  ],
+  "kernel_release": "6.8.0-147-generic",
+  "scope": "isolated Linux native PG17 service; not KVM or normal qualification"
+}

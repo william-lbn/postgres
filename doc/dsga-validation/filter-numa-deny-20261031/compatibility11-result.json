@@ -1,0 +1,68 @@
+{
+  "passed": true,
+  "expectedRoots": 11,
+  "testsRun": 11,
+  "tests": [
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_001_default_disabled_real_pg",
+      "result": "PASS",
+      "seconds": 1.1325357430032454
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_002_configuration_cannot_drift",
+      "result": "PASS",
+      "seconds": 1.5878715819999343
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_003_real_logger_and_recovery_keep_r",
+      "result": "PASS",
+      "seconds": 9.605904545998783
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_S_BIRTH_004_extension_and_native_acl",
+      "result": "PASS",
+      "seconds": 1.3155425450022449
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_001_explicit_invalid_modes_and_original_as",
+      "result": "PASS",
+      "seconds": 0.07662273099413142
+    },
+    {
+      "test": "test_early_arrays.EarlyArrays.test_PG17_U_BIRTH_002_no_nnp_cannot_enable",
+      "result": "PASS",
+      "seconds": 0.0037467530055437237
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_001_actual_syscall_boundaries_and_threads",
+      "result": "PASS",
+      "seconds": 2.221164170994598
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_002_real_logger_and_internal_recovery",
+      "result": "PASS",
+      "seconds": 8.151435134997882
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_003_actual_extension_acl_and_definer",
+      "result": "PASS",
+      "seconds": 1.2875607550013228
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_S_FILTER_004_ready_edge_failures_reaped",
+      "result": "PASS",
+      "seconds": 10.9935611050023
+    },
+    {
+      "test": "test_filter.Filter.test_PG17_U_FILTER_001_explicit_mode_and_missing_r_fail",
+      "result": "PASS",
+      "seconds": 1.2698896119982237
+    }
+  ],
+  "scope": "DEFAULT_OFF_AND_TEST_V1_COMPATIBILITY_NOT_NORMAL",
+  "sourceSHA256": {
+    "test_early_arrays.py": "f23b43d6be6a21d829a3d01b83461a1572e065c6d79e136a1457efef0ecd0ee1",
+    "test_filter.py": "27c1f376a23b9dfed030f1b53868b7f47eb6579f294887f362a99a0fd4797ef8"
+  },
+  "postgresSHA256": "62757f73eca3f7a401df5ddf73d281b2f6e93157b7152a8c8c71d9e5689a14bf"
+}

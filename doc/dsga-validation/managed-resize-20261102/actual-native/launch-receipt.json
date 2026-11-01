@@ -1,0 +1,5 @@
+{
+  "exit": 0,
+  "stdout": "{\"cpu\": 2, \"kind\": \"native\", \"last_observation\": null, \"memory\": 3221225472, \"nonce\": \"20261101T232403Z-950cf4\", \"process_exit_code\": null, \"queue_reason\": \"\", \"spec_sha256\": \"6e9b73a3a517e79151c780367ef0dd350131ab26c8f0a8809013201ec4ae7078\", \"state\": \"running\", \"test_verdict\": \"NOT_INTERPRETED\", \"unit\": \"neon-pg18-managed-resize-native-20261101t232403z-950cf4.service\", \"unit_result\": null, \"worker_sha256\": \"53c7c86ae397c9d6f5f62de940b7292e71854ab6d5f46d8592977b029b64f30d\"}\n",
+  "stderr": ""
+}

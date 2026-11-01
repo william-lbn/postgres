@@ -1,0 +1,24 @@
+2026-11-01 23:24:12.050 GMT [179] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 23:24:12.050 GMT [179] LOG:  listening on Unix socket "/tmp/pg18-r-4am2_t_6/s/.s.PGSQL.55438"
+2026-11-01 23:24:12.050 GMT [179] LOG:  listening on Unix socket "/tmp/pg18-r-4am2_t_6/data/dsg_socket/.s.PGSQL.55438"
+2026-11-01 23:24:12.053 GMT [186] LOG:  database system was shut down at 2026-11-01 23:24:12 GMT
+2026-11-01 23:24:12.054 GMT [186] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 23:24:12.055 GMT [179] LOG:  database system is ready to accept connections
+2026-11-01 23:24:12.572 GMT [184] LOG:  checkpoint starting: immediate force wait
+2026-11-01 23:24:12.582 GMT [184] LOG:  checkpoint complete: wrote 1999 buffers (390.4%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 2 recycled; write=0.010 s, sync=0.001 s, total=0.011 s; sync files=51, longest=0.001 s, average=0.001 s; distance=29783 kB, estimate=29783 kB; lsn=0/322C7A8, redo lsn=0/322C750
+2026-11-01 23:24:12.590 GMT [184] LOG:  checkpoint starting: immediate force wait
+2026-11-01 23:24:12.591 GMT [184] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=26805 kB; lsn=0/322C878, redo lsn=0/322C820
+2026-11-01 23:24:12.620 GMT [179] LOG:  client backend (PID 227) was terminated by signal 9: Killed
+2026-11-01 23:24:12.620 GMT [179] DETAIL:  Failed process was running: BEGIN
+2026-11-01 23:24:12.620 GMT [179] LOG:  terminating any other active server processes
+2026-11-01 23:24:12.622 GMT [179] LOG:  all server processes terminated; reinitializing
+2026-11-01 23:24:12.630 GMT [233] LOG:  database system was interrupted; last known up at 2026-11-01 23:24:12 GMT
+2026-11-01 23:24:12.630 GMT [236] FATAL:  the database system is in recovery mode
+2026-11-01 23:24:12.637 GMT [233] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-11-01 23:24:12.638 GMT [233] LOG:  redo starts at 0/322C820
+2026-11-01 23:24:12.638 GMT [233] LOG:  invalid record length at 0/322C8F0: expected at least 24, got 0
+2026-11-01 23:24:12.638 GMT [233] LOG:  redo done at 0/322C878 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-11-01 23:24:12.638 GMT [233] LOG:  Continue writing WAL at 0/322C8F0
+2026-11-01 23:24:12.639 GMT [234] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-11-01 23:24:12.639 GMT [234] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/322C8F0, redo lsn=0/322C8F0
+2026-11-01 23:24:12.640 GMT [179] LOG:  database system is ready to accept connections

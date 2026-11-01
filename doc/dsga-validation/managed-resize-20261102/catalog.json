@@ -1,0 +1,54 @@
+{
+  "scope": "PG18 core managed required-admission/PM gate with Buffer grow/shrink/regrow/busy/samePM recovery only",
+  "owned2": {
+    "src/test/modules/test_dsg_region18/t/test_managed_resize18.py": "f7a5d728bc9f3ab37386442e4a585362564aa4929c219aed56cb91a0902dc20e",
+    "src/test/modules/test_dsg_region18/README.managed-resize": "c9cdd75cd001e9a428e71167bf27b64b0bbdcb6e2bee6bb91ec0e91f6085e649"
+  },
+  "base": "611922219f6cf9b4fd3b322f76f45b9108b37a0a",
+  "actual_run": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4",
+  "native_result": {
+    "Source": false,
+    "normal": false,
+    "E": 0,
+    "native_exit": 0,
+    "seconds": 8.73771016698447
+  },
+  "actual_targets": [
+    "test_managed_resize18.ManagedResize.test_PG18_S_MANAGED_RESIZE_001_required_gate_actual_grow_shrink_regrow",
+    "test_managed_resize18.ManagedResize.test_PG18_S_MANAGED_RESIZE_002_closed_gate_real_tail_pin_busy_then_retry",
+    "test_managed_resize18.ManagedResize.test_PG18_S_MANAGED_RESIZE_003_same_PM_crash_newboot_closed_then_resize"
+  ],
+  "actual_target_kind": "three_actual_PG_services",
+  "targets_count": 3,
+  "skips": 0,
+  "compile_inputs_exact_count": 3730,
+  "no_C_change_or_rebuild": true,
+  "PG_SHA256": "e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e",
+  "DSO_SHA256": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+  "old_Configuration_DSM_matrix_rerun": false,
+  "new_VM_runs": 0,
+  "samePM_true_newboot_recovery": true,
+  "exact_old_boot_request_shim_tested": false,
+  "Root_crossboot_qualified": false,
+  "Neon_production_adaptation_tested": false,
+  "Source": false,
+  "normal": false,
+  "Linux_E": 0,
+  "K8s_E": 0,
+  "resource_terminal": {
+    "cpu": 2,
+    "kind": "native",
+    "last_observation": "original-unit-terminal",
+    "memory": 3221225472,
+    "nonce": "20261101T232403Z-950cf4",
+    "process_exit_code": 0,
+    "queue_reason": "",
+    "spec_sha256": "6e9b73a3a517e79151c780367ef0dd350131ab26c8f0a8809013201ec4ae7078",
+    "state": "terminal",
+    "test_verdict": "NOT_INTERPRETED",
+    "unit": "neon-pg18-managed-resize-native-20261101t232403z-950cf4.service",
+    "unit_result": "success",
+    "worker_sha256": "53c7c86ae397c9d6f5f62de940b7292e71854ab6d5f46d8592977b029b64f30d"
+  },
+  "excluded_compiled_artifacts": "same original /data c26843 install PG and DSO, only hashes in Git"
+}

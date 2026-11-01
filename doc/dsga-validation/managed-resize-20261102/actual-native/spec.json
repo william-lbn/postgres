@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T232403Z-950cf4",
+  "unit": "neon-pg18-managed-resize-native-20261101t232403z-950cf4.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/worker.py"
+  ]
+}

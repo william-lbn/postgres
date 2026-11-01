@@ -1,0 +1,12 @@
+{
+  "Root_authorized": "3 direct actual managed required admission+PM gate buffer grow/shrink/regrow/busy/samePM crash newboot tests",
+  "owned2": [
+    "src/test/modules/test_dsg_region18/t/test_managed_resize18.py",
+    "src/test/modules/test_dsg_region18/README.managed-resize"
+  ],
+  "source_test_SHA256": "f7a5d728bc9f3ab37386442e4a585362564aa4929c219aed56cb91a0902dc20e",
+  "limits": "native2CPU3GiB; no newVM; no old Configuration DSM standalone rerun",
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

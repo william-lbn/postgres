@@ -1,0 +1,15 @@
+{
+  "testsRun": 3,
+  "passed": [
+    "test_managed_resize18.ManagedResize.test_PG18_S_MANAGED_RESIZE_001_required_gate_actual_grow_shrink_regrow",
+    "test_managed_resize18.ManagedResize.test_PG18_S_MANAGED_RESIZE_002_closed_gate_real_tail_pin_busy_then_retry",
+    "test_managed_resize18.ManagedResize.test_PG18_S_MANAGED_RESIZE_003_same_PM_crash_newboot_closed_then_resize"
+  ],
+  "subtests": [],
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

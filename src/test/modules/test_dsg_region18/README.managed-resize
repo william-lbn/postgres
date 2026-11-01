@@ -1,0 +1,12 @@
+PG18 必需门禁与实际Buffer扩缩组合验证
+
+准确基线611922219f6cf9b4fd3b322f76f45b9108b37a0a。本批无生产C/SQL或公共协议修改，只新增Python与此说明。实际核3730份C/H/汇编/构建/SQL/control输入与c26843构建完全相同，复用PG e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e、测试DSO cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49，不重复编译或刷Configuration/DSM旧矩阵。
+
+新增三个真实PG服务目标在950cf4全部通过，零失败/错误/跳过：
+1. require_admission及connection_gate真实开启，固定私有管理socket，PM原主循环实际ack。ordinary public backend插入150000行，关门后真实foreground_idle且新public连接被拒，再执行Grow/Shrink/Regrow/再次Shrink，数据与四数组VA保持、真实数组上界下降，保原2个IO worker。
+2. 门已关时原管理backend真实持有tail pin；Shrink忙拒，H/gen/费用上界不降，原holder退出后新revision成功，数据保持。它也证明不能仅凭foreground_idle采样释放数组。
+3. 通过原pidfd真实SIGKILL一个处于事务中的ordinary backend；同PM内部恢复产生新boot，public门默认closed、旧工作槽/事务清0、H=N0/gen1、原四VA保持。明确新boot重新fence/prepare后再Grow/Shrink/Regrow，数据保持。
+
+测试仍为显式test-v1原生数组、测试扩展管理员包装，不是Root预算或Neon生产控制链。没有显式旧boot请求shim，不称已验旧boot请求拒绝；同PM恢复也不冒Root跨boot许可。Work2是观察，不是新增MemoryContext预算。本批只补近期Work/Connection门与Buffer组合缺口，不重新设计已移植内核，不改PG17/Neon/gitlink/AS/发行锁或Git。完整安全normal、真实VM/K8s验收仍需主线继续。
+
+重现与资源：/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4，native2CPU3GiB、network none/capdropALL/NNP/实际UID1000、只读源码与安装；原nonce保存spec、命令、源码锁、日志、真实PG事实、cpu.stat/memory.peak/io.stat/memory.events及终态。

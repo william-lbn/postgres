@@ -1,0 +1,245 @@
+{
+  "before": {
+    "boot": "5534258339656703504",
+    "generation": "2",
+    "floor": "1",
+    "revision": "1",
+    "low": 2048,
+    "high": 2048,
+    "maximum": 2048,
+    "phase": 2,
+    "reason": 0,
+    "disposition": -1,
+    "replayed": false,
+    "main_upper": "5558272",
+    "current_main_arrays_upper": "22540288",
+    "tail_now": {
+      "pinned": 0,
+      "io": 0,
+      "wref": 0
+    },
+    "normal_permit": false,
+    "arrays": [
+      {
+        "committed_upper": "131072",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "16777216",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "32768",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "40960",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      }
+    ],
+    "drain_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "receipt_has_result": false,
+    "receipt_revision": "0",
+    "result_phase": -1,
+    "result_high": 0,
+    "result_generation": "0"
+  },
+  "pinned": {
+    "boot": "5534258339656703504",
+    "generation": "2",
+    "floor": "1",
+    "revision": "1",
+    "low": 2048,
+    "high": 2048,
+    "maximum": 2048,
+    "phase": 2,
+    "reason": 0,
+    "disposition": -1,
+    "replayed": false,
+    "main_upper": "5558272",
+    "current_main_arrays_upper": "22540288",
+    "tail_now": {
+      "pinned": 1,
+      "io": 0,
+      "wref": 0
+    },
+    "normal_permit": false,
+    "arrays": [
+      {
+        "committed_upper": "131072",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "16777216",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "32768",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "40960",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      }
+    ],
+    "drain_counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "receipt_has_result": false,
+    "receipt_revision": "0",
+    "result_phase": -1,
+    "result_high": 0,
+    "result_generation": "0"
+  },
+  "denied": {
+    "boot": "5534258339656703504",
+    "generation": "2",
+    "floor": "1",
+    "revision": "2",
+    "low": 2048,
+    "high": 2048,
+    "maximum": 2048,
+    "phase": 3,
+    "reason": 1,
+    "disposition": 0,
+    "replayed": false,
+    "main_upper": "5558272",
+    "current_main_arrays_upper": "22540288",
+    "tail_now": {
+      "pinned": 1,
+      "io": 0,
+      "wref": 0
+    },
+    "normal_permit": false,
+    "arrays": [
+      {
+        "committed_upper": "131072",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "16777216",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "32768",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      },
+      {
+        "committed_upper": "40960",
+        "unknown": false,
+        "release_state": 0,
+        "release_verified": false
+      }
+    ],
+    "drain_counts": [
+      1535,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "receipt_has_result": true,
+    "receipt_revision": "2",
+    "result_phase": 3,
+    "result_high": 2048,
+    "result_generation": "2"
+  },
+  "retry": {
+    "boot": "5534258339656703504",
+    "generation": "3",
+    "floor": "1",
+    "revision": "3",
+    "low": 512,
+    "high": 512,
+    "maximum": 2048,
+    "phase": 2,
+    "reason": 0,
+    "disposition": 0,
+    "replayed": false,
+    "main_upper": "5558272",
+    "current_main_arrays_upper": "9805824",
+    "tail_now": {
+      "pinned": 0,
+      "io": 0,
+      "wref": 0
+    },
+    "normal_permit": false,
+    "arrays": [
+      {
+        "committed_upper": "32768",
+        "unknown": false,
+        "release_state": 3,
+        "release_verified": true
+      },
+      {
+        "committed_upper": "4194304",
+        "unknown": false,
+        "release_state": 3,
+        "release_verified": true
+      },
+      {
+        "committed_upper": "8192",
+        "unknown": false,
+        "release_state": 3,
+        "release_verified": true
+      },
+      {
+        "committed_upper": "12288",
+        "unknown": false,
+        "release_state": 3,
+        "release_verified": true
+      }
+    ],
+    "drain_counts": [
+      1536,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "receipt_has_result": true,
+    "receipt_revision": "3",
+    "result_phase": 2,
+    "result_high": 512,
+    "result_generation": "3"
+  },
+  "held_buffer_id": 1323,
+  "Source": false,
+  "normal": false
+}

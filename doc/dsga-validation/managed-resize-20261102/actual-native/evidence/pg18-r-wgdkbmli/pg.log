@@ -1,0 +1,10 @@
+2026-11-01 23:24:07.115 GMT [21] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 23:24:07.116 GMT [21] LOG:  listening on Unix socket "/tmp/pg18-r-wgdkbmli/s/.s.PGSQL.55438"
+2026-11-01 23:24:07.116 GMT [21] LOG:  listening on Unix socket "/tmp/pg18-r-wgdkbmli/data/dsg_socket/.s.PGSQL.55438"
+2026-11-01 23:24:07.118 GMT [28] LOG:  database system was shut down at 2026-11-01 23:24:07 GMT
+2026-11-01 23:24:07.119 GMT [28] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 23:24:07.121 GMT [21] LOG:  database system is ready to accept connections
+2026-11-01 23:24:07.641 GMT [26] LOG:  checkpoint starting: immediate force wait
+2026-11-01 23:24:07.653 GMT [26] LOG:  checkpoint complete: wrote 1999 buffers (390.4%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 2 recycled; write=0.013 s, sync=0.001 s, total=0.013 s; sync files=51, longest=0.001 s, average=0.001 s; distance=29783 kB, estimate=29783 kB; lsn=0/322C7E0, redo lsn=0/322C788
+2026-11-01 23:24:07.816 GMT [26] LOG:  checkpoint starting: immediate force wait
+2026-11-01 23:24:07.818 GMT [26] LOG:  checkpoint complete: wrote 373 buffers (72.9%), wrote 0 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.003 s, sync=0.001 s, total=0.003 s; sync files=3, longest=0.001 s, average=0.001 s; distance=15 kB, estimate=26806 kB; lsn=0/3230550, redo lsn=0/32304F8

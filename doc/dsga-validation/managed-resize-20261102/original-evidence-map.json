@@ -1,0 +1,147 @@
+{
+  "doc/dsga-validation/managed-resize-20261102/planning/compile-source-proof.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-planning-20261102/compile-source-proof.json",
+    "sha256": "46594b7683c5c9897ce3423b156b7e1710e283bedf0d54e21f95656469da8593",
+    "bytes": 414930
+  },
+  "doc/dsga-validation/managed-resize-20261102/planning/authorization.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-planning-20261102/authorization.json",
+    "sha256": "82f559567296032a91f3cb2b272ca8b38cbff1e1cd24008052d40f92111a6538",
+    "bytes": 510
+  },
+  "doc/dsga-validation/managed-resize-20261102/planning/native-launch-reference.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-planning-20261102/native-launch-reference.json",
+    "sha256": "c037c839388d2d794c9fe616fb001e5c0ca6dbbbcad9a635ea26e2db5211ad66",
+    "bytes": 264
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/source-lock.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/source-lock.json",
+    "sha256": "aa2dae53c2d561026c199f67afe45ed8af99af66ce49b1bcc3a161c6f3057721",
+    "bytes": 1194
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/metadata.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/metadata.json",
+    "sha256": "894b2b86c66c719251d7a427bbdbb571797526832c38ac5b14cece13a2eb1a7f",
+    "bytes": 207
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/runner.py": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/runner.py",
+    "sha256": "604cc5bbec7326d52b9947a0893ddfe89cee3c4eccdf752a0fe73f8a8b1cc900",
+    "bytes": 1021
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/worker.py": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/worker.py",
+    "sha256": "53c7c86ae397c9d6f5f62de940b7292e71854ab6d5f46d8592977b029b64f30d",
+    "bytes": 2342
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/spec.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/spec.json",
+    "sha256": "6e9b73a3a517e79151c780367ef0dd350131ab26c8f0a8809013201ec4ae7078",
+    "bytes": 399
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/reserve-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/reserve-receipt.json",
+    "sha256": "dcccbfc9526d7699d6c82eaa326c286ad8ca8efcd01941e5d5720e4d8bd45f14",
+    "bytes": 571
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/launch-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/launch-receipt.json",
+    "sha256": "8b900e6c7e061643e61d27b118229d27161fc5b88f407a881e6fb33396f56898",
+    "bytes": 570
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/command.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/command.json",
+    "sha256": "f1ece8c9c197c94b6fbc2488d53b3716eb3a96e66c32366701848950d678ca27",
+    "bytes": 1372
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/container.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/container.json",
+    "sha256": "18117f7c9714bd46bbff3358a4e3d44f4bf44c3bf2369243b582096c2ad688dc",
+    "bytes": 814
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/cleanup.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/cleanup.json",
+    "sha256": "0d234944a058f30d20ac33b9d97a239b4839e28418f93f28a0713b927bc894f7",
+    "bytes": 91
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/run.log": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/run.log",
+    "sha256": "0a07dc8e5aaa609516c9bcaf8423af05a697c07d370663e9a452d20e1588b1a7",
+    "bytes": 665
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/result.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/result.json",
+    "sha256": "6e4d9199e52087126891d1b69b4afee804e2a21818048f539ab85195524a7359",
+    "bytes": 102
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/cpu.stat": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/cpu.stat",
+    "sha256": "0644339992b4adec536a0c89e8813805118973c972fcba2043112738f79f3347",
+    "bytes": 157
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/io.stat": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/io.stat",
+    "sha256": "075ab4875edd8045f83b3af0ec705509c656ecb4d244a8cd4448c2c952f42c8b",
+    "bytes": 67
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/managed-resize-real-busy-pin.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/managed-resize-real-busy-pin.json",
+    "sha256": "a2a53203efe137efe47c3557ce35c29b777282bad463dc2f79f9917483846059",
+    "bytes": 5009
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/managed-resize-required-gate-regrow.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/managed-resize-required-gate-regrow.json",
+    "sha256": "241e3bc316ef8da416d4a8ee9b108f0ad85c277b0f446be3957e35ae2b63f70c",
+    "bytes": 9287
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/managed-resize-same-PM-newboot.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/managed-resize-same-PM-newboot.json",
+    "sha256": "3dc1f3f5d84514b55ea2bdfaa19f2a003965aae333891e563245f0bc4215d44e",
+    "bytes": 6562
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/memory.events": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/memory.events",
+    "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+    "bytes": 53
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/memory.peak": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/memory.peak",
+    "sha256": "e51bfbc6f9012a6bf88b29bf65fb0ec8e34ebf347ad7587a2f3dfc5d7f4bde6d",
+    "bytes": 10
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/pg18-r-4am2_t_6/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/pg18-r-4am2_t_6/pg.log",
+    "sha256": "516171978bb58ece8c3b9bea284e057f951bfc6232cdd44b0bbae14d78ff304b",
+    "bytes": 2976
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/pg18-r-4am2_t_6.log": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/pg18-r-4am2_t_6.log",
+    "sha256": "674f1020bec9462734529873582c0bb51036e373aa5cf7b9a2fe14490ad3ebce",
+    "bytes": 184
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/pg18-r-d5sokmmf/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/pg18-r-d5sokmmf/pg.log",
+    "sha256": "d9cf6375fd90bc03c598d9a5df8b4e01731b462c539881201053b5a3e25526f5",
+    "bytes": 1064
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/pg18-r-d5sokmmf.log": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/pg18-r-d5sokmmf.log",
+    "sha256": "b14c9fd1cde00741b24a0641fa44951bb4e5a2cb10b5763c4d1956124bf9085d",
+    "bytes": 184
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/pg18-r-wgdkbmli/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/pg18-r-wgdkbmli/pg.log",
+    "sha256": "31c407c0578dbf16c729f441c3edfd7155e450bd77bb464651c652d7f7808e11",
+    "bytes": 1451
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/pg18-r-wgdkbmli.log": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/pg18-r-wgdkbmli.log",
+    "sha256": "5a302a61e2c57e33f2764c6798c5566b98a5a78ba433737d2ac91ca70ce7d68c",
+    "bytes": 182
+  },
+  "doc/dsga-validation/managed-resize-20261102/actual-native/evidence/test-result.json": {
+    "original_path": "/data/neon-build/validation/pg18-managed-resize-native-20261101T232403Z-950cf4/evidence/test-result.json",
+    "sha256": "e9d67376032a39b0de01f8d57a803dc5a8382a8bff6a5a5c8eefa9028154c3df",
+    "bytes": 498
+  }
+}

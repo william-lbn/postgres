@@ -8,6 +8,7 @@ backend_sources += files(
   'dsg_native_birth_wire.c',
   'dsg_filter_audit.c',
   'dynamic_shared_buffers.c',
+  'dsg_work.c',
   'dsg_buffer_grow.c',
   'dsg_buffer_shrink.c',
   'dsg_buffer_control.c',

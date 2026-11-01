@@ -1200,6 +1200,88 @@ pq_is_reading_msg(void)
  *		returns 0 if OK, EOF if trouble
  * --------------------------------
  */
+static int
+pq_getmessage_length(int maxlen)
+{
+	int32		len;
+
+	Assert(PqCommReadingMsg);
+
+	/* Read message length word */
+	if (pq_getbytes((char *) &len, 4) == EOF)
+	{
+		ereport(COMMERROR,
+				(errcode(ERRCODE_PROTOCOL_VIOLATION),
+				 errmsg("unexpected EOF within message length word")));
+		return EOF;
+	}
+
+	len = pg_ntoh32(len);
+
+	if (len < 4 || len > maxlen)
+	{
+		ereport(COMMERROR,
+				(errcode(ERRCODE_PROTOCOL_VIOLATION),
+				 errmsg("invalid message length")));
+		return EOF;
+	}
+
+	return len - 4;				/* discount length itself */
+}
+
+/*-
+ * 已关闭准入或已经ignore-till-Sync的消息不能先enlargeStringInfo再拒绝。
+ * pq_discardbytes只复用固定PqRecvBuffer，流式消费正文，不解析/执行其内容。
+ * 完整消费后才恢复帧边界；半帧/非法长度仍与pq_getmessage一样断连。
+ */
+int
+pq_discardmessage(int maxlen)
+{
+	int			len = pq_getmessage_length(maxlen);
+
+	if (len == EOF)
+		return EOF;
+	if (pq_discardbytes(len) == EOF)
+	{
+		ereport(COMMERROR,
+				(errcode(ERRCODE_PROTOCOL_VIOLATION),
+				 errmsg("incomplete message from client")));
+		return EOF;
+	}
+	pq_endmsgread();
+	return 0;
+}
+
+/*-
+ * 在已关闭工作准入时，只为已有事务识别有界结束命令。长度与普通协议读取
+ * 使用同一校验，dst由调用方固定分配；超过capacity整帧流式丢弃，绝不按声明
+ * 长度分配。captured_len=-1表示正文已丢弃，调用方不能因门禁后来重开而执行。
+ * 不自动补NUL：调用方必须验证实际协议终止符，不能把截断文本当完整命令。
+ * 完整消费后才恢复帧边界；半帧/非法长度沿原EOF流程断连，不能假发Ready。
+ */
+int
+pq_getmessage_fixed(char *dst, int capacity, int maxlen, int *captured_len)
+{
+	int			len = pq_getmessage_length(maxlen);
+
+	Assert(dst != NULL && capacity > 0);
+	*captured_len = -1;
+	if (len == EOF)
+		return EOF;
+	if ((len <= capacity ? pq_getbytes(dst, len) : pq_discardbytes(len)) == EOF)
+	{
+		ereport(COMMERROR,
+				(errcode(ERRCODE_PROTOCOL_VIOLATION),
+				 errmsg("incomplete message from client")));
+		return EOF;
+	}
+	if (len <= capacity)
+		*captured_len = len;
+	pq_endmsgread();
+	return 0;
+}
+
+
 int
 pq_getmessage(StringInfo s, int maxlen)
 {

@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T164119Z-35811d",
+  "unit": "neon-pg18-work2-extended-20261101t164119z-35811d.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg18-work2-extended-native-20261101T164119Z-35811d",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-work2-extended-native-20261101T164119Z-35811d/worker.py"
+  ]
+}

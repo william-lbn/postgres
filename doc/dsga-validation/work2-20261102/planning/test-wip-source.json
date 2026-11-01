@@ -1,0 +1,12 @@
+{
+  "stage": "5_DIRECT_ROOTS_DEFINED_NOT_YET_EXECUTED",
+  "files": {
+    "src/test/modules/test_dsg_region18/test_dsg_work18.c": "a09813054cfafb4f2394682f48a33e5f2dd804c8096082caf6fbd67eb4cc029e",
+    "src/test/modules/test_dsg_region18/Makefile": "219971e77ba38368d38bec313443eac06422c6324f1792d77cd85ade46835b74",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "2a67468a04c9e5eba3eb8e558b4b791b5e6492519f531ae435b2666faf3967cf",
+    "src/test/modules/test_dsg_region18/t/test_work18.py": "777a43a4a52902343aa8b8d90bedc7e3ebddfb3facdd7ce722a71551542b4191"
+  },
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

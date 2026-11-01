@@ -1,0 +1,5 @@
+{
+  "build": "/data/neon-build/validation/pg18-work2-build-20261101T160721Z-6f5eff",
+  "runtime_source": "/data/neon-build/validation/pg18-work2-extended-native-20261101T164119Z-35811d/source",
+  "scope": "ONLY_NEW_EXTENDED_FOUR_PHASES_AND_FIXED512_TARGETS_NOT_OLD5"
+}

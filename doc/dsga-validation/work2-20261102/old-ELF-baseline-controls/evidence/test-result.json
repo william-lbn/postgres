@@ -1,0 +1,14 @@
+{
+  "testsRun": 2,
+  "passed": [
+    "__main__.Baseline.test_PG18_ENV_WORK2_BASELINE_001_without_initial_checkpoint_fails_RM134",
+    "__main__.Baseline.test_PG18_ENV_WORK2_BASELINE_002_with_checkpoint_same_PM_new_boot"
+  ],
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "scope": "OLD_UNMODIFIED_PG18_ELF_BASELINE_FIXTURE_CONTROLS_ONLY_NOT_WORK2_ACCEPTANCE",
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

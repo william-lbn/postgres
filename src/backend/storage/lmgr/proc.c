@@ -28,6 +28,7 @@
  * associated with the process.
  */
 #include "postgres.h"
+#include "storage/dsg_work.h"
 
 #include <signal.h>
 #include <unistd.h>
@@ -567,6 +568,8 @@ InitProcess(void)
 	if (IsUnderPostmaster)
 		AttachSharedMemoryStructs();
 #endif
+	/* ProcStructLock外；原退出回调已经安装，注册失败不留下伪空闲槽。 */
+	DsgWorkAttach(false);
 }
 
 /*
@@ -741,6 +744,8 @@ InitAuxiliaryProcess(void)
 	if (IsUnderPostmaster)
 		AttachSharedMemoryStructs();
 #endif
+	/* ProcStructLock外；原退出回调已经安装，注册失败不留下伪空闲槽。 */
+	DsgWorkAttach(true);
 }
 
 /*
@@ -995,6 +1000,8 @@ ProcKill(int code, Datum arg)
 	pgstat_reset_wait_event_storage();
 
 	proc = MyProc;
+	/* 原资源退出工作完成后才移除自己拥有的Work槽。 */
+	DsgWorkDetach();
 	MyProc = NULL;
 	MyProcNumber = INVALID_PROC_NUMBER;
 	DisownLatch(&proc->procLatch);
@@ -1064,6 +1071,8 @@ AuxiliaryProcKill(int code, Datum arg)
 	pgstat_reset_wait_event_storage();
 
 	proc = MyProc;
+	/* 原资源退出工作完成后才移除自己拥有的Work槽。 */
+	DsgWorkDetach();
 	MyProc = NULL;
 	MyProcNumber = INVALID_PROC_NUMBER;
 	DisownLatch(&proc->procLatch);

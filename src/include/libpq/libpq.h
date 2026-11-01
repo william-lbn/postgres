@@ -76,6 +76,8 @@ extern void pq_startmsgread(void);
 extern void pq_endmsgread(void);
 extern bool pq_is_reading_msg(void);
 extern int	pq_getmessage(StringInfo s, int maxlen);
+extern int pq_discardmessage(int maxlen);
+extern int pq_getmessage_fixed(char *dst, int capacity, int maxlen, int *captured_len);
 extern int	pq_getbyte(void);
 extern int	pq_peekbyte(void);
 extern int	pq_getbyte_if_available(unsigned char *c);

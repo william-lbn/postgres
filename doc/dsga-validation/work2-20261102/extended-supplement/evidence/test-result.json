@@ -1,0 +1,39 @@
+{
+  "testsRun": 2,
+  "passed": [
+    "test_work18_extended.Extended.test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen",
+    "test_work18_extended.Extended.test_PG18_S_WORK2_006_fixed512_transaction_finish_query_and_extended"
+  ],
+  "subtests": [
+    {
+      "id": "test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen (test_work18_extended.Extended.test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen) (phase='P')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen (test_work18_extended.Extended.test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen) (phase='B')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen (test_work18_extended.Extended.test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen) (phase='D')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen (test_work18_extended.Extended.test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen) (phase='E')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_WORK2_006_fixed512_transaction_finish_query_and_extended (test_work18_extended.Extended.test_PG18_S_WORK2_006_fixed512_transaction_finish_query_and_extended) (body_bytes=512)",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_WORK2_006_fixed512_transaction_finish_query_and_extended (test_work18_extended.Extended.test_PG18_S_WORK2_006_fixed512_transaction_finish_query_and_extended) (body_bytes=513)",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

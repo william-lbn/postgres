@@ -1,0 +1,5 @@
+{
+  "build": "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5",
+  "runtime_source": "/data/neon-build/validation/pg18-work2-build-20261101T160721Z-6f5eff/source",
+  "scope": "OLD_PG18_BASELINE_NO_WORK2_CODE"
+}

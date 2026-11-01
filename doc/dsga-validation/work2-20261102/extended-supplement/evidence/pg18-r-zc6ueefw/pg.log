@@ -1,0 +1,7 @@
+2026-11-01 16:41:22.842 GMT [21] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 16:41:22.843 GMT [21] LOG:  listening on Unix socket "/tmp/pg18-r-zc6ueefw/s/.s.PGSQL.55438"
+2026-11-01 16:41:22.845 GMT [28] LOG:  database system was shut down at 2026-11-01 16:41:22 GMT
+2026-11-01 16:41:22.847 GMT [28] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 16:41:22.848 GMT [29] FATAL:  the database system is starting up
+2026-11-01 16:41:22.849 GMT [21] LOG:  database system is ready to accept connections
+2026-11-01 16:41:22.945 GMT [41] ERROR:  dynamic shared buffer admission is closed for this boot

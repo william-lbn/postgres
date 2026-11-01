@@ -18,6 +18,8 @@
  */
 
 #include "postgres.h"
+#include "storage/dsg_work.h"
+#include "storage/dynamic_shared_buffers.h"
 
 #include <fcntl.h>
 #include <limits.h>
@@ -350,11 +352,190 @@ interactive_getc(void)
  *	EOF is returned if the connection is lost.
  * ----------------
  */
+#define DSG_FINISH_MAX_BODY 512
+
+static bool
+DsgFinishTransactionNode(Node *node)
+{
+	if (node && IsA(node, TransactionStmt))
+	{
+		TransactionStmt *stmt = (TransactionStmt *) node;
+
+		/* IsTransactionExitStmt还允许PREPARE/ROLLBACK TO，不能复用于这里。 */
+		return !stmt->chain && (stmt->kind == TRANS_STMT_COMMIT ||
+								stmt->kind == TRANS_STMT_ROLLBACK);
+	}
+	return false;
+}
+
+/* ASCII不依赖client_encoding转换；实际NUL必须唯一且在帧末，禁止截断伪装。 */
+static bool
+DsgFinishText(const char *text, int len)
+{
+	if (len < 1 || len > DSG_FINISH_MAX_BODY || text[len - 1] != '\0')
+		return false;
+	for (int i = 0; i < len - 1; i++)
+		if (text[i] == '\0' || (unsigned char) text[i] >= 128)
+			return false;
+	return true;
+}
+
+static bool
+DsgFinishQuery(const char *text, int len)
+{
+	List	   *stmts;
+
+	if (!DsgFinishText(text, len))
+		return false;
+	/*-
+	 * 有界分类复用官方语法：END/ABORT、WORK/TRANSACTION、AND NO CHAIN及
+	 * 空白/注释都按PG解释，但整帧只能有一个COMMIT/ROLLBACK且不能CHAIN。
+	 * raw_parser不做分析/计划/目录访问；分配只在本轮MessageContext，调用
+	 * 时已有事务仍计retained。语法错误沿原ERROR清理，不保留跨longjmp许可。
+	 */
+	stmts = raw_parser(text, RAW_PARSE_DEFAULT);
+	return list_length(stmts) == 1 &&
+		DsgFinishTransactionNode(linitial_node(RawStmt, stmts)->stmt);
+}
+
+/* 只查本backend已有缓存，不启动事务、不重规划、不从用户body声明可信语义。 */
+static bool
+DsgFinishStatement(const char *name)
+{
+	CachedPlanSource *psrc;
+
+	if (*name)
+	{
+		PreparedStatement *pstmt = FetchPreparedStatement(name, false);
+
+		psrc = pstmt ? pstmt->plansource : NULL;
+	}
+	else
+		psrc = unnamed_stmt_psrc;
+	return psrc && psrc->num_params == 0 && psrc->raw_parse_tree &&
+		DsgFinishTransactionNode(psrc->raw_parse_tree->stmt) &&
+		DsgFinishText(psrc->query_string,
+					 strnlen(psrc->query_string, DSG_FINISH_MAX_BODY) + 1);
+}
+
+static bool
+DsgFinishPortal(const char *name)
+{
+	Portal		portal = GetPortalByName(name);
+	PlannedStmt *stmt;
+
+	if (!PortalIsValid(portal) || !portal->atStart ||
+		list_length(portal->stmts) != 1 ||
+		!DsgFinishText(portal->sourceText,
+					   strnlen(portal->sourceText, DSG_FINISH_MAX_BODY) + 1))
+		return false;
+	stmt = linitial_node(PlannedStmt, portal->stmts);
+	return stmt->commandType == CMD_UTILITY &&
+		DsgFinishTransactionNode(stmt->utilityStmt);
+}
+
+/* wire字段仅在固定小体内扫描，不能用未验证的strlen或pq转换函数先分配。 */
+static const char *
+DsgFinishString(const char **cursor, const char *end)
+{
+	const char *start = *cursor;
+
+	while (*cursor < end)
+	{
+		unsigned char c = (unsigned char) *(*cursor)++;
+
+		if (c == 0)
+			return start;
+		if (c >= 128)
+			break;
+	}
+	return NULL;
+}
+
+/* 无参数/无结果行的事务结束，只需0或1个合法文本/二进制格式声明。 */
+static bool
+DsgFinishFormats(const char **cursor, const char *end)
+{
+	const char *p = *cursor;
+	int			count;
+
+	if (end - p < 2 || p[0] != 0 || (unsigned char) p[1] > 1)
+		return false;
+	count = p[1];
+	p += 2;
+	if (count)
+	{
+		if (end - p < 2 || p[0] != 0 || (unsigned char) p[1] > 1)
+			return false;
+		p += 2;
+	}
+	*cursor = p;
+	return true;
+}
+
+static bool
+DsgFinishMessage(int type, StringInfo message)
+{
+	const char *p = message->data;
+	const char *end = p + message->len;
+	const char *name;
+	const char *query;
+
+	if (!DsgBufferAdmissionBlocksCurrentRole() || am_walsender ||
+		!(IsTransactionOrTransactionBlock() || IsAbortedTransactionBlockState()) ||
+		message->len > DSG_FINISH_MAX_BODY)
+		return false;
+	switch (type)
+	{
+		case PqMsg_Query:
+			return DsgFinishQuery(p, message->len);
+		case PqMsg_Parse:
+			name = DsgFinishString(&p, end);
+			query = DsgFinishString(&p, end);
+			/* 只替换唯一unnamed缓存，不允许关门时反复创建named对象。 */
+			return name && *name == '\0' && query && end - p == 2 &&
+				p[0] == 0 && p[1] == 0 && DsgFinishQuery(query, p - query);
+		case PqMsg_Bind:
+			name = DsgFinishString(&p, end);
+			if (!name || *name != '\0')
+				return false; /* 新portal也只能替换唯一unnamed实例。 */
+			name = DsgFinishString(&p, end);
+			if (!name || !DsgFinishFormats(&p, end) || end - p < 2 ||
+				p[0] != 0 || p[1] != 0)
+				return false;
+			p += 2; /* 参数个数必须为0，不能在绑定阶段执行类型输入函数。 */
+			return DsgFinishFormats(&p, end) && p == end && DsgFinishStatement(name);
+		case PqMsg_Describe:
+			if (p == end)
+				return false;
+			type = *p++;
+			name = DsgFinishString(&p, end);
+			return name && p == end && (type == 'S' ? DsgFinishStatement(name) :
+				(type == 'P' && DsgFinishPortal(name)));
+		case PqMsg_Execute:
+			name = DsgFinishString(&p, end);
+			return name && end - p == 4 && p[0] == 0 && p[1] == 0 &&
+				p[2] == 0 && p[3] == 0 && DsgFinishPortal(name);
+		default:
+			return false;
+	}
+}
+
+/* ----------------
+ *	SocketBackend()		Is called for frontend-backend connections
+ *
+ *	Returns the message type code, and loads message body data into inBuf.
+ *
+ *	EOF is returned if the connection is lost.
+ * ----------------
+ */
 static int
 SocketBackend(StringInfo inBuf)
 {
 	int			qtype;
 	int			maxmsglen;
+	bool		discard_ignored;
+	bool		reject_admission = false;
 
 	/*
 	 * Get message type code from the frontend.
@@ -457,6 +638,69 @@ SocketBackend(StringInfo inBuf)
 					 errmsg("invalid frontend message type %d", qtype)));
 			maxmsglen = 0;		/* keep compiler quiet */
 			break;
+	}
+
+	/*-
+	 * 必须在pq_getmessage/enlargeStringInfo之前作准入决定，否则关闭期间
+	 * Query/Parse/Bind/FastPath甚至主循环中被忽略的CopyData仍可按攻击者声明
+	 * 的大长度申请内存。保留原消息类型/长度校验和extended错误恢复语义。
+	 * Sync/Terminate已在上面的switch清掉ignore标记，仍按官方路径处理。
+	 */
+	/*-
+	 * 到达主循环的CopyData是COPY失败后可能仍在途的残留，官方协议要求
+	 * 静默忽略。只改变其内存读取方式，不额外产生ERROR或Ready；正在执行
+	 * 的COPY使用自己的读取器，不能把这里当作其排空/取消证明。
+	 */
+	discard_ignored = enable_dynamic_shared_buffers &&
+		(ignore_till_sync || qtype == PqMsg_CopyData);
+	/* Describe可触发缓存计划重新校验，同Parse/Bind一样必须在正文前登记/门禁。 */
+	reject_admission = DsgWorkStartMessage(
+		!discard_ignored && (qtype == PqMsg_Query || qtype == PqMsg_Parse ||
+		qtype == PqMsg_Bind || qtype == PqMsg_Describe ||
+		qtype == PqMsg_Execute || qtype == PqMsg_FunctionCall), discard_ignored);
+	if (discard_ignored || reject_admission)
+	{
+		bool		finish = false;
+
+		resetStringInfo(inBuf);
+		if (reject_admission && !am_walsender &&
+			(IsTransactionOrTransactionBlock() || IsAbortedTransactionBlockState()) &&
+			(qtype == PqMsg_Query || qtype == PqMsg_Parse || qtype == PqMsg_Bind ||
+			 qtype == PqMsg_Describe || qtype == PqMsg_Execute))
+		{
+			char		body[DSG_FINISH_MAX_BODY];
+			int			captured;
+
+			if (pq_getmessage_fixed(body, sizeof(body), maxmsglen, &captured))
+				return EOF;
+			RESUME_CANCEL_INTERRUPTS();
+			if (captured >= 0)
+			{
+				/* initStringInfo已有1024字节；此复制最大512且不按声明长度分配。 */
+				appendBinaryStringInfo(inBuf, body, captured);
+				finish = DsgFinishMessage(qtype, inBuf);
+			}
+			if (finish)
+				DsgWorkStartMessage(false, false);
+		}
+		else
+		{
+			if (pq_discardmessage(maxmsglen))
+				return EOF;
+			RESUME_CANCEL_INTERRUPTS();
+		}
+		if (reject_admission && !finish)
+		{
+			/*-
+			 * 丢弃时门禁可能重开，仍拒绝本帧：正文已经消费，不能再次检查
+			 * 后把空inBuf当正常命令。完整帧后ERROR保留连接和Sync清理能力；
+			 * 半帧/非法长度只走上面EOF断连，不能假造已恢复协议同步。
+			 */
+			ereport(ERROR,
+					(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+					 errmsg("dynamic shared buffer admission is closed for this boot")));
+		}
+		return qtype;
 	}
 
 	/*
@@ -1010,7 +1254,7 @@ pg_plan_queries(List *querytrees, const char *query_string, int cursorOptions,
  * Execute a "simple Query" protocol message.
  */
 static void
-exec_simple_query(const char *query_string)
+exec_simple_query(const char *query_string, bool dsg_transaction_finish)
 {
 	CommandDest dest = whereToSendOutput;
 	MemoryContext oldcontext;
@@ -1064,6 +1308,18 @@ exec_simple_query(const char *query_string)
 	 * we are in aborted transaction state!)
 	 */
 	parsetree_list = pg_parse_query(query_string);
+	/*-
+	 * 只对本次已分类的完整小帧放行，并在真正执行使用的AST上再次核验。
+	 * 不是进程全局allow标志，ERROR/longjmp不会泄漏至下一条消息或嵌套SQL。
+	 * 原事务到finish_xact_command和回调完成之前始终由Work2 EXEC/retained覆盖。
+	 */
+	if (dsg_transaction_finish &&
+		(list_length(parsetree_list) != 1 ||
+		 !DsgFinishTransactionNode(linitial_node(RawStmt, parsetree_list)->stmt)))
+		ereport(ERROR,
+				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+				 errmsg("dynamic shared buffer transaction finish changed after classification")));
+
 
 	/* Log immediately if dictated by log_statement */
 	if (check_log_statement(parsetree_list))
@@ -1108,6 +1364,9 @@ exec_simple_query(const char *query_string)
 		const char *cmdtagname;
 		size_t		cmdtaglen;
 
+		/* 同一多语句Query中的SET ROLE后仍核实际角色。 */
+		if (!dsg_transaction_finish)
+			DsgBufferCheckAdmission();
 		pgstat_report_query_id(0, true);
 		pgstat_report_plan_id(0, true);
 
@@ -4700,12 +4959,15 @@ PostgresMain(const char *dbname, const char *username)
 		 * conditional since we don't want, say, reads on behalf of COPY FROM
 		 * STDIN doing the same thing.)
 		 */
+		/* 原消息/ERROR事务/Portal清理和Ready输出之后，才记真实空闲。 */
+		DsgWorkIdle(IsTransactionOrTransactionBlock() || IsAbortedTransactionBlockState());
 		DoingCommandRead = true;
 
 		/*
 		 * (3) read a command (loop blocks here)
 		 */
 		firstchar = ReadCommand(&input_message);
+		DsgWorkStartExecution();
 
 		/*
 		 * (4) turn off the idle-in-transaction and idle-session timeouts if
@@ -4755,25 +5017,46 @@ PostgresMain(const char *dbname, const char *username)
 		if (ignore_till_sync && firstchar != EOF)
 			continue;
 
+		/*-
+		 * 同时覆盖简单/扩展协议及FastPath，不能只在ExecutorStart拦截，
+		 * 否则Parse/Bind、utility或C函数仍可在新boot预算确认前执行。
+		 * Sync/Close/Terminate等协议清理消息仍可正常消费。
+		 */
+		switch (firstchar)
+		{
+			case PqMsg_Parse:
+			case PqMsg_Bind:
+			case PqMsg_Describe:
+			case PqMsg_Execute:
+			case PqMsg_FunctionCall:
+				if (!DsgFinishMessage(firstchar, &input_message))
+					DsgBufferCheckAdmission();
+				break;
+		}
+
 		switch (firstchar)
 		{
 			case PqMsg_Query:
 				{
 					const char *query_string;
+					bool dsg_transaction_finish;
 
 					/* Set statement_timestamp() */
 					SetCurrentStatementStartTimestamp();
 
+					dsg_transaction_finish = DsgFinishMessage(firstchar, &input_message);
+					if (!dsg_transaction_finish)
+						DsgBufferCheckAdmission();
 					query_string = pq_getmsgstring(&input_message);
 					pq_getmsgend(&input_message);
 
 					if (am_walsender)
 					{
 						if (!exec_replication_command(query_string))
-							exec_simple_query(query_string);
+							exec_simple_query(query_string, false);
 					}
 					else
-						exec_simple_query(query_string);
+						exec_simple_query(query_string, dsg_transaction_finish);
 
 					valgrind_report_error_query(query_string);
 

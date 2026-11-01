@@ -1,0 +1,45 @@
+{
+  "semantic_base": "60378838d2fdfaf0a86fa5ed02346cff06a18b03",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "source16": {
+    "src/backend/libpq/pqcomm.c": "eb3ee0bde538cadcfa520a9eccc116fc9adf6de067d287004804e0a448bb83a3",
+    "src/backend/postmaster/pmchild.c": "70f1ddf276f5cad550a57bae8cea1669b7ae96ceaeb628cf6d421c104edce683",
+    "src/backend/postmaster/postmaster.c": "415ff3ee7ed93775aabdaca138eca443898543755ccac8554dfe3a97b75e5f1f",
+    "src/backend/storage/buffer/Makefile": "cb41b69bdb5710bbbb58cf7605d0d3f3547a0c2b4469697f0e9ed3f9314b69c9",
+    "src/backend/storage/buffer/dsg_work.c": "1c281065d7b143fef4b870641cc7c88bd7e3a5a7779bf0ad33fbbdb3fb758f4b",
+    "src/backend/storage/buffer/meson.build": "6367e0af576f79867f4458bbef61545f1c6a94b1bfc305cf81172a340acdd38e",
+    "src/backend/storage/ipc/ipci.c": "eb895435a49249e4a706f84b4a2e0733e4e2a5affcbc8f7e30d7108f4a958dc2",
+    "src/backend/storage/lmgr/proc.c": "51fdea5091697b57b6c8d9e5b186f8c5e87044f49e73a910ebf4b81bd131423a",
+    "src/backend/tcop/postgres.c": "032e07798b46917fd8e4a8e472171a386c3188e3adc59d5d4abbaddb40c9ae87",
+    "src/include/libpq/libpq.h": "ec23784a9a9b044bc12f2219f93d899a63ad1c635c4c6c939bbf1d415dc67156",
+    "src/include/storage/dsg_work.h": "05c8ba9609bc157a308af2e2a57a22acc32e438293ecf65893b5a82709afc762",
+    "src/test/modules/test_dsg_region18/Makefile": "219971e77ba38368d38bec313443eac06422c6324f1792d77cd85ade46835b74",
+    "src/test/modules/test_dsg_region18/t/test_work18.py": "a7146009eff2b9b38d3b605b966e26509e4914afabfee23fe0ba832d645d4db5",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "2a67468a04c9e5eba3eb8e558b4b791b5e6492519f531ae435b2666faf3967cf",
+    "src/test/modules/test_dsg_region18/test_dsg_work18.c": "a09813054cfafb4f2394682f48a33e5f2dd804c8096082caf6fbd67eb4cc029e",
+    "src/test/modules/test_dsg_region18/t/test_work18_extended.py": "ce91696ef82836ef5f17875e6c613476f644608d9712279c3a3c64d8fbfbcab9"
+  },
+  "first5_catalog": "doc/dsga-validation/work2-20261102/catalog.json",
+  "new2_catalog": "doc/dsga-validation/work2-20261102/extended-supplement/catalog.json",
+  "aggregate": {
+    "stable_roots": 7,
+    "unit_native": 1,
+    "native_service": 6,
+    "subtests": 8,
+    "skips": 0,
+    "E": 0
+  },
+  "first_failure_and_old_ELF_baseline_preserved": true,
+  "no_new_C_or_recompile_for_extended": true,
+  "Source": false,
+  "normal": false,
+  "not_proven": [
+    "standalone enabled runtime",
+    "EXEC_BACKEND runtime",
+    "MemoryContext budget",
+    "DSM/Prepared",
+    "required connection gate",
+    "full Neon18 extension/WAL recovery",
+    "Source/normal/Linux/K8s E"
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "api": 2,
+  "boot": "12983526828963897730",
+  "generation": "1",
+  "admission_revision": "0",
+  "admission_open": true,
+  "client_processes": 1,
+  "startup_clients": 0,
+  "idle_clients": 1,
+  "frontend_reads": 0,
+  "frontend_executes": 0,
+  "bounded_inputs": 0,
+  "retained_transactions": 0,
+  "background_processes": 2,
+  "auxiliary_processes": 5,
+  "observer_excluded": true,
+  "foreground_idle": false,
+  "snapshot_bytes": 640,
+  "normal_permit": false,
+  "memory_context_budget": false
+}

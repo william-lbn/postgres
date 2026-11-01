@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T161416Z-6da39d",
+  "unit": "neon-pg18-work2-baseline-20261101t161416z-6da39d.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg18-work2-baseline-recovery-20261101T161416Z-6da39d",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-work2-baseline-recovery-20261101T161416Z-6da39d/worker.py"
+  ]
+}

@@ -1,0 +1,9 @@
+2026-11-01 16:08:26.397 GMT [229] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 16:08:26.397 GMT [229] LOG:  listening on Unix socket "/tmp/pg18-r-05abpazs/s/.s.PGSQL.55438"
+2026-11-01 16:08:26.400 GMT [236] LOG:  database system was shut down at 2026-11-01 16:08:26 GMT
+2026-11-01 16:08:26.401 GMT [236] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 16:08:26.402 GMT [229] LOG:  database system is ready to accept connections
+2026-11-01 16:08:26.489 GMT [257] ERROR:  PG18 Work tests require original administrator
+2026-11-01 16:08:26.489 GMT [257] STATEMENT:  SET ROLE work18_user;SELECT test_dsg_work18_snapshot()
+2026-11-01 16:08:26.495 GMT [259] ERROR:  PG18 Work tests require original administrator
+2026-11-01 16:08:26.495 GMT [259] STATEMENT:  SET SESSION AUTHORIZATION work18_user;SELECT work18_definer()

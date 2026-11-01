@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T161633Z-893317",
+  "unit": "neon-pg18-work2-crash-20261101t161633z-893317.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg18-work2-crash-native-20261101T161633Z-893317",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-work2-crash-native-20261101T161633Z-893317/worker.py"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "base": "60378838d2fdfaf0a86fa5ed02346cff06a18b03",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "clean_before": true,
+  "reference_pg17_head": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "scope": "COMPLETE_REAL_WORK2_OBSERVATION_MODULE_NOT_MEMORYCONTEXT_HARD_BUDGET",
+  "invariants": [
+    "unchanged WorkSnapshot version2 semantics and BufferABI6",
+    "real PM fork-before prestart count with PG18 PMChild release callback",
+    "same statuslock atomic prestart-to-PGPROC handoff",
+    "actual frontend read/execute/idle and retained transaction observations",
+    "fixed bounded discard/finish transaction semantics equal PG17 when admission is closed",
+    "no DSM/Prepared/required connection capability advertised",
+    "no PG17 source/gitlink/release locks or public upper protocol mutation"
+  ],
+  "PG18_specific": [
+    "PMChild* pools and Release moved into postmaster/pmchild.c",
+    "MaxLivePostmasterChildren requires initialized PM pools; standalone registry prestart slots zero",
+    "IO workers count as background owners; logger has no PGPROC and remains outsideWork2 exactly as original17",
+    "EXEC_BACKEND handling must be explicit; do not read untrusted shared count as address bound"
+  ],
+  "next": "implement core and direct actual PG tests; Root sole Git"
+}

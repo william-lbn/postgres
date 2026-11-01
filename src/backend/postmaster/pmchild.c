@@ -30,6 +30,7 @@
  */
 
 #include "postgres.h"
+#include "storage/dsg_work.h"
 
 #include "miscadmin.h"
 #include "postmaster/autovacuum.h"
@@ -275,6 +276,8 @@ ReleasePostmasterChildSlot(PMChild *pmchild)
 				 pmchild->bkend_type);
 		}
 
+		/* 原waitpid确认或fork失败后才能消除prestart；非client槽原值0。 */
+		DsgWorkPreForget(pmchild->child_slot);
 		dlist_push_head(&pool->freelist, &pmchild->elem);
 		return MarkPostmasterChildSlotUnassigned(pmchild->child_slot);
 	}

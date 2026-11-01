@@ -1,0 +1,7 @@
+test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen (test_work18_extended.Extended.test_PG18_S_WORK2_005_extended_original_phases_close_sync_reopen) ... ok
+test_PG18_S_WORK2_006_fixed512_transaction_finish_query_and_extended (test_work18_extended.Extended.test_PG18_S_WORK2_006_fixed512_transaction_finish_query_and_extended) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 5.133s
+
+OK

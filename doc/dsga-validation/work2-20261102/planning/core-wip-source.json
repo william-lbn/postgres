@@ -1,0 +1,41 @@
+{
+  "stage": "CORE_AND_NATIVE_PROCESS_HOOKS_FRONTEND_NOT_YET_WIRED_TESTS_NOT_RUN",
+  "reference_pg17": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "changes": {
+    "src/include/storage/dsg_work.h": {
+      "before": null,
+      "after": "05c8ba9609bc157a308af2e2a57a22acc32e438293ecf65893b5a82709afc762"
+    },
+    "src/backend/storage/buffer/dsg_work.c": {
+      "before": null,
+      "after": "1c281065d7b143fef4b870641cc7c88bd7e3a5a7779bf0ad33fbbdb3fb758f4b"
+    },
+    "src/backend/storage/buffer/Makefile": {
+      "before": "b8aee7c7d54342810c72e6f558a50f280cd22b8ae7b5a52e2ee1486895a3255c",
+      "after": "cb41b69bdb5710bbbb58cf7605d0d3f3547a0c2b4469697f0e9ed3f9314b69c9"
+    },
+    "src/backend/storage/buffer/meson.build": {
+      "before": "030e185c59cf795c8962a10cdbc3922efe45d7c2d84f80247414121d6b2917fb",
+      "after": "6367e0af576f79867f4458bbef61545f1c6a94b1bfc305cf81172a340acdd38e"
+    },
+    "src/backend/storage/ipc/ipci.c": {
+      "before": "7b38b31b5a581e80b156cc0eb096cb395d2506695e353d9e8dc6c1967bf2f718",
+      "after": "eb895435a49249e4a706f84b4a2e0733e4e2a5affcbc8f7e30d7108f4a958dc2"
+    },
+    "src/backend/postmaster/postmaster.c": {
+      "before": "d711abf754322778bdde49f6488486aed9f057bc159a3cb913c973e150385ba0",
+      "after": "415ff3ee7ed93775aabdaca138eca443898543755ccac8554dfe3a97b75e5f1f"
+    },
+    "src/backend/postmaster/pmchild.c": {
+      "before": "68f209af4116d092dab24136320b3b8cbb041fd2cfaee6435e80f9610913a66d",
+      "after": "70f1ddf276f5cad550a57bae8cea1669b7ae96ceaeb628cf6d421c104edce683"
+    },
+    "src/backend/storage/lmgr/proc.c": {
+      "before": "7971107f579987f82593912246b64e3f6b0e78d42f9ec0dd86a9968f986bcccd",
+      "after": "51fdea5091697b57b6c8d9e5b186f8c5e87044f49e73a910ebf4b81bd131423a"
+    }
+  },
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

@@ -1,0 +1,19 @@
+2026-11-01 16:08:24.796 GMT [157] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 16:08:24.796 GMT [157] LOG:  listening on Unix socket "/tmp/pg18-r-x63nd1rn/s/.s.PGSQL.55438"
+2026-11-01 16:08:24.799 GMT [164] LOG:  database system was shut down at 2026-11-01 16:08:24 GMT
+2026-11-01 16:08:24.800 GMT [164] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 16:08:24.802 GMT [157] LOG:  database system is ready to accept connections
+2026-11-01 16:08:24.863 GMT [157] LOG:  client backend (PID 174) was terminated by signal 9: Killed
+2026-11-01 16:08:24.863 GMT [157] DETAIL:  Failed process was running: BEGIN
+2026-11-01 16:08:24.863 GMT [157] LOG:  terminating any other active server processes
+2026-11-01 16:08:24.864 GMT [157] LOG:  all server processes terminated; reinitializing
+2026-11-01 16:08:24.873 GMT [183] FATAL:  the database system is in recovery mode
+2026-11-01 16:08:24.873 GMT [180] LOG:  database system was interrupted; last known up at 2026-11-01 16:08:24 GMT
+2026-11-01 16:08:24.881 GMT [180] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-11-01 16:08:24.882 GMT [180] LOG:  redo starts at 0/1516A40
+2026-11-01 16:08:24.882 GMT [180] FATAL:  resource manager with ID 134 not registered
+2026-11-01 16:08:24.882 GMT [180] HINT:  Include the extension module that implements this resource manager in "shared_preload_libraries".
+2026-11-01 16:08:24.883 GMT [157] LOG:  startup process (PID 180) exited with exit code 1
+2026-11-01 16:08:24.883 GMT [157] LOG:  terminating any other active server processes
+2026-11-01 16:08:24.884 GMT [157] LOG:  shutting down due to startup process failure
+2026-11-01 16:08:24.886 GMT [157] LOG:  database system is shut down

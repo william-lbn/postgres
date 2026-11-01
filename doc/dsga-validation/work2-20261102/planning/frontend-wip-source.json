@@ -1,0 +1,22 @@
+{
+  "stage": "FRONTEND_WIRED_TESTS_BUILD_NOT_YET_RUN",
+  "changes": {
+    "src/backend/tcop/postgres.c": {
+      "before": "d59209005c2ea667255e68d66b154706a5aea6417e1e65f2bdfa163517c14f7e",
+      "after": "032e07798b46917fd8e4a8e472171a386c3188e3adc59d5d4abbaddb40c9ae87"
+    },
+    "src/backend/libpq/pqcomm.c": {
+      "before": "fdd95211ead0c7c729e53a1bc8599588c40b666e9924354907d101a515a25dd0",
+      "after": "eb3ee0bde538cadcfa520a9eccc116fc9adf6de067d287004804e0a448bb83a3"
+    },
+    "src/include/libpq/libpq.h": {
+      "before": "77e576787fa6801fa2d79e59988c8e3b993ec8926054641b1ab05774650e44af",
+      "after": "ec23784a9a9b044bc12f2219f93d899a63ad1c635c4c6c939bbf1d415dc67156"
+    }
+  },
+  "original_18_socket_logic_matched_before_patch": true,
+  "MemoryContext_budget_implemented": false,
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

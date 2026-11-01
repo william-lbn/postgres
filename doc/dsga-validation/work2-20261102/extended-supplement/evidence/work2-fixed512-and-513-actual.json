@@ -1,0 +1,54 @@
+[
+  {
+    "body_bytes": 512,
+    "query_and_parse_accepted": true,
+    "actual_closed_after_end": {
+      "api": 2,
+      "boot": "18276723578804435737",
+      "generation": "1",
+      "admission_revision": "3",
+      "admission_open": false,
+      "client_processes": 1,
+      "startup_clients": 0,
+      "idle_clients": 1,
+      "frontend_reads": 0,
+      "frontend_executes": 0,
+      "bounded_inputs": 0,
+      "retained_transactions": 0,
+      "background_processes": 2,
+      "auxiliary_processes": 5,
+      "observer_excluded": true,
+      "foreground_idle": true,
+      "snapshot_bytes": 640,
+      "normal_permit": false,
+      "memory_context_budget": false
+    },
+    "same_original_backend_pid": 221
+  },
+  {
+    "body_bytes": 513,
+    "query_and_parse_accepted": false,
+    "actual_closed_after_end": {
+      "api": 2,
+      "boot": "13374656243926296043",
+      "generation": "1",
+      "admission_revision": "3",
+      "admission_open": false,
+      "client_processes": 1,
+      "startup_clients": 0,
+      "idle_clients": 1,
+      "frontend_reads": 0,
+      "frontend_executes": 0,
+      "bounded_inputs": 0,
+      "retained_transactions": 0,
+      "background_processes": 2,
+      "auxiliary_processes": 5,
+      "observer_excluded": true,
+      "foreground_idle": true,
+      "snapshot_bytes": 640,
+      "normal_permit": false,
+      "memory_context_budget": false
+    },
+    "same_original_backend_pid": 264
+  }
+]

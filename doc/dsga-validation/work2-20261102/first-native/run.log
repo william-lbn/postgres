@@ -1,0 +1,24 @@
+test_PG18_S_WORK2_001_pre_pgproc_half_startup_and_actual_exit (test_work18.Work.test_PG18_S_WORK2_001_pre_pgproc_half_startup_and_actual_exit) ... ok
+test_PG18_S_WORK2_002_partial_message_and_real_execution_cancel (test_work18.Work.test_PG18_S_WORK2_002_partial_message_and_real_execution_cancel) ... ok
+test_PG18_S_WORK2_003_retained_transaction_and_bounded_closed_input (test_work18.Work.test_PG18_S_WORK2_003_retained_transaction_and_bounded_closed_input) ... ok
+test_PG18_S_WORK2_004_actual_crash_new_boot_discards_old_slots (test_work18.Work.test_PG18_S_WORK2_004_actual_crash_new_boot_discards_old_slots) ... ERROR
+test_PG18_U_WORK2_001_default_off_and_original_session_acl (test_work18.Work.test_PG18_U_WORK2_001_default_off_and_original_session_acl) ... ok
+
+======================================================================
+ERROR: test_PG18_S_WORK2_004_actual_crash_new_boot_discards_old_slots (test_work18.Work.test_PG18_S_WORK2_004_actual_crash_new_boot_discards_old_slots)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/src/src/test/modules/test_dsg_region18/t/test_work18.py", line 88, in test_PG18_S_WORK2_004_actual_crash_new_boot_discards_old_slots
+    os.kill(w.pid,signal.SIGKILL);w.close();p.ready();self.assertEqual(p.process.pid,pm)
+                                            ^^^^^^^^^
+  File "/src/src/test/modules/test_dsg_region18/t/test_arrays18.py", line 19, in ready
+    if self.process.poll() is not None:raise RuntimeError(self.log.read_text())
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: 2026-11-01 16:08:24.796 GMT [157] LOG:  redirecting log output to logging collector process
+2026-11-01 16:08:24.796 GMT [157] HINT:  Future log output will appear in directory "logs".
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 5.217s
+
+FAILED (errors=1)

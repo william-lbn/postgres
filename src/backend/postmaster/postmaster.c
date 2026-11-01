@@ -64,6 +64,7 @@
  */
 
 #include "postgres.h"
+#include "storage/dsg_work.h"
 #include "storage/dsg_envelope_filter.h"
 
 #include <unistd.h>
@@ -3608,6 +3609,9 @@ BackendStartup(ClientSocket *client_sock)
 	/* Hasn't asked to be notified about any bgworkers yet */
 	bn->bgworker_notify = false;
 
+	/* PG18 PMChild分型槽；只有真实普通backend在fork前进入prestart。 */
+	if (bn->bkend_type == B_BACKEND)
+		DsgWorkPreStart(bn->child_slot);
 	pid = postmaster_child_launch(bn->bkend_type, bn->child_slot,
 								  &startup_data, sizeof(startup_data),
 								  client_sock);

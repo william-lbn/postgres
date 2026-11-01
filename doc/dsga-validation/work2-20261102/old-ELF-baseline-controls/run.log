@@ -1,0 +1,7 @@
+test_PG18_ENV_WORK2_BASELINE_001_without_initial_checkpoint_fails_RM134 (__main__.Baseline.test_PG18_ENV_WORK2_BASELINE_001_without_initial_checkpoint_fails_RM134) ... ok
+test_PG18_ENV_WORK2_BASELINE_002_with_checkpoint_same_PM_new_boot (__main__.Baseline.test_PG18_ENV_WORK2_BASELINE_002_with_checkpoint_same_PM_new_boot) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.988s
+
+OK

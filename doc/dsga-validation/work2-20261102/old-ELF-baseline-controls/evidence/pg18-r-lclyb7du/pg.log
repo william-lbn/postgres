@@ -1,0 +1,21 @@
+2026-11-01 16:14:19.628 GMT [60] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 16:14:19.628 GMT [60] LOG:  listening on Unix socket "/tmp/pg18-r-lclyb7du/s/.s.PGSQL.55438"
+2026-11-01 16:14:19.630 GMT [67] LOG:  database system was shut down at 2026-11-01 16:14:19 GMT
+2026-11-01 16:14:19.631 GMT [67] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 16:14:19.632 GMT [60] LOG:  database system is ready to accept connections
+2026-11-01 16:14:19.682 GMT [65] LOG:  checkpoint starting: immediate force wait
+2026-11-01 16:14:19.683 GMT [65] LOG:  checkpoint complete: wrote 44 buffers (8.6%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=26, longest=0.001 s, average=0.001 s; distance=217 kB, estimate=217 kB; lsn=0/154CFC8, redo lsn=0/154CF70
+2026-11-01 16:14:19.693 GMT [60] LOG:  client backend (PID 81) was terminated by signal 9: Killed
+2026-11-01 16:14:19.693 GMT [60] DETAIL:  Failed process was running: BEGIN
+2026-11-01 16:14:19.693 GMT [60] LOG:  terminating any other active server processes
+2026-11-01 16:14:19.694 GMT [60] LOG:  all server processes terminated; reinitializing
+2026-11-01 16:14:19.701 GMT [85] LOG:  database system was interrupted; last known up at 2026-11-01 16:14:19 GMT
+2026-11-01 16:14:19.701 GMT [88] FATAL:  the database system is in recovery mode
+2026-11-01 16:14:19.708 GMT [85] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-11-01 16:14:19.708 GMT [85] LOG:  redo starts at 0/154CF70
+2026-11-01 16:14:19.708 GMT [85] LOG:  invalid record length at 0/154D040: expected at least 24, got 0
+2026-11-01 16:14:19.708 GMT [85] LOG:  redo done at 0/154CFC8 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-11-01 16:14:19.708 GMT [85] LOG:  Continue writing WAL at 0/154D040
+2026-11-01 16:14:19.709 GMT [86] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-11-01 16:14:19.710 GMT [86] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/154D040, redo lsn=0/154D040
+2026-11-01 16:14:19.710 GMT [60] LOG:  database system is ready to accept connections

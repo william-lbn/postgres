@@ -1,0 +1,8 @@
+{
+  "old_build": "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5",
+  "old_build_source_lock_sha256": "75f48004ae0da1dcbfe0f4d2aec658bfeedb81befaf46d6701347a490d12d975",
+  "old_PG_ELF_sha256": "ece22255f9b1624e18aa23a2109ca91a0090c706c31e1466657749e8d93e8fe1",
+  "old_test_DSO_sha256": "be266f3496f7cf981224306f5eda0fa419e32ea98c6ee274d5c1f0c47cce602b",
+  "only_reuse_Work_Python_Wire_and_Cluster_helpers_no_new_C_or_Work_API_called": true,
+  "driver_sha256": "a83f737410a43c3979961e69734b8d3bd38190607f303209068fa2072aef0a84"
+}

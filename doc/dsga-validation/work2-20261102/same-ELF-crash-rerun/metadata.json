@@ -1,0 +1,5 @@
+{
+  "build": "/data/neon-build/validation/pg18-work2-build-20261101T160721Z-6f5eff",
+  "runtime_source": "/data/neon-build/validation/pg18-work2-crash-native-20261101T161633Z-893317/source",
+  "scope": "ONLY_PREVIOUSLY_FAILED_WORK2_CRASH_SAME_ELF_CHECKPOINT_FIXTURE"
+}

@@ -1,0 +1,9 @@
+PG18 Configuration1 最终格式收口
+
+仅将dsg_buffer_arrays.c中errmsg续行的四空格改为一个tab，遵循原仓库.gitattributes；未改变任何条件、错误、GUC默认/单位/范围或原profile权限。原de5冻结和058编译、d8首次失败、71同ELF补测原件均保留。
+
+/data/neon-build/validation/pg18-configuration1-formatted-build-20261101T214350Z-c26843复用原已配置对象目录的独立副本，只编译这一C并链接postgres，PG SHA e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e；test DSO仍为cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49。原对象/安装目录无可变硬链，没有改写旧ELF。
+
+/data/neon-build/validation/pg18-configuration1-native-20261101T214506Z-48f454用最终格式源码对应ELF实际跑4个配置服务/组件目标与5子例全通过。按原稳定ID替换，不把旧4加本次4计为8；函数名虽有U前缀仍属真实PG服务/组件测试。early正例为test-v1且source_bound/root_enrolled=false，不是Root传输正例。无profile/最大值冲突的PG拒启动、原生配置元数据、仅重启可生效边界均保持。
+
+本批未重测Work/DSM/AIO/HA，未动PG17、AS、发行锁、Git/index或仓库配置。Source、normal及Linux/K8s端到端不因此获得资格。

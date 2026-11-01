@@ -1,0 +1,81 @@
+{
+  "before": {
+    "enabled": true,
+    "maximum_buffers": 2048,
+    "startup_buffers": 512,
+    "active_completions": 0,
+    "paused_completions": 0,
+    "completed_aio": "179",
+    "released_aio_pins": "179",
+    "completion_lock_available": true,
+    "resize_authorized": false,
+    "normal_permit": false,
+    "arrays": [
+      {
+        "base": "134933975359488",
+        "maximum_bytes": "131072",
+        "reserved_bytes": "131072",
+        "committed_bytes": "32768"
+      },
+      {
+        "base": "134933958582272",
+        "maximum_bytes": "16777216",
+        "reserved_bytes": "16777216",
+        "committed_bytes": "4194304"
+      },
+      {
+        "base": "134933958549504",
+        "maximum_bytes": "32768",
+        "reserved_bytes": "32768",
+        "committed_bytes": "8192"
+      },
+      {
+        "base": "134933958508544",
+        "maximum_bytes": "40960",
+        "reserved_bytes": "40960",
+        "committed_bytes": "12288"
+      }
+    ]
+  },
+  "after": {
+    "enabled": true,
+    "maximum_buffers": 2048,
+    "startup_buffers": 512,
+    "active_completions": 0,
+    "paused_completions": 0,
+    "completed_aio": "206",
+    "released_aio_pins": "206",
+    "completion_lock_available": true,
+    "resize_authorized": false,
+    "normal_permit": false,
+    "arrays": [
+      {
+        "base": "134933975359488",
+        "maximum_bytes": "131072",
+        "reserved_bytes": "131072",
+        "committed_bytes": "32768"
+      },
+      {
+        "base": "134933958582272",
+        "maximum_bytes": "16777216",
+        "reserved_bytes": "16777216",
+        "committed_bytes": "4194304"
+      },
+      {
+        "base": "134933958549504",
+        "maximum_bytes": "32768",
+        "reserved_bytes": "32768",
+        "committed_bytes": "8192"
+      },
+      {
+        "base": "134933958508544",
+        "maximum_bytes": "40960",
+        "reserved_bytes": "40960",
+        "committed_bytes": "12288"
+      }
+    ]
+  },
+  "pending": "2048|t",
+  "Source": false,
+  "normal": false
+}

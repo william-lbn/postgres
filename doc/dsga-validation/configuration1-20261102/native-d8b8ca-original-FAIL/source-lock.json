@@ -1,0 +1,14 @@
+{
+  "build": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb",
+  "compile_lock_sha256": "d8385dde10907585f1f379acd3b91dde151a8285231325ba0094d38d999c6222",
+  "owned": {
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "f2fe5559c223c4bb7149e1f10c48d6f7f34f2e1cb62c89495d1005007d04cf67",
+    "src/backend/utils/misc/guc_tables.c": "59190e66f70bdfd094426f21b3ac571d8e9d6ee253c7932dc47dc311f571a3a0",
+    "src/test/modules/test_dsg_region18/README.configuration": "2de04f19d0c4b08459faaf7aacc9f20019a191a9bc0006afc3cb154e9ed56828",
+    "src/test/modules/test_dsg_region18/t/test_configuration18.py": "7a9c5b8d8a1aa9c5f721d1f38f16f1b0e8d946ea627533fcf0b2b0879a2366ab"
+  },
+  "postgres_sha256": "e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e",
+  "scope": "ACTUAL_PG18_CONFIGURATION1_ONLY_NOT_ROOT_SOURCE_OR_NORMAL",
+  "test_DSO_sha256": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+  "test_python_sha256": "7a9c5b8d8a1aa9c5f721d1f38f16f1b0e8d946ea627533fcf0b2b0879a2366ab"
+}

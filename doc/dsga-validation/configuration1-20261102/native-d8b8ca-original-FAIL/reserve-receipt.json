@@ -1,0 +1,5 @@
+{
+  "exit": 0,
+  "stdout": "{\"cpu\": 2, \"kind\": \"native\", \"last_observation\": null, \"memory\": 3221225472, \"nonce\": \"20261101T212311Z-d8b8ca\", \"process_exit_code\": null, \"queue_reason\": \"\", \"spec_sha256\": \"f2488e611fa73db53c639e215d8a509557ad157f06285f36b31537ab58db27e1\", \"state\": \"reserved\", \"test_verdict\": \"NOT_INTERPRETED\", \"unit\": \"neon-pg18-configuration1-native-20261101t212311z-d8b8ca.service\", \"unit_result\": null, \"worker_sha256\": \"605b55de185a80b3deda284ce1cf314e970c57ccef275a3f7780235610aa17c5\"}\n",
+  "stderr": ""
+}

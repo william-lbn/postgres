@@ -1,0 +1,9 @@
+test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum) ... ok
+test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) ... ok
+test_PG18_S_CONFIGURATION1_003_postmaster_setting_cannot_change_running_geometry (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_003_postmaster_setting_cannot_change_running_geometry) ... ok
+test_PG18_U_CONFIGURATION1_001_same_GUC_metadata_and_disabled_default (test_configuration18.Configuration.test_PG18_U_CONFIGURATION1_001_same_GUC_metadata_and_disabled_default) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 5.317s
+
+OK

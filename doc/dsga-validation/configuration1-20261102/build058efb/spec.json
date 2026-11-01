@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T212216Z-058efb",
+  "unit": "neon-pg18-configuration1-build-20261101t212216z-058efb.service",
+  "kind": "heavy",
+  "evidence_dir": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/worker.py"
+  ]
+}

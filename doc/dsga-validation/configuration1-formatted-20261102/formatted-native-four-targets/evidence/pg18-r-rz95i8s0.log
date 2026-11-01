@@ -1,0 +1,2 @@
+2026-11-01 21:45:14.284 GMT [134] LOG:  redirecting log output to logging collector process
+2026-11-01 21:45:14.284 GMT [134] HINT:  Future log output will appear in directory "logs".

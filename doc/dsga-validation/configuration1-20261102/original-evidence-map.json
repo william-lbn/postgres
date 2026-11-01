@@ -1,0 +1,427 @@
+{
+  "doc/dsga-validation/configuration1-20261102/planning/authorization-and-plan.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-planning-20261102/authorization-and-plan.json",
+    "sha256": "37508e7e11746476792df1730e4d56a475007abd237e1d8b0ad885728a1eb320",
+    "bytes": 1094
+  },
+  "doc/dsga-validation/configuration1-20261102/planning/production2-applied-lock.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-planning-20261102/production2-applied-lock.json",
+    "sha256": "e1b1d7a370eb02acda8e3117f0ba814e8d369a1ea490f4f07f5358ee0fd41325",
+    "bytes": 232
+  },
+  "doc/dsga-validation/configuration1-20261102/planning/source-freeze4.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-planning-20261102/source-freeze4.json",
+    "sha256": "4aa83f6066e1a3f57bcbdcec07cb4790eec1529513befc90e9d813228f7bd6fc",
+    "bytes": 644
+  },
+  "doc/dsga-validation/configuration1-20261102/planning/source-freeze4-driverfix.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-planning-20261102/source-freeze4-driverfix.json",
+    "sha256": "2f3b923682cf1c00b97f4bf9d7bd03887ec6085d1a5446233fe254f54c5a9e27",
+    "bytes": 801
+  },
+  "doc/dsga-validation/configuration1-20261102/planning/native-start.py": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-planning-20261102/native-start.py",
+    "sha256": "5ee99ac1d781ec3128bc2894f60fa25b96e4fbea1721ecab4649eb20c8ee40b3",
+    "bytes": 5713
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/source-lock.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/source-lock.json",
+    "sha256": "d8385dde10907585f1f379acd3b91dde151a8285231325ba0094d38d999c6222",
+    "bytes": 822456
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/metadata.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/metadata.json",
+    "sha256": "f5650f8f3d18c3b1ebf5f8c82dec2473427e2267750c337deea5fa57d7eb5885",
+    "bytes": 1057
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/expected-source-sha256.txt": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/expected-source-sha256.txt",
+    "sha256": "49c547b129dde5cce7d7531f17dac05174bb0dce08dcce9efbab6f292c7e0e79",
+    "bytes": 755936
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/build.sh": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/build.sh",
+    "sha256": "3a6f3a5ff206b4e1845c2728cdb83ec3bd5016fa27f891eb7e247b3f3851488e",
+    "bytes": 1713
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/worker.py": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/worker.py",
+    "sha256": "7dc44cdda48dc5547518313cecb1accecdecb753bcd43a39a3fe0592bc6514b5",
+    "bytes": 3162
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/spec.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/spec.json",
+    "sha256": "ff5423ed83af2c08d8aef703907b938a93248d2cd3f8d2066a988997f43e1d76",
+    "bytes": 395
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/reserve-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/reserve-receipt.json",
+    "sha256": "2ad1cf2b2684145231a506b3fdb03b433f15bedfcae07172308742eecf722a29",
+    "bytes": 569
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/launch-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/launch-receipt.json",
+    "sha256": "afc0ca204efb4ef11ce41521ac2496ced23e881973b08926de33ca2e010d460a",
+    "bytes": 568
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/result.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/result.json",
+    "sha256": "79a0b8425a7b029003a4d163ec15581bce0e2f1bd88897edf8fe5e6676764e52",
+    "bytes": 398
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/build.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/build.log",
+    "sha256": "2381a5c95b7a430afcca7bd456c71f8fb0a7e77234cbe6c8813fc5a8203a728e",
+    "bytes": 21530
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/build-command.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/build-command.json",
+    "sha256": "dae281c246c0ba3c700e0fd6dcffa0b137ffc62d80c4ac51ccdcd155b5bc378e",
+    "bytes": 1155
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/container.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/container.json",
+    "sha256": "8e8bcca2150b503ed161add1955b6461a699ac01f50b279193fdf4d36a2f45bf",
+    "bytes": 805
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/cleanup.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/cleanup.json",
+    "sha256": "449501c5d6bc54a9db9204172e4a26d5d614deea99fb4c6ec7dbc7d48de7c806",
+    "bytes": 97
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/native-chain.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/native-chain.log",
+    "sha256": "df4989d9d5c3cf517d3963cfad9026237c225a375400fe7bbb262d452bc7399f",
+    "bytes": 1128
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/auto-native-run.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/auto-native-run.json",
+    "sha256": "dcb2bab0a308345da7e68430f780d51e1ed1565dcc962e570fafa347520c9518",
+    "bytes": 264
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/io.stat": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/io.stat",
+    "sha256": "9011fee05127c99fed3340f9df8aa9d948b01f02d1fe4d39adb7629eb0a0c789",
+    "bytes": 77
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/cpu.max": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/cpu.max",
+    "sha256": "2f8bd783be33cf80b6a2a0cf810f81ccf85f988c72c9bb76fa6172b6e4ec2b02",
+    "bytes": 14
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/cpu.stat": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/cpu.stat",
+    "sha256": "ee666cc1d99f35385c168cbd2b226bb8987437cd4587c2a1c196179f4abe4d63",
+    "bytes": 168
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/memory.events": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/memory.events",
+    "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+    "bytes": 53
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/pkglibdir.txt": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/pkglibdir.txt",
+    "sha256": "e685f8f73ed2b6d1c5fd697aad08fe8a898710e7905230232efd906b703dfd2b",
+    "bytes": 25
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/actual-source-check.txt": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/actual-source-check.txt",
+    "sha256": "e852baba7a9f641deb325b9bb515fcd1752edb9e347548fb8386d6592fcd92da",
+    "bytes": 302778
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/compiler.txt": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/compiler.txt",
+    "sha256": "e622b2bc67b20c151f65966228a3244623e27c4c601578d59f092e298ab65469",
+    "bytes": 304
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/binary.sha256": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/binary.sha256",
+    "sha256": "5fe85d65ce4fffc8fde44bc894c2ea8d261000f66eb7b66819f7da63566a2d4e",
+    "bytes": 201
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/memory.max": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/memory.max",
+    "sha256": "8528d39f97fdd9c9689c4373fe4c7b18f2c3bef6b044a2c4be74b07bf9cd07d8",
+    "bytes": 11
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/postgres-version.txt": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/postgres-version.txt",
+    "sha256": "23650a744c5c462f210888f45b7e48ed1906e0a86a8db06b271043a8051d73b5",
+    "bytes": 56
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/ccache-stats.txt": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/ccache-stats.txt",
+    "sha256": "c1b1f2b288299cb2ae83f7b6a6eb671abc26a06b9b97d6e95bf2fb5a515205b2",
+    "bytes": 334
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/source.exitcode": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/source.exitcode",
+    "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "bytes": 2
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/memory.peak": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/memory.peak",
+    "sha256": "49cc1fd174aede3c6056b6fbb6ae137576a1924e679877337f229279f62bded1",
+    "bytes": 11
+  },
+  "doc/dsga-validation/configuration1-20261102/build058efb/evidence/pg-configure.txt": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb/evidence/pg-configure.txt",
+    "sha256": "bfee05407821487ecc861eefed3e50b5749895c7d1a877aa383e321e2d4708be",
+    "bytes": 420
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/source-lock.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/source-lock.json",
+    "sha256": "f22423d4546b3b295706f56ba8f1232daec4c80d59873db47c8cc4a512c55b4b",
+    "bytes": 1047
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/metadata.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/metadata.json",
+    "sha256": "edd2bf5a72342a72525ceae4fa003f6cb16f4f30907514cbaaead3112620c951",
+    "bytes": 165
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/worker.py": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/worker.py",
+    "sha256": "605b55de185a80b3deda284ce1cf314e970c57ccef275a3f7780235610aa17c5",
+    "bytes": 2346
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/runner.py": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/runner.py",
+    "sha256": "dd825b523df4d6c5bec3257ac5b2aef15c30f76d5fc8342969ff6ba26a907d81",
+    "bytes": 1019
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/spec.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/spec.json",
+    "sha256": "f2488e611fa73db53c639e215d8a509557ad157f06285f36b31537ab58db27e1",
+    "bytes": 399
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/reserve-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/reserve-receipt.json",
+    "sha256": "3bd5648b6be536bb6065c37816a2b9c46fd6ca802ba7ab70f5ec35cb1240808e",
+    "bytes": 571
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/launch-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/launch-receipt.json",
+    "sha256": "cd9ef93269c657895167dec6a731c2e2a5814970a33522d644fe9ca5dd916424",
+    "bytes": 570
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/command.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/command.json",
+    "sha256": "5cbfa48778b50b732466f8aa19455c404344c41d4c8bafe3856708dcce66b36b",
+    "bytes": 1361
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/container.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/container.json",
+    "sha256": "2ad0952e5591a95028ea6c48ecd5e218e262c1a6be1e440609524614d3d69f8b",
+    "bytes": 815
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/cleanup.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/cleanup.json",
+    "sha256": "a190b6bcd93fc062c2251791e90c85cfb57f11e097ce4334bad3e4e7d8c135d5",
+    "bytes": 91
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/run.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/run.log",
+    "sha256": "d6c069a54988d77d5c31a3cd4462cb6a5a27dea299cadd0afe6e3e9502088cd4",
+    "bytes": 5369
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/result.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/result.json",
+    "sha256": "6274b156f9470bdb9e60738b040947a5f88acd2da979343c345cee3591394f9e",
+    "bytes": 103
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/io.stat": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/io.stat",
+    "sha256": "b4223c030b82c19c9b8a057897b0775f90b71615411eeb1d12f660fcfd0ba5d6",
+    "bytes": 63
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/cpu.stat": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/cpu.stat",
+    "sha256": "0f6b334fd7bbd8cf2ccfb161c5f5f23144deb725121066c3974153145a518120",
+    "bytes": 157
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/memory.events": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/memory.events",
+    "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+    "bytes": 53
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/configuration1-matching-actual-profiles.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/configuration1-matching-actual-profiles.json",
+    "sha256": "ea4b36f73d56c207e7e16bd2c148a84c99280205410e989739204c197db553b8",
+    "bytes": 1588
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/configuration1-postmaster-runtime-immutable.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/configuration1-postmaster-runtime-immutable.json",
+    "sha256": "c0e52315e27cec4ebb7e258f7ada1df8bc10218e9472f03c7074ad31e987ae0a",
+    "bytes": 1999
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/configuration1-original-disabled-metadata.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/configuration1-original-disabled-metadata.json",
+    "sha256": "f3e0ee1120c164e4b830ea6720370e78387c478316efc4e239e6ccb4d437df16",
+    "bytes": 371
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/pg18-r-x9l80hht.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/pg18-r-x9l80hht.log",
+    "sha256": "26b13e679ae9b2361a9ae8288caa84f30e8c39fb67f454d48f978b7b431b400e",
+    "bytes": 182
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/configuration1-real-startup-refusals.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/configuration1-real-startup-refusals.json",
+    "sha256": "5930aa223f339498e72af28d71791e6b1a466da718f47225db2c1973aef515f4",
+    "bytes": 610
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/test-result.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/test-result.json",
+    "sha256": "a2ea38513d91484eb3e340ae8067b6d80b164a49131a2eab27dcbbe58c9f0ebc",
+    "bytes": 5618
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/memory.peak": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/memory.peak",
+    "sha256": "e6e9db4f96768b6a2d4e53ec5269297a446f8e2cc0f5bc5e9c2505b7bf21562c",
+    "bytes": 10
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/pg18-r-k7i5v6rz.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/pg18-r-k7i5v6rz.log",
+    "sha256": "294adb5506c43cc24f066fb81abaf30ca65729efce9af34a33dd5c8abb2a24de",
+    "bytes": 184
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/pg18-r-mcrchwwf.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/pg18-r-mcrchwwf.log",
+    "sha256": "2c768a84903d5a15306a1047f8d845b01a060275b3dcd1203d237d5562c26605",
+    "bytes": 182
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/pg18-r-mcrchwwf/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/pg18-r-mcrchwwf/pg.log",
+    "sha256": "52925fe92451a844ab42bdedec4bbc4a4a47f9fcefe0de9155700e3af781c328",
+    "bytes": 537
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/pg18-r-x9l80hht/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/pg18-r-x9l80hht/pg.log",
+    "sha256": "c5a847b662a284f99fdcfc7fde1941faaa64551c673678692061f8007039af67",
+    "bytes": 1308
+  },
+  "doc/dsga-validation/configuration1-20261102/native-d8b8ca-original-FAIL/evidence/pg18-r-k7i5v6rz/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212311Z-d8b8ca/evidence/pg18-r-k7i5v6rz/pg.log",
+    "sha256": "dfc45848cb07ac2d83acd4309e5bcb36d640994f4d218141a9ebda04fabe41d0",
+    "bytes": 542
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/source-lock.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/source-lock.json",
+    "sha256": "d5399a22c9b7bbac831808d285d4c03938ee4e97c123b13b8c963c011dfa3bac",
+    "bytes": 1047
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/metadata.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/metadata.json",
+    "sha256": "64291e7a4de4c8d64f4efee12388b48f6b74f98a837f0790e69a19b2574b5242",
+    "bytes": 177
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/worker.py": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/worker.py",
+    "sha256": "cfa6f6dea7dd6f78e63cf4f695913ec3d77465075d11c44e570234d8c22af9d9",
+    "bytes": 2342
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/runner.py": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/runner.py",
+    "sha256": "cc6d7e60c4be5e535500a60063a7a0a12e461402d4a4bb59f94caed1cfcc8105",
+    "bytes": 1188
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/spec.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/spec.json",
+    "sha256": "f164ec9b3bc480970ea4d4c52c03ff813dc24e2284c06b134a8c30757634e390",
+    "bytes": 399
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/reserve-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/reserve-receipt.json",
+    "sha256": "ce4b1b75a61223324cd513ff289d01dac49f1918e7e1d8327515ce4c352f2253",
+    "bytes": 571
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/launch-receipt.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/launch-receipt.json",
+    "sha256": "d62b65911d9b078c11a2b879d1152f16442e8a881cd62eb657ffe9b8579b406c",
+    "bytes": 570
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/command.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/command.json",
+    "sha256": "82c50fce0125ce93d8fa7dde8ee452906db113d80a0d05a2f5ac440950b99101",
+    "bytes": 1362
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/container.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/container.json",
+    "sha256": "bb9d0598febe972a6a5362dd76a527003d2fd88f7d97d215f24dc22a288be928",
+    "bytes": 815
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/cleanup.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/cleanup.json",
+    "sha256": "dd7c8dc58f62aa2aeccc784461b147eb5c65ee868acb996b8271eb37ca6bc992",
+    "bytes": 91
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/run.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/run.log",
+    "sha256": "224b417e01bcc7266417a97a1a371688741e67743ba2764abd5857e63641df5e",
+    "bytes": 498
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/result.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/result.json",
+    "sha256": "b208251884753b6f0f818686f78f7a2a10d00b266a4fb58fa0ca72cbf7ef47c6",
+    "bytes": 103
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/io.stat": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/io.stat",
+    "sha256": "94ff94f695c63d21ddc443be4aa23bad69e138f4e2e583ae048fe39c54f8e13f",
+    "bytes": 63
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/cpu.stat": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/cpu.stat",
+    "sha256": "e40e8f186b0312cfe18499d015261b7bc296b2425cd424bd818e33e07b2fd688",
+    "bytes": 156
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/memory.events": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/memory.events",
+    "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2",
+    "bytes": 53
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/pg18-r-xfh_jb0e.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/pg18-r-xfh_jb0e.log",
+    "sha256": "771c9c0348e5459b3af701b9cf9c4d280ff6085af6f60a57e52d7518a56153fb",
+    "bytes": 182
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/configuration1-matching-actual-profiles.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/configuration1-matching-actual-profiles.json",
+    "sha256": "a87dfe8e34f87c1f471c9a86f2a151862a1aa91f83ae2a945bbdddd49a95612a",
+    "bytes": 3172
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/pg18-r-p7aujyw6.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/pg18-r-p7aujyw6.log",
+    "sha256": "5a7aed41a6fd6f19fe94ab0f53e5fe677c0ee0aaab55a87e4d545d1242e7cdf2",
+    "bytes": 183
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/configuration1-real-startup-refusals.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/configuration1-real-startup-refusals.json",
+    "sha256": "d01b16aeb3492f8e54283a8d923e347b9678f2341a764e094bbe7a38716470dc",
+    "bytes": 916
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/test-result.json": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/test-result.json",
+    "sha256": "2257407370d7898a48a7f13110a261f2b35c025659f6763ebea6caab0e024b44",
+    "bytes": 1730
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/pg18-r-1nyq81is.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/pg18-r-1nyq81is.log",
+    "sha256": "aa2adbe26fef4e7a167f8437929e0358fac331c684d2cb6ace062140c313a0f8",
+    "bytes": 182
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/memory.peak": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/memory.peak",
+    "sha256": "5b29d94dff91a5d1c2e837b5a7ba4385774060a2e92fdfd53d139519fcbfea7b",
+    "bytes": 10
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/pg18-r-1nyq81is/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/pg18-r-1nyq81is/pg.log",
+    "sha256": "815eb0378aecb0e15d32497cfb85286d6a4b9771c279261726c6e7c23af8972e",
+    "bytes": 537
+  },
+  "doc/dsga-validation/configuration1-20261102/native-71e881-two-root-retry/evidence/pg18-r-xfh_jb0e/pg.log": {
+    "original_path": "/data/neon-build/validation/pg18-configuration1-native-20261101T212818Z-71e881/evidence/pg18-r-xfh_jb0e/pg.log",
+    "sha256": "22a6b10f5e250982499f5b0a504471f46d499d25225c4be712733b750152ae83",
+    "bytes": 537
+  }
+}

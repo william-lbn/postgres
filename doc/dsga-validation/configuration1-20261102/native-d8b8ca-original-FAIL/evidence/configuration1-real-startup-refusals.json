@@ -1,0 +1,16 @@
+[
+  {
+    "case": "no-profile",
+    "exit": 1,
+    "actual_error": "2026-11-01 21:23:15.273 GMT [56] FATAL:  dynamic shared buffers require an explicit PG18 native or early birth profile\n2026-11-01 21:23:15.273 GMT [56] LOG:  database system is shut down\n",
+    "Source": false,
+    "normal": false
+  },
+  {
+    "case": "native-conflict",
+    "exit": 1,
+    "actual_error": "2026-11-01 21:23:15.978 GMT [70] FATAL:  max_shared_buffers differs from the original PG18 array profile maximum\n2026-11-01 21:23:15.978 GMT [70] LOG:  database system is shut down\n",
+    "Source": false,
+    "normal": false
+  }
+]

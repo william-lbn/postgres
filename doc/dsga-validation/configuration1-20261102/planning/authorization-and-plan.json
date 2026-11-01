@@ -1,0 +1,21 @@
+{
+  "scope": "PG18 Configuration1 only; same named PG17 metadata; native/birth origins still required; not Root/normal",
+  "base": "410a64c5f3dacb9b6f580716611dc7b24e4277e6",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "Root_approved": "2prod + new direct Python + Chinese README; heavy max1 queued behind Root38c0fa",
+  "owned4_before": {
+    "src/backend/utils/misc/guc_tables.c": "930658ef5eed2e99cf576d38372c6ac2be05fd480a7ac82926276ca6972d4e12",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "ca2037e2bcc48b18ddae80d84d292f3e6a284abaff1e1148e67b8bdfeb2a998a",
+    "src/test/modules/test_dsg_region18/t/test_configuration18.py": null,
+    "src/test/modules/test_dsg_region18/README.configuration": null
+  },
+  "PG17_reference_HEAD": "adecb5ecaf131fffde035a56f88c634403309b46",
+  "constraints": [
+    "PG17/AS/public ABI/release locks unchanged",
+    "old native profile autoenable retained",
+    "new no-profile enable explicit reject",
+    "nonzero configured max must match original source max",
+    "only directly affected native PG tests",
+    "no Work/DSM/AIO/HA rerun"
+  ]
+}

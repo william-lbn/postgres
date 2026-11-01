@@ -1,0 +1,12 @@
+2026-11-01 21:45:14.284 GMT [134] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 21:45:14.284 GMT [134] LOG:  listening on Unix socket "/tmp/pg18-r-rz95i8s0/s/.s.PGSQL.55438"
+2026-11-01 21:45:14.287 GMT [141] LOG:  database system was shut down at 2026-11-01 21:45:14 GMT
+2026-11-01 21:45:14.288 GMT [141] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 21:45:14.289 GMT [134] LOG:  database system is ready to accept connections
+2026-11-01 21:45:14.340 GMT [152] ERROR:  parameter "enable_dynamic_shared_buffers" cannot be changed without restarting the server
+2026-11-01 21:45:14.340 GMT [152] STATEMENT:  SET enable_dynamic_shared_buffers=off
+2026-11-01 21:45:14.346 GMT [154] ERROR:  parameter "max_shared_buffers" cannot be changed without restarting the server
+2026-11-01 21:45:14.346 GMT [154] STATEMENT:  SET max_shared_buffers=1024
+2026-11-01 21:45:14.357 GMT [134] LOG:  received SIGHUP, reloading configuration files
+2026-11-01 21:45:14.358 GMT [134] LOG:  parameter "max_shared_buffers" cannot be changed without restarting the server
+2026-11-01 21:45:14.358 GMT [134] LOG:  configuration file "/tmp/pg18-r-rz95i8s0/data/postgresql.auto.conf" contains errors; unaffected changes were applied

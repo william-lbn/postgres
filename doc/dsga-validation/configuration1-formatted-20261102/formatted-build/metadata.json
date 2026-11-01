@@ -1,0 +1,15 @@
+{
+  "old_build": "/data/neon-build/validation/pg18-configuration1-build-20261101T212216Z-058efb",
+  "old_compile_lock_sha256": "d8385dde10907585f1f379acd3b91dde151a8285231325ba0094d38d999c6222",
+  "base": "410a64c5f3dacb9b6f580716611dc7b24e4277e6",
+  "owned4": {
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "2a89c6c3a44edd3e87116a5eb0ef9a5ba20b3811fd399a21808afebab813e31c",
+    "src/backend/utils/misc/guc_tables.c": "59190e66f70bdfd094426f21b3ac571d8e9d6ee253c7932dc47dc311f571a3a0",
+    "src/test/modules/test_dsg_region18/README.configuration": "975923f0f8422c6030e56a76d0a646a09fe0991cd4898aae35f4cb5f282a85d2",
+    "src/test/modules/test_dsg_region18/t/test_configuration18.py": "7554dde4967d677eadd6ec95b2b3ba43bd8a8d40cb40695cd58ec08e88673378"
+  },
+  "scope": "ONE_CONTINUATION_TAB_ONLY_INCREMENTAL_C_AND_LINK_NOT_NORMAL",
+  "preserve_old_freeze_sha256": "de5d5af4c59806d119095b74e66b5f1f51d977d416c6a56f3d74291f154fca73",
+  "source_snapshot_hardlinks_readonly": true,
+  "mutable_build_install_full_independent_copy": true
+}

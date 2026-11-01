@@ -1,0 +1,2 @@
+2026-11-01 21:45:13.522 GMT [119] FATAL:  max_shared_buffers differs from the original PG18 array profile maximum
+2026-11-01 21:45:13.522 GMT [119] LOG:  database system is shut down

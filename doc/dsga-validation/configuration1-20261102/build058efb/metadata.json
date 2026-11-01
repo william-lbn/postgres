@@ -1,0 +1,20 @@
+{
+  "base": "410a64c5f3dacb9b6f580716611dc7b24e4277e6",
+  "owned4": {
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "f2fe5559c223c4bb7149e1f10c48d6f7f34f2e1cb62c89495d1005007d04cf67",
+    "src/backend/utils/misc/guc_tables.c": "59190e66f70bdfd094426f21b3ac571d8e9d6ee253c7932dc47dc311f571a3a0",
+    "src/test/modules/test_dsg_region18/README.configuration": "2de04f19d0c4b08459faaf7aacc9f20019a191a9bc0006afc3cb154e9ed56828",
+    "src/test/modules/test_dsg_region18/t/test_configuration18.py": "7a9c5b8d8a1aa9c5f721d1f38f16f1b0e8d946ea627533fcf0b2b0879a2366ab"
+  },
+  "prior_build": "/data/neon-build/validation/pg18-native-final-attempt01-20261031T210303Z-70b567",
+  "limits": {
+    "cpu": 6,
+    "memoryGiB": 8,
+    "make_j": 6
+  },
+  "source_lock_sha256": "d8385dde10907585f1f379acd3b91dde151a8285231325ba0094d38d999c6222",
+  "scope": "BUILD_ONLY_NOT_TESTED_NOT_SOURCE_NORMAL",
+  "single_Docker_RUN": true,
+  "native_starter_sha256": "5ee99ac1d781ec3128bc2894f60fa25b96e4fbea1721ecab4649eb20c8ee40b3",
+  "queue_only_if_Root_heavy_active": true
+}

@@ -1,0 +1,98 @@
+{
+  "scope": "PG18 Configuration1 final single-tab formatting correction only; no semantic change",
+  "owned4": {
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "2a89c6c3a44edd3e87116a5eb0ef9a5ba20b3811fd399a21808afebab813e31c",
+    "src/backend/utils/misc/guc_tables.c": "59190e66f70bdfd094426f21b3ac571d8e9d6ee253c7932dc47dc311f571a3a0",
+    "src/test/modules/test_dsg_region18/README.configuration": "975923f0f8422c6030e56a76d0a646a09fe0991cd4898aae35f4cb5f282a85d2",
+    "src/test/modules/test_dsg_region18/t/test_configuration18.py": "7554dde4967d677eadd6ec95b2b3ba43bd8a8d40cb40695cd58ec08e88673378"
+  },
+  "compile_base": "410a64c5f3dacb9b6f580716611dc7b24e4277e6",
+  "previous_freeze_manifest_sha256": "de5d5af4c59806d119095b74e66b5f1f51d977d416c6a56f3d74291f154fca73",
+  "previous_freeze_unchanged": true,
+  "previous_build_058_and_all_FAIL_PASS_receipts_unchanged": true,
+  "build": {
+    "path": "/data/neon-build/validation/pg18-configuration1-formatted-build-20261101T214350Z-c26843",
+    "source_lock_sha256": "77519323bcf6093cc95657a2def445e5ba86e850417b54ca5244ff100015dff5",
+    "build_exit": 0,
+    "PG_SHA": "e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e",
+    "DSO_SHA": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+    "seconds": 56.368981023988454,
+    "incremental_only": "one dsg_buffer_arrays.c compile and postgres link, independent mutable build/install copy, original install untouched"
+  },
+  "actual_native": {
+    "path": "/data/neon-build/validation/pg18-configuration1-native-20261101T214506Z-48f454",
+    "native_exit": 0,
+    "seconds": 7.835559236991685,
+    "final_target_kind": "four_actual_native_PG_service_component_targets_not_pure_U",
+    "targets": [
+      "test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum",
+      "test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused",
+      "test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_003_postmaster_setting_cannot_change_running_geometry",
+      "test_configuration18.Configuration.test_PG18_U_CONFIGURATION1_001_same_GUC_metadata_and_disabled_default"
+    ],
+    "target_count": 4,
+    "unique_subcases": 5,
+    "pure_unit_targets": 0,
+    "stable_IDs_replace_prior_four_targets_not_added": true,
+    "same_final_formatted_ELF_all_four": true
+  },
+  "actual_positive_profiles": [
+    "native test-v1",
+    "early test-v1"
+  ],
+  "early_source_bound": false,
+  "early_root_enrolled": false,
+  "Root_transport_tested": false,
+  "Source": false,
+  "normal": false,
+  "Linux_E": 0,
+  "K8s_E": 0,
+  "old_Work_DSM_AIO_HA_rerun": false,
+  "git_diff_check": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "resource_budget_own_terminal": [
+    {
+      "cpu": 6,
+      "kind": "heavy",
+      "last_observation": "original-unit-terminal",
+      "memory": 8589934592,
+      "nonce": "20261101T214350Z-c26843",
+      "process_exit_code": 0,
+      "queue_reason": "",
+      "spec_sha256": "5343e6a4906c4690ac09c5ba4cbac7f772f7479486292b3792bd71146a56d6d7",
+      "state": "terminal",
+      "test_verdict": "NOT_INTERPRETED",
+      "unit": "neon-pg18-conf1-formatted-build-20261101t214350z-c26843.service",
+      "unit_result": "success",
+      "worker_sha256": "3d4c3c2765062966ca04b8c17e85fc61faa46e157d21507238471bb7228b1dad"
+    },
+    {
+      "cpu": 2,
+      "kind": "native",
+      "last_observation": "original-unit-terminal",
+      "memory": 3221225472,
+      "nonce": "20261101T214506Z-48f454",
+      "process_exit_code": 0,
+      "queue_reason": "",
+      "spec_sha256": "e6af052e224ec4a4ab96a3aa43abb5d632820f52ace7e83e387bc9d39e90201c",
+      "state": "terminal",
+      "test_verdict": "NOT_INTERPRETED",
+      "unit": "neon-pg18-configuration1-native-20261101t214506z-48f454.service",
+      "unit_result": "success",
+      "worker_sha256": "cfa6f6dea7dd6f78e63cf4f695913ec3d77465075d11c44e570234d8c22af9d9"
+    }
+  ],
+  "excluded_compiled_artifacts": {
+    "/data/neon-build/validation/pg18-configuration1-formatted-build-20261101T214350Z-c26843/install/bin/postgres": {
+      "sha256": "e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e",
+      "bytes": 134131800
+    },
+    "/data/neon-build/validation/pg18-configuration1-formatted-build-20261101T214350Z-c26843/install/lib/postgresql/test_dsg_region18.so": {
+      "sha256": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+      "bytes": 485272
+    }
+  }
+}

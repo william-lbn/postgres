@@ -1,0 +1,11 @@
+PG18 Configuration1：命名启动配置与原数组来源
+
+增加与PG17 adecb5同名的enable_dynamic_shared_buffers/max_shared_buffers，保持PGC_POSTMASTER、默认off/0、blocks单位、0..INT_MAX/2范围和GUC_NOT_IN_SAMPLE。
+PG18当前仍只支持显式Linux fork native/birth数组profile；仅配置enable=on不能启用未移植布局，也不能产生Root/normal资格。非零配置最大值须与原profile最大值一致，不能被内部赋值静默覆盖。原profile自动启用及默认max=0取原profile几何保持。
+
+最终4个直接实际PG服务/组件目标，按稳定函数ID合并：原d8b8ca中默认元数据、SET/重载两个根通过；driver-only修正后同ELF71e881补两个失败根通过，最终去重4根/5子例，不相加为6。原函数名虽有U前缀，第一个目标实际启动PG查pg_settings，不当纯单元测试计。
+正例native test-v1和early test-v1都实际配置on/max2048，查命名设置及真实4数组最大/启动2048/512；early实际b.enabled且source_bound/root_enrolled均false，不叫Root传输正例。无profile配置on、native/early原max冲突均实际PG拒启动且无Ready；运行期SET拒、配置reload只pending_restart，数组最大/VA不变。
+
+058efb构建0，PG SHA e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e，DSO cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49。首native d8b8ca的两个early子例在initdb前因旧Root helper setgroups调用EPERM，原FAIL保留；仅修新Python driver，保持容器真实UID1000，实际NNP与PG2GiB硬AS检查不删。未改C/重编PG，只补两个相关根。
+
+原/data/neon-build/validation各nonce保留不可变源/日志/资源/原失败；精确小收据在doc/dsga-validation/configuration1-20261102。未重复旧Work/DSM/AIO/HA矩阵，未修改PG17/AS/发行锁/公共ABI。完整Root Source、normal、Linux/K8s端到端均不因此获资格。

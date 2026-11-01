@@ -1,0 +1,35 @@
+{
+  "testsRun": 2,
+  "passed": [
+    "test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum",
+    "test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused"
+  ],
+  "subtests": [
+    {
+      "id": "test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum) (profile='native')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum) (profile='early')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) (profile='no-profile')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) (profile='native-conflict')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) (profile='early-conflict')",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

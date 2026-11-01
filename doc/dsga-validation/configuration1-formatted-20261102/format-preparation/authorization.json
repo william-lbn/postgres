@@ -1,0 +1,8 @@
+{
+  "scope": "ONLY_ONE_CONTINUATION_INDENT_FORMAT_NO_SEMANTIC_CHANGE",
+  "Root_requested": "replace four spaces continuation with PGtab; preserve de5 oldfreeze; rebuild one C/link and directtargets only",
+  "old_source_SHA": "f2fe5559c223c4bb7149e1f10c48d6f7f34f2e1cb62c89495d1005007d04cf67",
+  "new_source_SHA": "2a89c6c3a44edd3e87116a5eb0ef9a5ba20b3811fd399a21808afebab813e31c",
+  "old_freeze_manifest_SHA": "de5d5af4c59806d119095b74e66b5f1f51d977d416c6a56f3d74291f154fca73",
+  "PG17_AS_Git_index_config_untouched": true
+}

@@ -821,6 +821,16 @@ struct config_bool ConfigureNamesBool[] =
 		NULL, NULL, NULL
 	},
 	{
+		{"enable_dynamic_shared_buffers", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Enables the experimental dynamic shared buffer pool."),
+			NULL,
+			GUC_NOT_IN_SAMPLE
+		},
+		&enable_dynamic_shared_buffers,
+		false,
+		NULL, NULL, NULL
+	},
+	{
 		{"enable_indexscan_prefetch", PGC_USERSET, RESOURCES_IO,
 			gettext_noop("Enables prefetching of heap pages in index scans."),
 			NULL,
@@ -2238,6 +2248,16 @@ struct config_int ConfigureNamesInt[] =
 		},
 		&dynamic_shared_buffers_startup_budget,
 		0, 0, INT_MAX,
+		NULL, NULL, NULL
+	},
+	{
+		{"max_shared_buffers", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Sets the reserved maximum size of the dynamic buffer pool."),
+			gettext_noop("Zero uses the startup shared_buffers value."),
+			GUC_UNIT_BLOCKS | GUC_NOT_IN_SAMPLE
+		},
+		&max_shared_buffers,
+		0, 0, INT_MAX / 2,
 		NULL, NULL, NULL
 	},
 	{

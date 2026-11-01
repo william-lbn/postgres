@@ -1,0 +1,5 @@
+2026-11-01 21:28:23.587 GMT [21] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 21:28:23.587 GMT [21] LOG:  listening on Unix socket "/tmp/pg18-r-xfh_jb0e/s/.s.PGSQL.55438"
+2026-11-01 21:28:23.590 GMT [28] LOG:  database system was shut down at 2026-11-01 21:28:23 GMT
+2026-11-01 21:28:23.591 GMT [28] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 21:28:23.593 GMT [21] LOG:  database system is ready to accept connections

@@ -1,0 +1,20 @@
+{
+  "enable_dynamic_shared_buffers": {
+    "setting": "off",
+    "context": "postmaster",
+    "vartype": "bool",
+    "unit": null,
+    "boot": "off",
+    "min": null,
+    "max": null
+  },
+  "max_shared_buffers": {
+    "setting": "0",
+    "context": "postmaster",
+    "vartype": "integer",
+    "unit": "8kB",
+    "boot": "0",
+    "min": "0",
+    "max": "1073741823"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "testsRun": 4,
+  "passed": [
+    "test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_003_postmaster_setting_cannot_change_running_geometry",
+    "test_configuration18.Configuration.test_PG18_U_CONFIGURATION1_001_same_GUC_metadata_and_disabled_default"
+  ],
+  "subtests": [
+    {
+      "id": "test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum) (profile='native')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum) (profile='early')",
+      "passed": false
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) (profile='no-profile')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) (profile='native-conflict')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) (profile='early-conflict')",
+      "passed": false
+    }
+  ],
+  "failures": [],
+  "errors": [
+    {
+      "id": "test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum) (profile='early')",
+      "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_configuration18.py\", line 34, in test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum\n    p=self.keep(Cluster('test-v1:2048',config)if kind=='native'else EarlyCluster(config));p.start();s=self.snapshot(p);v=self.settings(p)\n                                                                    ^^^^^^^^^^^^^^^^^^^^\n  File \"/src/src/test/modules/test_dsg_region18/t/test_configuration18.py\", line 14, in __init__\n    super().__init__(early='test-v1:2048')\n  File \"/src/src/test/modules/test_dsg_region18/t/test_birth18.py\", line 13, in __init__\n    super().__init__()\n  File \"/src/src/test/modules/test_dsg_region18/t/test_array_root18.py\", line 125, in __init__\n    self.run('initdb','-D',self.data,'-A','trust','--no-locale','--no-sync')\n  File \"/src/src/test/modules/test_dsg_region18/t/test_array_root18.py\", line 130, in run\n    result=subprocess.run([str(BIN/binary),*map(str,args)],env=environment(),capture_output=True,text=True,timeout=30,**credentials())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 548, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 1024, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n  File \"/usr/lib/python3.11/subprocess.py\", line 1901, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted\n"
+    },
+    {
+      "id": "test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) (profile='early-conflict')",
+      "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_configuration18.py\", line 46, in test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused\n    p=self.keep(EarlyCluster(config));self.assertFalse(p.start(check=False));rc=p.process.returncode;log=p.logs()\n                ^^^^^^^^^^^^^^^^^^^^\n  File \"/src/src/test/modules/test_dsg_region18/t/test_configuration18.py\", line 14, in __init__\n    super().__init__(early='test-v1:2048')\n  File \"/src/src/test/modules/test_dsg_region18/t/test_birth18.py\", line 13, in __init__\n    super().__init__()\n  File \"/src/src/test/modules/test_dsg_region18/t/test_array_root18.py\", line 125, in __init__\n    self.run('initdb','-D',self.data,'-A','trust','--no-locale','--no-sync')\n  File \"/src/src/test/modules/test_dsg_region18/t/test_array_root18.py\", line 130, in run\n    result=subprocess.run([str(BIN/binary),*map(str,args)],env=environment(),capture_output=True,text=True,timeout=30,**credentials())\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 548, in run\n    with Popen(*popenargs, **kwargs) as process:\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 1024, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n  File \"/usr/lib/python3.11/subprocess.py\", line 1901, in _execute_child\n    raise child_exception_type(errno_num, err_msg, err_filename)\nPermissionError: [Errno 1] Operation not permitted\n"
+    }
+  ],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

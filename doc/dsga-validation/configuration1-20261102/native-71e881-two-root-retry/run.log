@@ -1,0 +1,7 @@
+test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_001_matching_native_and_early_profile_maximum) ... ok
+test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused (test_configuration18.Configuration.test_PG18_S_CONFIGURATION1_002_no_profile_and_conflicting_original_maximum_refused) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 3.906s
+
+OK

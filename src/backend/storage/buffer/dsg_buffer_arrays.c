@@ -57,7 +57,13 @@ DsgBufferArraysEnabled(void)
  mode_read=true;
  raw=getenv(DSG_NATIVE_ARRAYS_ENV);
  DsgBirthArraysGetSnapshot(&birth);
- if(raw==NULL && !birth.enabled) return false;
+ if(raw==NULL && !birth.enabled) {
+  /* 命名GUC只表达配置；PG18仍须原显式native/birth来源，不能启未移植的旧布局。 */
+  if(enable_dynamic_shared_buffers)
+   ereport(FATAL,(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+	errmsg("dynamic shared buffers require an explicit PG18 native or early birth profile")));
+  return false;
+ }
 #if !defined(__linux__) || defined(EXEC_BACKEND)
  ereport(FATAL,(errmsg("PG18 native arrays require supported Linux fork profile")));
 #endif
@@ -75,6 +81,10 @@ DsgBufferArraysEnabled(void)
   ereport(FATAL,(errmsg("PG18 native arrays maximum differs from original early reservations")));
  if(value<(uint64)NBuffers || value==0)
   ereport(FATAL,(errmsg("PG18 native arrays maximum is below startup shared_buffers")));
+ /* 先核配置与原固定预留，不能用profile赋值静默覆盖冲突的命名最大值。 */
+ if(max_shared_buffers!=0 && (uint64)max_shared_buffers!=value)
+  ereport(FATAL,(errcode(ERRCODE_INVALID_PARAMETER_VALUE),
+   errmsg("max_shared_buffers differs from the original PG18 array profile maximum")));
  maximum_buffers=(int)value;
  enable_dynamic_shared_buffers=true;max_shared_buffers=maximum_buffers;
  mode_enabled=true;return true;

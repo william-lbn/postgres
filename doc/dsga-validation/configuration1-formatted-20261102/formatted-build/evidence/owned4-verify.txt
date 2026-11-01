@@ -1,0 +1,4 @@
+src/backend/storage/buffer/dsg_buffer_arrays.c: OK
+src/backend/utils/misc/guc_tables.c: OK
+src/test/modules/test_dsg_region18/README.configuration: OK
+src/test/modules/test_dsg_region18/t/test_configuration18.py: OK

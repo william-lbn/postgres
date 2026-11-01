@@ -1,0 +1,12 @@
+{
+  "files": {
+    "src/backend/utils/misc/guc_tables.c": "59190e66f70bdfd094426f21b3ac571d8e9d6ee253c7932dc47dc311f571a3a0",
+    "src/backend/storage/buffer/dsg_buffer_arrays.c": "f2fe5559c223c4bb7149e1f10c48d6f7f34f2e1cb62c89495d1005007d04cf67",
+    "src/test/modules/test_dsg_region18/t/test_configuration18.py": "7554dde4967d677eadd6ec95b2b3ba43bd8a8d40cb40695cd58ec08e88673378",
+    "src/test/modules/test_dsg_region18/README.configuration": "2de04f19d0c4b08459faaf7aacc9f20019a191a9bc0006afc3cb154e9ed56828"
+  },
+  "base": "410a64c5f3dacb9b6f580716611dc7b24e4277e6",
+  "only_driver_changed_after_build058efb": true,
+  "reuse_PG_SHA": "e3471d5062fb9dc7e25fdd9093b42a485f20bdf78441ae57a74f133c3e6e5d2e",
+  "reason": "nonroot driver preserves actualUID; NNPhardAS remain originalactualPG checks"
+}

@@ -1,0 +1,128 @@
+{
+  "schema": "pg18-independent-module-plan-v1",
+  "state": "READ_ONLY_PLAN_NOT_IMPLEMENTED_NOT_AUTHORIZED_YET",
+  "utc": "2026-11-01T18:01:26.857749+00:00",
+  "base": "3d44746ad4669c6eb96d9cc10df7567aca8de96a",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "production9": [
+    "src/backend/storage/ipc/dsg_dsm.c",
+    "src/include/storage/dsg_dsm.h",
+    "src/backend/storage/ipc/dsm.c",
+    "src/include/storage/dsm.h",
+    "src/backend/storage/ipc/ipci.c",
+    "src/backend/storage/ipc/Makefile",
+    "src/backend/storage/ipc/meson.build",
+    "src/backend/utils/misc/guc_tables.c",
+    "src/backend/storage/buffer/dsg_work.c"
+  ],
+  "test4": [
+    "src/test/modules/test_dsg_region18/test_dsg_dsm18.c",
+    "src/test/modules/test_dsg_region18/Makefile",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql",
+    "src/test/modules/test_dsg_region18/t/test_dsm18.py"
+  ],
+  "base_sha256": {
+    "src/backend/storage/ipc/dsg_dsm.c": null,
+    "src/include/storage/dsg_dsm.h": null,
+    "src/backend/storage/ipc/dsm.c": "3ff99695b25e65764b6d0d2d5ddd8865984af6a434f9e903bcc33f0b7fc1dde8",
+    "src/include/storage/dsm.h": "940b542d73256c6d1452da6bfbde974f028b3e9e46566974958491ab22eb7d7d",
+    "src/backend/storage/ipc/ipci.c": "eb895435a49249e4a706f84b4a2e0733e4e2a5affcbc8f7e30d7108f4a958dc2",
+    "src/backend/storage/ipc/Makefile": "b7230c6d1c1d0cc7dae5559dcdf81abf9b022026cfbd010bcf5f4300095a3388",
+    "src/backend/storage/ipc/meson.build": "b2754eb898fbe638b2e83f45c505f072e8bbbfba8bfd2b7c1a57659e048463dc",
+    "src/backend/utils/misc/guc_tables.c": "1dc908f579e70e42688e3d85ed11cd2ec4b9fed11dc42a11ca7e47e900df8cc9",
+    "src/backend/storage/buffer/dsg_work.c": "3f69dcaddcf4534aab9877fa6ff3dbd668f128ad2aee930216af3b99aacca61a",
+    "src/test/modules/test_dsg_region18/test_dsg_dsm18.c": null,
+    "src/test/modules/test_dsg_region18/Makefile": "a17fbf49c3476fa8cdd7a331c0a8d302730d6f721e6ed0e46f3b7c3cacd15194",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "54dd706b9e158ea972dd993e3a429423dc2fac3afe5463803614b61a86ef2c3d",
+    "src/test/modules/test_dsg_region18/t/test_dsm18.py": null
+  },
+  "contract": {
+    "Work": 2,
+    "Connection": 1,
+    "Prepared": 1,
+    "DSM": 1,
+    "Buffer": 6,
+    "existing_public_structs_unchanged": true,
+    "native_DSM_control_segment_format_unchanged": true,
+    "normal": false,
+    "Source": false,
+    "E": 0
+  },
+  "real_principles": [
+    "one actual native dsm_control_slot_capacity helper exported in existing dsm.h: derive registry from same maxitems used by actual control, not duplicate constants",
+    "fixed private registry in original startup shared-memory cost; after actual Work/Buffer initialization, before dsm_postmaster_startup fixed control size registration",
+    "PM startup/old-control cleanup keeps original no-backend-lock OS paths; control and main-region costs separate from external payload, no double counting",
+    "backend external CREATE pre-reserves checked page-rounded upper before original dsm_impl_op; all SU/background covered and concurrent pending included",
+    "native handle collision with proven no new OS effect only rolls back own candidate reservation; never delete collided object",
+    "created-but-unpublished and allocation errors retain fee unless actual safe cleanup verified; do not prematurely publish guessed handle into native cleanup control",
+    "all mutable slots native DynamicSharedMemoryControlLock then status_lock; snapshot only status_lock, same-original Work/Connection/Prepared/DSM point",
+    "native control publication marks RESIDENT, actual DETACH/DESTROY failures mark unknown and retain reserved upper; mapping unknown cannot be released by successful unlink alone",
+    "successful actual DESTROY only releases fee when mapping lifecycle is known; no RSS/idle/current mapping count shortcut",
+    "same-PM shared reinit newboot clears only new registry; crossboot Root Held/Original and orphan OS/mapping proof remain mandatory, this DSM snapshot never certifies crossboot safe lower"
+  ],
+  "config": {
+    "name": "dynamic_shared_buffers_dsm_budget",
+    "context": "PGC_POSTMASTER",
+    "default": 0,
+    "minimum": 0,
+    "maximum": "INT_MAX",
+    "unit": "kB",
+    "same_name_defaults_range_as_pg17": true,
+    "zero": "account only, no positive hard external payload cap",
+    "positive": "must actually enforce in supported Linux fork postmaster mode or fail startup; cannot silently accept positive cap with native arrays disabled/standalone unsupported",
+    "enable_max_GUCs": "unchanged, still explicit existing native/birth provider profile"
+  },
+  "version_specific_adaptations": [
+    "PG18 injection macro requires (name,NULL), not PG17 one argument",
+    "verify every dsm_impl_op callsite; original PM/control paths untouched, external backend create/attach/detach/destroy must wrap",
+    "early-child control attach/detach before PGPROC remains original path with no LWLock",
+    "audit ResourceOwner/creating/pinning cleanup and main-region code against PG18 original instead of replacing full dsm.c",
+    "avoid blind trailing function copy that caused preserved Prepared1 compile failure"
+  ],
+  "direct_targets": [
+    "U defaultoff/original-session ACL/DSM1 layout and positive-cap unsupported settings startup rejection",
+    "S actual bounded page-round cap/payload lifecycle for each declared supported POSIX/SYSV/MMAP method, 3 small subcases only",
+    "S actual before-OS paused CREATE consumes cap while no native publication; concurrent creator denied before OS",
+    "S actual payload attach in second backend no duplicate charge; pin/creator exit retains; actual last unpin/detach/destroy releases",
+    "S actual ERROR before OS versus after OS before native publication invokes original ResourceOwner cleanup and preserves conservative counters",
+    "S injected failed destroy/unknown remains charged and blocks excess; do not fabricate confirmed release or erase unknown; test objects isolated to own container IPC and preserved evidence",
+    "S actual main-region DSM allocation charged only original fixed startup region, external remains zero; control upper independently accounted",
+    "S same original PM SIGKILL/reinit known-published DSM native cleanup and newboot closed/counters, exact old OS object absence verified; does not prove arbitrary orphan cleanup/crossboot Root Held"
+  ],
+  "build": {
+    "base_GitArchive": true,
+    "exact_owned_overlay": 13,
+    "source_lock_full_inputs": true,
+    "ccache_preserved": true,
+    "existing_tools_digest": "sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+    "test_dependencies": [
+      "only own test_dsg_region18 module",
+      "existing unmodified injection_points module for real before/after OS lifecycle windows"
+    ],
+    "no_unrelated_tests": [
+      "old Buffer/AIO/HA/storage matrix",
+      "PG17 unrelated old logic"
+    ]
+  },
+  "resource_budget": {
+    "heavy_cpu": 6,
+    "heavy_memory_GiB": 8,
+    "make_j": 6,
+    "max_heavy": 1,
+    "native_cpu": 2,
+    "native_memory_GiB": 3,
+    "build_timeout_s": 900,
+    "native_driver_timeout_s": 240,
+    "preserve": "nonce/spec/unit/argv/actual source/ELF hash/log/failure/terminal/cpu.stat/memory.peak/io.stat/memory.events",
+    "global_original_budget": "12CPU16GiB with reserve, no prune or central release/index edits"
+  },
+  "remaining": [
+    "MemoryContext hard work-domain budget",
+    "full DSM Root Held crossboot proof",
+    "full Root-bound PG18 Source force/I/normal",
+    "PG18 production enabling/max provider integration",
+    "full Neon new heap WAL extension",
+    "PG17 Linux and Helm K8s actual E",
+    "latest own control plane official full functionality"
+  ]
+}

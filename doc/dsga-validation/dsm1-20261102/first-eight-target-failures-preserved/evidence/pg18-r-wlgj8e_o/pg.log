@@ -1,0 +1,8 @@
+2026-11-01 18:16:01.123 GMT [168] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 18:16:01.123 GMT [168] LOG:  listening on Unix socket "/tmp/pg18-r-wlgj8e_o/s/.s.PGSQL.55438"
+2026-11-01 18:16:01.123 GMT [168] LOG:  listening on Unix socket "/tmp/pg18-r-wlgj8e_o/data/dsg_socket/.s.PGSQL.55438"
+2026-11-01 18:16:01.126 GMT [175] LOG:  database system was shut down at 2026-11-01 18:16:01 GMT
+2026-11-01 18:16:01.126 GMT [175] FATAL:  DSGA external DSM budget or registry capacity is exhausted
+2026-11-01 18:16:01.127 GMT [168] LOG:  startup process (PID 175) exited with exit code 1
+2026-11-01 18:16:01.127 GMT [168] LOG:  aborting startup due to startup process failure
+2026-11-01 18:16:01.128 GMT [168] LOG:  database system is shut down

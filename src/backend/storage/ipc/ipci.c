@@ -14,6 +14,7 @@
  */
 #include "postgres.h"
 #include "storage/dsg_work.h"
+#include "storage/dsg_dsm.h"
 
 #include "access/clog.h"
 #include "access/commit_ts.h"
@@ -123,6 +124,7 @@ CalculateShmemSize(int *num_semaphores)
 	size = add_size(size, PredicateLockShmemSize());
 	size = add_size(size, ProcGlobalShmemSize());
 	size = add_size(size, DsgWorkShmemSize());
+	size = add_size(size, DsgDsmShmemSize());
 	size = add_size(size, XLogPrefetchShmemSize());
 	size = add_size(size, VarsupShmemSize());
 	size = add_size(size, XLOGShmemSize());
@@ -317,6 +319,7 @@ CreateOrAttachShmemStructs(void)
 	if (!IsUnderPostmaster)
 		InitProcGlobal();
 	DsgWorkShmemInit();
+	DsgDsmShmemInit();
 	ProcArrayShmemInit();
 	BackendStatusShmemInit();
 	TwoPhaseShmemInit();

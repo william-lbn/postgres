@@ -1,0 +1,234 @@
+{
+  "base": "3d44746ad4669c6eb96d9cc10df7567aca8de96a",
+  "owned9": {
+    "src/backend/storage/ipc/dsg_dsm.c": "4daeff8e89163fecdee2243aa4b4b0b725d1c4ca7914f8392dc4b4b9d4acd19b",
+    "src/include/storage/dsg_dsm.h": "b7522c765acf6915b21e5426c300b0b774c532b441aa9be5546b0fc087f4a37c",
+    "src/backend/storage/ipc/dsm.c": "520b76cfe61ff4684b7b214844bff3fa8cb3ad61bfdb96f73611b46542553dd9",
+    "src/include/storage/dsm.h": "eda5cf401e061dfd1f266d6528c3457ec837b907f01c0c1e25be0beadbfa0f7a",
+    "src/backend/storage/ipc/ipci.c": "812f3ebe26081071534dc4f28d10b64ec684afc6d1ce5bd46d371bfcb446e96f",
+    "src/backend/storage/ipc/Makefile": "416c4d5faeea45cebaffc043a8ed96ede24efc0fff4c08f950e378b21ba4ab5f",
+    "src/backend/storage/ipc/meson.build": "0f81a6e46ea9f1c586c3ce6cbeb851b5287381cb3468bdae2052733b29a4c28a",
+    "src/backend/utils/misc/guc_tables.c": "930658ef5eed2e99cf576d38372c6ac2be05fd480a7ac82926276ca6972d4e12",
+    "src/backend/storage/buffer/dsg_work.c": "2caa0491ea2ae35e7bc91a9ba187309f57c3fc5f9916b666732876f8f9f2dea3"
+  },
+  "dsm_incremental_hunks": [
+    {
+      "old_lines": [
+        40,
+        39
+      ],
+      "new_lines": [
+        40,
+        40
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "db85c8dbcdfd3baa16334da2e50848bef3acde81ac23f27287720b53fb95ecb1"
+    },
+    {
+      "old_lines": [
+        47,
+        46
+      ],
+      "new_lines": [
+        48,
+        48
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "20f00ff6491c6bcee204ce0777b463019e4cec5a646439962736fa3648bda570"
+    },
+    {
+      "old_lines": [
+        76,
+        75
+      ],
+      "new_lines": [
+        78,
+        79
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "83ca8b3be5dee7c96fbde41a83545d311ec3d995841a6970b733b6a15e695f5b"
+    },
+    {
+      "old_lines": [
+        170,
+        169
+      ],
+      "new_lines": [
+        174,
+        238
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "2f1310461d0c5341d55934da5636cfc18adb53b1912bb48771458f9fa3e49514"
+    },
+    {
+      "old_lines": [
+        195,
+        196
+      ],
+      "new_lines": [
+        264,
+        264
+      ],
+      "old_sha256": "12fd9e289f90e0a314747558099877d6d96d5a43c01887bed173b064090f8349",
+      "new_sha256": "31d4ee769c8102961ec0494d44640ef38911a2876a24f40bcbfdd2b4e090a3a6"
+    },
+    {
+      "old_lines": [
+        200,
+        199
+      ],
+      "new_lines": [
+        268,
+        268
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "4cbf80b8036c83bd6caa64e271b27244452704eb0bb88074ac2de39e09700fc6"
+    },
+    {
+      "old_lines": [
+        466,
+        465
+      ],
+      "new_lines": [
+        535,
+        541
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "d96c42cef30ae7631b1038bcda0f8155e91a4f6870198f89e33464cb5032c09b"
+    },
+    {
+      "old_lines": [
+        576,
+        576
+      ],
+      "new_lines": [
+        652,
+        653
+      ],
+      "old_sha256": "495d7a9a6ca4add7fb831f02f9be5c7eeb6060093a8db9400e938f8af3483cc3",
+      "new_sha256": "3ad92005c2a062fbf0487b53178fa4aa4ce70bed2419dd692baea32a9ee951c5"
+    },
+    {
+      "old_lines": [
+        579,
+        578
+      ],
+      "new_lines": [
+        656,
+        656
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "34173a0003570fb9457c2a9efea10944bccc65957809c6efc701c77f7c6489ae"
+    },
+    {
+      "old_lines": [
+        580,
+        579
+      ],
+      "new_lines": [
+        658,
+        659
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "74cd604ff569450d1c4f983ba8ff7aa9f915ce50d4bd41183dfe2eb98b03eeff"
+    },
+    {
+      "old_lines": [
+        603,
+        602
+      ],
+      "new_lines": [
+        683,
+        685
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "db95b7fff1466effbe40e5e5dacb5f10994f46d2eedfa2babd67e177cf7a7c86"
+    },
+    {
+      "old_lines": [
+        615,
+        615
+      ],
+      "new_lines": [
+        698,
+        698
+      ],
+      "old_sha256": "9376f0020b5dde301b9f6f7b07fab55eff5b5250e3bc24c35a5036138f31e08f",
+      "new_sha256": "dad2b820a7b6c0a8beb77dfacbdd2ec819c4cf826bcd409e7bc1f471012ac615"
+    },
+    {
+      "old_lines": [
+        643,
+        642
+      ],
+      "new_lines": [
+        726,
+        728
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "a4837b47d68e2fecd22a7551b3cd982cd22afe1169284fbcd048d64902477d6a"
+    },
+    {
+      "old_lines": [
+        745,
+        745
+      ],
+      "new_lines": [
+        831,
+        831
+      ],
+      "old_sha256": "76a232584e715e516f2e72ede5caa6ecff8d19713f7ac161d7222357d5ba88d8",
+      "new_sha256": "791cf01de93e4c68a278884702f3f7a9383235f49660ccd32a1c8dd1a73da10e"
+    },
+    {
+      "old_lines": [
+        842,
+        842
+      ],
+      "new_lines": [
+        928,
+        934
+      ],
+      "old_sha256": "febe1d717c02d98af6f2b2e980188fbd29a1655b1c2d3223ab9b847af0ba7c3d",
+      "new_sha256": "edacedf02f3de6f866fac1bbb569af3be136e3eb4b95597cc32187484ff9d20a"
+    },
+    {
+      "old_lines": [
+        884,
+        884
+      ],
+      "new_lines": [
+        976,
+        976
+      ],
+      "old_sha256": "10936fea869977559b4017ce9f4f9269b2eae0c66ecebb38ec5d065bd9d7cd17",
+      "new_sha256": "82e96e3d8b3de1775b6ef972c3938622383cc9812236e3a73fbde41734e395f8"
+    },
+    {
+      "old_lines": [
+        1056,
+        1056
+      ],
+      "new_lines": [
+        1148,
+        1148
+      ],
+      "old_sha256": "fe267afe7678be5328ab5b88f4c7dfbd31895303b27e0df2188c9d8863f58a43",
+      "new_sha256": "6eb6b9f75247a0e3c3673b9ac48ea6dbae893e4bd6e391a149d5186885499c45"
+    },
+    {
+      "old_lines": [
+        1213,
+        1212
+      ],
+      "new_lines": [
+        1305,
+        1305
+      ],
+      "old_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "new_sha256": "aeb5d7759936581d4be19378072e8e1286655c86938e2fdffb243018bec488ce"
+    }
+  ],
+  "PG18_native_base_preserved": true,
+  "state": "IMPLEMENTED_NOT_COMPILED_NOT_TESTED"
+}

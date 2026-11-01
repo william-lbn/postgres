@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T181418Z-78005a",
+  "unit": "neon-pg18-dsm1-build-20261101t181418z-78005a.service",
+  "kind": "heavy",
+  "evidence_dir": "/data/neon-build/validation/pg18-dsm1-build-20261101T181418Z-78005a",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-dsm1-build-20261101T181418Z-78005a/worker.py"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "testsRun": 1,
+  "passed": [
+    "test_dsm18.DSM.test_PG18_S_DSM1_007_same_PM_newboot_closed_cleans_known_native_OS_objects"
+  ],
+  "subtests": [],
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

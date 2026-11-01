@@ -81,6 +81,7 @@
 #include "storage/aio.h"
 #include "storage/bufmgr.h"
 #include "storage/dsg_work.h"
+#include "storage/dsg_dsm.h"
 #include "storage/bufpage.h"
 #include "storage/copydir.h"
 #include "storage/fd.h"
@@ -2211,6 +2212,16 @@ struct config_bool ConfigureNamesBool[] =
 
 struct config_int ConfigureNamesInt[] =
 {
+	{
+		{"dynamic_shared_buffers_dsm_budget", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Limits external DSM payload reservations for this PG boot."),
+			gettext_noop("Zero leaves the payload budget unenforced."),
+			GUC_UNIT_KB | GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_dsm_budget,
+		0, 0, INT_MAX,
+		NULL, NULL, NULL
+	},
 	{
 		{"dynamic_shared_buffers_admission_lease_timeout", PGC_POSTMASTER, RESOURCES_MEM,
 			gettext_noop("Bounds managed admission without a verified renewal."),

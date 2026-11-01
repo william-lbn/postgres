@@ -1,0 +1,18 @@
+{
+  "exit": 0,
+  "job": {
+    "cpu": 2,
+    "kind": "native",
+    "last_observation": "original-unit-terminal",
+    "memory": 3221225472,
+    "nonce": "20261101T183227Z-b15797",
+    "process_exit_code": 0,
+    "queue_reason": "",
+    "spec_sha256": "2989b1a14ba94e5b9ffbd413caaf3dbb22fe1539a7a6aaf53f33e8120053925e",
+    "state": "terminal",
+    "test_verdict": "NOT_INTERPRETED",
+    "unit": "neon-pg18-dsm1-recovery-20261101t183227z-b15797.service",
+    "unit_result": "success",
+    "worker_sha256": "8ff285b327ad64ec38ead1b7289efb09b98bdf5d0c7e404e443858e5604fcf74"
+  }
+}

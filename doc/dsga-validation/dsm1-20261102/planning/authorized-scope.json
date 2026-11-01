@@ -1,0 +1,7 @@
+{
+  "utc": "2026-11-01T18:03:53.369351+00:00",
+  "authority": "Root explicit approval after plan81fb5ab6; exact9production+4test; build success and independent no-blocker before actual PG; no Git/index/PG17/release locks",
+  "plan_sha256": "81fb5ab6b911580e1a93f57b1837cf034c8c972075943c5ec8f280998f6d5e3b",
+  "budget_cli_sha256": "ddd54a6a22cd289f7c8a3c19252dc7e02b24a60babd28731b29b8c35e555880a",
+  "base": "3d44746ad4669c6eb96d9cc10df7567aca8de96a"
+}

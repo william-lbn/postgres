@@ -1,0 +1,28 @@
+{
+  "base": "3d44746ad4669c6eb96d9cc10df7567aca8de96a",
+  "owned13": {
+    "src/backend/storage/buffer/dsg_work.c": "2caa0491ea2ae35e7bc91a9ba187309f57c3fc5f9916b666732876f8f9f2dea3",
+    "src/backend/storage/ipc/Makefile": "416c4d5faeea45cebaffc043a8ed96ede24efc0fff4c08f950e378b21ba4ab5f",
+    "src/backend/storage/ipc/dsg_dsm.c": "4daeff8e89163fecdee2243aa4b4b0b725d1c4ca7914f8392dc4b4b9d4acd19b",
+    "src/backend/storage/ipc/dsm.c": "520b76cfe61ff4684b7b214844bff3fa8cb3ad61bfdb96f73611b46542553dd9",
+    "src/backend/storage/ipc/ipci.c": "812f3ebe26081071534dc4f28d10b64ec684afc6d1ce5bd46d371bfcb446e96f",
+    "src/backend/storage/ipc/meson.build": "0f81a6e46ea9f1c586c3ce6cbeb851b5287381cb3468bdae2052733b29a4c28a",
+    "src/backend/utils/misc/guc_tables.c": "930658ef5eed2e99cf576d38372c6ac2be05fd480a7ac82926276ca6972d4e12",
+    "src/include/storage/dsg_dsm.h": "b7522c765acf6915b21e5426c300b0b774c532b441aa9be5546b0fc087f4a37c",
+    "src/include/storage/dsm.h": "eda5cf401e061dfd1f266d6528c3457ec837b907f01c0c1e25be0beadbfa0f7a",
+    "src/test/modules/test_dsg_region18/Makefile": "de7b52d761c53a2c4b75d1fa505f47c0a702cf4de1cbb9e032f894bd26e25429",
+    "src/test/modules/test_dsg_region18/t/test_dsm18.py": "daad5745d48313841b6773cccaf9fca7cfa5fa4b1e13bfe9aa21e47e5c2c6df2",
+    "src/test/modules/test_dsg_region18/test_dsg_dsm18.c": "c19f04961cb77c34befa5dfd360532b6eda49fe518f824b1df6d9ab3e342137f",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "2601b2a4b135d53fc18169855c772a3287565f9eccb4a90f8d5a59cda769b8f5"
+  },
+  "prior_build": "/data/neon-build/validation/pg18-native-final-attempt01-20261031T210303Z-70b567",
+  "limits": {
+    "cpu": 6,
+    "memoryGiB": 8,
+    "make_j": 6
+  },
+  "source_lock_sha256": "2998ab6469153e0373e5a39beadc9f5b434c0edb6269a8c447430fddf9499d99",
+  "scope": "BUILD_ONLY_NOT_TESTED_NOT_SOURCE_NORMAL",
+  "single_Docker_RUN": true,
+  "native_starter_sha256": "3386614362765d78c1b811e7295a02e6c210dc0db4fc252166ecb0df748c2130"
+}

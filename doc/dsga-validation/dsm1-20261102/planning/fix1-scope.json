@@ -1,0 +1,11 @@
+{
+  "authority": "Root approved unified fork tracking and fixed proven baseline plus standalone target",
+  "old_build": "/data/neon-build/validation/pg18-dsm1-build-20261101T181418Z-78005a",
+  "new_true_targets": 9,
+  "fixed_clean_start_baseline_bytes": 1048576,
+  "main_2MiB_external_baseline_bytes": 0,
+  "actual_pgstat_inplace_bytes": 262144,
+  "startup_restore_chain": "StartupXLOG→pgstat_restore_stats→pgstat_read_statsfile→shared pgstat DSA growth→dsm_create, actual area dump and total counter must prove deterministic fixed baseline",
+  "not_dynamic_learning": true,
+  "normal": false
+}

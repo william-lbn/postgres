@@ -1,0 +1,29 @@
+PG18 DSM1修1最终十三源独立只读审查（2026-11-02）
+结论：d071f3修1已闭合初审明确standalone/cap0发布PANIC边界，当前九生产源未见其它明确阻断；最终九个独立实际根可分账归档。审查者未改源码/Git，未重建或重测PG18。
+
+准确图：base3d44746ad4669c6eb96d9cc10df7567aca8de96a，d071f3 source-lock owned13。12编译输入当前逐SHA同不可变source；唯一后继运行Py另锁1d7ed0d3ab7f3ea0d98a6751ea9bbdd68ae6088bb1ae0c3a982bac917b801192，其余八测试方法AST与修1构建Py完全相同。PG7dfec415bfcfc4297392142a85c44e099c2dcfacead29f5cd159abb837827687；DSOcada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49。
+
+真实调用覆盖与upper/pending：
+- 已查全部src/backend raw dsm_impl_op调用，仅dsm.c与dsm_impl.c；backend外部create/attach/detach/destroy/末refcount与unpin销毁均接包装。原main-region DSM由固定主段成本承载，不重复外部payload；控制段成本另在PM尚无child时登记。
+- BeginCreate先页对齐检查并在原DSM control锁→status锁下保留upper/segments/pending，然后才OS调用；控制槽发布两口在原control锁下pending→resident，pending期间预算已占用，不能并发穿cap。registry本地容量不信共享长度，unknown占槽且不能覆盖。
+- 所有OS/ERROR在status锁外，已检查catch重取DSM锁之前相关路径均已释放；snapshot只取同status锁复制Work/Connection/Prepared/DSM，无反向LWLock或OS动作。PM/control/early no-PGPROC路径保raw原操作，不为查不存在记录取backend锁。
+
+false碰撞与unknown：
+- Linux POSIX/SYSV/MMAP三个原实现未改。runtime CREATE固定ERROR级：真正O_EXCL/EEXIST（含SysV IPC_PRIVATE候选明确无效果）才返回false撤本次预留；stat/resize/map/close等失败先ERROR跳catch，其后的returnfalse不可当实际可达碰撞。
+- token=-1是本登记已占候选号，尚未OS；false不销毁原撞名对象。beforeOS注入ERROR撤尚无本次效果预留；OS开始后ERROR保UNKNOWN/upper，不以异常推定回滚成功。
+- DETACH成功不减；DETACH/DESTROY失败标mapping_unknown/unknown并继续占upper。后来unlink成功也不忘记不明mapping；只有真实最后销毁成功且无mappingUnknown才Forget。原未发布create只有自己实际映射存在才可DESTROY，不盲删未确认候选名。
+- mapped_size超预留保实际较大upper并令accounting_valid=false；溢出不截小，计数损坏不下溢成空闲。
+
+启动/跨boot与修1：
+- 正数cap在nativeoff/standalone/不能支持的实现明确FATAL，不静默忽略；支持仅fork PM下POSIX/SYSV/MMAP。零cap不强制，但受管fork仍准确统计；不支持/standalone不冒有效accounting。
+- 初core9仅wrapper跳standalone，creating/aftercreate/publish仍按enable，曾可无预留发布PANIC。修1新增统一dsm_dsg_tracking_enabled=enable&&IsUnder，wrapper/creating/aftercreate/两个publish全同谓词，cleanup据creating选择原路径；真fork跟踪不被bypass。最终实际standalone cap0快照invalid/unenforced、create正常且external0；positive同模式启动拒，闭合该新hook回归。
+- 每boot账重建与known旧OS清理仅本boot事实；它不证明root Held/Original跨boot回收，更不含PTE/内核/THP/Host或MemoryContext硬预算。旧公开ABI不变，DSM为独立API1；不签normal/完整Quiesce/Root-bound Source。
+
+测试准确分账：
+- 780旧图/195473原八根有1FAIL+10sub ERROR（原native统计DSA基线未纳cap），原件保留。初审静态standalone阻断另档保持，不冒已在780复现。
+- 修1d071编译PASS44.080s；4ef00f九根八PASS，仅recovery驱动误期新boot应0FAIL。实际原pgstat DSA通过每cluster直接dsa_dump证实总1.25MiB=main-in-place256KiB+首外部1MiB；测试绝对cap纳这个固定基线，不猜动态baseline、不把真实原费归零。
+- b15797同PG/DSO/12编译输入，仅Py修原失败recovery一根PASS0.890s；同PM21，boot14263427977892277277→17907052423067492942，exact旧OS2529522698gone，新原生1MiB对象221848286，新账1MiB/1seg/unknown0，实际新pgstat dump同1.25MiB。不是跨boot RootHeld许可。
+- 最终独立九根=4ef原八已绿+b157一根（1U+8S），5sub（三实现+两error点），零skip；不重复算十根。覆盖真实3OS round/cap/collision、OS前pending并发拒、creator退出仍pin/实际第二backend attach不双计、前/后OS ERROR cleanup、destroyError未知持续收费/main不双计/zero-cap standalone与positive拒/新boot known对象清理。
+- collision C夹具精确创建自有raw OS对象、固定候选重试后原payload未变、精确销毁；只用于定向OS碰撞，不作为来源或额外生产预算权限。ACL同时查session user防SECURITY DEFINER。
+
+所有Source/normal/E/K8s仍false/0。PG17同形边界另已准确817/f883实际startup PANIC复现，由Root另授权两源同步修复；不混PG18证据，不动gitlink。

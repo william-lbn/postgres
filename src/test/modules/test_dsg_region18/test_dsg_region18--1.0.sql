@@ -38,3 +38,12 @@ REVOKE ALL ON FUNCTION test_dsg_connection18_snapshot() FROM PUBLIC;
 
 CREATE FUNCTION test_dsg_prepared18_snapshot() RETURNS text AS 'MODULE_PATHNAME','test_dsg_prepared18_snapshot' LANGUAGE C STRICT;
 REVOKE ALL ON FUNCTION test_dsg_prepared18_snapshot() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_dsm18_snapshot() RETURNS text AS 'MODULE_PATHNAME','test_dsg_dsm18_snapshot' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_dsm18_create(bigint,boolean) RETURNS text AS 'MODULE_PATHNAME','test_dsg_dsm18_create' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_dsm18_touch(bigint,boolean) RETURNS text AS 'MODULE_PATHNAME','test_dsg_dsm18_touch' LANGUAGE C STRICT;
+CREATE FUNCTION test_dsg_dsm18_collision() RETURNS text AS 'MODULE_PATHNAME','test_dsg_dsm18_collision' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_dsm18_snapshot(),test_dsg_dsm18_create(bigint,boolean),test_dsg_dsm18_touch(bigint,boolean),test_dsg_dsm18_collision() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_dsm18_pgstat_area() RETURNS void AS 'MODULE_PATHNAME','test_dsg_dsm18_pgstat_area' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_dsm18_pgstat_area() FROM PUBLIC;

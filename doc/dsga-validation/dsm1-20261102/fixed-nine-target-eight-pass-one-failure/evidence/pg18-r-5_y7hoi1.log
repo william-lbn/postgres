@@ -1,0 +1,4 @@
+2026-11-01 18:29:25.992 GMT [133] LOG:  registered custom cumulative statistics "injection_points" with ID 25
+2026-11-01 18:29:25.992 GMT [133] LOG:  registered custom cumulative statistics "injection_points_fixed" with ID 26
+2026-11-01 18:29:25.997 GMT [133] LOG:  redirecting log output to logging collector process
+2026-11-01 18:29:25.997 GMT [133] HINT:  Future log output will appear in directory "logs".

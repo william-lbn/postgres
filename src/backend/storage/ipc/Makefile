@@ -12,6 +12,7 @@ OBJS = \
 	barrier.o \
 	dsg_region.o \
 	dsm.o \
+	dsg_dsm.o \
 	dsm_impl.o \
 	dsm_registry.o \
 	ipc.o \

@@ -1,0 +1,35 @@
+{
+  "E": 0,
+  "Source": false,
+  "actual_DSO_sha256": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+  "actual_PG_ELF_sha256": "7dfec415bfcfc4297392142a85c44e099c2dcfacead29f5cd159abb837827687",
+  "compiled12_unchanged": {
+    "src/backend/storage/buffer/dsg_work.c": "2caa0491ea2ae35e7bc91a9ba187309f57c3fc5f9916b666732876f8f9f2dea3",
+    "src/backend/storage/ipc/Makefile": "416c4d5faeea45cebaffc043a8ed96ede24efc0fff4c08f950e378b21ba4ab5f",
+    "src/backend/storage/ipc/dsg_dsm.c": "4daeff8e89163fecdee2243aa4b4b0b725d1c4ca7914f8392dc4b4b9d4acd19b",
+    "src/backend/storage/ipc/dsm.c": "331c79cc6f7b84313a4eadacdd97592931a12ed01d9e9f4636209e151f5eac08",
+    "src/backend/storage/ipc/ipci.c": "812f3ebe26081071534dc4f28d10b64ec684afc6d1ce5bd46d371bfcb446e96f",
+    "src/backend/storage/ipc/meson.build": "0f81a6e46ea9f1c586c3ce6cbeb851b5287381cb3468bdae2052733b29a4c28a",
+    "src/backend/utils/misc/guc_tables.c": "930658ef5eed2e99cf576d38372c6ac2be05fd480a7ac82926276ca6972d4e12",
+    "src/include/storage/dsg_dsm.h": "b7522c765acf6915b21e5426c300b0b774c532b441aa9be5546b0fc087f4a37c",
+    "src/include/storage/dsm.h": "eda5cf401e061dfd1f266d6528c3457ec837b907f01c0c1e25be0beadbfa0f7a",
+    "src/test/modules/test_dsg_region18/Makefile": "de7b52d761c53a2c4b75d1fa505f47c0a702cf4de1cbb9e032f894bd26e25429",
+    "src/test/modules/test_dsg_region18/test_dsg_dsm18.c": "183388fd05918e9ab153c7d8c1e720b43784a2edde9df1c31105d6f7aa57cb78",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "afca9986001f08fad7cfe75684d9ff366c352d7379081b163087d020da86273e"
+  },
+  "compiled_build": "/data/neon-build/validation/pg18-dsm1-build-20261101T182834Z-d071f3",
+  "compiled_source_lock_sha256": "9c2b9a4564ef964ff94765f2914c12172f637154956ce134063234e97ce84c0d",
+  "fixed_target": "test_PG18_S_DSM1_007_same_PM_newboot_closed_cleans_known_native_OS_objects",
+  "no_recompile": true,
+  "normal": false,
+  "old8_not_rerun": true,
+  "rest_module_AST_identical": true,
+  "runtime6": {
+    "src/test/modules/test_dsg_region18/t/test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+    "src/test/modules/test_dsg_region18/t/test_connection18.py": "783bfb36f01dd1929ff0cdbbab3a2303989d9135358d125ee5b4b033bd7d7f19",
+    "src/test/modules/test_dsg_region18/t/test_dsm18.py": "1d7ed0d3ab7f3ea0d98a6751ea9bbdd68ae6088bb1ae0c3a982bac917b801192",
+    "src/test/modules/test_dsg_region18/t/test_prepared18.py": "834038e09167832dfde2c8fb96119a2a0732c60e863227b2554c2f9b0886a2f1",
+    "src/test/modules/test_dsg_region18/t/test_region18.py": "d48fb9bc6285c831381008402ed4c2964537cc46e1d380ff9077dce6f7bb4263",
+    "src/test/modules/test_dsg_region18/t/test_work18.py": "a7146009eff2b9b38d3b605b966e26509e4914afabfee23fe0ba832d645d4db5"
+  }
+}

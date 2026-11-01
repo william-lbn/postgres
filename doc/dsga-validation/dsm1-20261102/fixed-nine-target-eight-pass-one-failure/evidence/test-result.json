@@ -1,0 +1,46 @@
+{
+  "testsRun": 9,
+  "passed": [
+    "test_dsm18.DSM.test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision",
+    "test_dsm18.DSM.test_PG18_S_DSM1_002_preOS_pending_reservation_blocks_concurrent_creator",
+    "test_dsm18.DSM.test_PG18_S_DSM1_003_creator_exit_pin_cross_backend_attach_no_double_charge",
+    "test_dsm18.DSM.test_PG18_S_DSM1_004_real_beforeOS_and_afterOS_unpublished_ERROR_cleanup",
+    "test_dsm18.DSM.test_PG18_S_DSM1_005_destroy_error_unknown_stays_charged",
+    "test_dsm18.DSM.test_PG18_S_DSM1_006_main_DSM_region_not_double_counted_external",
+    "test_dsm18.DSM.test_PG18_S_DSM1_008_zero_cap_standalone_legacy_DSM_and_positive_reject",
+    "test_dsm18.DSM.test_PG18_U_DSM1_001_defaultoff_original_session_ABI_and_positive_unsupported"
+  ],
+  "subtests": [
+    {
+      "id": "test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision (test_dsm18.DSM.test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision) (method='posix')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision (test_dsm18.DSM.test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision) (method='sysv')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision (test_dsm18.DSM.test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision) (method='mmap')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_DSM1_004_real_beforeOS_and_afterOS_unpublished_ERROR_cleanup (test_dsm18.DSM.test_PG18_S_DSM1_004_real_beforeOS_and_afterOS_unpublished_ERROR_cleanup) (point='dsg-dsm-before-create')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_DSM1_004_real_beforeOS_and_afterOS_unpublished_ERROR_cleanup (test_dsm18.DSM.test_PG18_S_DSM1_004_real_beforeOS_and_afterOS_unpublished_ERROR_cleanup) (point='dsg-dsm-after-create')",
+      "passed": true
+    }
+  ],
+  "failures": [
+    {
+      "id": "test_PG18_S_DSM1_007_same_PM_newboot_closed_cleans_known_native_OS_objects (test_dsm18.DSM.test_PG18_S_DSM1_007_same_PM_newboot_closed_cleans_known_native_OS_objects)",
+      "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_dsm18.py\", line 74, in test_PG18_S_DSM1_007_same_PM_newboot_closed_cleans_known_native_OS_objects\n    p=self.cluster();p.sql('CHECKPOINT');v=self.create(p);old=self.snap(p);obj=Path('/dev/shm')/('PostgreSQL.'+str(v['handle']));self.assertTrue(obj.exists());w=conn.work.Wire(p,user=region.USER);self.addCleanup(w.close);self.assertFalse(w.query('BEGIN')[0]);pm=p.process.pid;os.kill(w.pid,signal.SIGKILL);w.close();p.ready();self.assertEqual(p.process.pid,pm);fresh=self.wait(p,lambda s:s['boot']!=old['boot']and s['acknowledged']and s['public_connections_blocked']);self.assertFalse(fresh['admission_open']);self.assertEqual(int(fresh['reserved_upper_bytes']),0);self.assertEqual(fresh['external_segments'],0);self.assertFalse(obj.exists());self.blocked(p);self.fact('dsm1-actual-known-native-cleanup-newboot-closed',{'old':old,'new':fresh,'same_actual_PM':pm,'exact_old_OS_object':str(obj),'old_object_absent':not obj.exists(),'crossboot_Root_Held_proven':False,'Source':False,'normal':False})\n                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1048576 != 0\n"
+    }
+  ],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

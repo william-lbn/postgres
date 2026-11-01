@@ -1,0 +1,61 @@
+{
+  "schema": "READ_ONLY_STATIC_REACHABILITY_NOT_ACTUAL_PG17_REPRODUCTION",
+  "base17": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "finding": "PG17 same bypass !IsUnderPostmaster vs creating/Publish enable-only predicate found; no standalone-positive rejection found in dsg_dsm.c. Work explicitly classifies B_STANDALONE_BACKEND. Potential same boundary needs separate owner/support-constraints/actual reproduction before code change.",
+  "evidence": {
+    "src/backend/storage/ipc/dsm.c": {
+      "sha256": "db141fdacc18aedfcabb6a89bce39e3478db3e7ae6665846fb4a9b3b1e1cfc49",
+      "matches": [
+        {
+          "line": 193,
+          "text": "\tif (!enable_dynamic_shared_buffers || !IsUnderPostmaster ||"
+        },
+        {
+          "line": 652,
+          "text": "\t\t\tseg->creating = enable_dynamic_shared_buffers;"
+        },
+        {
+          "line": 684,
+          "text": "\t\t\t\tDsgDsmPublishLocked(seg->handle);"
+        },
+        {
+          "line": 727,
+          "text": "\t\tDsgDsmPublishLocked(seg->handle);"
+        }
+      ]
+    },
+    "src/backend/storage/ipc/dsg_dsm.c": {
+      "sha256": "031149ed244b471a510801a5a8753e5b3406f8cfa582aca6644a505f0048f503",
+      "matches": [
+        {
+          "line": 64,
+          "text": "\tif (!enable_dynamic_shared_buffers)"
+        },
+        {
+          "line": 78,
+          "text": "\tif (!enable_dynamic_shared_buffers)"
+        },
+        {
+          "line": 302,
+          "text": "DsgDsmPublishLocked(dsm_handle handle)"
+        },
+        {
+          "line": 306,
+          "text": "\tif (!enable_dynamic_shared_buffers)"
+        }
+      ]
+    },
+    "src/backend/storage/buffer/dsg_work.c": {
+      "sha256": "1eba41c1da1ce6b7c1cbbb66ab6357f86d78b05e066896d6a0571566deb36952",
+      "matches": [
+        {
+          "line": 256,
+          "text": "\t\t MyBackendType == B_STANDALONE_BACKEND ?"
+        }
+      ]
+    }
+  },
+  "PG17_source_modified": false,
+  "actual_PG17_tests_run": false,
+  "does_not_infer_normal_Source_support_or_qualification": true
+}

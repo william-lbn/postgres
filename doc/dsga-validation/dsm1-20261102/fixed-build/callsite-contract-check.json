@@ -1,0 +1,101 @@
+{
+  "scope": "STATIC_CALLSITE_AUDIT_NOT_EXTRA_TEST",
+  "current_dsm_c_sha256": "331c79cc6f7b84313a4eadacdd97592931a12ed01d9e9f4636209e151f5eac08",
+  "calls": [
+    {
+      "line": 202,
+      "function": "dsm_dsg_tracking_enabled",
+      "text": "return dsm_impl_op(op, handle, request_size, impl_private, mapped_address, mapped_size, elevel);",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 213,
+      "function": "dsm_dsg_tracking_enabled",
+      "text": "result = dsm_impl_op(op, handle, request_size, impl_private, mapped_address, mapped_size, elevel);",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 228,
+      "function": "dsm_dsg_tracking_enabled",
+      "text": "result = dsm_impl_op(op, handle, request_size, impl_private, mapped_address, mapped_size, elevel);",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 290,
+      "function": "dsm_postmaster_startup",
+      "text": "if (dsm_impl_op(DSM_OP_CREATE, dsm_control_handle, segsize, &dsm_control_impl_private, &dsm_control_address,",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 332,
+      "function": "dsm_cleanup_using_control_segment",
+      "text": "if (!dsm_impl_op(DSM_OP_ATTACH, old_control_handle, 0, &impl_private, &mapped_address, &mapped_size, DEBUG1))",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 343,
+      "function": "dsm_cleanup_using_control_segment",
+      "text": "dsm_impl_op(DSM_OP_DETACH, old_control_handle, 0, &impl_private, &mapped_address, &mapped_size, LOG);",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 373,
+      "function": "dsm_cleanup_using_control_segment",
+      "text": "dsm_impl_op(DSM_OP_DESTROY, handle, 0, &junk_impl_private, &junk_mapped_address, &junk_mapped_size, LOG);",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 381,
+      "function": "dsm_cleanup_using_control_segment",
+      "text": "dsm_impl_op(DSM_OP_DESTROY, old_control_handle, 0, &impl_private, &mapped_address, &mapped_size, LOG);",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 477,
+      "function": "dsm_postmaster_shutdown",
+      "text": "dsm_impl_op(DSM_OP_DESTROY, handle, 0, &junk_impl_private, &junk_mapped_address, &junk_mapped_size, LOG);",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 486,
+      "function": "dsm_postmaster_shutdown",
+      "text": "dsm_impl_op(DSM_OP_DESTROY, dsm_control_handle, 0, &dsm_control_impl_private, &dsm_control_address,",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 508,
+      "function": "dsm_backend_startup",
+      "text": "dsm_impl_op(DSM_OP_ATTACH, dsm_control_handle, 0, &dsm_control_impl_private, &control_address,",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 515,
+      "function": "dsm_backend_startup",
+      "text": "dsm_impl_op(DSM_OP_DETACH, dsm_control_handle, 0, &dsm_control_impl_private, &control_address,",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 660,
+      "function": "dsm_create",
+      "text": "if (dsm_dsg_impl_op(DSM_OP_CREATE, seg->handle, size, &seg->impl_private, &seg->mapped_address, &seg->mapped_size, ERROR))",
+      "kind": "wrapped backend payload or guarded original mode"
+    },
+    {
+      "line": 881,
+      "function": "dsm_detach_all",
+      "text": "dsm_impl_op(DSM_OP_DETACH, dsm_control_handle, 0, &dsm_control_impl_private, &control_address,",
+      "kind": "original raw call inside wrapper or PM/control path"
+    },
+    {
+      "line": 1368,
+      "function": "make_main_region_dsm_handle",
+      "text": "* segment created by dsm_impl_op(), so we'll make it odd.  It also * mustn't collide with any other main area pseudo-segment, so we'll",
+      "kind": "original raw call inside wrapper or PM/control path"
+    }
+  ],
+  "track_predicate": "enable_dynamic_shared_buffers && IsUnderPostmaster; identical wrapper/creating/aftercreate/publish guard",
+  "original_PM_control_format_unchanged": true,
+  "CREATE_false_native_semantics": "POSIX/MMAP O_CREAT|O_EXCL EEXIST only returns false at elevelERROR; SYSV also reserved IPC_PRIVATE no OS effect (native candidate0 skipped); other CREATE errors throw, wrapper retains unknown if OS started",
+  "PG17_modified": false,
+  "normal": false
+}

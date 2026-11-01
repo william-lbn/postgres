@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+# DSM1实际受限payload；不把逻辑idle、unlink或新boot当Root Held证明。
+import importlib.util,json,os,re,signal,subprocess,time,unittest
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('dsm18_prepared',Path(__file__).with_name('test_prepared18.py'));prep=importlib.util.module_from_spec(spec);spec.loader.exec_module(prep)
+conn=prep.conn;region=prep.region
+# 已定位原pgstat在startup恢复统计：in-place256KiB+固定首个外部DSA1MiB。
+BASELINE=1048576
+class Cluster(prep.Cluster):
+ def __init__(self,budget='64kB',method='posix',main='0',**kw):
+  super().__init__(injection=True,**kw)
+  self.expected_baseline=0 if main!='0'else BASELINE;self.expected_segments=0 if main!='0'else 1
+  allowance={'0':0,'8kB':8192,'16kB':16384,'64kB':65536}[budget];self.configured_cap=0 if budget=='0'else self.expected_baseline+allowance
+  with (self.data/'postgresql.conf').open('a')as f:f.write(f"dynamic_shared_buffers_dsm_budget='{self.configured_cap//1024}kB'\ndynamic_shared_memory_type='{method}'\nmin_dynamic_shared_memory='{main}'\n")
+class DSM(unittest.TestCase):
+ wait=conn.Connection.wait;gate=conn.Connection.gate;blocked=conn.Connection.blocked;fact=conn.Connection.fact
+ def cluster(self,**kw):
+  p=Cluster(**kw);self.addCleanup(p.close);p.start();p.sql('CREATE ROLE work18_user LOGIN')
+  if p.mode is not None:
+   initial=self.snap(p);self.assertEqual(int(initial['reserved_upper_bytes']),p.expected_baseline);self.assertEqual(initial['external_segments'],p.expected_segments);self.assertEqual(initial['pending_creations'],0);self.assertEqual(initial['unknown_segments'],0);self.assertEqual(int(initial['external_budget_bytes']),p.configured_cap)
+   p.sql('SELECT test_dsg_dsm18_pgstat_area()');until=time.monotonic()+2;dump=''
+   while time.monotonic()<until:
+    log=(p.data/'logs/pg.log').read_text();dump=log.split('PG18_DSM_TEST_PGSTAT_AREA_BEGIN')[-1].split('PG18_DSM_TEST_PGSTAT_AREA_END')[0]
+    if 'total_segment_size: 1310720'in dump:break
+    time.sleep(.01)
+   self.assertIn('total_segment_size: 1310720',dump);self.fact(p.root.name+'-exact-native-baseline',{'actual_total_snapshot':initial,'configured_absolute_cap':p.configured_cap,'required_fixed_baseline':p.expected_baseline,'actual_pgstat_area_dump':dump,'unproven_dynamic_baseline_not_accepted':True})
+  return p
+ def snap(self,p):
+  s=json.loads(p.sql('SELECT test_dsg_dsm18_snapshot()').stdout)
+  if s['limit_enforced']and s['accounting_valid']:self.assertLessEqual(int(s['reserved_upper_bytes']),int(s['external_budget_bytes']))
+  return s
+ def create(self,p,size=8192,pin=True):return json.loads(p.sql(f'SELECT test_dsg_dsm18_create({size},{str(pin).lower()})').stdout)
+ def touch(self,p,h,release=False):return json.loads(p.sql(f'SELECT test_dsg_dsm18_touch({h},{str(release).lower()})').stdout)
+ def zero(self,p):return self.wait(p,lambda s:int(s['reserved_upper_bytes'])==p.expected_baseline and s['external_segments']==p.expected_segments and s['pending_creations']==0 and s['unknown_segments']==0)
+ def attach(self,p,name,action):p.sql("SELECT injection_points_attach('"+name+"','"+action+"')")
+ def detach(self,p,name):p.sql("SELECT injection_points_detach('"+name+"')")
+ def wake(self,p,name):p.sql("SELECT injection_points_wakeup('"+name+"')",check=False)
+ def async_sql(self,p,sql,app):
+  e=region.env();e['PGAPPNAME']=app;c=subprocess.Popen([str(region.BIN/'psql'),'-h',str(p.sock),'-p','55438','-U',region.USER,'-d','postgres','-XqAt','-v','ON_ERROR_STOP=1','-c',sql],env=e,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True);self.addCleanup(lambda:c.kill()if c.poll()is None else None);return c
+ def test_PG18_U_DSM1_001_defaultoff_original_session_ABI_and_positive_unsupported(self):
+  off=self.cluster(mode=None,gate=False,admission=False,budget='0');bad=off.sql('SELECT test_dsg_dsm18_snapshot()',check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('registered running server',bad.stderr)
+  p=Cluster(mode=None,gate=False,admission=False,budget='64kB');self.addCleanup(p.close);e=region.env();bad=subprocess.run([str(region.BIN/'postgres'),'-D',str(p.data)],env=e,capture_output=True,text=True,timeout=10);self.assertNotEqual(bad.returncode,0);self.assertIn('budget requires managed native buffer profile',bad.stderr)
+  p=self.cluster(budget='0');s=self.snap(p);self.assertEqual((s['api'],s['prepared_api'],s['connection_api'],s['work_api']),(1,1,1,2));self.assertFalse(s['limit_enforced']);self.assertTrue(s['accounting_valid']);self.assertFalse(s['normal_permit']);v=self.create(p,8192);tracked=self.snap(p);self.assertEqual(int(tracked['reserved_upper_bytes']),p.expected_baseline+8192);self.touch(p,v['handle'],True);self.zero(p);self.gate(p,True)
+  self.assertEqual(p.sql("SELECT has_function_privilege('work18_user','test_dsg_dsm18_snapshot()','EXECUTE')").stdout.strip(),'f');p.sql('GRANT EXECUTE ON FUNCTION test_dsg_dsm18_snapshot() TO work18_user');p.sql(f"CREATE FUNCTION dsm18_definer() RETURNS text AS '{region.LIB}','test_dsg_dsm18_snapshot' LANGUAGE C SECURITY DEFINER")
+  for sql in ['SET ROLE work18_user;SELECT test_dsg_dsm18_snapshot()','SET SESSION AUTHORIZATION work18_user;SELECT dsm18_definer()']:
+   bad=p.sql(sql,check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('original administrator',bad.stderr)
+  self.fact('dsm1-ABI-and-zero-unenforced-actual-accounting',{'empty':s,'actual_zero_cap_tracked':tracked})
+ def test_PG18_S_DSM1_001_three_supported_methods_real_round_cap_and_OS_collision(self):
+  observations=[]
+  for method in ['posix','sysv','mmap']:
+   with self.subTest(method=method):
+    p=self.cluster(budget='16kB',method=method);before=self.zero(p);self.assertTrue(before['limit_enforced']);self.assertTrue(before['accounting_valid']);v=self.create(p,8193);s=self.snap(p);self.assertEqual(int(s['reserved_upper_bytes']),p.expected_baseline+12288);self.assertEqual(s['external_segments'],p.expected_segments+1);bad=p.sql('SELECT test_dsg_dsm18_create(8192,true)',check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('budget or registry capacity',bad.stderr);self.assertEqual(int(self.snap(p)['reserved_upper_bytes']),p.expected_baseline+12288);self.assertTrue(self.touch(p,v['handle'])['actual_payload_valid']);self.touch(p,v['handle'],True);self.zero(p);collision=json.loads(p.sql('SELECT test_dsg_dsm18_collision()').stdout);self.assertNotEqual(collision['original_handle'],collision['retried_handle']);self.assertTrue(collision['original_actual_payload_preserved']);self.zero(p);observations.append({'method':method,'reserved':s,'actual_collision_fixture_not_Source':collision})
+  self.fact('dsm1-real-methods-round-cap-and-OS-collision',observations)
+ def test_PG18_S_DSM1_002_preOS_pending_reservation_blocks_concurrent_creator(self):
+  p=self.cluster(budget='8kB');name='dsg-dsm-before-create';self.attach(p,name,'wait');c=self.async_sql(p,'SELECT test_dsg_dsm18_create(8192,true)','pg18-dsm-preOS');self.addCleanup(lambda:self.wake(p,name)if p.process.poll()is None else None);pending=self.wait(p,lambda s:s['pending_creations']==1);self.assertEqual(int(pending['reserved_upper_bytes']),p.expected_baseline+8192);self.assertEqual(pending['external_segments'],p.expected_segments+1);bad=p.sql('SELECT test_dsg_dsm18_create(8192,true)',check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('budget or registry capacity',bad.stderr);self.wake(p,name);out,err=c.communicate(timeout=10);self.assertEqual(c.returncode,0,err);v=json.loads(out);self.detach(p,name);s=self.snap(p);self.assertEqual(s['pending_creations'],0);self.assertEqual(int(s['reserved_upper_bytes']),p.expected_baseline+8192);self.touch(p,v['handle'],True);self.zero(p);self.fact('dsm1-real-preOS-pending-concurrent-cap',{'pending_before_OS':pending,'published':s})
+ def test_PG18_S_DSM1_003_creator_exit_pin_cross_backend_attach_no_double_charge(self):
+  p=self.cluster();v=self.create(p);held=self.snap(p);self.assertEqual(held['external_segments'],p.expected_segments+1);name='test-dsg-dsm18-after-attach';self.attach(p,name,'wait');c=self.async_sql(p,f"SELECT test_dsg_dsm18_touch({v['handle']},false)",'pg18-dsm-attached');self.addCleanup(lambda:self.wake(p,name)if p.process.poll()is None else None);until=time.monotonic()+5;pid=''
+  while time.monotonic()<until:
+   pid=p.sql("SELECT pid FROM pg_stat_activity WHERE application_name='pg18-dsm-attached' AND wait_event='test-dsg-dsm18-after-attach'").stdout.strip()
+   if pid:break
+   time.sleep(.01)
+  self.assertTrue(pid);attached=self.snap(p);self.assertEqual(attached['reserved_upper_bytes'],held['reserved_upper_bytes']);self.assertEqual(attached['external_segments'],p.expected_segments+1);self.wake(p,name);out,err=c.communicate(timeout=10);self.assertEqual(c.returncode,0,err);self.assertTrue(json.loads(out)['actual_payload_valid']);self.detach(p,name);self.assertEqual(self.snap(p)['external_segments'],p.expected_segments+1);self.touch(p,v['handle'],True);zero=self.zero(p);self.fact('dsm1-pin-survives-creator-exit-no-double-attach',{'held_after_creator_exit':held,'while_actual_second_mapping':attached,'actual_attached_backend_pid':int(pid),'after_actual_last_destroy':zero})
+ def test_PG18_S_DSM1_004_real_beforeOS_and_afterOS_unpublished_ERROR_cleanup(self):
+  observations=[]
+  for name in ['dsg-dsm-before-create','dsg-dsm-after-create']:
+   with self.subTest(point=name):
+    p=self.cluster();self.attach(p,name,'error');bad=p.sql('SELECT test_dsg_dsm18_create(8192,true)',check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('error triggered for injection point',bad.stderr);self.detach(p,name);zero=self.zero(p);v=self.create(p);self.touch(p,v['handle'],True);self.zero(p);observations.append({'point':name,'actual_error':bad.stderr,'after_actual_cleanup':zero})
+  self.fact('dsm1-real-pre-and-postOS-error-cleanup',observations)
+ def test_PG18_S_DSM1_005_destroy_error_unknown_stays_charged(self):
+  p=self.cluster(budget='8kB');v=self.create(p);osobject=Path('/dev/shm')/('PostgreSQL.'+str(v['handle']));self.assertTrue(osobject.exists());name='dsg-dsm-before-destroy';self.attach(p,name,'error');bad=p.sql(f"SELECT test_dsg_dsm18_touch({v['handle']},true)",check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('error triggered for injection point',bad.stderr);self.detach(p,name);unknown=self.snap(p);self.assertEqual(unknown['unknown_segments'],1);self.assertEqual(int(unknown['reserved_upper_bytes']),p.expected_baseline+8192);self.assertTrue(osobject.exists());again=p.sql('SELECT test_dsg_dsm18_create(8192,true)',check=False);self.assertNotEqual(again.returncode,0);self.assertIn('budget or registry capacity',again.stderr);self.assertEqual(self.snap(p)['unknown_segments'],1);self.fact('dsm1-destroy-failure-unknown-retains-real-budget',{'actual_error':bad.stderr,'unknown_held':unknown,'actual_owned_OS_object':str(osobject),'OS_object_still_exists':osobject.exists(),'not_cleared_by_RSS_or_idle':True})
+ def test_PG18_S_DSM1_006_main_DSM_region_not_double_counted_external(self):
+  p=self.cluster(main='2MB',budget='8kB');before=self.zero(p);self.assertGreater(int(before['control_upper_bytes']),0);v=self.create(p,8192);self.assertEqual(v['handle']&1,1);s=self.snap(p);self.assertEqual(int(s['reserved_upper_bytes']),0);self.assertEqual(s['external_segments'],0);self.assertEqual(s['control_upper_bytes'],before['control_upper_bytes']);self.touch(p,v['handle'],True);self.zero(p);self.fact('dsm1-main-region-already-fixed-budget-no-double-charge',{'before':before,'actual_main_region_handle':v,'observed':s})
+ def test_PG18_S_DSM1_007_same_PM_newboot_closed_cleans_known_native_OS_objects(self):
+  p=self.cluster();p.sql('CHECKPOINT');v=self.create(p);old=self.snap(p);obj=Path('/dev/shm')/('PostgreSQL.'+str(v['handle']));self.assertTrue(obj.exists());w=conn.work.Wire(p,user=region.USER);self.addCleanup(w.close);self.assertFalse(w.query('BEGIN')[0]);pm=p.process.pid;os.kill(w.pid,signal.SIGKILL);w.close();p.ready();self.assertEqual(p.process.pid,pm);fresh=self.wait(p,lambda s:s['boot']!=old['boot']and s['acknowledged']and s['public_connections_blocked']);self.assertFalse(fresh['admission_open']);self.assertEqual(int(fresh['reserved_upper_bytes']),0);self.assertEqual(fresh['external_segments'],0);self.assertFalse(obj.exists());self.blocked(p);self.fact('dsm1-actual-known-native-cleanup-newboot-closed',{'old':old,'new':fresh,'same_actual_PM':pm,'exact_old_OS_object':str(obj),'old_object_absent':not obj.exists(),'crossboot_Root_Held_proven':False,'Source':False,'normal':False})
+ def test_PG18_S_DSM1_008_zero_cap_standalone_legacy_DSM_and_positive_reject(self):
+  p=Cluster(mode='test-v1:2048',gate=False,admission=False,budget='0');self.addCleanup(p.close);e=region.env();e['NEON_DSGA_PG18_NATIVE_ARRAYS']='test-v1:2048';cmd=[str(region.BIN/'postgres'),'--single','-D',str(p.data),'postgres'];script='CREATE EXTENSION test_dsg_region18;\nSELECT test_dsg_dsm18_snapshot();\nSELECT test_dsg_dsm18_create(8192,false);\nSELECT test_dsg_dsm18_snapshot();\n';x=subprocess.run(cmd,input=script,env=e,capture_output=True,text=True,timeout=20);self.assertEqual(x.returncode,0,x.stderr);self.assertNotIn('PANIC',x.stderr);values=[json.loads(v)for v in re.findall(r'\{[^\r\n]*\}',x.stdout)];snaps=[v for v in values if 'api'in v];created=[v for v in values if 'mapped_bytes'in v];self.assertEqual(len(snaps),2,x.stdout);self.assertEqual(len(created),1,x.stdout)
+  for v in snaps:self.assertFalse(v['limit_enforced']);self.assertFalse(v['accounting_valid']);self.assertEqual(v['external_segments'],0);self.assertEqual(int(v['reserved_upper_bytes']),0)
+  with (p.data/'postgresql.conf').open('a')as f:f.write("dynamic_shared_buffers_dsm_budget='8kB'\n")
+  bad=subprocess.run(cmd,input='SELECT 1;\n',env=e,capture_output=True,text=True,timeout=10);self.assertNotEqual(bad.returncode,0);self.assertIn('requires a fork Postmaster environment',bad.stderr);self.fact('dsm1-zero-standalone-actual-legacy-no-false-accounting',{'actual_returncode':x.returncode,'actual_standalone_snapshots':snaps,'actual_DSM_create':created,'positive_budget_actual_error':bad.stderr,'Source':False,'normal':False})
+if __name__=='__main__':unittest.main(verbosity=2)

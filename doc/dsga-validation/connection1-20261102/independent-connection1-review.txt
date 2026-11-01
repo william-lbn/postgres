@@ -1,0 +1,24 @@
+PG18 Connection1独立只读审查（2026-11-02）
+结论：当前六生产源未见明确阻断。只确认Connection1真实PM连接准入及同次Work2观察，绝不解释为MemoryContext硬预算、Prepared/DSM、完整Quiesce、安全normal降限、Root-bound Source或E/K8s通过。本轮未修改源码，未构建、未重跑业务测试。
+
+准确图：base aafbb451dad90a39ba7cc543c2f406f2d93be063；原b6eede source-lock owned10。当前六生产+Makefile/C测试/SQL共九个编译输入逐SHA仍同不可变构建源；最终Python另锁，不把后改Py冒称编译时输入。PG b65ef3f6a0edf17163d2e297ad2ffc4a1b4bcdc9b3496127899ab880057070f8；DSO a38274bbf5beeb1147f960d36b36e7f9761d6e564a7e4ff8d7c59b81f617ce29。
+
+PM闭门与无零窗：
+- DsgConnectionAccept在BackendStartup入口，先于canAcceptConnections/AssignPostmasterChildSlot/DsgWorkPreStart/fork；拒绝后ServerLoop关闭实际接受的socket，不读客户端startup用户名/标记，也不分配dead-end子进程。
+- PM只在主循环顶部及同步process_pm_pmsignal中刷新ack，信号handler不直接确认；单线程PM不可能在已接纳launch与prestart登记中间ack。旧launch完成prestart登记后写屏障→applied；观察者先在status_lock内读wanted/applied、读屏障，然后采prestart+PGPROC。Work2交接本就在status_lock内先登记PGPROC startup再转/减prestart；故不会把“旧launch已在途而两域都零”拼接成关闭后空闲。
+- wanted/applied为native32位atomic；serial<<1|open，满serial只可关而不能再开，不回绕；新boot wanted=2/applied=0，PM循环才确认关闭。并发新请求使wanted!=applied时保守不ack，不能签旧关闭。
+- PM路径无backend锁、共享区长度寻址或客户端阻塞。open同时读真实lease deadline，过期在snapshot持status时单调发布关门；PM即使尚未更新ack，Accept也按deadline拒绝，snapshot只保守不确认。
+
+固定私有端点与GUC：
+- 路径取原PGDATA/dsg_socket与固定port；初始化要求原owned0700目录、Unix_socket_permissions=0700、空socket_group、目录确在监听配置；运行检查目录及socket的lstat/类型/owner/mode，不跟最后组件symlink。关闭时只认getsockname内核AF_UNIX本地端点+当前私有路径状态，不认startup自报。
+- 新四项均PGC_POSTMASTER；require_connection_gate依赖require_admission，启动原动态数组/预算条件仍由DSB原校验拒绝。此私有路径检查是Connection1合同，不另宣称连续文件系统writer权限已闭合。
+- CopySnapshot的private-ready文件检查在spinlock外，status内过期处理、请求/ack/Work观察无分配/等待；返回是当次事实，不是可缓存授权。
+
+PG17统一合同：已对比当前PG17原dsg_work.c，PrivateReady/Initialize/PublishLocked/Notify/PostmasterRefresh/Accept六函数去注释空白后完全同token。PG18 CopySnapshot/GetSnapshot保同Connection字段与屏障顺序；有意不带PG17额外prepared_slots/DSM参数/采样，不能把PG18 API1误标完整prepared/DSM能力。
+
+原件分账：e54804原六根中4PASS+2FAIL（真实临时snapshot observer尚未PM reap造成children2，及精确lease expired报错与泛文案断言不符）均保留。61449f仅Py修这两处，同九编译输入/同ELF，原失败两根PASS2.809s；不是把旧fail改绿。最终Py783bfb36f01dd1929ff0cdbbab3a2303989d9135358d125ee5b4b033bd7d7f19，原六测试方法AST与61449f完全相同。
+ae8b12新增一根真实earlybirth test-v1整合PASS0.830s；默认birth=False保原super.start。新根实际核NNP1、/proc AS软硬2GiB、四数组import、maximum2048，明确source_bound/root_enrolled均false，之后实际PM初始关/开/关。它不是Root绑定生产Source。
+
+最终累计独立根7（2U+5S），不是4+2+2+1重复计9；配置subtest7个，无skip。原6根涵盖default-off权限/SECURITY DEFINER拒绝、required配置失败、真实public空startup无fork、旧half-startup在关闭ack仍startup1、lease到期关门/不可重开、同PM crash新boot serial1/closed。最后Python新增只核earlybirth一根。C源与运行Py、各run命令/资源/原终态由owner最终freeze归档。
+
+限制：并发交接/屏障证明主要为实际代码独审，直接half-startup S补实证；不把少量测试解释为穷尽调度枚举。不扩大无关旧逻辑矩阵。

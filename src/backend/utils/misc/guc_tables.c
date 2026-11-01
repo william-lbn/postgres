@@ -80,6 +80,7 @@
 #include "replication/walreceiver.h"
 #include "storage/aio.h"
 #include "storage/bufmgr.h"
+#include "storage/dsg_work.h"
 #include "storage/bufpage.h"
 #include "storage/copydir.h"
 #include "storage/fd.h"
@@ -800,6 +801,24 @@ StaticAssertDecl(lengthof(config_type_names) == (PGC_ENUM + 1),
 
 struct config_bool ConfigureNamesBool[] =
 {
+	{
+		{"dynamic_shared_buffers_require_connection_gate", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Requires the Postmaster private-channel connection gate for dynamic buffers."),
+			NULL, GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_require_connection_gate,
+		false,
+		NULL, NULL, NULL
+	},
+	{
+		{"dynamic_shared_buffers_require_admission", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Closes application admission on every dynamic buffer boot."),
+			NULL, GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_require_admission,
+		false,
+		NULL, NULL, NULL
+	},
 	{
 		{"enable_indexscan_prefetch", PGC_USERSET, RESOURCES_IO,
 			gettext_noop("Enables prefetching of heap pages in index scans."),
@@ -2192,6 +2211,24 @@ struct config_bool ConfigureNamesBool[] =
 
 struct config_int ConfigureNamesInt[] =
 {
+	{
+		{"dynamic_shared_buffers_admission_lease_timeout", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Bounds managed admission without a verified renewal."),
+			NULL, GUC_UNIT_MS | GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_admission_lease_timeout,
+		30000, 1000, 60000,
+		NULL, NULL, NULL
+	},
+	{
+		{"dynamic_shared_buffers_startup_budget", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Limits the main shared segment plus dynamic bootstrap arrays."),
+			NULL, GUC_UNIT_KB | GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_startup_budget,
+		0, 0, INT_MAX,
+		NULL, NULL, NULL
+	},
 	{
 		{"archive_timeout", PGC_SIGHUP, WAL_ARCHIVING,
 			gettext_noop("Sets the amount of time to wait before forcing a "

@@ -1,0 +1,33 @@
+{
+  "E": 0,
+  "Source": false,
+  "actual_DSO_sha256": "a38274bbf5beeb1147f960d36b36e7f9761d6e564a7e4ff8d7c59b81f617ce29",
+  "actual_PG_ELF_sha256": "b65ef3f6a0edf17163d2e297ad2ffc4a1b4bcdc9b3496127899ab880057070f8",
+  "compiled9_unchanged": {
+    "src/backend/postmaster/postmaster.c": "aef75a9fa5053ab98cd3d820bec10dbc38837ff2b5678872edc1e7f347e5e924",
+    "src/backend/storage/buffer/dsg_work.c": "d99a51da85f5d4fea1fe35d6f9eed9127c020c00a91002c7182a65594c06aa1a",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "90a7abd71fb1fd5b4d09c7f437425067baf7f9d987caa6cfa0b08e32e292ac00",
+    "src/backend/utils/misc/guc_tables.c": "1dc908f579e70e42688e3d85ed11cd2ec4b9fed11dc42a11ca7e47e900df8cc9",
+    "src/include/storage/dsg_work.h": "b7910226903fe365861efd78ab8526cf7ce42fd4e15c0eb80378707afe674a5e",
+    "src/include/storage/pmsignal.h": "5bcd10014a80c40b136d907a97e492154bcd4308ae908479c9bfc0305a994be5",
+    "src/test/modules/test_dsg_region18/Makefile": "767e78c290815ccef5b01a47263cb4e6a7fafbf332cb8dfc5aaa5fa2cd1cf84c",
+    "src/test/modules/test_dsg_region18/test_dsg_connection18.c": "de3ec4c1e06554b64d19476b2954e18ac2baae1eb4ee68ee71d37605eea9f56f",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "5ad9d16f54ec4ece48dc25a7bfa525c2186e0c904946e7ab925ca4d5806e9e7b"
+  },
+  "compiled_build": "/data/neon-build/validation/pg18-connection1-build-20261101T170215Z-b6eede",
+  "compiled_source_lock_sha256": "fbb41bb3d904e2704193f66de0f48b2603157071fd4a59c78ca77f40672eeebb",
+  "fixed_methods": [
+    "test_PG18_S_CONNECTION1_002_reopen_and_inflight_prestart_survives_closed_ack",
+    "test_PG18_S_CONNECTION1_003_actual_lease_expiry_blocks_later_accept"
+  ],
+  "no_recompile": true,
+  "normal": false,
+  "old4_not_rerun": true,
+  "rest_module_AST_identical": true,
+  "runtime4": {
+    "src/test/modules/test_dsg_region18/t/test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+    "src/test/modules/test_dsg_region18/t/test_connection18.py": "2857b3606e723d5926ffaf4aee56160fe0768b1d2afbabd281ac4c44a483c7dd",
+    "src/test/modules/test_dsg_region18/t/test_region18.py": "d48fb9bc6285c831381008402ed4c2964537cc46e1d380ff9077dce6f7bb4263",
+    "src/test/modules/test_dsg_region18/t/test_work18.py": "a7146009eff2b9b38d3b605b966e26509e4914afabfee23fe0ba832d645d4db5"
+  }
+}

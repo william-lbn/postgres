@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T170713Z-ae8b12",
+  "unit": "neon-pg18-connection1-birth-20261101t170713z-ae8b12.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg18-connection1-birth-native-20261101T170713Z-ae8b12",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-connection1-birth-native-20261101T170713Z-ae8b12/worker.py"
+  ]
+}

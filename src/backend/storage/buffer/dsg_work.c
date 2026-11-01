@@ -1,8 +1,14 @@
 /* PG18 Work2真实进程/前台工作登记，保持PG17 Work2 snapshot ABI。
  * status_lock只保护固定槽与计数；PM预启动登记不等待backend锁。
- * 不实现DSM、prepared、connection-gate或MemoryContext预算，不授normal许可。
+ * Connection1使用真实PM闭门应答；不实现DSM、prepared或MemoryContext预算，不授normal许可。
  */
 #include "postgres.h"
+#include <sys/stat.h>
+#include <unistd.h>
+#include "libpq/pqcomm.h"
+#include "nodes/pg_list.h"
+#include "storage/pmsignal.h"
+#include "utils/varlena.h"
 #include "access/xact.h"
 #include "miscadmin.h"
 #include "postmaster/postmaster.h"
@@ -45,11 +51,15 @@ typedef struct DsgWorkControl
 	uint32 backgrounds;
 	uint32 auxiliaries;
 	pg_atomic_uint32 prestart_clients;
+	pg_atomic_uint32 connection_wanted;
+	pg_atomic_uint32 connection_applied;
 	DsgWorkSlot slots[FLEXIBLE_ARRAY_MEMBER];
 } DsgWorkControl;
 
 static DsgWorkControl *work_control;
 static bool work_registered;
+static char management_directory[MAXPGPATH];
+static char management_socket[MAXPGPATH];
 /*-
  * 启动前槽放在PGPROC槽尾部，指针/容量由Postmaster本地初始化并通过fork继承。
  * Postmaster绝不读取共享区里的长度来寻址，也不等待status_lock等backend锁。
@@ -82,6 +92,54 @@ DsgWorkShmemSize(void)
  return add_size(DsgWorkProcBytes(),mul_size(DsgWorkPrestartCapacity(),sizeof(pg_atomic_uint32)));
 }
 
+/* 启动/运行时都不跟随目录或socket符号链接；路径固定取PGDATA，调用方不能自报。 */
+static bool
+DsgConnectionPrivateReady(bool socket_required)
+{
+	struct stat st;
+
+	if (lstat(management_directory, &st) != 0 || !S_ISDIR(st.st_mode) ||
+		st.st_uid != geteuid() || (st.st_mode & 0777) != 0700)
+		return false;
+	return !socket_required ||
+		(lstat(management_socket, &st) == 0 && S_ISSOCK(st.st_mode) &&
+		 st.st_uid == geteuid() && (st.st_mode & 0777) == 0700);
+}
+
+/* 只在创建共享段时运行：可分配/检查文件，不进入Postmaster运行期的backend锁。 */
+static void
+DsgConnectionInitialize(void)
+{
+	char *raw;
+	List *directories;
+	ListCell *cell;
+	bool found = false;
+
+	if (!dynamic_shared_buffers_require_connection_gate)
+		return;
+	if (!dynamic_shared_buffers_require_admission || DataDir == NULL ||
+		Unix_socket_permissions != 0700 ||
+		(Unix_socket_group != NULL && Unix_socket_group[0] != '\0'))
+		elog(FATAL, "DSGA connection gate requires closed bootstrap and private socket permissions");
+	if (snprintf(management_directory, sizeof(management_directory), "%s/dsg_socket", DataDir) >= sizeof(management_directory) ||
+		UNIXSOCK_PATH(management_socket, PostPortNumber, management_directory) >= UNIXSOCK_PATH_BUFLEN)
+		elog(FATAL, "DSGA private management socket path is too long");
+	if (!DsgConnectionPrivateReady(false))
+		elog(FATAL, "DSGA management socket directory must be an owned private directory");
+	raw = pstrdup(Unix_socket_directories == NULL ? "" : Unix_socket_directories);
+	if (!SplitDirectoriesString(raw, ',', &directories))
+		elog(FATAL, "DSGA connection gate requires valid socket directories");
+	foreach(cell, directories)
+	{
+		if (strcmp((char *) lfirst(cell), management_directory) == 0)
+			found = true;
+	}
+	list_free_deep(directories);
+	pfree(raw);
+	if (!found)
+		elog(FATAL, "DSGA private management directory is not a listening endpoint");
+}
+
 void
 DsgWorkShmemInit(void)
 {
@@ -93,6 +151,7 @@ DsgWorkShmemInit(void)
  elog(FATAL,"DSGA prestart registry requires native 32-bit atomics and memory barriers");
 #endif
  if(DSBCtrl==NULL || ProcGlobal==NULL)elog(FATAL,"DSGA work registry requires initialized buffer and process state");
+ DsgConnectionInitialize();
  bytes=DsgWorkShmemSize();
  work_control=ShmemInitStruct("DSGA Work Registry",bytes,&found);
  prestart_slot_count=DsgWorkPrestartCapacity();
@@ -101,7 +160,10 @@ DsgWorkShmemInit(void)
   MemSet(work_control,0,bytes);
   work_control->boot_id=DSBCtrl->boot_id;
   work_control->slot_count=ProcGlobal->allProcCount;
-  pg_atomic_init_u32(&work_control->prestart_clients,0);
+   pg_atomic_init_u32(&work_control->prestart_clients,0);
+   /* word=serial<<1|open；新boot初始关闭，PM主循环之前没有ack。 */
+   pg_atomic_init_u32(&work_control->connection_wanted,dynamic_shared_buffers_require_connection_gate?2:0);
+   pg_atomic_init_u32(&work_control->connection_applied,0);
   for(i=0;i<prestart_slot_count;i++)pg_atomic_init_u32(&prestart_slots[i],0);
  }
  if(work_control->boot_id!=DSBCtrl->boot_id || work_control->slot_count!=ProcGlobal->allProcCount)
@@ -370,4 +432,114 @@ DsgWorkGetSnapshot(DsgWorkSnapshot *snapshot)
 	SpinLockRelease(&DSBCtrl->status_lock);
 	if (!valid)
 		elog(ERROR, "DSGA prestart registry count is inconsistent");
+}
+
+/* Connection1保持PG17发布/应答合同；观察不是完整Quiesce或normal许可。 */
+bool
+DsgConnectionPublishLocked(bool open)
+{
+	uint32 previous;
+	uint32 serial;
+	uint32 next;
+
+	if (!dynamic_shared_buffers_require_connection_gate)
+		return true;
+	previous = pg_atomic_read_u32(&work_control->connection_wanted);
+	if (((previous & 1) != 0) == open)
+		return true;
+	serial = previous >> 1;
+	if (serial == (PG_UINT32_MAX >> 1) && open)
+		return false;
+	next = serial == (PG_UINT32_MAX >> 1) ? previous & ~1U :
+		((serial + 1) << 1) | (open ? 1 : 0);
+	pg_atomic_write_u32(&work_control->connection_wanted, next);
+	return true;
+}
+
+/* 必须在status/resize锁外；重复原请求也唤醒，覆盖commit后未发信号的断连。 */
+void
+DsgConnectionNotify(void)
+{
+	if (dynamic_shared_buffers_require_connection_gate)
+		SendPostmasterSignal(PMSIGNAL_DSG_CONNECTION_GATE);
+}
+
+/*-
+ * 只在Postmaster主循环调用。之前任何BackendStartup已完成fork前登记，之后每次
+ * 新业务fork都重新读取wanted。信号处理函数不能直接ack，不能在旧launch途中确认。
+ * 不取backend锁，不读共享长度，不等待客户端；新boot初始化ack=0，主循环后才确认。
+ */
+void
+DsgConnectionPostmasterRefresh(void)
+{
+	if (dynamic_shared_buffers_require_connection_gate)
+	{
+		uint32 wanted = pg_atomic_read_u32(&work_control->connection_wanted);
+
+		/* 先前launch的prestart登记必须先于ack可见，不能依赖fork的隐含屏障。 */
+		pg_write_barrier();
+		pg_atomic_write_u32(&work_control->connection_applied, wanted);
+	}
+}
+
+bool
+DsgConnectionAccept(pgsocket socket)
+{
+	struct sockaddr_un local;
+	socklen_t length = sizeof(local);
+
+	if (!dynamic_shared_buffers_require_connection_gate ||
+		((pg_atomic_read_u32(&work_control->connection_wanted) & 1) != 0 &&
+		 DsgBufferAdmissionLeaseAllowsConnections()))
+		return true;
+	/* 私有端点来自内核getsockname，不读取startup用户名或连接方自报的标记。 */
+	MemSet(&local, 0, sizeof(local));
+	return getsockname(socket, (struct sockaddr *) &local, &length) == 0 &&
+		local.sun_family == AF_UNIX &&
+		strnlen(local.sun_path, sizeof(local.sun_path)) < sizeof(local.sun_path) &&
+		strcmp(local.sun_path, management_socket) == 0 && DsgConnectionPrivateReady(true);
+}
+
+static void
+DsgConnectionCopySnapshot(DsgConnectionSnapshot *snapshot)
+{
+	DsgWorkSlot *slot;
+	uint32 wanted;
+	uint32 applied;
+	bool valid;
+	bool may_exclude = !IsTransactionBlock() && !IsAbortedTransactionBlockState();
+
+	if (!enable_dynamic_shared_buffers || !work_registered)
+		elog(ERROR, "DSGA connection observation requires a registered running server");
+	slot = DsgWorkOwnSlot();
+	MemSet(snapshot, 0, sizeof(*snapshot));
+	snapshot->enabled = dynamic_shared_buffers_require_connection_gate;
+	/* 文件检查在锁外；漂移拒绝private-ready，不把历史0700当作当前管理可用。 */
+	snapshot->private_management_ready = snapshot->enabled && DsgConnectionPrivateReady(true);
+	SpinLockAcquire(&DSBCtrl->status_lock);
+	DsgBufferAdmissionExpireLocked();
+	wanted = pg_atomic_read_u32(&work_control->connection_wanted);
+	applied = pg_atomic_read_u32(&work_control->connection_applied);
+	/*-
+	 * 必须先读ack再采工作。若先采prestart=0，再让旧launch登记并ack新关闭，
+	 * 会拼出不存在的“关门已确认且空闲”。与发布方写屏障配对，使旧launch
+	 * 登记在观察到ack后可见；status同时冻结wanted、PGPROC交接及原生代次。
+	 */
+	pg_read_barrier();
+	valid = DsgWorkCopyLocked(&snapshot->work, slot, may_exclude);
+	SpinLockRelease(&DSBCtrl->status_lock);
+	if (!valid)
+		elog(ERROR, "DSGA prestart registry count is inconsistent");
+	snapshot->requested_serial = wanted >> 1;
+	snapshot->applied_serial = applied >> 1;
+	snapshot->requested_open = (wanted & 1) != 0;
+	snapshot->applied_open = (applied & 1) != 0;
+	snapshot->acknowledged = snapshot->enabled && wanted != 0 && wanted == applied;
+	snapshot->public_connections_blocked = snapshot->acknowledged && !snapshot->requested_open;
+}
+
+void
+DsgConnectionGetSnapshot(DsgConnectionSnapshot *snapshot)
+{
+	DsgConnectionCopySnapshot(snapshot);
 }

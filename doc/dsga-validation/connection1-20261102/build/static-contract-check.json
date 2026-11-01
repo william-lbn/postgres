@@ -1,0 +1,23 @@
+{
+  "scope": "STATIC_SOURCE_EQUIVALENCE_NOT_RUNTIME_TEST",
+  "PG17_HEAD": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "exact_function_bodies": {
+    "DsgConnectionPrivateReady": true,
+    "DsgConnectionInitialize": true,
+    "DsgConnectionPublishLocked": true,
+    "DsgConnectionNotify": true,
+    "DsgConnectionPostmasterRefresh": true,
+    "DsgConnectionAccept": true
+  },
+  "ConnectionSnapshot1_exact": true,
+  "PM18_Accept_before_slot_and_launch": true,
+  "snapshot_copy_delta": "only remove unimplemented Prepared/DSM optional copy arguments; same wanted/applied read-before-prestart barriers and status lock",
+  "GUC4": "exact PG17 declaration bytes inserted; no enable/max exposure",
+  "remaining": [
+    "MemoryContext budget",
+    "Prepared",
+    "DSM",
+    "full root-v1 bound Source and normal",
+    "production enabling GUC/provider adaptation"
+  ]
+}

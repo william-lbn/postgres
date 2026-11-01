@@ -12,6 +12,7 @@
 #include "miscadmin.h"
 #include "portability/instr_time.h"
 #include "storage/buf_internals.h"
+#include "storage/dsg_work.h"
 #include "storage/dynamic_shared_buffers.h"
 
 #include "storage/pg_shmem.h"
@@ -21,19 +22,8 @@
 bool		enable_dynamic_shared_buffers = false;
 int			max_shared_buffers = 0;
 bool		dynamic_shared_buffers_require_admission = false;
-/* PG18本批无Work/连接准入producer，此未暴露开关仅保持原Buffer布局校验。 */
+/* Connection1由原Work控制区/PM主循环实际生产，不改变Buffer ABI6。 */
 bool dynamic_shared_buffers_require_connection_gate = false;
-/* 与17@99f7ff1未启用connection-gate分支完全同义；18本批尚无Work/PM准入
- * producer，不能为required模式返回伪造ack。required配置在启动即拒绝。 */
-static bool DsgConnectionPublishLocked(bool open)
-{
- return !dynamic_shared_buffers_require_connection_gate;
-}
-static void DsgConnectionNotify(void)
-{
- if(dynamic_shared_buffers_require_connection_gate)
-  ereport(ERROR,(errmsg("PG18 connection gate producer is not ported")));
-}
 
 int			dynamic_shared_buffers_startup_budget = 0;
 int			dynamic_shared_buffers_admission_lease_timeout = 30000;
@@ -274,9 +264,6 @@ DsgBufferCheckStartupBudget(Size main_segment_bytes)
 	Size		elements[] = {sizeof(BufferDescPadded), BLCKSZ,
 	sizeof(ConditionVariableMinimallyPadded), sizeof(CkptSortItem)};
 	int			i;
-
-	if(dynamic_shared_buffers_require_connection_gate)
-		ereport(FATAL,(errmsg("PG18 native buffer profile has no connection gate producer")));
 
 	if (!enable_dynamic_shared_buffers)
 	{

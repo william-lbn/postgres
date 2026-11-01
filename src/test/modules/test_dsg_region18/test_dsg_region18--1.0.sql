@@ -32,3 +32,6 @@ REVOKE ALL ON FUNCTION test_dsg_birth_filter18(),test_dsg_filter_probe18(text) F
 CREATE FUNCTION test_dsg_work18_snapshot() RETURNS text AS 'MODULE_PATHNAME','test_dsg_work18_snapshot' LANGUAGE C STRICT;
 CREATE FUNCTION test_dsg_work18_admission(boolean) RETURNS void AS 'MODULE_PATHNAME','test_dsg_work18_admission' LANGUAGE C STRICT;
 REVOKE ALL ON FUNCTION test_dsg_work18_snapshot(),test_dsg_work18_admission(boolean) FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_connection18_snapshot() RETURNS text AS 'MODULE_PATHNAME','test_dsg_connection18_snapshot' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_connection18_snapshot() FROM PUBLIC;

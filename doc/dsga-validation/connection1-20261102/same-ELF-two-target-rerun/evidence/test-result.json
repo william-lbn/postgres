@@ -1,0 +1,14 @@
+{
+  "testsRun": 2,
+  "passed": [
+    "test_connection18.Connection.test_PG18_S_CONNECTION1_002_reopen_and_inflight_prestart_survives_closed_ack",
+    "test_connection18.Connection.test_PG18_S_CONNECTION1_003_actual_lease_expiry_blocks_later_accept"
+  ],
+  "subtests": [],
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

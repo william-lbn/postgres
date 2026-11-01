@@ -1,0 +1,25 @@
+{
+  "base": "aafbb451dad90a39ba7cc543c2f406f2d93be063",
+  "owned10": {
+    "src/backend/postmaster/postmaster.c": "aef75a9fa5053ab98cd3d820bec10dbc38837ff2b5678872edc1e7f347e5e924",
+    "src/backend/storage/buffer/dsg_work.c": "d99a51da85f5d4fea1fe35d6f9eed9127c020c00a91002c7182a65594c06aa1a",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "90a7abd71fb1fd5b4d09c7f437425067baf7f9d987caa6cfa0b08e32e292ac00",
+    "src/backend/utils/misc/guc_tables.c": "1dc908f579e70e42688e3d85ed11cd2ec4b9fed11dc42a11ca7e47e900df8cc9",
+    "src/include/storage/dsg_work.h": "b7910226903fe365861efd78ab8526cf7ce42fd4e15c0eb80378707afe674a5e",
+    "src/include/storage/pmsignal.h": "5bcd10014a80c40b136d907a97e492154bcd4308ae908479c9bfc0305a994be5",
+    "src/test/modules/test_dsg_region18/Makefile": "767e78c290815ccef5b01a47263cb4e6a7fafbf332cb8dfc5aaa5fa2cd1cf84c",
+    "src/test/modules/test_dsg_region18/t/test_connection18.py": "5c54b5fe337f270312d0bba388a9e68831fbcc752898a63b857bcb778bea3cb4",
+    "src/test/modules/test_dsg_region18/test_dsg_connection18.c": "de3ec4c1e06554b64d19476b2954e18ac2baae1eb4ee68ee71d37605eea9f56f",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "5ad9d16f54ec4ece48dc25a7bfa525c2186e0c904946e7ab925ca4d5806e9e7b"
+  },
+  "prior_build": "/data/neon-build/validation/pg18-native-final-attempt01-20261031T210303Z-70b567",
+  "limits": {
+    "cpu": 6,
+    "memoryGiB": 8,
+    "make_j": 6
+  },
+  "source_lock_sha256": "fbb41bb3d904e2704193f66de0f48b2603157071fd4a59c78ca77f40672eeebb",
+  "scope": "BUILD_ONLY_NOT_TESTED_NOT_SOURCE_NORMAL",
+  "single_Docker_RUN": true,
+  "native_starter_sha256": "3f97d88cedd0f13c1cc8efb736127c72a8f0b80ef5f15cc6c103b3cc81718cf2"
+}

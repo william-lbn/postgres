@@ -1,0 +1,29 @@
+test_PG18_S_CONNECTION1_001_actual_closed_PM_ack_private_and_public_no_fork (test_connection18.Connection.test_PG18_S_CONNECTION1_001_actual_closed_PM_ack_private_and_public_no_fork) ... ok
+test_PG18_S_CONNECTION1_002_reopen_and_inflight_prestart_survives_closed_ack (test_connection18.Connection.test_PG18_S_CONNECTION1_002_reopen_and_inflight_prestart_survives_closed_ack) ... FAIL
+test_PG18_S_CONNECTION1_003_actual_lease_expiry_blocks_later_accept (test_connection18.Connection.test_PG18_S_CONNECTION1_003_actual_lease_expiry_blocks_later_accept) ... FAIL
+test_PG18_S_CONNECTION1_004_actual_same_PM_crash_newboot_closed (test_connection18.Connection.test_PG18_S_CONNECTION1_004_actual_same_PM_crash_newboot_closed) ... ok
+test_PG18_U_CONNECTION1_001_default_off_and_original_session (test_connection18.Connection.test_PG18_U_CONNECTION1_001_default_off_and_original_session) ... ok
+test_PG18_U_CONNECTION1_002_required_configuration_fails_closed (test_connection18.Connection.test_PG18_U_CONNECTION1_002_required_configuration_fails_closed) ... ok
+
+======================================================================
+FAIL: test_PG18_S_CONNECTION1_002_reopen_and_inflight_prestart_survives_closed_ack (test_connection18.Connection.test_PG18_S_CONNECTION1_002_reopen_and_inflight_prestart_survives_closed_ack)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/src/src/test/modules/test_dsg_region18/t/test_connection18.py", line 65, in test_PG18_S_CONNECTION1_002_reopen_and_inflight_prestart_survives_closed_ack
+    p=self.cluster();opened=self.gate(p,True);w=self.wire(p);self.assertFalse(w.query('SELECT 18')[0]);oldchildren=p.children();half=self.wire(p,False);inflight=self.wait(p,lambda s:s['startup_clients']==1);newchildren=p.children()-oldchildren;self.assertEqual(len(newchildren),1)
+                                                                                                                                                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 2 != 1
+
+======================================================================
+FAIL: test_PG18_S_CONNECTION1_003_actual_lease_expiry_blocks_later_accept (test_connection18.Connection.test_PG18_S_CONNECTION1_003_actual_lease_expiry_blocks_later_accept)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/src/src/test/modules/test_dsg_region18/t/test_connection18.py", line 68, in test_PG18_S_CONNECTION1_003_actual_lease_expiry_blocks_later_accept
+    p=self.cluster(lease=1000);opened=self.gate(p,True);w=self.wire(p);self.assertFalse(w.query('SELECT 1')[0]);w.close();time.sleep(1.12);self.blocked(p);closed=self.wait(p,lambda s:s['acknowledged']and s['public_connections_blocked']and not s['admission_open']);bad=p.sql('SELECT test_dsg_work18_admission(true)',check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('admission rejected',bad.stderr);self.fact('connection1-actual-expired-public-accept',{'opened':opened,'closed':closed})
+                                                                                                                                                                                                                                                                                                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'admission rejected' not found in 'ERROR:  DSGA admission lease expired; controlled recovery is required\n'
+
+----------------------------------------------------------------------
+Ran 6 tests in 11.108s
+
+FAILED (failures=2)

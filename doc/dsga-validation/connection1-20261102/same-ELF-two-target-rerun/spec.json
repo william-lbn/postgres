@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T170425Z-61449f",
+  "unit": "neon-pg18-connection1-rerun-20261101t170425z-61449f.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg18-connection1-rerun-native-20261101T170425Z-61449f",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-connection1-rerun-native-20261101T170425Z-61449f/worker.py"
+  ]
+}

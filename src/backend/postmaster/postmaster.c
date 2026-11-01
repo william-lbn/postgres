@@ -1665,6 +1665,8 @@ ServerLoop(void)
 	{
 		time_t		now;
 
+		/* 初始/重建boot及丢失唤醒均由PM主循环应答，不能在launch中途ack。 */
+		DsgConnectionPostmasterRefresh();
 		nevents = WaitEventSetWait(pm_wait_set,
 								   DetermineSleepTime(),
 								   events,
@@ -3565,6 +3567,10 @@ BackendStartup(ClientSocket *client_sock)
 	BackendStartupData startup_data;
 	CAC_state	cac;
 
+	/* 关闭时只核原内核私有端点，拒绝发生于分配PM child槽和任何fork之前。 */
+	if (!DsgConnectionAccept(client_sock->sock))
+		return STATUS_ERROR;
+
 	/*
 	 * Capture time that Postmaster got a socket from accept (for logging
 	 * connection establishment and setup total duration).
@@ -3719,6 +3725,9 @@ process_pm_pmsignal(void)
 	bool		request_state_update = false;
 
 	pending_pm_pmsignal = false;
+
+	if (CheckPostmasterSignal(PMSIGNAL_DSG_CONNECTION_GATE))
+		DsgConnectionPostmasterRefresh();
 
 	ereport(DEBUG2,
 			(errmsg_internal("postmaster received pmsignal signal")));

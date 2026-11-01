@@ -1,0 +1,5 @@
+{
+  "build": "/data/neon-build/validation/pg18-connection1-build-20261101T170215Z-b6eede",
+  "runtime_source": "/data/neon-build/validation/pg18-connection1-rerun-native-20261101T170425Z-61449f/source",
+  "scope": "ONLY_TWO_FAILED_CONNECTION1_TEST_ASSERTIONS_FIXED_NOT_PRODUCTION"
+}

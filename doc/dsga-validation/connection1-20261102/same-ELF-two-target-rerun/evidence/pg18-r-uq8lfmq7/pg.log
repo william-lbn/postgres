@@ -1,0 +1,8 @@
+2026-11-01 17:04:27.633 GMT [70] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 17:04:27.633 GMT [70] LOG:  listening on Unix socket "/tmp/pg18-r-uq8lfmq7/s/.s.PGSQL.55438"
+2026-11-01 17:04:27.633 GMT [70] LOG:  listening on Unix socket "/tmp/pg18-r-uq8lfmq7/data/dsg_socket/.s.PGSQL.55438"
+2026-11-01 17:04:27.636 GMT [77] LOG:  database system was shut down at 2026-11-01 17:04:27 GMT
+2026-11-01 17:04:27.637 GMT [77] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 17:04:27.639 GMT [70] LOG:  database system is ready to accept connections
+2026-11-01 17:04:28.860 GMT [97] ERROR:  DSGA admission lease expired; controlled recovery is required
+2026-11-01 17:04:28.860 GMT [97] STATEMENT:  SELECT test_dsg_work18_admission(true)

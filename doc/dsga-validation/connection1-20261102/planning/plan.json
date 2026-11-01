@@ -1,0 +1,81 @@
+{
+  "schema": "pg18-independent-module-plan-v1",
+  "utc": "2026-11-01T16:53:25.966997+00:00",
+  "state": "READ_ONLY_PLAN_NOT_IMPLEMENTED",
+  "base": "aafbb451dad90a39ba7cc543c2f406f2d93be063",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "module": "Connection1",
+  "why_before_prepared": "PG17 Prepared1 snapshot embeds Connection1; Work2 already gives exact prestart-to-PGPROC observation. Port one real PM gate module without publishing missing prepared/DSM capabilities.",
+  "production_files": [
+    "src/backend/storage/buffer/dsg_work.c",
+    "src/include/storage/dsg_work.h",
+    "src/backend/postmaster/postmaster.c",
+    "src/include/storage/pmsignal.h",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c",
+    "src/backend/utils/misc/guc_tables.c"
+  ],
+  "test_files": [
+    "src/test/modules/test_dsg_region18/test_dsg_connection18.c",
+    "src/test/modules/test_dsg_region18/Makefile",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql",
+    "src/test/modules/test_dsg_region18/t/test_connection18.py"
+  ],
+  "source_sha256": {
+    "src/backend/storage/buffer/dsg_work.c": "1c281065d7b143fef4b870641cc7c88bd7e3a5a7779bf0ad33fbbdb3fb758f4b",
+    "src/include/storage/dsg_work.h": "05c8ba9609bc157a308af2e2a57a22acc32e438293ecf65893b5a82709afc762",
+    "src/backend/postmaster/postmaster.c": "415ff3ee7ed93775aabdaca138eca443898543755ccac8554dfe3a97b75e5f1f",
+    "src/include/storage/pmsignal.h": "b098265ce06ab8145fa23eedc3c30506709b46c6991bda329e9bbb1c2d698f82",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "2c5cf5cac8e4c96f7b7edef9de62ef71a0d50aa72f8747b60c66a72e5abce6b2",
+    "src/backend/utils/misc/guc_tables.c": "58c6ffa49cfc1c5789017ebf867d94d9909da2bad57bd4e27e193c4ca43f763c",
+    "src/test/modules/test_dsg_region18/test_dsg_connection18.c": null,
+    "src/test/modules/test_dsg_region18/Makefile": "219971e77ba38368d38bec313443eac06422c6324f1792d77cd85ade46835b74",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "2a67468a04c9e5eba3eb8e558b4b791b5e6492519f531ae435b2666faf3967cf",
+    "src/test/modules/test_dsg_region18/t/test_connection18.py": null
+  },
+  "contract": {
+    "Work": 2,
+    "Connection": 1,
+    "Buffer": 6,
+    "same_snapshot_fields_as_pg17": true,
+    "normal_permit": false,
+    "full_pg18_complete": false,
+    "public_interface_change": false
+  },
+  "config": {
+    "gucs_only": [
+      "dynamic_shared_buffers_require_connection_gate",
+      "dynamic_shared_buffers_require_admission",
+      "dynamic_shared_buffers_startup_budget",
+      "dynamic_shared_buffers_admission_lease_timeout"
+    ],
+    "PGC_POSTMASTER": true,
+    "defaults_and_units_ranges": "same exact PG17 existing declaration",
+    "enable_and_max": "remain actual native/birth profile; no enabling GUC is exposed without matching native provider qualification"
+  },
+  "requirements": [
+    "private fixed PGDATA/dsg_socket with owned 0700 directory+socket and exact actual getsockname",
+    "boot wanted serial1/closed; ack0 then actual PM main-loop refresh only; no signal-handler acknowledgement",
+    "native 32-bit atomics; status_lock writer, PM takes no backend locks",
+    "closed public socket rejected before child allocation/fork; private management remains actual endpoint",
+    "ack sampled before prestart with matching barriers; no impossible idle/ack composite",
+    "expiry checked at every public accept; no test-only SU fixture treated as production budget",
+    "same PM shared-memory reinitialization creates new boot closed wanted and fresh ack, old lease never inherited"
+  ],
+  "targeted_tests": [
+    "default-off and original-session ACL",
+    "startup exact private endpoint failures and managed settings without native profile",
+    "real PM closed ack, public no child/fork, actual private management available",
+    "open-close-reopen with real in-flight half-startup retained through gate ack",
+    "actual admission lease expiry closes later public accepts",
+    "same PM crash reinitialization new boot returns closed and does not inherit prior open lease/ack"
+  ],
+  "explicit_remaining": [
+    "Prepared1",
+    "DSM core live-retirement coverage",
+    "MemoryContext hard work-domain budget",
+    "actual persistent normal lower qualification",
+    "full PG18 production enabling GUC/profile adaptation",
+    "PG17 actual Source/normal/Linux E and Helm K8s E",
+    "full control plane official functionality"
+  ]
+}

@@ -97,6 +97,7 @@
 #include "replication/origin.h"
 #include "replication/syncrep.h"
 #include "storage/fd.h"
+#include "storage/dsg_work.h"
 #include "storage/ipc.h"
 #include "storage/md.h"
 #include "storage/predicate.h"
@@ -104,6 +105,7 @@
 #include "storage/procarray.h"
 #include "utils/builtins.h"
 #include "utils/memutils.h"
+#include "utils/injection_point.h"
 #include "utils/timestamp.h"
 
 /*
@@ -404,6 +406,14 @@ MarkAsPreparing(TransactionId xid, const char *gid,
 				 errmsg("maximum number of prepared transactions reached"),
 				 errhint("Increase \"max_prepared_transactions\" (currently %d).",
 						 max_prepared_xacts)));
+	/* 原TwoPhase锁→status锁登记，关门拒新runtime PREPARE（包括SU/后台）。 */
+	if (!DsgPreparedReserve(false))
+	{
+		LWLockRelease(TwoPhaseStateLock);
+		ereport(ERROR,
+				(errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
+				 errmsg("dynamic shared buffer admission is closed for new prepared transactions")));
+	}
 	gxact = TwoPhaseState->freeGXacts;
 	TwoPhaseState->freeGXacts = gxact->next;
 
@@ -414,6 +424,8 @@ MarkAsPreparing(TransactionId xid, const char *gid,
 	/* And insert it into the active array */
 	Assert(TwoPhaseState->numPrepXacts < max_prepared_xacts);
 	TwoPhaseState->prepXacts[TwoPhaseState->numPrepXacts++] = gxact;
+	/* 仅实际测试可停/失败：原槽已登记，AtAbort_Twophase负责真实回收。 */
+	INJECTION_POINT("dsg-prepared-after-register", NULL);
 
 	LWLockRelease(TwoPhaseStateLock);
 
@@ -638,6 +650,7 @@ RemoveGXact(GlobalTransaction gxact)
 			/* remove from the active array */
 			TwoPhaseState->numPrepXacts--;
 			TwoPhaseState->prepXacts[i] = TwoPhaseState->prepXacts[TwoPhaseState->numPrepXacts];
+			DsgPreparedForget();
 
 			/* and put it back in the freelist */
 			gxact->next = TwoPhaseState->freeGXacts;
@@ -2544,6 +2557,9 @@ PrepareRedoAdd(char *buf, XLogRecPtr start_lsn,
 	gxact->inredo = true;		/* yes, added in redo */
 	strcpy(gxact->gid, gid);
 
+	/* 新boot关闭也必须按原WAL/文件恢复旧槽，不能遗漏持有者。 */
+	if (!DsgPreparedReserve(true))
+		elog(PANIC, "DSGA prepared recovery registration was refused");
 	/* And insert it into the active array */
 	Assert(TwoPhaseState->numPrepXacts < max_prepared_xacts);
 	TwoPhaseState->prepXacts[TwoPhaseState->numPrepXacts++] = gxact;

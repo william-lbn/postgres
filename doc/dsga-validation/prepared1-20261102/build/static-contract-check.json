@@ -1,0 +1,14 @@
+{
+  "scope": "STATIC_SOURCE_FACTS_NOT_EXTRA_RUNTIME_TESTS",
+  "PG17_reference": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "two_core_function_bodies_exact": {
+    "DsgPreparedReserve": true,
+    "DsgPreparedForget": true
+  },
+  "PreparedSnapshot1_exact": true,
+  "Connection1_and_Work2_public_structs_unchanged": true,
+  "DsgDsm_unported_identifiers": false,
+  "snapshot_private_helper_delta": "optional prepared pointer copied under same status_lock, no DSM or reverse TwoPhase lock",
+  "actual_cancel_fact": "PG18 xact.c PrepareTransaction HOLD_INTERRUPTS before MarkAsPreparing until EndPrepare/lock transfer and final TRANS_DEFAULT; requests are not completion proofs",
+  "no_memory_budget_or_normal_qualification": true
+}

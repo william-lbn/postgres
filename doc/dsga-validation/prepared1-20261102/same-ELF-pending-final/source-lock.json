@@ -1,0 +1,31 @@
+{
+  "E": 0,
+  "LWLock_actual_interrupt_semantics": "PrepareTransaction HOLD_INTERRUPTS begins before MarkAsPreparing and ends after EndPrepare/lock transfer; queued cancel observed PREPARE success means retain count1, explicit rollback is not cancel cleanup; independent ERROR must AtAbort0",
+  "Source": false,
+  "actual_DSO_sha256": "7a7e30fc69bf17c865d5ffea475df12fb846482c0f9fc6f28d319522af32ffad",
+  "actual_PG_ELF_sha256": "38a958bd2322424937c5ea50a1b146cc8cbf269d560d61fb21f6cb5eeeeff93d",
+  "compiled6_unchanged": {
+    "src/backend/access/transam/twophase.c": "507ca214b1addf07a3b6015776236c79ed0889b970f4c52da94d49df3b257ea6",
+    "src/backend/storage/buffer/dsg_work.c": "3f69dcaddcf4534aab9877fa6ff3dbd668f128ad2aee930216af3b99aacca61a",
+    "src/include/storage/dsg_work.h": "67b40293a992de12f2147e6b34fba600365248fea6bda593bd2c6d01b77d1b61",
+    "src/test/modules/test_dsg_region18/Makefile": "a17fbf49c3476fa8cdd7a331c0a8d302730d6f721e6ed0e46f3b7c3cacd15194",
+    "src/test/modules/test_dsg_region18/test_dsg_prepared18.c": "6b2b5e95bc7649ec70b6994625e5690ac3a134e63b704a2bb82ba694b93bdcd0",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "54dd706b9e158ea972dd993e3a429423dc2fac3afe5463803614b61a86ef2c3d"
+  },
+  "compiled_build": "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd",
+  "compiled_source_lock_sha256": "5a1a611f8003aadb103d7209b6e3248e932953971042f0665087a2e61ef9f973",
+  "fixed_methods": [
+    "test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup"
+  ],
+  "no_recompile": true,
+  "normal": false,
+  "old4_not_rerun": true,
+  "rest_module_AST_identical": true,
+  "runtime5": {
+    "src/test/modules/test_dsg_region18/t/test_arrays18.py": "64a193e5d4aaa1f744b0dfe1a3f14b5ad04065cb54de192a44371669a356652a",
+    "src/test/modules/test_dsg_region18/t/test_connection18.py": "783bfb36f01dd1929ff0cdbbab3a2303989d9135358d125ee5b4b033bd7d7f19",
+    "src/test/modules/test_dsg_region18/t/test_prepared18.py": "834038e09167832dfde2c8fb96119a2a0732c60e863227b2554c2f9b0886a2f1",
+    "src/test/modules/test_dsg_region18/t/test_region18.py": "d48fb9bc6285c831381008402ed4c2964537cc46e1d380ff9077dce6f7bb4263",
+    "src/test/modules/test_dsg_region18/t/test_work18.py": "a7146009eff2b9b38d3b605b966e26509e4914afabfee23fe0ba832d645d4db5"
+  }
+}

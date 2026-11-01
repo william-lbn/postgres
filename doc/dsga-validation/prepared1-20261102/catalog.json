@@ -1,0 +1,1090 @@
+{
+  "scope": "PG18_PREPARED1_NATIVE_RETAINED_SLOTS_AND_RECOVERY_ONLY",
+  "base18": "a27d59266583ecbccd23f808ff16f6eff63c9ee9",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "owned7": {
+    "src/backend/access/transam/twophase.c": "507ca214b1addf07a3b6015776236c79ed0889b970f4c52da94d49df3b257ea6",
+    "src/backend/storage/buffer/dsg_work.c": "3f69dcaddcf4534aab9877fa6ff3dbd668f128ad2aee930216af3b99aacca61a",
+    "src/include/storage/dsg_work.h": "67b40293a992de12f2147e6b34fba600365248fea6bda593bd2c6d01b77d1b61",
+    "src/test/modules/test_dsg_region18/Makefile": "a17fbf49c3476fa8cdd7a331c0a8d302730d6f721e6ed0e46f3b7c3cacd15194",
+    "src/test/modules/test_dsg_region18/t/test_prepared18.py": "834038e09167832dfde2c8fb96119a2a0732c60e863227b2554c2f9b0886a2f1",
+    "src/test/modules/test_dsg_region18/test_dsg_prepared18.c": "6b2b5e95bc7649ec70b6994625e5690ac3a134e63b704a2bb82ba694b93bdcd0",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "54dd706b9e158ea972dd993e3a429423dc2fac3afe5463803614b61a86ef2c3d"
+  },
+  "compiled7": {
+    "src/backend/access/transam/twophase.c": "507ca214b1addf07a3b6015776236c79ed0889b970f4c52da94d49df3b257ea6",
+    "src/backend/storage/buffer/dsg_work.c": "3f69dcaddcf4534aab9877fa6ff3dbd668f128ad2aee930216af3b99aacca61a",
+    "src/include/storage/dsg_work.h": "67b40293a992de12f2147e6b34fba600365248fea6bda593bd2c6d01b77d1b61",
+    "src/test/modules/test_dsg_region18/Makefile": "a17fbf49c3476fa8cdd7a331c0a8d302730d6f721e6ed0e46f3b7c3cacd15194",
+    "src/test/modules/test_dsg_region18/t/test_prepared18.py": "4e31cfa256cab15905bfb5585b90f1997da96e0f6cad369f58c23512e41b38cf",
+    "src/test/modules/test_dsg_region18/test_dsg_prepared18.c": "6b2b5e95bc7649ec70b6994625e5690ac3a134e63b704a2bb82ba694b93bdcd0",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "54dd706b9e158ea972dd993e3a429423dc2fac3afe5463803614b61a86ef2c3d"
+  },
+  "compiled6_unchanged_except_runtime_Python": {
+    "src/backend/access/transam/twophase.c": "507ca214b1addf07a3b6015776236c79ed0889b970f4c52da94d49df3b257ea6",
+    "src/backend/storage/buffer/dsg_work.c": "3f69dcaddcf4534aab9877fa6ff3dbd668f128ad2aee930216af3b99aacca61a",
+    "src/include/storage/dsg_work.h": "67b40293a992de12f2147e6b34fba600365248fea6bda593bd2c6d01b77d1b61",
+    "src/test/modules/test_dsg_region18/Makefile": "a17fbf49c3476fa8cdd7a331c0a8d302730d6f721e6ed0e46f3b7c3cacd15194",
+    "src/test/modules/test_dsg_region18/test_dsg_prepared18.c": "6b2b5e95bc7649ec70b6994625e5690ac3a134e63b704a2bb82ba694b93bdcd0",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "54dd706b9e158ea972dd993e3a429423dc2fac3afe5463803614b61a86ef2c3d"
+  },
+  "actual_PG_ELF_sha256": "38a958bd2322424937c5ea50a1b146cc8cbf269d560d61fb21f6cb5eeeeff93d",
+  "actual_test_DSO_sha256": "7a7e30fc69bf17c865d5ffea475df12fb846482c0f9fc6f28d319522af32ffad",
+  "aggregate_final": {
+    "stable_roots": 5,
+    "unit_native_roots": 1,
+    "native_service_roots": 4,
+    "skips": 0,
+    "passed": [
+      "test_prepared18.Prepared.test_PG18_S_PREPARED1_001_retained_native_lock_backend_exit_and_closed_admin_reject",
+      "test_prepared18.Prepared.test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup",
+      "test_prepared18.Prepared.test_PG18_S_PREPARED1_003_duplicate_capacity_failures_and_native_slot_reuse",
+      "test_prepared18.Prepared.test_PG18_S_PREPARED1_004_same_PM_newboot_closed_recovers_durable_prepared",
+      "test_prepared18.Prepared.test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI"
+    ],
+    "Source": false,
+    "normal": false,
+    "E": 0
+  },
+  "all_actual_native_results_preserved": [
+    {
+      "testsRun": 5,
+      "passed": [
+        "test_prepared18.Prepared.test_PG18_S_PREPARED1_001_retained_native_lock_backend_exit_and_closed_admin_reject",
+        "test_prepared18.Prepared.test_PG18_S_PREPARED1_003_duplicate_capacity_failures_and_native_slot_reuse",
+        "test_prepared18.Prepared.test_PG18_S_PREPARED1_004_same_PM_newboot_closed_recovers_durable_prepared"
+      ],
+      "subtests": [],
+      "failures": [
+        {
+          "id": "test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI (test_prepared18.Prepared.test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI)",
+          "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_prepared18.py\", line 28, in test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI\n    bad=p.sql(sql,check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('original administrator',bad.stderr)\n                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'original administrator' not found in 'ERROR:  dynamic shared buffer admission is closed for this boot\\n'\n"
+        }
+      ],
+      "errors": [
+        {
+          "id": "test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup (test_prepared18.Prepared.test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup)",
+          "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_prepared18.py\", line 40, in test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup\n    self.assertTrue(pid);closed=self.gate(p,False);self.assertEqual(closed['prepared_slots'],1);self.assertFalse(closed['foreground_idle']);self.assertEqual(p.sql('SELECT pg_cancel_backend('+pid+')').stdout.strip(),'t');out,err=child.communicate(timeout=10);self.assertNotEqual(child.returncode,0);self.assertIn('canceling statement',err);self.count(p,0);p.sql(\"SELECT injection_points_detach('\"+name+\"')\");self.gate(p,True)\n                                                                                                                                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 1207, in communicate\n    stdout, stderr = self._communicate(input, endtime, timeout)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 2060, in _communicate\n    self._check_timeout(endtime, orig_timeout, stdout, stderr)\n  File \"/usr/lib/python3.11/subprocess.py\", line 1251, in _check_timeout\n    raise TimeoutExpired(\nsubprocess.TimeoutExpired: Command '['/opt/pg18/bin/psql', '-h', '/tmp/pg18-r-auy0m3fu/data/dsg_socket', '-p', '55438', '-U', 'nonroot', '-d', 'postgres', '-XqAt', '-v', 'ON_ERROR_STOP=1', '-c', \"BEGIN;PREPARE TRANSACTION 'pending18'\"]' timed out after 10 seconds\n"
+        }
+      ],
+      "skips": [],
+      "Source": false,
+      "normal": false,
+      "E": 0
+    },
+    {
+      "testsRun": 2,
+      "passed": [
+        "test_prepared18.Prepared.test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI"
+      ],
+      "subtests": [],
+      "failures": [
+        {
+          "id": "test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup (test_prepared18.Prepared.test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup)",
+          "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_prepared18.py\", line 40, in test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup\n    self.assertTrue(pid);closed=self.gate(p,False);self.assertEqual(closed['prepared_slots'],1);self.assertFalse(closed['foreground_idle']);self.assertEqual(p.sql('SELECT pg_cancel_backend('+pid+')').stdout.strip(),'t');p.sql(\"SELECT injection_points_wakeup('\"+name+\"')\");out,err=child.communicate(timeout=10);self.assertNotEqual(child.returncode,0);self.assertIn('canceling statement',err);self.count(p,0);p.sql(\"SELECT injection_points_detach('\"+name+\"')\");self.gate(p,True)\n                                                                                                                                                                                                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 0 == 0\n"
+        }
+      ],
+      "errors": [],
+      "skips": [],
+      "Source": false,
+      "normal": false,
+      "E": 0
+    },
+    {
+      "testsRun": 1,
+      "passed": [
+        "test_prepared18.Prepared.test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup"
+      ],
+      "subtests": [],
+      "failures": [],
+      "errors": [],
+      "skips": [],
+      "Source": false,
+      "normal": false,
+      "E": 0
+    }
+  ],
+  "first_actual_compile_failure_preserved": {
+    "source": false,
+    "normal": false,
+    "S": 0,
+    "build_exit": 2,
+    "seconds": 30.91096709499834
+  },
+  "actual_facts": {
+    "retained": {
+      "one": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "11960385874881821160",
+        "admission_open": true,
+        "prepared_slots": 1,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 2,
+        "applied_serial": 2,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "two": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "11960385874881821160",
+        "admission_open": true,
+        "prepared_slots": 2,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 2,
+        "applied_serial": 2,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "closed_with_prepared": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "11960385874881821160",
+        "admission_open": false,
+        "prepared_slots": 2,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 3,
+        "applied_serial": 3,
+        "requested_open": false,
+        "applied_open": false,
+        "acknowledged": true,
+        "public_connections_blocked": true,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": true,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "actual_zero_after_commit_rollback": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "11960385874881821160",
+        "admission_open": false,
+        "prepared_slots": 0,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 3,
+        "applied_serial": 3,
+        "requested_open": false,
+        "applied_open": false,
+        "acknowledged": true,
+        "public_connections_blocked": true,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": true,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      }
+    },
+    "capacity": {
+      "one": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "7634200990939143354",
+        "admission_open": true,
+        "prepared_slots": 1,
+        "maximum_prepared_slots": 2,
+        "enabled": true,
+        "requested_serial": 2,
+        "applied_serial": 2,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "two": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "7634200990939143354",
+        "admission_open": true,
+        "prepared_slots": 2,
+        "maximum_prepared_slots": 2,
+        "enabled": true,
+        "requested_serial": 2,
+        "applied_serial": 2,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "after_native_reuse": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "7634200990939143354",
+        "admission_open": true,
+        "prepared_slots": 0,
+        "maximum_prepared_slots": 2,
+        "enabled": true,
+        "requested_serial": 2,
+        "applied_serial": 2,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      }
+    },
+    "recovery": {
+      "old": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15987350722800226411",
+        "admission_open": true,
+        "prepared_slots": 1,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 2,
+        "applied_serial": 2,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "new_closed_with_prepared": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15296911985902818259",
+        "admission_open": false,
+        "prepared_slots": 1,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 1,
+        "applied_serial": 1,
+        "requested_open": false,
+        "applied_open": false,
+        "acknowledged": true,
+        "public_connections_blocked": true,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": true,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "after_real_rollback": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15296911985902818259",
+        "admission_open": false,
+        "prepared_slots": 0,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 1,
+        "applied_serial": 1,
+        "requested_open": false,
+        "applied_open": false,
+        "acknowledged": true,
+        "public_connections_blocked": true,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": true,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "same_actual_PM": 199,
+      "actual_pg_twophase_files": [
+        {
+          "name": "00000000000002F3",
+          "bytes": 164
+        }
+      ],
+      "Source": false,
+      "normal": false
+    },
+    "pending": {
+      "pending_before_valid": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15285337942307809641",
+        "admission_open": true,
+        "prepared_slots": 1,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 2,
+        "applied_serial": 2,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 1,
+        "startup_clients": 0,
+        "frontend_executes": 1,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "closed_while_pending": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15285337942307809641",
+        "admission_open": false,
+        "prepared_slots": 1,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 3,
+        "applied_serial": 3,
+        "requested_open": false,
+        "applied_open": false,
+        "acknowledged": true,
+        "public_connections_blocked": true,
+        "private_management_ready": true,
+        "client_processes": 1,
+        "startup_clients": 0,
+        "frontend_executes": 1,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "actual_waiting_backend_pid": 48,
+      "queued_cancel_outcome": "PREPARE completed; retain native durable row and count until explicit rollback",
+      "actual_prepare_exit": 0,
+      "actual_prepare_stderr": "",
+      "actual_after_queued_cancel": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15285337942307809641",
+        "admission_open": false,
+        "prepared_slots": 1,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 3,
+        "applied_serial": 3,
+        "requested_open": false,
+        "applied_open": false,
+        "acknowledged": true,
+        "public_connections_blocked": true,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": true,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "after_explicit_rollback_not_cancel_cleanup": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15285337942307809641",
+        "admission_open": false,
+        "prepared_slots": 0,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 3,
+        "applied_serial": 3,
+        "requested_open": false,
+        "applied_open": false,
+        "acknowledged": true,
+        "public_connections_blocked": true,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": true,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      },
+      "actual_injected_ERROR_exit": 1,
+      "actual_injected_ERROR_stderr": "ERROR:  error triggered for injection point dsg-prepared-after-register\n",
+      "after_ERROR_AtAbort": {
+        "api": 1,
+        "connection_api": 1,
+        "work_api": 2,
+        "boot": "15285337942307809641",
+        "admission_open": true,
+        "prepared_slots": 0,
+        "maximum_prepared_slots": 4,
+        "enabled": true,
+        "requested_serial": 4,
+        "applied_serial": 4,
+        "requested_open": true,
+        "applied_open": true,
+        "acknowledged": true,
+        "public_connections_blocked": false,
+        "private_management_ready": true,
+        "client_processes": 0,
+        "startup_clients": 0,
+        "frontend_executes": 0,
+        "foreground_idle": false,
+        "observer_excluded": true,
+        "snapshot_bytes": 664,
+        "connection_snapshot_bytes": 656,
+        "normal_permit": false,
+        "memory_context_budget": false
+      }
+    }
+  },
+  "original_small_files": {
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/source-lock.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/source-lock.json",
+      "sha256": "73c778a0a6747e0da17493203f3d5906fe0b5fa6922b0f64ac03276546a17eaf"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/result.json",
+      "sha256": "2f2ffadac098fe9d86ae869a411fe31c5b2509c90338d9c1223450fd22c8bf20"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/metadata.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/metadata.json",
+      "sha256": "bd6fa06528cc389836b61d33751340606738574b3c607ec7776c961e61024585"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/worker.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/worker.py",
+      "sha256": "46df4d541ced6140169442785f16526c476291b7f2a0bffece05b320a0eff03b"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/build.sh": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/build.sh",
+      "sha256": "3a6f3a5ff206b4e1845c2728cdb83ec3bd5016fa27f891eb7e247b3f3851488e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/build-command.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/build-command.json",
+      "sha256": "e825f2d691329ae8242333bf50759cc574dbe742d0923df38e68309e0003a39b"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/container.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/container.json",
+      "sha256": "e0ddc732aa60e34196a74f4bef753b208d182a7f8f388d0f187f469efeb20754"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/spec.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/spec.json",
+      "sha256": "ce2dc60ac417e3ff9598f61b8657089c3c6ced2ee286addd13c524d1cdf2850e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/reserve-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/reserve-receipt.json",
+      "sha256": "fabd0c42ca35fd74a6427999a6a3a9e9e7d5be261a63533fb9d755e7864bc2ad"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/launch-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/launch-receipt.json",
+      "sha256": "79b2fbebe1d59cc28ac54813be4f580cb3351e26314439ea91ebdc17d570f646"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/budget-terminal.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/budget-terminal.json",
+      "sha256": "92a2099cb72043252fa7506c1e77158de987b60e24d922ed3b9a2b67e9547761"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/build.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/build.log",
+      "sha256": "fefc9936e99119d6dadb1db988d316dd76e0a262498a575518739029de6597e7"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/cleanup.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/cleanup.json",
+      "sha256": "94b61503c03f4a87f351aec61e9d533f1d10ab3e1f6b8ba63ba98eb5f2f5f843"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/compiler.txt": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/compiler.txt",
+      "sha256": "e622b2bc67b20c151f65966228a3244623e27c4c601578d59f092e298ab65469"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/cpu.max": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/cpu.max",
+      "sha256": "2f8bd783be33cf80b6a2a0cf810f81ccf85f988c72c9bb76fa6172b6e4ec2b02"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/cpu.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/cpu.stat",
+      "sha256": "932426656cfaa57d8f30d4165e5381dcc65105b8a27a8bac4686ea102a31a702"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/io.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/io.stat",
+      "sha256": "bc9c11f43fe7ea4f042de477167b9fb31b6d95aefaa1f995821975ec2a58688e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/memory.events": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/memory.events",
+      "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/memory.max": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/memory.max",
+      "sha256": "8528d39f97fdd9c9689c4373fe4c7b18f2c3bef6b044a2c4be74b07bf9cd07d8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/memory.peak": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/memory.peak",
+      "sha256": "8275d9b8f98ce3e03ad3395e62e7f285a28dd711ae2011107363a98128d3f0a6"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/evidence/source.exitcode": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-compile-failure-preserved/evidence/source.exitcode",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/source-lock.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/source-lock.json",
+      "sha256": "5a1a611f8003aadb103d7209b6e3248e932953971042f0665087a2e61ef9f973"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/result.json",
+      "sha256": "d4864a6f7e7914a93396accb7917f56cf2e495520591c0584210b277e03d4120"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/metadata.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/metadata.json",
+      "sha256": "574e752be4c3baf79ea2ccfe77fac38ce2cf625be4f7cc27dc3c3a0bc07b5cdb"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/worker.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/worker.py",
+      "sha256": "46df4d541ced6140169442785f16526c476291b7f2a0bffece05b320a0eff03b"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/build.sh": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/build.sh",
+      "sha256": "3a6f3a5ff206b4e1845c2728cdb83ec3bd5016fa27f891eb7e247b3f3851488e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/build-command.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/build-command.json",
+      "sha256": "94ba7523f54d97b3e4f1d70829820eb2890a61c453a0637919946d1abd12a4b1"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/container.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/container.json",
+      "sha256": "ada554c32a984cda1e51c75eaae3bdb189b83fc5f11c429bf48c49465d14c50f"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/spec.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/spec.json",
+      "sha256": "70ccfe4ce4d5b7a9a5c378a5246e84f11a7c2b96a37f44f04364754c95c7155d"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/reserve-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/reserve-receipt.json",
+      "sha256": "76cf1fc835fceb6bf703ad2d3b45e0ae9e204b523acb4e27b3204237dee1ece8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/launch-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/launch-receipt.json",
+      "sha256": "21fcb32b492a2b364ae96dd42688c4b2572d51a7631907d050efd88dedc49ab5"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/budget-terminal.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/budget-terminal.json",
+      "sha256": "b14739dc107245e7423d452bd89dda3ecee33121fd484edb088b77be95428d6a"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/auto-native-run.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/auto-native-run.json",
+      "sha256": "0ff98abab336a1651744814ac2b98ab35ef10a780145c1b1e71474fa73c00223"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/native-chain.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/native-chain.log",
+      "sha256": "3c75ea225c2a1a6123c70b26b0a182908745064a1d4323470c7273a3f80226ac"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/build.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/build.log",
+      "sha256": "273b80feff572e4f3f22654d63e6235790a38370bbc5bab812844e2fade69300"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/cleanup.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/cleanup.json",
+      "sha256": "92866bcaa7559cba0bb512a093abacadd375338b9dc226ad6396d9ab5d7987c1"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/static-contract-check.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/static-contract-check.json",
+      "sha256": "90a6fddd5458d4848b2eef9f2a3f017d612e2877dc96af50c19c52e708df2f59"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/binary.sha256": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/binary.sha256",
+      "sha256": "2c3ab9b461a5203e0b41bfbad9b4cabd56f2cae9ee349362a2e61a6841bc5396"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/ccache-stats.txt": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/ccache-stats.txt",
+      "sha256": "659bf7fd6334ced0de76d38b669708b4153cb04b78216a1b69e8e64c3a2cc310"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/compiler.txt": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/compiler.txt",
+      "sha256": "e622b2bc67b20c151f65966228a3244623e27c4c601578d59f092e298ab65469"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/cpu.max": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/cpu.max",
+      "sha256": "2f8bd783be33cf80b6a2a0cf810f81ccf85f988c72c9bb76fa6172b6e4ec2b02"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/cpu.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/cpu.stat",
+      "sha256": "c5946d4cdc72bb68ecf0ed982f163ac6119f223b46347a5c8a253094592d110c"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/io.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/io.stat",
+      "sha256": "dd613e39ba5a296f18a5ef5a0f5d547146e541018922def27f384bab025eb071"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/memory.events": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/memory.events",
+      "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/memory.max": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/memory.max",
+      "sha256": "8528d39f97fdd9c9689c4373fe4c7b18f2c3bef6b044a2c4be74b07bf9cd07d8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/memory.peak": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/memory.peak",
+      "sha256": "383a9cba2a92c4b0075a2186dea08b7cbf732ceb85188f4dd7ef55d9a29952d8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/pg-configure.txt": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/pg-configure.txt",
+      "sha256": "bfee05407821487ecc861eefed3e50b5749895c7d1a877aa383e321e2d4708be"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/pkglibdir.txt": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/pkglibdir.txt",
+      "sha256": "e685f8f73ed2b6d1c5fd697aad08fe8a898710e7905230232efd906b703dfd2b"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/postgres-version.txt": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/postgres-version.txt",
+      "sha256": "23650a744c5c462f210888f45b7e48ed1906e0a86a8db06b271043a8051d73b5"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/evidence/source.exitcode": {
+      "path": "doc/dsga-validation/prepared1-20261102/build/evidence/source.exitcode",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/source-lock.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/source-lock.json",
+      "sha256": "3ba297e4d611a11c2ec59c9f5dccbdc761e198da70c838d7bf8a0f2231a70937"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/result.json",
+      "sha256": "1501a8cd9b8dccac2952248772a8633c3359fa9e0b1dd7a4b85c63de2738b422"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/metadata.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/metadata.json",
+      "sha256": "5973844c071de443188a24c533783ca7a863a35110fc51cf3a000a210913d35b"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/worker.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/worker.py",
+      "sha256": "bf1e70a9200630ae83c9c6b2481547516e8c8df4260e47ae3f5a6a50cd5d6a58"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/runner.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/runner.py",
+      "sha256": "181d09c214433cac102cd53faf6eb465f32e277b5c7f5ec8f1e2422c3741963d"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/command.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/command.json",
+      "sha256": "81006d2d2e3861ecd90e0cbaa782764fb9293af87e231ae537f896333553bd08"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/container.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/container.json",
+      "sha256": "ec78cb728579898646d7dd27f8357a4a8b2d68a233ebc007b40676297798fcbc"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/spec.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/spec.json",
+      "sha256": "20088b650c8f5a67012b7d07ee6b463ba24ab56a19879725c66d827808f1de5f"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/reserve-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/reserve-receipt.json",
+      "sha256": "1917d04bb048fd568b971b59b7e68d2f114e7feebd5127132315ac922c1e0162"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/launch-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/launch-receipt.json",
+      "sha256": "0d0ea2bb8185b85dee6da5a605ae3d069bd7e0c89d49fcace0d2ce650a225656"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/budget-terminal.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/budget-terminal.json",
+      "sha256": "1a1fdf8647893901888a0445c443c033c2547c9d8dfffa6de54e5222dcf573af"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/run.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/run.log",
+      "sha256": "e4746daeb170e3ec64c12f973bee3c7b83b23ca8b0eb75b40f4c0e477028a8ba"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/cleanup.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/cleanup.json",
+      "sha256": "c31715633a7f576492e5a4c09b72a8156e48e8e1285c8e59f27d52ebbf9172f1"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/cpu.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/cpu.stat",
+      "sha256": "c2d317ffe5eeaa488fda0bf4aeece03df94af73dc82d1e62c25ba7c50f96bed0"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/io.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/io.stat",
+      "sha256": "e77717a040619cadaa8bcc25e06a266c1ae5d1e77dd6fa75bd3b1adefb668fdd"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/memory.events": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/memory.events",
+      "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/memory.peak": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/memory.peak",
+      "sha256": "bf691397cd319eea0f32ee704ba382aa53243dcda91fb8db81ba6db7b0e6fefb"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-30mutkq9/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-30mutkq9/pg.log",
+      "sha256": "17d9aee6d7ac0c03b41637530057280cc5516ee9956c8f3a0f6a2a77cd2df16e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-30mutkq9.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-30mutkq9.log",
+      "sha256": "5a1b02c40b9ece74a67d077249cfaaacfce1a3e7f4a5b0f13a7281656a568244"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-50nf_s6x/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-50nf_s6x/pg.log",
+      "sha256": "bfd871f9ecf1fcf5473be673facebd2e9fbfd8d31b22be0d87b693da694dbd16"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-50nf_s6x.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-50nf_s6x.log",
+      "sha256": "99550565d59262ff2fd8fbd9689e1af7ea55ae1e21297079d471ac0eb7ba755e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-_y5kiafd/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-_y5kiafd/pg.log",
+      "sha256": "27d5ad2eb2ee1ee0b14f85ccd7d2f99cc515fe57b1ab9dea64c335f9d71a8889"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-_y5kiafd.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-_y5kiafd.log",
+      "sha256": "7fb98ed4113ad38506448569739b5132f883f95aaefe0ad319b5a27dc35853b0"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-auy0m3fu/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-auy0m3fu/pg.log",
+      "sha256": "579846b56bb2aae07c67e1517a067352667f2accb5de84ee0a4bec861f90b36f"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-auy0m3fu.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-auy0m3fu.log",
+      "sha256": "967ff48bf2cc8493bf138369c8643aeb7cfecb4c3aeca19a852b476e25736fae"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-p8sf33yv/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-p8sf33yv/pg.log",
+      "sha256": "7dfd4181d148569b0985d805a06013a2017d424bb8aab617c96434d4bc915b2f"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-p8sf33yv.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-p8sf33yv.log",
+      "sha256": "9153b98e74814ac36c845dab5e6ec2e8b3295ca5904c2fd966770412ed024874"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-vadh5oug/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-vadh5oug/pg.log",
+      "sha256": "b1d04ba5a92f9dad99c3f8abf59a4adf31f4c5c937dd48af78a6570ac439a6db"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/pg18-r-vadh5oug.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/pg18-r-vadh5oug.log",
+      "sha256": "cc66f407dbcf61f55175dea3cc949105bff6840bf63f8c5762c0490a501f4b1b"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/prepared1-actual-newboot-recovery-closed.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/prepared1-actual-newboot-recovery-closed.json",
+      "sha256": "41b31730b1857b0f14ae5ba72f4e62b1a34e76a4483a2abd984c5f362af51afd"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/prepared1-native-capacity-error-no-leak.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/prepared1-native-capacity-error-no-leak.json",
+      "sha256": "ff4ca95501fa15a795797aa72053ee8508d7c019e280b70348602decef72f502"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/prepared1-retained-native-slot-lock-and-release.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/prepared1-retained-native-slot-lock-and-release.json",
+      "sha256": "0c7ab70a7129ef14d60eedd64199d194d723056ab35231b0e172ae2a7c0fb0a5"
+    },
+    "/data/neon-build/validation/pg18-prepared1-native-20261101T174806Z-830e70/evidence/test-result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/first-native-failures-preserved/evidence/test-result.json",
+      "sha256": "f660907d027797ad2997014b2d3c9ec2580f290c0e2b639d4b4fbe56d53d41aa"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/source-lock.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/source-lock.json",
+      "sha256": "9e799a837ed425d7824d954b66eaade654e14dca75f8e90c9d8619cdb37703ff"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/result.json",
+      "sha256": "11c23de4c5610a47a8d1d61a799555d694e663d1ee536412267fbb3f6197229c"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/metadata.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/metadata.json",
+      "sha256": "193f582632686f6b8072f63f39a6a739c8c99b62cce4fe6d7d1e102638b824b7"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/worker.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/worker.py",
+      "sha256": "f38ac13dffa1db50ee1e3275f7cbcac3a1f88d1ddbd7f9c7265b7742cdc4766e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/runner.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/runner.py",
+      "sha256": "ca357cf2d9b1795cb68774258a88786d5a74b794061561b4ecbdce5149608ee2"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/command.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/command.json",
+      "sha256": "d004a7d8afd6d1fd96b464c06df32c269553390d473d421f8207259c7ccb8ccc"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/container.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/container.json",
+      "sha256": "d4c24b9dd120ffb3f9d4f33409deae2456be27955bff57b1777c070200446912"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/spec.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/spec.json",
+      "sha256": "527c32f174d0874a958333da89ee6deb95eef05a110694a6fcd6f4bf2405d3b8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/reserve-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/reserve-receipt.json",
+      "sha256": "15f3e372926dbec8d1852363eea9b4097e03af98276507cea68443fa9302edad"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/launch-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/launch-receipt.json",
+      "sha256": "1f5b3232ce0b870a827f2aa4be65a9acfe6325d529fa06e53b070ac393d561ee"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/budget-terminal.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/budget-terminal.json",
+      "sha256": "88a7ce472de5cd97113a65c0585f44c409269c0e601bd99777e34a0c4050aef6"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/run.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/run.log",
+      "sha256": "00abefa408bf6a34a5af0d482d6846815bde68f9c2017bdc838d0da74a353ad5"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/cleanup.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/cleanup.json",
+      "sha256": "6309127b7eed44534c43082cc459a9cb7f316f66e74cf3ab1ccee807fddece57"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/cpu.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/cpu.stat",
+      "sha256": "2667f8167cf4ccdb18f03213ef577d94a7bbc1e2f2c80e6fd1817dfaa8ef62d8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/io.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/io.stat",
+      "sha256": "172a6f0197f98f87470021b829b7b16495b907db1d5998bf7d73aee507a28857"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/memory.events": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/memory.events",
+      "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/memory.peak": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/memory.peak",
+      "sha256": "fa3c25c87fe2db5d55672c4dad741ce92fb5f246dcde6e42f0d8f15e8c11de4d"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/pg18-r-181xm_nr/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/pg18-r-181xm_nr/pg.log",
+      "sha256": "3253f9b86726c0dc8bf7f6292d48eedde67110e26912491c6fe94e3a0f71f46e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/pg18-r-181xm_nr.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/pg18-r-181xm_nr.log",
+      "sha256": "640b8a828f34cb90538db8a5570725fad0b5afb2e49713beb544f9fa5d370f52"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/pg18-r-450d368q/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/pg18-r-450d368q/pg.log",
+      "sha256": "a54969b942298d364913f20cd525bd8f9e8286d7e546660230e2d8b64de9f652"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/pg18-r-450d368q.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/pg18-r-450d368q.log",
+      "sha256": "7267c2368b25f5d5460fcb356508300437220d994394567c4b2f0a000214242d"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/pg18-r-jyzvydmg/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/pg18-r-jyzvydmg/pg.log",
+      "sha256": "50c841d706ebc87d2f1b2c221a0e124645a651b135503101514891cd48269558"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/pg18-r-jyzvydmg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/pg18-r-jyzvydmg.log",
+      "sha256": "e9a79f09ab801537b33e622ac4832e1b525ce197528542a524767ce884b9f13d"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/prepared1-actual-ABI-and-empty.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/prepared1-actual-ABI-and-empty.json",
+      "sha256": "cd84fdd6b9439f64119de1a60d78ebc863df0edbbd972b2ee8cd5e276b470cbb"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/evidence/test-result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-ACL-pass-pending-failure/evidence/test-result.json",
+      "sha256": "c29aefce1256f563030274700ceabf1e62aec7197ea08a439a8e26c8fa6a498e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/source-lock.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/source-lock.json",
+      "sha256": "fcf7a5a438dec4dc6cc17b8858d33b3fa71c96c844c9b9623d59dac8bd105513"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/result.json",
+      "sha256": "ddcc4026382dbeeffe6b4f50167884e832921a833c9126a86dca70f643b2bb72"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/metadata.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/metadata.json",
+      "sha256": "0ee2f753888451034aa54c335b5bba3ebb81941561a355e78240ed0afd4fdf9f"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/worker.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/worker.py",
+      "sha256": "f38ac13dffa1db50ee1e3275f7cbcac3a1f88d1ddbd7f9c7265b7742cdc4766e"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/runner.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/runner.py",
+      "sha256": "6e5acbd7768062e0073f9129416320cf96032d92d29cb3ddbbbeaada061a82ab"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/command.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/command.json",
+      "sha256": "be8407551f3c197e5e574e6415ab0a4a6e7d61f2a1d482862771e8da959cd82a"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/container.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/container.json",
+      "sha256": "e12fbee3b5376b6e1cdb355e30607cee98d030e61bdf65fbd4391e1e2086f606"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/spec.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/spec.json",
+      "sha256": "79cf49180a788c66060341b3f6f90272b2439a3a8268de19208240ac89de4f04"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/reserve-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/reserve-receipt.json",
+      "sha256": "d51e518d1c57d60a19b3c5e8120716eb65f2486936ea45752c6d65adc8e1be70"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/launch-receipt.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/launch-receipt.json",
+      "sha256": "b752fb31b0ae65002f674da54b7ff3e0f20b7489c3cf18118ab834264f783bf8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/budget-terminal.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/budget-terminal.json",
+      "sha256": "bbfddc3610a2648105f857c7853acf5bed9f05f407b21c7270393dfcfbb979a4"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/run.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/run.log",
+      "sha256": "dbf936a4ba21aa740523c02001946318a70f4c73ee6a81375570697fd81c79e8"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/cleanup.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/cleanup.json",
+      "sha256": "9566d6674a479db0f2c2fcd0ac4f57f10fe449fa62b573e6d5091a67175d8398"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/cpu.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/cpu.stat",
+      "sha256": "5ef991ab210c82aeeda6ae13edcc32cdfc04f771419068228e2733ddbc59362f"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/io.stat": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/io.stat",
+      "sha256": "2bc1e5f849e9bb8b74ec3d3b9ab3bfcbef95f973f3455307ba4d1d9fff29b583"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/memory.events": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/memory.events",
+      "sha256": "28fe05a1d7b8467a03fb54454f7b6a130fab752864d0454f5f6c4a4b6ce307f2"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/memory.peak": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/memory.peak",
+      "sha256": "4d3874656923974e43f76594ab071a28184111a478fdd2a47a1927e91bc6d555"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/pg18-r-4xr7axdk/pg.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/pg18-r-4xr7axdk/pg.log",
+      "sha256": "f9c3660f0056c2ba6783a7f6123a27439493d8f9ff99cd63949f98f97b78d78b"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/pg18-r-4xr7axdk.log": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/pg18-r-4xr7axdk.log",
+      "sha256": "352e4165d9a3b54af3249f9a61ee79b8013627e128676b8d5425d6042918d8f7"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/prepared1-real-pending-cancel-error-cleanup.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/prepared1-real-pending-cancel-error-cleanup.json",
+      "sha256": "c0981c4e01bbd3f864f1f5fb4620b238bc755718ab47d81adf9be4e0e2a7d300"
+    },
+    "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/evidence/test-result.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/same-ELF-pending-final/evidence/test-result.json",
+      "sha256": "e17567a055a6096059c845323ca3159c4889bb6a0fb49262388ae353c795dba2"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b/source/src/backend/storage/buffer/dsg_work.c": {
+      "path": "doc/dsga-validation/prepared1-20261102/history/dsg_work-first-compile-unported-DSM-tail.c.txt",
+      "sha256": "7a76c6500d361f350a615c93cb7fc55ae0364a4a0b123fbd5a4335b4a7cd25ac"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/source/src/test/modules/test_dsg_region18/t/test_prepared18.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/history/test_prepared18-first.py.txt",
+      "sha256": "4e31cfa256cab15905bfb5585b90f1997da96e0f6cad369f58c23512e41b38cf"
+    },
+    "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/source/src/test/modules/test_dsg_region18/t/test_prepared18.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/history/test_prepared18-queued-cancel-assumption.py.txt",
+      "sha256": "5db0a0a9be63fa6a2cfd951bc7daa010fde8b9f41d8677c59042ec7e33c7ec02"
+    },
+    "/data/neon-build/validation/pg18-prepared1-planning-20261102/plan.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/planning/plan.json",
+      "sha256": "6421819f46fdfb79b1eb17ce9f2362bdcef4b6f123370168ee40c9a00fd363e7"
+    },
+    "/data/neon-build/validation/pg18-prepared1-planning-20261102/native-start.py": {
+      "path": "doc/dsga-validation/prepared1-20261102/planning/native-start.py",
+      "sha256": "5ffcf27f5d4d59c72e3f5e35c39469d4f0659c563428f2180a811b103239d2e3"
+    },
+    "/data/neon-build/validation/pg18-prepared1-planning-20261102/exact-fix1-audit.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/planning/exact-fix1-audit.json",
+      "sha256": "b361f743d886caa28127ce9bf5586417f7d68febbdb976865b1a27a5baf13c75"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/independent-prepared1-review.txt": {
+      "path": "doc/dsga-validation/prepared1-20261102/independent-prepared1-review.txt",
+      "sha256": "ee353a272d07a06170ed2a7d0bb7273d09f317cc9569265dc0e47e4fe364be64"
+    },
+    "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd/independent-prepared1-review.json": {
+      "path": "doc/dsga-validation/prepared1-20261102/independent-prepared1-review.json",
+      "sha256": "7446f9b9c6e966afba7bde43ba46b9073e58265d3c4d05dc0613079c1f103f2f"
+    }
+  },
+  "upper_or_PG17_or_release_locks_changed": false,
+  "not_proven": [
+    "MemoryContext hard allocation/work-domain budgets",
+    "DSM budget/retained lifecycle",
+    "full protected root-v1 Source-qualified PG18 Guest",
+    "normal safe lower persistent qualification",
+    "complete PG18 production enable/max GUC/provider integration",
+    "full Neon extension RM134 recovery after new heap WAL",
+    "PG17 Linux E and real Helm 117/118/119 K8s E"
+  ],
+  "independent_review": "No concrete component blocker; final pending lifecycle classification and five-target dedup reviewed; no new tests or Source/normal/E claim."
+}

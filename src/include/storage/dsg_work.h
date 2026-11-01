@@ -7,6 +7,7 @@
 #ifndef EXEC_BACKEND
 #define NEON_DSG_WORK_API_VERSION 2
 #define NEON_DSG_CONNECTION_API_VERSION 1
+#define NEON_DSG_PREPARED_API_VERSION 1
 #endif
 
 extern PGDLLIMPORT bool dynamic_shared_buffers_require_connection_gate;
@@ -41,6 +42,14 @@ typedef struct DsgConnectionSnapshot
 	bool public_connections_blocked;
 } DsgConnectionSnapshot;
 
+/* 独立API，保留已发布Work2/Connection1的结构和调用ABI。含尚未valid的保留槽。 */
+typedef struct DsgPreparedSnapshot
+{
+	DsgConnectionSnapshot connections;
+	uint32 prepared_slots;
+	uint32 maximum_prepared_slots;
+} DsgPreparedSnapshot;
+
 extern Size DsgWorkShmemSize(void);
 extern void DsgWorkShmemInit(void);
 extern void DsgWorkPreStart(int child_slot);
@@ -57,4 +66,9 @@ extern void DsgConnectionNotify(void);
 extern void DsgConnectionPostmasterRefresh(void);
 extern bool DsgConnectionAccept(pgsocket socket);
 extern void DsgConnectionGetSnapshot(DsgConnectionSnapshot *snapshot);
+/* 调用者持TwoPhaseStateLock；只在同status锁内登记，不分配/IO/等待LWLock。 */
+extern bool DsgPreparedReserve(bool recovery);
+extern void DsgPreparedForget(void);
+extern void DsgPreparedGetSnapshot(DsgPreparedSnapshot *snapshot);
+
 #endif

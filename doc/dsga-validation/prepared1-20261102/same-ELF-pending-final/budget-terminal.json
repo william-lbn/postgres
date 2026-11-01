@@ -1,0 +1,18 @@
+{
+  "exit": 0,
+  "job": {
+    "cpu": 2,
+    "kind": "native",
+    "last_observation": "original-unit-terminal",
+    "memory": 3221225472,
+    "nonce": "20261101T175223Z-3e9b59",
+    "process_exit_code": 0,
+    "queue_reason": "",
+    "spec_sha256": "79cf49180a788c66060341b3f6f90272b2439a3a8268de19208240ac89de4f04",
+    "state": "terminal",
+    "test_verdict": "NOT_INTERPRETED",
+    "unit": "neon-pg18-prepared1-pending-20261101t175223z-3e9b59.service",
+    "unit_result": "success",
+    "worker_sha256": "f38ac13dffa1db50ee1e3275f7cbcac3a1f88d1ddbd7f9c7265b7742cdc4766e"
+  }
+}

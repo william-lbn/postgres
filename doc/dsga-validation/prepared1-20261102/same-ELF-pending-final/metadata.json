@@ -1,0 +1,5 @@
+{
+  "build": "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd",
+  "runtime_source": "/data/neon-build/validation/pg18-prepared1-pending-native-20261101T175223Z-3e9b59/source",
+  "scope": "ONLY_PENDING_COUNTER_ACTUAL_PREPARE_OUTCOME_AND_INJECTED_ERROR_NO_PRODUCTION_CHANGE"
+}

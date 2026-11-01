@@ -1,0 +1,11 @@
+2026-11-01 17:48:31.987 GMT [135] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 17:48:31.987 GMT [135] LOG:  listening on Unix socket "/tmp/pg18-r-vadh5oug/s/.s.PGSQL.55438"
+2026-11-01 17:48:31.987 GMT [135] LOG:  listening on Unix socket "/tmp/pg18-r-vadh5oug/data/dsg_socket/.s.PGSQL.55438"
+2026-11-01 17:48:31.991 GMT [142] LOG:  database system was shut down at 2026-11-01 17:48:31 GMT
+2026-11-01 17:48:31.992 GMT [142] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 17:48:31.993 GMT [135] LOG:  database system is ready to accept connections
+2026-11-01 17:48:32.072 GMT [161] ERROR:  transaction identifier "a18" is already in use
+2026-11-01 17:48:32.072 GMT [161] STATEMENT:  BEGIN;PREPARE TRANSACTION 'a18'
+2026-11-01 17:48:32.097 GMT [169] ERROR:  maximum number of prepared transactions reached
+2026-11-01 17:48:32.097 GMT [169] HINT:  Increase "max_prepared_transactions" (currently 2).
+2026-11-01 17:48:32.097 GMT [169] STATEMENT:  BEGIN;PREPARE TRANSACTION 'c18'

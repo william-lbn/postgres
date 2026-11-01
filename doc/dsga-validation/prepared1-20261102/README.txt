@@ -1,0 +1,50 @@
+PG18 Prepared1：真实两阶段保留槽及恢复独立模块
+
+基线a27d5926，原codex/dsga-pg18-v1-20261031。Linux开发，3生产+4测试；不改PG17/gitlink、
+发行锁或公共上层合同。新增PreparedSnapshot1与PG17同结构，嵌原Connection1/Work2；已有
+二者结构和Buffer ABI6未变。Work私有prepared_slots通过原固定ShmemSize计入启动预算。
+
+真实native保留槽可能在backend退出后继续持有dummy PGPROC、XID和表锁；未valid的槽也
+计入，不能用pg_prepared_xacts可见行或活PID代替。MarkAsPreparing在原freelist取出之前
+按TwoPhaseStateLock→status_lock串行Reserve；关闭拒所有新runtime PREPARE，包括SU及
+后台。原active array发布后才有测试注入点，MyLockedGxact在此前已建立，原AtAbort可清理。
+统一RemoveGXact实际移除active槽时才Forget，覆盖准备失败、COMMIT/ROLLBACK PREPARED
+和redo删除；无法解释的计数PANIC重建，不清零伪空闲。PrepareRedoAdd恢复登记不受新boot
+关闭阻断，必须如实重建旧WAL/文件槽。快照只取status_lock，不反取TwoPhase锁，不把
+prepared1且Work foreground_idle=true误当完整排空或normal许可。
+
+最终5稳定目标=1U-native+4S，零skip，只有本次修改相关功能：默认off/原session权限及ABI；
+实际两阶段表锁/槽在backend退出后保留，关闭SU新PREPARE被拒，COMMIT/ROLLBACK精确扣减；
+原after-register暂停点未valid保留槽可见且关门不能丢；独立ERROR真实AtAbort清理；原native
+重复GID/容量错误不泄漏计数并可重用槽；同PM199实际SIGKILL/reinit，新boot关闭仍恢复持久
+pg_twophase文件00000000000002F3(164B)、prepared1及真实锁，明确ROLLBACK才归0。
+实际boot15987350722800226411→15296911985902818259。初始化CREATE EXT/ROLE/TABLE后
+CHECKPOINT沿已核RM134夹具边界，之后测试真实PREPARE/XACT WAL与2PC文件恢复，不重启
+容器、不跳恢复、不声称任意新增heap WAL或HA矩阵完成。
+
+首次66b45b实际C编译FAIL30.911秒：剪取PG17文件尾范围过宽误带未授权DsgDsmGetSnapshot，
+类型未定义且额外参数错误。Root独审指出并与真实编译日志一致；仅删除该DSM末函数，
+其余六源字节保持不变。未补DSM类型或扩大范围。新c2debd同6CPU8GiB/make6受限缓存
+构建41.233秒PASS，本批7源码中只有后续Python可变，六个编译/安装输入保持一致。
+PG38a958bd2322424937c5ea50a1b146cc8cbf269d560d61fb21f6cb5eeeeff93d、DSO
+7a7e30fc69bf17c865d5ffea475df12fb846482c0f9fc6f28d319522af32ffad被后两轮原生复用。
+仅安装既有未修改injection_points依赖，未重跑旧Buffer/AIO/Work/Connection矩阵。
+
+自动原生830e70共3PASS+2driver问题：初关闭时普通角色在前台门禁被拒，未到C ACL；
+after-register持原LWLock且PrepareTransaction原HOLD_INTERRUPTS在MarkAsPreparing之前
+一直到EndPrepare/锁转移/TRANS_DEFAULT之后，排队cancel不能当即时撤销。原10s超时保留。
+仅Py开门后测原会话权限，并cancel后原wakeup释放注入暂停，同ELF仅两根ac4df7：ACL通过，
+pending原“必须取消退出”断言仍失败，因为实际PREPARE已完成exit0。未改C或原中断语义。
+
+Root确认后最终只重跑pending一根3e9b59，实际PASS1.062秒。JSON严格分账：真实PID48在
+原after-register等待，prepared1；关门后排队cancel+wakeup，实际psql退出0、持久SQL行1、
+prepared1仍保留，明确ROLLBACK PREPARED后才0，不叫cancel成功/AtAbort；另独立ERROR
+注入实际exit1并原error消息，AtAbort→RemoveGXact后真实prepared0，再准备/回滚可重用。
+所有失败/旧driver、源码锁/ELF、命令nonce/spec/unit终态和cpu.stat/memory.peak/io.stat/
+memory.events均保留。没有prune，无业务二进制入Git。最终原三PASS与ACL通过不重复重测。
+
+剩余：MemoryContext工作域硬预算、DSM预算/生命周期、完整Root绑定Source/force/I与持续
+normal安全降限、PG18生产enable/max配置、完整Neon新WAL扩展、PG17单机/Linux端到端及
+三worker真实Helm K8s回归。Prepared槽计数仅独立事实，不签上述资格或VM许可。
+
+独立只读审查已完成，未见本模块明确代码阻断；两小档纳入归档，不重计实测。

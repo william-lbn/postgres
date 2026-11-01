@@ -1,0 +1,5 @@
+{
+  "build": "/data/neon-build/validation/pg18-prepared1-build-20261101T174721Z-c2debd",
+  "runtime_source": "/data/neon-build/validation/pg18-prepared1-rerun-native-20261101T174947Z-ac4df7/source",
+  "scope": "ONLY_TWO_PREPARED_DRIVER_FIXES_NO_PRODUCTION_CHANGE"
+}

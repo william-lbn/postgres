@@ -35,3 +35,6 @@ REVOKE ALL ON FUNCTION test_dsg_work18_snapshot(),test_dsg_work18_admission(bool
 
 CREATE FUNCTION test_dsg_connection18_snapshot() RETURNS text AS 'MODULE_PATHNAME','test_dsg_connection18_snapshot' LANGUAGE C STRICT;
 REVOKE ALL ON FUNCTION test_dsg_connection18_snapshot() FROM PUBLIC;
+
+CREATE FUNCTION test_dsg_prepared18_snapshot() RETURNS text AS 'MODULE_PATHNAME','test_dsg_prepared18_snapshot' LANGUAGE C STRICT;
+REVOKE ALL ON FUNCTION test_dsg_prepared18_snapshot() FROM PUBLIC;

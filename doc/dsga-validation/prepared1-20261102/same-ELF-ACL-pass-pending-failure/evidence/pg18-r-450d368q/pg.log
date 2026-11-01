@@ -1,0 +1,8 @@
+2026-11-01 17:49:53.526 GMT [101] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 17:49:53.526 GMT [101] LOG:  listening on Unix socket "/tmp/pg18-r-450d368q/s/.s.PGSQL.55438"
+2026-11-01 17:49:53.526 GMT [101] LOG:  listening on Unix socket "/tmp/pg18-r-450d368q/data/dsg_socket/.s.PGSQL.55438"
+2026-11-01 17:49:53.529 GMT [108] LOG:  database system was shut down at 2026-11-01 17:49:53 GMT
+2026-11-01 17:49:53.530 GMT [108] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 17:49:53.532 GMT [101] LOG:  database system is ready to accept connections
+2026-11-01 17:49:53.669 GMT [141] ERROR:  could not find injection point dsg-prepared-after-register to wake up
+2026-11-01 17:49:53.669 GMT [141] STATEMENT:  SELECT injection_points_wakeup('dsg-prepared-after-register')

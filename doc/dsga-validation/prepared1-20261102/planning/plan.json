@@ -1,0 +1,68 @@
+{
+  "schema": "pg18-independent-module-plan-v1",
+  "state": "AUTHORIZED_NOT_IMPLEMENTED_NOT_TESTED",
+  "utc": "2026-11-01T17:42:40.057261+00:00",
+  "base": "a27d59266583ecbccd23f808ff16f6eff63c9ee9",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "owned7": [
+    "src/backend/storage/buffer/dsg_work.c",
+    "src/include/storage/dsg_work.h",
+    "src/backend/access/transam/twophase.c",
+    "src/test/modules/test_dsg_region18/test_dsg_prepared18.c",
+    "src/test/modules/test_dsg_region18/Makefile",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql",
+    "src/test/modules/test_dsg_region18/t/test_prepared18.py"
+  ],
+  "base_sha256": {
+    "src/backend/storage/buffer/dsg_work.c": "d99a51da85f5d4fea1fe35d6f9eed9127c020c00a91002c7182a65594c06aa1a",
+    "src/include/storage/dsg_work.h": "b7910226903fe365861efd78ab8526cf7ce42fd4e15c0eb80378707afe674a5e",
+    "src/backend/access/transam/twophase.c": "20fed45a5e782f60c5fd2f4acb1227e0407649f5e61a466dfeb969d3c9146fe2",
+    "src/test/modules/test_dsg_region18/test_dsg_prepared18.c": null,
+    "src/test/modules/test_dsg_region18/Makefile": "767e78c290815ccef5b01a47263cb4e6a7fafbf332cb8dfc5aaa5fa2cd1cf84c",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "5ad9d16f54ec4ece48dc25a7bfa525c2186e0c904946e7ab925ca4d5806e9e7b",
+    "src/test/modules/test_dsg_region18/t/test_prepared18.py": null
+  },
+  "contract": {
+    "Work": 2,
+    "Connection": 1,
+    "Prepared": 1,
+    "Buffer": 6,
+    "no_changed_public_structs": true,
+    "normal": false,
+    "Source": false
+  },
+  "core": [
+    "fixed prepared_slots in existing budgeted Work private control",
+    "TwoPhaseStateLock then status_lock; snapshot status only, no inverse acquisition",
+    "reserve before native active publication; count pending invalid slots, reject new runtime PREPARE closed even administrator",
+    "unified RemoveGXact decrements only original actual removal, failures/finish/redo all follow",
+    "PrepareRedoAdd recovery registration rebuilds actual previous native slots while closed newboot"
+  ],
+  "tests": [
+    "U default-off and original-session ACL/ABI",
+    "S real prepared lock/slot holds survive backend exit; closed admin new prepare denied; commit and rollback decrement exactly",
+    "S real after-register wait injection shows pending count despite not yet valid; close/cancel/error actual AtAbort cleanup count0",
+    "S duplicate/native capacity errors preserve new counter and slot reuse",
+    "S same PM SIGKILL shared reinit newboot closed restores durable prepared slot/lock then actual rollback removes"
+  ],
+  "test_dependency": "Only existing unmodified src/test/modules/injection_points built/installed for after-register wait/error callbacks; configure already enables injection points; no old unrelated tests run.",
+  "recovery_boundary": "CREATE EXTENSION/ROLE/TABLE then initial CHECKPOINT avoids known old RM134 startup fixture; native PREPARE/XACT WAL and checkpointed pg_twophase are actual new target, not skipped or container restart. No new heap DML after initial checkpoint.",
+  "resource_budget": {
+    "heavy_cpu": 6,
+    "heavy_memory_GiB": 8,
+    "make_j": 6,
+    "heavy_concurrency": 1,
+    "native_cpu": 2,
+    "native_memory_GiB": 3,
+    "timeouts_build_seconds": 900,
+    "native_driver_seconds": 240,
+    "parallel": "other PG17 small native within original global12CPU16GiB budget; no central index/lock edits"
+  },
+  "remaining": [
+    "MemoryContext hard work-domain allocation budgets",
+    "DSM budget/retained lifetime",
+    "full Root Source/normal/LinuxE/K8sE",
+    "full PG18 production enable/max adaptation",
+    "latest control plane official full implementation"
+  ]
+}

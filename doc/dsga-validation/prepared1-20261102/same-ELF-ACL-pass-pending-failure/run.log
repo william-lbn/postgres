@@ -1,0 +1,16 @@
+test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI (test_prepared18.Prepared.test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI) ... ok
+test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup (test_prepared18.Prepared.test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup) ... FAIL
+
+======================================================================
+FAIL: test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup (test_prepared18.Prepared.test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/src/src/test/modules/test_dsg_region18/t/test_prepared18.py", line 40, in test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup
+    self.assertTrue(pid);closed=self.gate(p,False);self.assertEqual(closed['prepared_slots'],1);self.assertFalse(closed['foreground_idle']);self.assertEqual(p.sql('SELECT pg_cancel_backend('+pid+')').stdout.strip(),'t');p.sql("SELECT injection_points_wakeup('"+name+"')");out,err=child.communicate(timeout=10);self.assertNotEqual(child.returncode,0);self.assertIn('canceling statement',err);self.count(p,0);p.sql("SELECT injection_points_detach('"+name+"')");self.gate(p,True)
+                                                                                                                                                                                                                                                                                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 == 0
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.718s
+
+FAILED (failures=1)

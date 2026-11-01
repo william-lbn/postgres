@@ -1,0 +1,17 @@
+{
+  "first_actual_compile_failure": "/data/neon-build/validation/pg18-prepared1-build-20261101T174546Z-66b45b",
+  "failure": "Prepared1 copy accidentally included trailing unported DSM function; removed only that function",
+  "changed_one_file": "src/backend/storage/buffer/dsg_work.c",
+  "source7": {
+    "src/backend/access/transam/twophase.c": "507ca214b1addf07a3b6015776236c79ed0889b970f4c52da94d49df3b257ea6",
+    "src/backend/storage/buffer/dsg_work.c": "3f69dcaddcf4534aab9877fa6ff3dbd668f128ad2aee930216af3b99aacca61a",
+    "src/include/storage/dsg_work.h": "67b40293a992de12f2147e6b34fba600365248fea6bda593bd2c6d01b77d1b61",
+    "src/test/modules/test_dsg_region18/Makefile": "a17fbf49c3476fa8cdd7a331c0a8d302730d6f721e6ed0e46f3b7c3cacd15194",
+    "src/test/modules/test_dsg_region18/t/test_prepared18.py": "4e31cfa256cab15905bfb5585b90f1997da96e0f6cad369f58c23512e41b38cf",
+    "src/test/modules/test_dsg_region18/test_dsg_prepared18.c": "6b2b5e95bc7649ec70b6994625e5690ac3a134e63b704a2bb82ba694b93bdcd0",
+    "src/test/modules/test_dsg_region18/test_dsg_region18--1.0.sql": "54dd706b9e158ea972dd993e3a429423dc2fac3afe5463803614b61a86ef2c3d"
+  },
+  "other6_bytes_equal_first": true,
+  "DsgDsm_identifiers_in_owned_prod": false,
+  "scope": "PREPARED_ONLY_NOT_DSM"
+}

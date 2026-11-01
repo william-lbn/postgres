@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+# Prepared1只观察实际native槽/恢复；不以Work idle或SQL行数冒normal许可。
+import importlib.util,json,os,signal,subprocess,time,unittest
+from pathlib import Path
+spec=importlib.util.spec_from_file_location('prepared18_connection',Path(__file__).with_name('test_connection18.py'));conn=importlib.util.module_from_spec(spec);spec.loader.exec_module(conn)
+region=conn.region
+class Cluster(conn.Cluster):
+ def __init__(self,maximum=4,injection=False,**kw):
+  super().__init__(**kw);self.injection=injection
+  with (self.data/'postgresql.conf').open('a')as f:
+   f.write('max_prepared_transactions='+str(maximum)+'\n')
+   if injection:f.write("shared_preload_libraries='injection_points'\n")
+ def start(self):
+  super().start()
+  if self.injection:self.sql('CREATE EXTENSION injection_points')
+class Prepared(unittest.TestCase):
+ wait=conn.Connection.wait;gate=conn.Connection.gate;blocked=conn.Connection.blocked;fact=conn.Connection.fact
+ def cluster(self,**kw):
+  p=Cluster(**kw);self.addCleanup(p.close);p.start();p.sql('CREATE ROLE work18_user LOGIN');return p
+ def snap(self,p):return json.loads(p.sql('SELECT test_dsg_prepared18_snapshot()').stdout)
+ def count(self,p,n):return self.wait(p,lambda s:s['prepared_slots']==n and s['client_processes']==0)
+ def prepare(self,p,gid):return p.sql("BEGIN;PREPARE TRANSACTION '"+gid+"'")
+ def test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI(self):
+  p=self.cluster(mode=None,gate=False,admission=False);bad=p.sql('SELECT test_dsg_prepared18_snapshot()',check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('registered running server',bad.stderr)
+  p=self.cluster();s=self.snap(p);self.assertEqual((s['api'],s['connection_api'],s['work_api']),(1,1,2));self.assertEqual((s['prepared_slots'],s['maximum_prepared_slots']),(0,4));c=json.loads(p.sql('SELECT test_dsg_connection18_snapshot()').stdout);self.assertEqual(s['connection_snapshot_bytes'],c['snapshot_bytes']);self.assertFalse(s['normal_permit']);self.assertTrue(s['observer_excluded'])
+  self.assertEqual(p.sql("SELECT has_function_privilege('work18_user','test_dsg_prepared18_snapshot()','EXECUTE')").stdout.strip(),'f');self.gate(p,True);p.sql('GRANT EXECUTE ON FUNCTION test_dsg_prepared18_snapshot() TO work18_user');p.sql(f"CREATE FUNCTION prepared18_definer() RETURNS text AS '{region.LIB}','test_dsg_prepared18_snapshot' LANGUAGE C SECURITY DEFINER")
+  for sql in ['SET ROLE work18_user;SELECT test_dsg_prepared18_snapshot()','SET SESSION AUTHORIZATION work18_user;SELECT prepared18_definer()']:
+   bad=p.sql(sql,check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('original administrator',bad.stderr)
+  self.fact('prepared1-actual-ABI-and-empty',s)
+ def test_PG18_S_PREPARED1_001_retained_native_lock_backend_exit_and_closed_admin_reject(self):
+  p=self.cluster();p.sql('CREATE TABLE prepared18_lock(i int);CHECKPOINT');self.gate(p,True);p.sql("BEGIN;LOCK prepared18_lock IN ACCESS EXCLUSIVE MODE;PREPARE TRANSACTION 'hold18a'");one=self.count(p,1);self.assertGreater(int(p.sql("SELECT count(*) FROM pg_locks WHERE relation='prepared18_lock'::regclass AND pid IS NULL").stdout),0);self.prepare(p,'hold18b');two=self.count(p,2);closed=self.gate(p,False);self.assertTrue(closed['foreground_idle']);self.assertEqual(closed['prepared_slots'],2)
+  bad=p.sql("BEGIN;PREPARE TRANSACTION 'denied18'",check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('closed for new prepared transactions',bad.stderr);self.count(p,2);p.sql("COMMIT PREPARED 'hold18b'");self.count(p,1);p.sql("ROLLBACK PREPARED 'hold18a'");zero=self.count(p,0);self.assertEqual(p.sql("SELECT count(*) FROM pg_locks WHERE relation='prepared18_lock'::regclass AND pid IS NULL").stdout.strip(),'0');self.fact('prepared1-retained-native-slot-lock-and-release',{'one':one,'two':two,'closed_with_prepared':closed,'actual_zero_after_commit_rollback':zero})
+ def test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup(self):
+  p=self.cluster(injection=True);self.gate(p,True);name='dsg-prepared-after-register';p.sql("SELECT injection_points_attach('"+name+"','wait')");self.addCleanup(lambda:p.sql("SELECT injection_points_wakeup('"+name+"')",check=False)if p.process.poll()is None else None);e=region.env();e['PGAPPNAME']='pg18-prepared-pending';child=subprocess.Popen([str(region.BIN/'psql'),'-h',str(p.sock),'-p','55438','-U',region.USER,'-d','postgres','-XqAt','-v','ON_ERROR_STOP=1','-c',"BEGIN;PREPARE TRANSACTION 'pending18'"],env=e,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True);self.addCleanup(lambda:child.kill()if child.poll()is None else None)
+  pending=self.wait(p,lambda s:s['prepared_slots']==1 and s['frontend_executes']==1);until=time.monotonic()+5;pid=''
+  while time.monotonic()<until:
+   pid=p.sql("SELECT pid FROM pg_stat_activity WHERE application_name='pg18-prepared-pending' AND wait_event='dsg-prepared-after-register'").stdout.strip()
+   if pid:break
+   time.sleep(.01)
+  self.assertTrue(pid);closed=self.gate(p,False);self.assertEqual(closed['prepared_slots'],1);self.assertFalse(closed['foreground_idle']);self.assertEqual(p.sql('SELECT pg_cancel_backend('+pid+')').stdout.strip(),'t');p.sql("SELECT injection_points_wakeup('"+name+"')");out,err=child.communicate(timeout=10);self.assertNotEqual(child.returncode,0);self.assertIn('canceling statement',err);self.count(p,0);p.sql("SELECT injection_points_detach('"+name+"')");self.gate(p,True)
+  p.sql("SELECT injection_points_attach('"+name+"','error')");bad=p.sql("BEGIN;PREPARE TRANSACTION 'error18'",check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('error triggered for injection point',bad.stderr);zero=self.count(p,0);p.sql("SELECT injection_points_detach('"+name+"')");self.prepare(p,'reuse18');self.count(p,1);p.sql("ROLLBACK PREPARED 'reuse18'");self.count(p,0);self.fact('prepared1-real-pending-cancel-error-cleanup',{'pending_before_valid':pending,'closed_while_pending':closed,'actual_waiting_backend_pid':int(pid),'after_error':zero})
+ def test_PG18_S_PREPARED1_003_duplicate_capacity_failures_and_native_slot_reuse(self):
+  p=self.cluster(maximum=2);self.gate(p,True);self.prepare(p,'a18');one=self.count(p,1);bad=p.sql("BEGIN;PREPARE TRANSACTION 'a18'",check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('already in use',bad.stderr);self.count(p,1);self.prepare(p,'b18');two=self.count(p,2);bad=p.sql("BEGIN;PREPARE TRANSACTION 'c18'",check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('maximum number of prepared transactions',bad.stderr);self.count(p,2);p.sql("ROLLBACK PREPARED 'a18'");self.count(p,1);self.prepare(p,'c18');self.count(p,2);p.sql("ROLLBACK PREPARED 'b18'");p.sql("ROLLBACK PREPARED 'c18'");zero=self.count(p,0);self.fact('prepared1-native-capacity-error-no-leak',{'one':one,'two':two,'after_native_reuse':zero})
+ def test_PG18_S_PREPARED1_004_same_PM_newboot_closed_recovers_durable_prepared(self):
+  p=self.cluster();p.sql('CREATE TABLE prepared18_recovery(i int);CHECKPOINT');self.gate(p,True);p.sql("BEGIN;LOCK prepared18_recovery IN ACCESS EXCLUSIVE MODE;PREPARE TRANSACTION 'durable18'");p.sql('CHECKPOINT');old=self.count(p,1);files=[{'name':q.name,'bytes':q.stat().st_size}for q in (p.data/'pg_twophase').iterdir()if q.is_file()];self.assertTrue(files);self.gate(p,False)
+  w=conn.work.Wire(p,user=region.USER);self.addCleanup(w.close);self.assertFalse(w.query('BEGIN')[0]);pm=p.process.pid;os.kill(w.pid,signal.SIGKILL);w.close();p.ready();self.assertEqual(p.process.pid,pm);fresh=self.wait(p,lambda s:s['boot']!=old['boot']and s['acknowledged']and s['public_connections_blocked']and s['prepared_slots']==1);self.assertFalse(fresh['admission_open']);self.assertEqual(p.sql("SELECT count(*) FROM pg_prepared_xacts WHERE gid='durable18'").stdout.strip(),'1');self.assertGreater(int(p.sql("SELECT count(*) FROM pg_locks WHERE relation='prepared18_recovery'::regclass AND pid IS NULL").stdout),0);self.blocked(p)
+  bad=p.sql("BEGIN;PREPARE TRANSACTION 'new_closed18'",check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('closed for new prepared transactions',bad.stderr);self.count(p,1);p.sql("ROLLBACK PREPARED 'durable18'");zero=self.count(p,0);self.fact('prepared1-actual-newboot-recovery-closed',{'old':old,'new_closed_with_prepared':fresh,'after_real_rollback':zero,'same_actual_PM':pm,'actual_pg_twophase_files':files,'Source':False,'normal':False})
+if __name__=='__main__':unittest.main(verbosity=2)

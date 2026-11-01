@@ -1,0 +1,25 @@
+{
+  "testsRun": 5,
+  "passed": [
+    "test_prepared18.Prepared.test_PG18_S_PREPARED1_001_retained_native_lock_backend_exit_and_closed_admin_reject",
+    "test_prepared18.Prepared.test_PG18_S_PREPARED1_003_duplicate_capacity_failures_and_native_slot_reuse",
+    "test_prepared18.Prepared.test_PG18_S_PREPARED1_004_same_PM_newboot_closed_recovers_durable_prepared"
+  ],
+  "subtests": [],
+  "failures": [
+    {
+      "id": "test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI (test_prepared18.Prepared.test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI)",
+      "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_prepared18.py\", line 28, in test_PG18_U_PREPARED1_001_default_off_original_session_and_ABI\n    bad=p.sql(sql,check=False);self.assertNotEqual(bad.returncode,0);self.assertIn('original administrator',bad.stderr)\n                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 'original administrator' not found in 'ERROR:  dynamic shared buffer admission is closed for this boot\\n'\n"
+    }
+  ],
+  "errors": [
+    {
+      "id": "test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup (test_prepared18.Prepared.test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup)",
+      "traceback": "Traceback (most recent call last):\n  File \"/src/src/test/modules/test_dsg_region18/t/test_prepared18.py\", line 40, in test_PG18_S_PREPARED1_002_pending_registration_cancel_and_error_cleanup\n    self.assertTrue(pid);closed=self.gate(p,False);self.assertEqual(closed['prepared_slots'],1);self.assertFalse(closed['foreground_idle']);self.assertEqual(p.sql('SELECT pg_cancel_backend('+pid+')').stdout.strip(),'t');out,err=child.communicate(timeout=10);self.assertNotEqual(child.returncode,0);self.assertIn('canceling statement',err);self.count(p,0);p.sql(\"SELECT injection_points_detach('\"+name+\"')\");self.gate(p,True)\n                                                                                                                                                                                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 1207, in communicate\n    stdout, stderr = self._communicate(input, endtime, timeout)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.11/subprocess.py\", line 2060, in _communicate\n    self._check_timeout(endtime, orig_timeout, stdout, stderr)\n  File \"/usr/lib/python3.11/subprocess.py\", line 1251, in _check_timeout\n    raise TimeoutExpired(\nsubprocess.TimeoutExpired: Command '['/opt/pg18/bin/psql', '-h', '/tmp/pg18-r-auy0m3fu/data/dsg_socket', '-p', '55438', '-U', 'nonroot', '-d', 'postgres', '-XqAt', '-v', 'ON_ERROR_STOP=1', '-c', \"BEGIN;PREPARE TRANSACTION 'pending18'\"]' timed out after 10 seconds\n"
+    }
+  ],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

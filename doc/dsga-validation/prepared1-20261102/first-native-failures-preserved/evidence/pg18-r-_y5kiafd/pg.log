@@ -1,0 +1,28 @@
+2026-11-01 17:48:32.866 GMT [199] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 17:48:32.866 GMT [199] LOG:  listening on Unix socket "/tmp/pg18-r-_y5kiafd/s/.s.PGSQL.55438"
+2026-11-01 17:48:32.866 GMT [199] LOG:  listening on Unix socket "/tmp/pg18-r-_y5kiafd/data/dsg_socket/.s.PGSQL.55438"
+2026-11-01 17:48:32.868 GMT [206] LOG:  database system was shut down at 2026-11-01 17:48:32 GMT
+2026-11-01 17:48:32.869 GMT [206] LOG:  Continue writing WAL at 0/1516A40
+2026-11-01 17:48:32.871 GMT [199] LOG:  database system is ready to accept connections
+2026-11-01 17:48:32.925 GMT [204] LOG:  checkpoint starting: immediate force wait
+2026-11-01 17:48:32.926 GMT [204] LOG:  checkpoint complete: wrote 65 buffers (12.7%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=40, longest=0.001 s, average=0.001 s; distance=323 kB, estimate=323 kB; lsn=0/1567908, redo lsn=0/1567880
+2026-11-01 17:48:32.950 GMT [204] LOG:  checkpoint starting: immediate force wait
+2026-11-01 17:48:32.951 GMT [204] LOG:  1 two-phase state file was written for a long-running prepared transaction
+2026-11-01 17:48:32.951 GMT [204] LOG:  checkpoint complete: wrote 6 buffers (1.2%), wrote 1 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=5, longest=0.001 s, average=0.001 s; distance=16 kB, estimate=292 kB; lsn=0/156B9D0, redo lsn=0/156B948
+2026-11-01 17:48:32.974 GMT [199] LOG:  client backend (PID 232) was terminated by signal 9: Killed
+2026-11-01 17:48:32.974 GMT [199] DETAIL:  Failed process was running: BEGIN
+2026-11-01 17:48:32.974 GMT [199] LOG:  terminating any other active server processes
+2026-11-01 17:48:32.975 GMT [199] LOG:  all server processes terminated; reinitializing
+2026-11-01 17:48:32.983 GMT [236] LOG:  database system was interrupted; last known up at 2026-11-01 17:48:32 GMT
+2026-11-01 17:48:32.983 GMT [239] FATAL:  the database system is in recovery mode
+2026-11-01 17:48:32.990 GMT [236] LOG:  database system was not properly shut down; automatic recovery in progress
+2026-11-01 17:48:32.990 GMT [236] LOG:  redo starts at 0/156B948
+2026-11-01 17:48:32.990 GMT [236] LOG:  invalid record length at 0/156BA48: expected at least 24, got 0
+2026-11-01 17:48:32.990 GMT [236] LOG:  redo done at 0/156B9D0 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+2026-11-01 17:48:32.990 GMT [236] LOG:  Continue writing WAL at 0/156BA48
+2026-11-01 17:48:32.991 GMT [236] LOG:  recovering prepared transaction 755 from shared memory
+2026-11-01 17:48:32.991 GMT [237] LOG:  checkpoint starting: end-of-recovery immediate wait
+2026-11-01 17:48:32.992 GMT [237] LOG:  checkpoint complete: wrote 0 buffers (0.0%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=2, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=0 kB; lsn=0/156BA48, redo lsn=0/156BA48
+2026-11-01 17:48:32.993 GMT [199] LOG:  database system is ready to accept connections
+2026-11-01 17:48:33.057 GMT [252] ERROR:  dynamic shared buffer admission is closed for new prepared transactions
+2026-11-01 17:48:33.057 GMT [252] STATEMENT:  BEGIN;PREPARE TRANSACTION 'new_closed18'

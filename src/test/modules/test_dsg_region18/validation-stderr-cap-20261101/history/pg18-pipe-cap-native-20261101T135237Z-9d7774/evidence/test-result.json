@@ -1,0 +1,47 @@
+{
+  "testsRun": 3,
+  "passed": [
+    "test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs",
+    "test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off",
+    "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach"
+  ],
+  "subtests": [
+    {
+      "id": "test_PG18_S_PIPE_001_actual_all_three_kernel_programs (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs) (stage='PMbase')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_PIPE_001_actual_all_three_kernel_programs (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs) (stage='PMfinal')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_PIPE_001_actual_all_three_kernel_programs (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs) (stage='child')",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off) (filtered=False)",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off) (filtered=True)",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_ROOTWIRE_001_real_exact_chain_detach (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach) (threaded=False)",
+      "passed": true
+    },
+    {
+      "id": "test_PG18_S_ROOTWIRE_001_real_exact_chain_detach (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach) (threaded=True)",
+      "passed": true
+    }
+  ],
+  "failures": [],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "PG_version": 18,
+  "new_stable_roots": 2,
+  "directly_affected_old_root_rerun": 1,
+  "E": 0
+}

@@ -1,0 +1,18 @@
+{
+  "actual_PG_ELF_sha256": "ece22255f9b1624e18aa23a2109ca91a0090c706c31e1466657749e8d93e8fe1",
+  "actual_test_DSO_sha256": "be266f3496f7cf981224306f5eda0fa419e32ea98c6ee274d5c1f0c47cce602b",
+  "build": "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5",
+  "compile_owned2": {
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "fbaa646b1b820ea9a66901d63e511442cded2fbeffd71a919d00648c97830837",
+    "src/test/modules/test_dsg_region18/test_dsg_filter18.c": "2ee8117ddb893e3f9058f76aa8242ac08c48cd5dd410a1dad3b28d909e685fa4"
+  },
+  "compile_source_lock_sha256": "75f48004ae0da1dcbfe0f4d2aec658bfeedb81befaf46d6701347a490d12d975",
+  "new_Python_only_after_compile": "src/test/modules/test_dsg_region18/t/test_pipe_capacity18.py",
+  "owned3": {
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "fbaa646b1b820ea9a66901d63e511442cded2fbeffd71a919d00648c97830837",
+    "src/test/modules/test_dsg_region18/t/test_pipe_capacity18.py": "4d220963aee510067107c942323968b1fdfc38844584780cd40805c7843b3ebc",
+    "src/test/modules/test_dsg_region18/test_dsg_filter18.c": "2ee8117ddb893e3f9058f76aa8242ac08c48cd5dd410a1dad3b28d909e685fa4"
+  },
+  "scope": "ACTUAL_KERNEL_PROGRAMS_AND_ISOLATED_PG_PIPE_CAP_ONLY_NOT_SOURCE_NORMAL",
+  "source_base": "648c38f41f2cd0d4723a81b49f1924e5737df65c"
+}

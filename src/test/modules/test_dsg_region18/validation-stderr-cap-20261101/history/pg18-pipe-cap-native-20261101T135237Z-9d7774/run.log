@@ -1,0 +1,8 @@
+test_PG18_S_PIPE_001_actual_all_three_kernel_programs (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs) ... ok
+test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off) ... ok
+test_PG18_S_ROOTWIRE_001_real_exact_chain_detach (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.899s
+
+OK

@@ -1,0 +1,278 @@
+[
+  {
+    "pid": 10,
+    "uid": [
+      1000,
+      1000,
+      1000
+    ],
+    "gid": [
+      1000,
+      1000,
+      1000
+    ],
+    "before_positive": [
+      [
+        4096,
+        0
+      ],
+      [
+        4096,
+        0
+      ]
+    ],
+    "unprivileged_NNP_preinstall_positive": [
+      [
+        4096,
+        0
+      ],
+      [
+        4096,
+        0
+      ]
+    ],
+    "capacity_initial": 4096,
+    "capacity_after": 4096,
+    "denied": [
+      {
+        "command": 1031,
+        "requested": 4096,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 1031,
+        "requested": 8192,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 1031,
+        "requested": 1,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 4096,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 8192,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 1,
+        "result": [
+          -1,
+          1
+        ]
+      }
+    ],
+    "normal_fcntl_roundtrip": true,
+    "O_DIRECT_still_denied": true,
+    "program_sha256": "8c065d1c2941149c2738dd7cc5346ab5917d2b1e51afb4c313dedb4e7a4d5f26",
+    "Source": false,
+    "normal": false,
+    "actual_unique_Wait_exit": 0,
+    "stage": "PMbase"
+  },
+  {
+    "pid": 11,
+    "uid": [
+      1000,
+      1000,
+      1000
+    ],
+    "gid": [
+      1000,
+      1000,
+      1000
+    ],
+    "before_positive": [
+      [
+        4096,
+        0
+      ],
+      [
+        4096,
+        0
+      ]
+    ],
+    "unprivileged_NNP_preinstall_positive": [
+      [
+        4096,
+        0
+      ],
+      [
+        4096,
+        0
+      ]
+    ],
+    "capacity_initial": 4096,
+    "capacity_after": 4096,
+    "denied": [
+      {
+        "command": 1031,
+        "requested": 4096,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 1031,
+        "requested": 8192,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 1031,
+        "requested": 1,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 4096,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 8192,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 1,
+        "result": [
+          -1,
+          1
+        ]
+      }
+    ],
+    "normal_fcntl_roundtrip": true,
+    "O_DIRECT_still_denied": true,
+    "program_sha256": "618405c353d88f593d2986211ab8cc47899e89dffc88f27af4ae036b7ab9ad75",
+    "Source": false,
+    "normal": false,
+    "actual_unique_Wait_exit": 0,
+    "stage": "PMfinal"
+  },
+  {
+    "pid": 12,
+    "uid": [
+      1000,
+      1000,
+      1000
+    ],
+    "gid": [
+      1000,
+      1000,
+      1000
+    ],
+    "before_positive": [
+      [
+        4096,
+        0
+      ],
+      [
+        4096,
+        0
+      ]
+    ],
+    "unprivileged_NNP_preinstall_positive": [
+      [
+        4096,
+        0
+      ],
+      [
+        4096,
+        0
+      ]
+    ],
+    "capacity_initial": 4096,
+    "capacity_after": 4096,
+    "denied": [
+      {
+        "command": 1031,
+        "requested": 4096,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 1031,
+        "requested": 8192,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 1031,
+        "requested": 1,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 4096,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 8192,
+        "result": [
+          -1,
+          1
+        ]
+      },
+      {
+        "command": 4294968327,
+        "requested": 1,
+        "result": [
+          -1,
+          1
+        ]
+      }
+    ],
+    "normal_fcntl_roundtrip": true,
+    "O_DIRECT_still_denied": true,
+    "program_sha256": "c9f8767c1551c11d689249c2692763d4485e80417bdf646dba2529a15f5f3f1a",
+    "Source": false,
+    "normal": false,
+    "actual_unique_Wait_exit": 0,
+    "stage": "child"
+  }
+]

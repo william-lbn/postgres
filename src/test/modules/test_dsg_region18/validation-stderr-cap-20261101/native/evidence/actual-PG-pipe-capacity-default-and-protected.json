@@ -1,0 +1,119 @@
+[
+  {
+    "pid": 41,
+    "stderr_capacity_before": 65536,
+    "stderr_same_result": 65536,
+    "stderr_same_errno": 0,
+    "pipe_capacity_before": 65536,
+    "pipe_capacity_after": 131072,
+    "requests": [
+      65536,
+      4096,
+      131072
+    ],
+    "results": [
+      65536,
+      4096,
+      131072
+    ],
+    "errors": [
+      0,
+      0,
+      0
+    ],
+    "setfl": 0,
+    "setfd": 0,
+    "dup_errno": 0,
+    "nonblock": true,
+    "cloexec": true,
+    "roundtrip": true,
+    "closed": true,
+    "bad_set_errno": 9,
+    "bad_get_errno": 9,
+    "logs": "2026-11-01 14:20:15.359 GMT [26] LOG:  redirecting log output to logging collector process\n2026-11-01 14:20:15.359 GMT [26] HINT:  Future log output will appear in directory \"logs\".\n\n2026-11-01 14:20:15.359 GMT [26] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit\n2026-11-01 14:20:15.360 GMT [26] LOG:  listening on Unix socket \"/tmp/pg18-array-root-3dge3llz/s/.s.PGSQL.55438\"\n2026-11-01 14:20:15.362 GMT [33] LOG:  database system was shut down at 2026-11-01 14:20:15 GMT\n2026-11-01 14:20:15.363 GMT [33] LOG:  Continue writing WAL at 0/1516A40\n2026-11-01 14:20:15.364 GMT [26] LOG:  database system is ready to accept connections\n2026-11-01 14:20:15.446 GMT [43] ERROR:  filter probes require actual native child policy\n2026-11-01 14:20:15.446 GMT [43] STATEMENT:  SELECT test_dsg_filter_probe18('private-outside')\n2026-11-01 14:20:15.459 GMT [47] ERROR:  native filter probes require original administrator\n2026-11-01 14:20:15.459 GMT [47] STATEMENT:  SET ROLE pipe18_ordinary;SELECT test_dsg_filter_probe18('pipe-capacity')\n2026-11-01 14:20:15.471 GMT [31] LOG:  checkpoint starting: immediate force wait\n2026-11-01 14:20:15.472 GMT [31] LOG:  checkpoint complete: wrote 83 buffers (16.2%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=50, longest=0.001 s, average=0.001 s; distance=420 kB, estimate=420 kB; lsn=0/157FDA8, redo lsn=0/157FD08\n",
+    "actual_unique_PM_Wait_exit": 0,
+    "filtered": false,
+    "Source": false,
+    "normal": false
+  },
+  {
+    "pid": 85,
+    "stderr_capacity_before": 65536,
+    "stderr_same_result": -1,
+    "stderr_same_errno": 1,
+    "pipe_capacity_before": 65536,
+    "pipe_capacity_after": 65536,
+    "requests": [
+      65536,
+      4096,
+      131072
+    ],
+    "results": [
+      -1,
+      -1,
+      -1
+    ],
+    "errors": [
+      1,
+      1,
+      1
+    ],
+    "setfl": 0,
+    "setfd": 0,
+    "dup_errno": 0,
+    "nonblock": true,
+    "cloexec": true,
+    "roundtrip": true,
+    "closed": true,
+    "bad_set_errno": 1,
+    "bad_get_errno": 9,
+    "actual_PMfinal": {
+      "pid": 69,
+      "stderr_capacity_before": -1,
+      "stderr_same_result": -1,
+      "stderr_same_errno": 1,
+      "pipe_capacity_before": 65536,
+      "pipe_capacity_after": 65536,
+      "requests": [
+        65536,
+        4096,
+        131072
+      ],
+      "results": [
+        -1,
+        -1,
+        -1
+      ],
+      "errors": [
+        1,
+        1,
+        1
+      ],
+      "setfl": 0,
+      "setfd": 0,
+      "dup_errno": 0,
+      "nonblock": true,
+      "cloexec": true,
+      "roundtrip": true,
+      "closed": true,
+      "bad_set_errno": 1,
+      "bad_get_errno": 9
+    },
+    "actual_filter": {
+      "protocol_version": 1,
+      "enabled": true,
+      "postmaster_installed": true,
+      "child_installed": true,
+      "finalized": true,
+      "postmaster_instructions": 801,
+      "final_postmaster_instructions": 794,
+      "child_instructions": 534,
+      "root_enrolled": false
+    },
+    "logs": "2026-11-01 14:20:16.264 GMT [69] LOG:  DSGA_FILTER_PM_PIPE_CAPACITY {\"pid\":69,\"stderr_capacity_before\":-1,\"stderr_same_result\":-1,\"stderr_same_errno\":1,\"pipe_capacity_before\":65536,\"pipe_capacity_after\":65536,\"requests\":[65536,4096,131072],\"results\":[-1,-1,-1],\"errors\":[1,1,1],\"setfl\":0,\"setfd\":0,\"dup_errno\":0,\"nonblock\":true,\"cloexec\":true,\"roundtrip\":true,\"closed\":true,\"bad_set_errno\":1,\"bad_get_errno\":9}\n2026-11-01 14:20:16.270 GMT [69] LOG:  redirecting log output to logging collector process\n2026-11-01 14:20:16.270 GMT [69] HINT:  Future log output will appear in directory \"logs\".\n\n2026-11-01 14:20:16.270 GMT [69] LOG:  starting PostgreSQL 18.2 (dsga-pg18-native-TEST_ONLY) on x86_64-pc-linux-gnu, compiled by gcc-12 (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit\n2026-11-01 14:20:16.270 GMT [69] LOG:  listening on Unix socket \"/tmp/pg18-array-root-zxm206gq/s/.s.PGSQL.55438\"\n2026-11-01 14:20:16.278 GMT [76] LOG:  database system was shut down at 2026-11-01 14:20:16 GMT\n2026-11-01 14:20:16.279 GMT [76] LOG:  Continue writing WAL at 0/1516A40\n2026-11-01 14:20:16.280 GMT [69] LOG:  database system is ready to accept connections\n2026-11-01 14:20:16.352 GMT [93] ERROR:  native filter probes require original administrator\n2026-11-01 14:20:16.352 GMT [93] STATEMENT:  SET ROLE pipe18_ordinary;SELECT test_dsg_filter_probe18('pipe-capacity')\n2026-11-01 14:20:16.363 GMT [74] LOG:  checkpoint starting: immediate force wait\n2026-11-01 14:20:16.365 GMT [74] LOG:  checkpoint complete: wrote 83 buffers (16.2%), wrote 3 SLRU buffers; 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=50, longest=0.001 s, average=0.001 s; distance=420 kB, estimate=420 kB; lsn=0/157FDA8, redo lsn=0/157FD08\n",
+    "actual_unique_PM_Wait_exit": 0,
+    "filtered": true,
+    "Source": false,
+    "normal": false
+  }
+]

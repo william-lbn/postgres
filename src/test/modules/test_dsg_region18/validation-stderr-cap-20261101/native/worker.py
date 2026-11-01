@@ -1,0 +1,15 @@
+from pathlib import Path
+import subprocess,json,time,hashlib,traceback
+p=Path(__file__).parent;start=time.monotonic();name='pg18-pipe-native-'+p.name[-21:].lower();build=Path('/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5');image='127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6';result={'Source':False,'normal':False,'E':0}
+cmd=['docker','run','--name',name,'--init','--pull=never','--network','none','--read-only','--cap-drop','ALL','--cpus','2','--memory','3g','--memory-swap','3g','--pids-limit','512','--tmpfs','/tmp:rw,nosuid,nodev,size=1g,mode=1777','--tmpfs','/run:rw,nosuid,nodev,size=16m,mode=755','--user','0:0','--cap-add','SYS_ADMIN','--cap-add','SYS_PTRACE','--cap-add','SETUID','--cap-add','SETGID','--cap-add','CHOWN','--cap-add','DAC_OVERRIDE','--cap-add','FOWNER','--cap-add','KILL','--security-opt','seccomp=unconfined','-v',str(p/'source')+':/src:ro','-v',str(p)+':/report:ro','-v',str(build/'install')+':/opt/pg18:ro','-v',str(p/'evidence')+':/evidence:rw','-e','NEON_TEST_PG_BIN=/opt/pg18/bin','-e','NEON_TEST_DSG_LIBRARY=/opt/pg18/lib/postgresql/test_dsg_region18.so','-e','NEON_PG18_EVIDENCE=/evidence','-e','NEON_ARRAY_ROOT_EVIDENCE=/evidence','-e','NEON_ROOT_WIRE_EVIDENCE=/evidence','-e','NEON_DSGA_ROOT_COMPONENT_TEST=1','-e','PYTHONDONTWRITEBYTECODE=1','--entrypoint','/bin/bash',image,'-c','set +e; /usr/bin/python3 /report/runner.py; rc=$?; for metric in cpu.stat memory.peak memory.current io.stat; do if [ -r /sys/fs/cgroup/$metric ]; then cat /sys/fs/cgroup/$metric >/evidence/$metric; fi; done; exit "$rc"']
+(p/'command.json').write_text(json.dumps(cmd,indent=2)+'\n')
+try:
+ with(p/'run.log').open('w')as log:result['native_exit']=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,timeout=180).returncode
+ x=subprocess.run(['docker','inspect',name],capture_output=True,text=True)
+ if x.returncode==0:
+  o=json.loads(x.stdout)[0];(p/'container.json').write_text(json.dumps({'ID':o['Id'],'Image':o['Image'],'State':o['State'],'HostConfig':{k:o['HostConfig'].get(k)for k in ['Memory','MemorySwap','NanoCpus','ReadonlyRootfs','NetworkMode','SecurityOpt','CapDrop','CapAdd','Tmpfs','PidsLimit','Init']}},indent=2)+'\n');assert not o['State']['OOMKilled']
+except BaseException:
+ result['driver_error']=True;(p/'driver-error.txt').write_text(traceback.format_exc())
+finally:
+ x=subprocess.run(['docker','rm','-f',name],capture_output=True,text=True);(p/'cleanup.json').write_text(json.dumps({'exit':x.returncode,'stdout':x.stdout,'stderr':x.stderr},indent=2)+'\n')
+result['seconds']=time.monotonic()-start;(p/'result.json').write_text(json.dumps(result,indent=2)+'\n');raise SystemExit(0 if result.get('native_exit')==0 and not result.get('driver_error')else 1)

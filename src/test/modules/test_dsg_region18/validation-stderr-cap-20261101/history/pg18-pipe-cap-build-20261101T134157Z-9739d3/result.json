@@ -1,0 +1,10 @@
+{
+  "source": false,
+  "normal": false,
+  "S": 0,
+  "build_exit": 126,
+  "postgres_sha256": "65107494edf4b376c3dbe7960247d37d84c96b2e546bd791e3d3aefe5344d530",
+  "pg_config_sha256": "988ad8e6df5e28718763ced43006380d4f4dff6367a50cda6d4d8a62198d8dbe",
+  "test_DSO_sha256": "3ac1cab277327eb5fe75637d7bb30810d3a2e80c9ca0affbbfdaf1f1e5aa74e1",
+  "seconds": 66.91525540401926
+}

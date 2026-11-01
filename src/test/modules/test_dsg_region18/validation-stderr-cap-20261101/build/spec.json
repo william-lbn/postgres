@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T134911Z-9279c5",
+  "unit": "neon-pg18-pipe-build-20261101t134911z-9279c5.service",
+  "kind": "heavy",
+  "evidence_dir": "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/worker.py"
+  ]
+}

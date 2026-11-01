@@ -215,6 +215,7 @@ Build(DsgFilterBuilder *b, bool child, bool birth_open, const DsgBirthArraysSnap
 	unsigned shmat_rule=NewLabel(b), sendto_rule=NewLabel(b), sendmsg_rule=NewLabel(b);
 	unsigned setsockopt_rule=NewLabel(b), sock_level=NewLabel(b), sock_option=NewLabel(b);
 	unsigned open_rule=NewLabel(b), openat_rule=NewLabel(b), fcntl_rule=NewLabel(b), setfl_rule=NewLabel(b);
+	unsigned fcntl_size_safe=NewLabel(b);
 	unsigned advice_rule=NewLabel(b), advice_other=NewLabel(b), receive_rule=NewLabel(b);
 	unsigned advice_list=NewLabel(b);
 	unsigned prctl_rule=NewLabel(b), dumpable_rule=NewLabel(b);
@@ -308,7 +309,10 @@ Build(DsgFilterBuilder *b, bool child, bool birth_open, const DsgBirthArraysSnap
 	Mark(b,sock_option);Go(b,allow);
 	Mark(b,open_rule);Arg(b,1,false);If(b,BPF_JSET|BPF_K,O_DIRECT,deny,allow);
 	Mark(b,openat_rule);Arg(b,2,false);If(b,BPF_JSET|BPF_K,O_DIRECT,deny,allow);
-	Mark(b,fcntl_rule);Arg(b,1,false);If(b,BPF_JEQ|BPF_K,F_SETFL,setfl_rule,allow);
+	/* 原日志管道容量只能在安装前确定；三套实际filter均拒运行期扩/缩/同值重设。
+	 * F_GETPIPE_SZ和其它fcntl仍沿原路径，F_SETFL的O_DIRECT门也保留。 */
+	Mark(b,fcntl_rule);Arg(b,1,false);If(b,BPF_JEQ|BPF_K,F_SETPIPE_SZ,deny,fcntl_size_safe);
+	Mark(b,fcntl_size_safe);If(b,BPF_JEQ|BPF_K,F_SETFL,setfl_rule,allow);
 	Mark(b,setfl_rule);Arg(b,2,false);If(b,BPF_JSET|BPF_K,O_DIRECT,deny,allow);
 	Mark(b,mmap_rule);
 	if(child)

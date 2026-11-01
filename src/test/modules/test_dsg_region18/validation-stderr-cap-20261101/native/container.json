@@ -1,0 +1,46 @@
+{
+  "ID": "19a912a6cea73b79564d94d286cdd96bbb934d24ee626a5890518a07ec76909e",
+  "Image": "sha256:76f5ecc895d360bfc9acadb6e4cf6059b85d9840a5e3dbaba6f0e19505d1f922",
+  "State": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-01T14:20:13.62058879Z",
+    "FinishedAt": "2026-11-01T14:20:16.503152098Z"
+  },
+  "HostConfig": {
+    "Memory": 3221225472,
+    "MemorySwap": 3221225472,
+    "NanoCpus": 2000000000,
+    "ReadonlyRootfs": true,
+    "NetworkMode": "none",
+    "SecurityOpt": [
+      "seccomp=unconfined"
+    ],
+    "CapDrop": [
+      "ALL"
+    ],
+    "CapAdd": [
+      "CAP_CHOWN",
+      "CAP_DAC_OVERRIDE",
+      "CAP_FOWNER",
+      "CAP_KILL",
+      "CAP_SETGID",
+      "CAP_SETUID",
+      "CAP_SYS_ADMIN",
+      "CAP_SYS_PTRACE"
+    ],
+    "Tmpfs": {
+      "/run": "rw,nosuid,nodev,size=16m,mode=755",
+      "/tmp": "rw,nosuid,nodev,size=1g,mode=1777"
+    },
+    "PidsLimit": 512,
+    "Init": true
+  }
+}

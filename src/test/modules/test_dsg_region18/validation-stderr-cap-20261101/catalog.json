@@ -1,0 +1,277 @@
+{
+  "PG": 18,
+  "base": "648c38f41f2cd0d4723a81b49f1924e5737df65c",
+  "branch": "codex/dsga-pg18-v1-20261031",
+  "scope": "ACTUAL_NATIVE_KERNEL_AND_POSTGRES_STDERR_CAP_COMPONENT_ONLY",
+  "owned_source": {
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "fbaa646b1b820ea9a66901d63e511442cded2fbeffd71a919d00648c97830837",
+    "src/test/modules/test_dsg_region18/t/test_pipe_capacity18.py": "4d220963aee510067107c942323968b1fdfc38844584780cd40805c7843b3ebc",
+    "src/test/modules/test_dsg_region18/test_dsg_filter18.c": "2ee8117ddb893e3f9058f76aa8242ac08c48cd5dd410a1dad3b28d909e685fa4"
+  },
+  "build": "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5",
+  "build_result": {
+    "source": false,
+    "normal": false,
+    "S": 0,
+    "build_exit": 0,
+    "postgres_sha256": "ece22255f9b1624e18aa23a2109ca91a0090c706c31e1466657749e8d93e8fe1",
+    "pg_config_sha256": "988ad8e6df5e28718763ced43006380d4f4dff6367a50cda6d4d8a62198d8dbe",
+    "test_DSO_sha256": "be266f3496f7cf981224306f5eda0fa419e32ea98c6ee274d5c1f0c47cce602b",
+    "seconds": 65.91328751502442
+  },
+  "native": "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a",
+  "native_result": {
+    "Source": false,
+    "normal": false,
+    "E": 0,
+    "native_exit": 0,
+    "seconds": 9.465622299991082
+  },
+  "test_result": {
+    "testsRun": 3,
+    "passed": [
+      "test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs",
+      "test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off",
+      "test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach"
+    ],
+    "subtests": [
+      {
+        "id": "test_PG18_S_PIPE_001_actual_all_three_kernel_programs (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs) (stage='PMbase')",
+        "passed": true
+      },
+      {
+        "id": "test_PG18_S_PIPE_001_actual_all_three_kernel_programs (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs) (stage='PMfinal')",
+        "passed": true
+      },
+      {
+        "id": "test_PG18_S_PIPE_001_actual_all_three_kernel_programs (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_001_actual_all_three_kernel_programs) (stage='child')",
+        "passed": true
+      },
+      {
+        "id": "test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off) (filtered=False)",
+        "passed": true
+      },
+      {
+        "id": "test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off (test_pipe_capacity18.Pipe18.test_PG18_S_PIPE_002_real_postmaster_backend_and_default_off) (filtered=True)",
+        "passed": true
+      },
+      {
+        "id": "test_PG18_S_ROOTWIRE_001_real_exact_chain_detach (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach) (threaded=False)",
+        "passed": true
+      },
+      {
+        "id": "test_PG18_S_ROOTWIRE_001_real_exact_chain_detach (test_root_birth18.RootBirth18.test_PG18_S_ROOTWIRE_001_real_exact_chain_detach) (threaded=True)",
+        "passed": true
+      }
+    ],
+    "failures": [],
+    "errors": [],
+    "skips": [],
+    "Source": false,
+    "normal": false,
+    "PG_version": 18,
+    "new_stable_roots": 2,
+    "directly_affected_old_root_rerun": 1,
+    "E": 0
+  },
+  "directly_affected_prior_roots": 1,
+  "new_roots": 2,
+  "resources": {
+    "container_declared_cpus": 2,
+    "container_declared_memory_bytes": 3221225472,
+    "actual_memory_peak_bytes": 100798464,
+    "cpu_stat": {
+      "usage_usec": 1981708,
+      "user_usec": 1337502,
+      "system_usec": 644206,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 28,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "io_stat": "253:16 rbytes=8765440 wbytes=8192 rios=184 wios=1 dbytes=0 dios=0\n"
+  },
+  "source_lock_sha256": "922432f28c66f63db476008c6792845e514f7299e436d19ddde80f8446181656",
+  "historical_runs_preserved": [
+    "pg18-pipe-cap-build-20261101T134157Z-9739d3",
+    "pg18-pipe-cap-native-20261101T135237Z-9d7774"
+  ],
+  "Source": false,
+  "normal": false,
+  "E": 0,
+  "not_proven": [
+    "PG Guest exact18c",
+    "full Root original stderr Source/WAL/runtime closure",
+    "continuous force-I source and actual normal lowering",
+    "Linux end-to-end",
+    "Kubernetes end-to-end"
+  ],
+  "included_original_small_files": {
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/result.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/result.json",
+      "sha256": "79246d0de0951da6850a7f3affa93328655d525db3099417ede3ded1dc681860"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/source-lock.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/source-lock.json",
+      "sha256": "75f48004ae0da1dcbfe0f4d2aec658bfeedb81befaf46d6701347a490d12d975"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/build-command.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/build-command.json",
+      "sha256": "5dcc794229766d587bf656c15a16f4973234e23352dfed236ab14899812e27f0"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/spec.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/spec.json",
+      "sha256": "fd670d09b44059540c53aca571bfbed905a5273993da52c6ee55b615aba9b7c9"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/container.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/container.json",
+      "sha256": "03bd78126418aa34ef7d0d17c5c1badc82c5f4da0da4f9ca82a7ad15bfff7286"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/metadata.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/metadata.json",
+      "sha256": "430c05197f7941096ecb959bf6712677b47bb49628cf19a948b83c5617daaa6f"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/worker.py": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/worker.py",
+      "sha256": "362ea47bb27d1b207d305f781d9c3407794d4356117a4cece3557e2612412632"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/build.sh": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/build.sh",
+      "sha256": "3ffc1e63b4c0a78bfb339eb97e53eb7e7dfff0c263fca56747ddbea2db9567a3"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/build.log": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/build.log",
+      "sha256": "ffbc26df5bcb8b5677fcacc897930f1daad6f4506e96c4baf287a8ac5da2dc44"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/binary.sha256": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/binary.sha256",
+      "sha256": "967d9bb82377735f8fd73171662025011adf78cef243a13a257d573b241fc014"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/ccache-stats.txt": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/ccache-stats.txt",
+      "sha256": "14db9b869c8a4226156ec00a37d9e845f39f4551be3c21e21c58ed6f893d70f1"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/compiler.txt": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/compiler.txt",
+      "sha256": "e622b2bc67b20c151f65966228a3244623e27c4c601578d59f092e298ab65469"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/cpu.max": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/cpu.max",
+      "sha256": "2f8bd783be33cf80b6a2a0cf810f81ccf85f988c72c9bb76fa6172b6e4ec2b02"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/memory.max": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/memory.max",
+      "sha256": "8528d39f97fdd9c9689c4373fe4c7b18f2c3bef6b044a2c4be74b07bf9cd07d8"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/pg-configure.txt": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/pg-configure.txt",
+      "sha256": "bfee05407821487ecc861eefed3e50b5749895c7d1a877aa383e321e2d4708be"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/pkglibdir.txt": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/pkglibdir.txt",
+      "sha256": "e685f8f73ed2b6d1c5fd697aad08fe8a898710e7905230232efd906b703dfd2b"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/postgres-version.txt": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/postgres-version.txt",
+      "sha256": "23650a744c5c462f210888f45b7e48ed1906e0a86a8db06b271043a8051d73b5"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134911Z-9279c5/evidence/source.exitcode": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/build/evidence/source.exitcode",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/result.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/result.json",
+      "sha256": "37935f64d1802fc1ac8746e281000be1efe3138dce67c02fdf5c7ab663998359"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/source-lock.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/source-lock.json",
+      "sha256": "922432f28c66f63db476008c6792845e514f7299e436d19ddde80f8446181656"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/command.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/command.json",
+      "sha256": "51cd16a23242be36bb90dfbeb9030226f8ac3b25fba411cfb8b4ed9f28a6a7c0"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/spec.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/spec.json",
+      "sha256": "f7da14749d2f427430256526d42c1899bd183c9d539d9e707e40dd549a1d2a0e"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/container.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/container.json",
+      "sha256": "ed9c2844234ad9821e48ebf2116d431673a14c9483bae2a288e7ef9c85daf18d"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/worker.py": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/worker.py",
+      "sha256": "ef905f4b694b80300cb78b66eabf4c3908f72a00618cee53a0036035730ba6e2"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/runner.py": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/runner.py",
+      "sha256": "d5ec669ea50d81c6cd434f5d92ff58c04b31488a7c9e38a82f4d83dc3418a695"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/run.log": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/run.log",
+      "sha256": "7fe7db81614026b545597b1e581ae5ab5b93340012a734d1039971dfc2b74750"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/actual-PG-pipe-capacity-default-and-protected.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/actual-PG-pipe-capacity-default-and-protected.json",
+      "sha256": "44938215545d5d6a42c542bf1b2fbf8fea723ee43a2eadad9b32dbccb7dfad88"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/actual-pipe-three-kernel-programs.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/actual-pipe-three-kernel-programs.json",
+      "sha256": "12f0922d7d13bf509023eba420460f089ce23a94c4b425ad6a7436965da29016"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/cpu.stat": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/cpu.stat",
+      "sha256": "3e3c3abd38deea1bb2825992fff3705584ec425af67d0bf9c42b2737386dad4e"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/io.stat": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/io.stat",
+      "sha256": "5e87cf75da805e12c0bbc2c9e9d24a829e44ff1bb620878f228bf6adbe2f7e2a"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/memory.current": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/memory.current",
+      "sha256": "0e2f92fe220b5adf9399ec56ab70fe626efcc402bfaf1f1c5c016186c5f2f4b2"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/memory.peak": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/memory.peak",
+      "sha256": "0677a3a866e687a92ff2977b0bba180166eac589fffb44aee6c4dc7db91bc5ff"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/test-result.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/test-result.json",
+      "sha256": "73ae56d0594cff9b966ec2a8c7486336c4d30b1b9e77d45127b96579e6574ee8"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T142003Z-66772a/evidence/test_PG18_S_ROOTWIRE_001_real_exact_chain_detach.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/native/evidence/test_PG18_S_ROOTWIRE_001_real_exact_chain_detach.json",
+      "sha256": "754f9ea7586dc8031cc4537e4d0ce49dff7346baa11872564801705c4b50e21a"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134157Z-9739d3/result.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/history/pg18-pipe-cap-build-20261101T134157Z-9739d3/result.json",
+      "sha256": "634f2211c292a8a9b3c5392c093823fb2929372c964801ddb5b7339ff59b95fc"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134157Z-9739d3/source-lock.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/history/pg18-pipe-cap-build-20261101T134157Z-9739d3/source-lock.json",
+      "sha256": "75f48004ae0da1dcbfe0f4d2aec658bfeedb81befaf46d6701347a490d12d975"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-build-20261101T134157Z-9739d3/build.log": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/history/pg18-pipe-cap-build-20261101T134157Z-9739d3/build.log",
+      "sha256": "11fb20e896e9728642cf0a53447a4dd63fa5461376c9f705a3bd35616e9ff80c"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T135237Z-9d7774/result.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/history/pg18-pipe-cap-native-20261101T135237Z-9d7774/result.json",
+      "sha256": "0225373e677513586ac92559b6cac5d902d1388105b11b731fad5ccc803f6fbb"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T135237Z-9d7774/source-lock.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/history/pg18-pipe-cap-native-20261101T135237Z-9d7774/source-lock.json",
+      "sha256": "506de97f69f3facd806b3dc03835460a0c1dc6d96a4cdb37dc0b9ddbae79d244"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T135237Z-9d7774/evidence/test-result.json": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/history/pg18-pipe-cap-native-20261101T135237Z-9d7774/evidence/test-result.json",
+      "sha256": "73ae56d0594cff9b966ec2a8c7486336c4d30b1b9e77d45127b96579e6574ee8"
+    },
+    "/data/neon-build/validation/pg18-pipe-cap-native-20261101T135237Z-9d7774/run.log": {
+      "archive": "src/test/modules/test_dsg_region18/validation-stderr-cap-20261101/history/pg18-pipe-cap-native-20261101T135237Z-9d7774/run.log",
+      "sha256": "94cb5243c311ec599414add004da5ddbd0115174d66db09bbae24b32d16d4c35"
+    }
+  }
+}

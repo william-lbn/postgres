@@ -1,0 +1,17 @@
+from pathlib import Path
+import subprocess,json,time,traceback
+p=Path(__file__).parent;start=time.monotonic();lock=json.loads((p/'source-lock.json').read_bytes());name='pg17-pipe-external-'+p.name[-21:].lower();image=lock['PG17_image'];result={'Source':False,'normal':False,'E':0}
+script='set -u\nexport CCACHE_DISABLE=1\nset +e\n{\n sha256sum /usr/local/pgsql/bin/postgres /postgres/src/backend/storage/buffer/dsg_envelope_filter.c\n /usr/local/pgsql/bin/pg_config --version\n /usr/local/pgsql/bin/pg_config --configure\n /usr/bin/cc --version\n} >/evidence/original-program-and-toolchain.txt 2>&1\nfind /usr/local/pgsql/include/server -type f -print0 | sort -z | xargs -0 sha256sum >/evidence/actual-pg17-header-sha256.txt\n/usr/bin/cc -fPIC -shared -O2 -g -I/usr/local/pgsql/include/server -I/usr/local/pgsql/include/internal /probe/pipe_probe17.c -o /probe/pipe_probe17.so >/evidence/compile.log 2>&1\nrc=$?\necho "$rc" >/evidence/compile.exitcode\nif [ "$rc" -eq 0 ]; then\n sha256sum /probe/pipe_probe17.so >/evidence/test-DSO.sha256\n export PYTHONHOME=/test-tools/usr PYTHONDONTWRITEBYTECODE=1 NEON_PG18_EVIDENCE=/evidence\n /test-tools/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2 --library-path /test-tools/lib/x86_64-linux-gnu:/test-tools/usr/lib/x86_64-linux-gnu:/test-tools/usr/local/lib /test-tools/usr/bin/python3.11 /probe/driver.py\n rc=$?\nfi\necho "$rc" >/evidence/test.exitcode\nfor metric in cpu.stat memory.peak memory.current io.stat; do\n if [ -r "/sys/fs/cgroup/$metric" ]; then cat "/sys/fs/cgroup/$metric" >"/evidence/$metric"; fi\ndone\nexit "$rc"'
+(p/'run.sh').write_text(script)
+cmd=['docker','run','--name',name,'--init','--pull=never','--network','none','--read-only','--cap-drop','ALL','--cpus','2','--memory','3g','--memory-swap','3g','--pids-limit','256','--tmpfs','/tmp:rw,nosuid,nodev,size=512m,mode=1777','--tmpfs','/run:rw,nosuid,nodev,size=16m,mode=755','--user','0:0','--cap-add','SETUID','--cap-add','SETGID','--cap-add','CHOWN','--cap-add','DAC_OVERRIDE','--cap-add','FOWNER','--cap-add','KILL','--security-opt','seccomp=unconfined','-v',lock['private_Python_runtime']+':/test-tools:ro','-v',str(p/'probe')+':/probe:rw','-v',str(p/'evidence')+':/evidence:rw','-v',str(p)+':/report:ro','--entrypoint','/bin/bash',image,'/report/run.sh']
+(p/'command.json').write_text(json.dumps(cmd,indent=2)+'\n')
+try:
+ with(p/'run.log').open('w')as log:result['native_exit']=subprocess.run(cmd,stdout=log,stderr=subprocess.STDOUT,timeout=180).returncode
+ x=subprocess.run(['docker','inspect',name],capture_output=True,text=True)
+ if x.returncode==0:
+  o=json.loads(x.stdout)[0];(p/'container.json').write_text(json.dumps({'ID':o['Id'],'Image':o['Image'],'State':o['State'],'HostConfig':{k:o['HostConfig'].get(k)for k in ['Memory','MemorySwap','NanoCpus','ReadonlyRootfs','NetworkMode','SecurityOpt','CapDrop','CapAdd','Tmpfs','PidsLimit','Init']}},indent=2)+'\n');assert not o['State']['OOMKilled']
+except BaseException:
+ result['driver_error']=True;(p/'driver-error.txt').write_text(traceback.format_exc())
+finally:
+ x=subprocess.run(['docker','rm','-f',name],capture_output=True,text=True);(p/'cleanup.json').write_text(json.dumps({'exit':x.returncode,'stdout':x.stdout,'stderr':x.stderr},indent=2)+'\n')
+result['seconds']=time.monotonic()-start;(p/'result.json').write_text(json.dumps(result,indent=2)+'\n');raise SystemExit(0 if result.get('native_exit')==0 and not result.get('driver_error')else 1)

@@ -215,6 +215,7 @@ Build(DsgFilterBuilder *b, bool child, bool birth_open, const DsgBirthArraysSnap
 	unsigned shmat_rule=NewLabel(b), sendto_rule=NewLabel(b), sendmsg_rule=NewLabel(b);
 	unsigned setsockopt_rule=NewLabel(b), sock_level=NewLabel(b), sock_option=NewLabel(b);
 	unsigned open_rule=NewLabel(b), openat_rule=NewLabel(b), fcntl_rule=NewLabel(b), setfl_rule=NewLabel(b);
+	unsigned fcntl_size_safe=NewLabel(b);
 	unsigned advice_rule=NewLabel(b), advice_other=NewLabel(b), receive_rule=NewLabel(b);
 	unsigned advice_list=NewLabel(b);
 	unsigned prctl_rule=NewLabel(b), dumpable_rule=NewLabel(b);
@@ -308,7 +309,9 @@ Build(DsgFilterBuilder *b, bool child, bool birth_open, const DsgBirthArraysSnap
 	Mark(b,sock_option);Go(b,allow);
 	Mark(b,open_rule);Arg(b,1,false);If(b,BPF_JSET|BPF_K,O_DIRECT,deny,allow);
 	Mark(b,openat_rule);Arg(b,2,false);If(b,BPF_JSET|BPF_K,O_DIRECT,deny,allow);
-	Mark(b,fcntl_rule);Arg(b,1,false);If(b,BPF_JEQ|BPF_K,F_SETFL,setfl_rule,allow);
+	/* 注册后的原stderr管道容量不可由SQL/C代码扩展；GET和旧O_DIRECT门保留。 */
+	Mark(b,fcntl_rule);Arg(b,1,false);If(b,BPF_JEQ|BPF_K,F_SETPIPE_SZ,deny,fcntl_size_safe);
+	Mark(b,fcntl_size_safe);If(b,BPF_JEQ|BPF_K,F_SETFL,setfl_rule,allow);
 	Mark(b,setfl_rule);Arg(b,2,false);If(b,BPF_JSET|BPF_K,O_DIRECT,deny,allow);
 	Mark(b,mmap_rule);
 	if(child)

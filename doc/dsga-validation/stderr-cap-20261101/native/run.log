@@ -1,0 +1,7 @@
+test_PG17_S_PIPE_001_actual_three_kernel_programs (__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs) ... ok
+test_PG17_S_PIPE_002_real_PM_backend_and_default_off (__main__.Pipe17.test_PG17_S_PIPE_002_real_PM_backend_and_default_off) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.313s
+
+OK

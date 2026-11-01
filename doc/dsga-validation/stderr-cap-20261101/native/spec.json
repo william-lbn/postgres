@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T142002Z-1fa576",
+  "unit": "neon-pg17-pipe-external-20261101t142002z-1fa576.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/worker.py"
+  ]
+}

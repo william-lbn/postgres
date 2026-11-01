@@ -1,0 +1,39 @@
+{
+  "testsRun": 2,
+  "passed": [
+    "__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs"
+  ],
+  "subtests": [
+    {
+      "id": "test_PG17_S_PIPE_001_actual_three_kernel_programs (__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs) (stage='PMbase')",
+      "passed": true
+    },
+    {
+      "id": "test_PG17_S_PIPE_001_actual_three_kernel_programs (__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs) (stage='PMfinal')",
+      "passed": true
+    },
+    {
+      "id": "test_PG17_S_PIPE_001_actual_three_kernel_programs (__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs) (stage='child')",
+      "passed": true
+    },
+    {
+      "id": "test_PG17_S_PIPE_002_real_PM_backend_and_default_off (__main__.Pipe17.test_PG17_S_PIPE_002_real_PM_backend_and_default_off) (filtered=False)",
+      "passed": true
+    },
+    {
+      "id": "test_PG17_S_PIPE_002_real_PM_backend_and_default_off (__main__.Pipe17.test_PG17_S_PIPE_002_real_PM_backend_and_default_off) (filtered=True)",
+      "passed": false
+    }
+  ],
+  "failures": [
+    {
+      "id": "test_PG17_S_PIPE_002_real_PM_backend_and_default_off (__main__.Pipe17.test_PG17_S_PIPE_002_real_PM_backend_and_default_off) (filtered=True)",
+      "traceback": "Traceback (most recent call last):\n  File \"/probe/driver.py\", line 89, in test_PG17_S_PIPE_002_real_PM_backend_and_default_off\n    pg=Cluster(enabled);self.addCleanup(pg.close);pg.start()\n                                                  ^^^^^^^^^^\n  File \"/probe/driver.py\", line 53, in start\n    assert self.process.poll()is None,self.logs()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 2026-11-01 14:14:06.274 GMT [77] LOG:  PG17_PIPE_PM {\"pg_version_num\":170011,\"enabled\":true,\"postmaster_installed\":true,\"finalized\":true,\"child_installed\":false,\"pipe\":{\"pid\":77,\"stderr_capacity_before\":-1,\"stderr_same_result\":-1,\"stderr_same_errno\":1,\"pipe_capacity_before\":65536,\"pipe_capacity_after\":65536,\"requests\":[65536,4096,131072],\"results\":[-1,-1,-1],\"errors\":[1,1,1],\"setfl\":0,\"setfd\":0,\"dup_errno\":0,\"nonblock\":true,\"cloexec\":true,\"roundtrip\":true,\"closed\":true,\"bad_set_errno\":1,\"bad_get_errno\":9}}\n2026-11-01 14:14:06.274 GMT [77] FATAL:  DSGA early arrays require dynamic shared buffers\n2026-11-01 14:14:06.274 GMT [77] LOG:  database system is shut down\n\n"
+    }
+  ],
+  "errors": [],
+  "skips": [],
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

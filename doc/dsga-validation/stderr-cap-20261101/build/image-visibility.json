@@ -1,0 +1,9 @@
+{
+  "utc": "2026-11-01T13:42:32.289264+00:00",
+  "host": "worker-118",
+  "original_digest": "127.0.0.1:5001/neon/pg17-stderr-cap@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b",
+  "visible_local_Docker_tag": "127.0.0.1:5001/neon/pg17-stderr-cap:test-only-b95-fsetpipe-6fa0fe7f3d5d",
+  "image_id": "sha256:9ee2b5b4b7f98ba8c23769ed9953a8656fb344ddf7a57eb03c3365c25ea11166",
+  "same_image_no_rebuild": true,
+  "scope": "TEST_ONLY_PG17_FCNTL_INCREMENTAL_BUILD_NOT_RUNTIME_OR_RELEASE"
+}

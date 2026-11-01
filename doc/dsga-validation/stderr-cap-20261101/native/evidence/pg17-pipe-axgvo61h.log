@@ -1,0 +1,19 @@
+2026-11-01 14:20:12.945 GMT [40] LOG:  redirecting log output to logging collector process
+2026-11-01 14:20:12.945 GMT [40] HINT:  Future log output will appear in directory "logs".
+
+2026-11-01 14:20:12.945 GMT [40] LOG:  starting PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 14:20:12.945 GMT [40] LOG:  listening on Unix socket "/tmp/pg17-pipe-axgvo61h/s/.s.PGSQL.55439"
+2026-11-01 14:20:12.948 GMT [45] LOG:  database system was shut down at 2026-11-01 14:20:12 GMT
+2026-11-01 14:20:12.949 GMT [45] LOG:  Continue writing WAL at 0/14EDDC0
+2026-11-01 14:20:12.951 GMT [40] LOG:  database system is ready to accept connections
+2026-11-01 14:20:13.010 GMT [60] ERROR:  pipe probe requires original administrator
+2026-11-01 14:20:13.010 GMT [60] STATEMENT:  SET ROLE pipe17_ordinary;SELECT test_pg17_pipe()
+2026-11-01 14:20:13.019 GMT [43] LOG:  checkpoint starting: immediate force wait
+2026-11-01 14:20:13.020 GMT [43] LOG:  checkpoint complete: wrote 56 buffers (10.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=39, longest=0.001 s, average=0.000 s; distance=293 kB, estimate=293 kB; lsn=0/1537368, redo lsn=0/15372C8
+2026-11-01 14:20:13.027 GMT [40] LOG:  received fast shutdown request
+2026-11-01 14:20:13.027 GMT [40] LOG:  aborting any active transactions
+2026-11-01 14:20:13.029 GMT [40] LOG:  background worker "logical replication launcher" (PID 48) exited with exit code 1
+2026-11-01 14:20:13.029 GMT [43] LOG:  shutting down
+2026-11-01 14:20:13.029 GMT [43] LOG:  checkpoint starting: shutdown immediate
+2026-11-01 14:20:13.029 GMT [43] LOG:  checkpoint complete: wrote 12 buffers (2.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.001 s; sync files=4, longest=0.001 s, average=0.000 s; distance=1 kB, estimate=264 kB; lsn=0/1537828, redo lsn=0/1537828
+2026-11-01 14:20:13.031 GMT [40] LOG:  database system is shut down

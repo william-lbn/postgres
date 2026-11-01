@@ -1,0 +1,50 @@
+#0 building with "neon-data" instance using remote driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.28kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for 127.0.0.1:5001/neon/compute-v17-stage@sha256:4578312b21ccf702470ce42c41b46698d4eb5c02197cd83d324283b64ef0542e
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context:
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [internal] setting cache mount permissions
+#4 CACHED
+
+#5 [stage-0 1/3] FROM 127.0.0.1:5001/neon/compute-v17-stage@sha256:4578312b21ccf702470ce42c41b46698d4eb5c02197cd83d324283b64ef0542e
+#5 resolve 127.0.0.1:5001/neon/compute-v17-stage@sha256:4578312b21ccf702470ce42c41b46698d4eb5c02197cd83d324283b64ef0542e 0.1s done
+#5 DONE 0.1s
+
+#6 [internal] load build context
+#6 transferring context: 22.24kB done
+#6 DONE 0.1s
+
+#5 [stage-0 1/3] FROM 127.0.0.1:5001/neon/compute-v17-stage@sha256:4578312b21ccf702470ce42c41b46698d4eb5c02197cd83d324283b64ef0542e
+#5 CACHED
+
+#7 [stage-0 2/3] COPY dsg_envelope_filter.c /postgres/src/backend/storage/buffer/dsg_envelope_filter.c
+#7 DONE 0.2s
+
+#8 [stage-0 3/3] RUN --mount=type=cache,id=neon-ccache-amd64,target=/home/nonroot/.cache/ccache,uid=1000,gid=1000,sharing=shared set -eu; test "$(cat /sys/fs/cgroup/memory.max)" = 8589934592; mkdir -p /stderr-cap-proof; cat /sys/fs/cgroup/memory.max >/stderr-cap-proof/memory.max; cat /sys/fs/cgroup/cpu.max >/stderr-cap-proof/cpu.max; echo "6fa0fe7f3d5d5fb89c19e6e18369f3f833522a01019398fdb0d2b357ef6a80d6  /postgres/src/backend/storage/buffer/dsg_envelope_filter.c" | sha256sum -c - >/stderr-cap-proof/overlay-check.txt; make -C /postgres -j6 -s >/stderr-cap-proof/build.log 2>&1; make -C /postgres -s install >/stderr-cap-proof/install.log 2>&1; sha256sum /usr/local/pgsql/bin/postgres /postgres/src/backend/storage/buffer/dsg_envelope_filter.c >/stderr-cap-proof/source-and-ELF.sha256; readelf -d /usr/local/pgsql/bin/postgres >/stderr-cap-proof/dynamic-tags.txt; find /postgres -type f \( -name '*.c' -o -name '*.h' -o -name '*.mk' -o -name Makefile -o -name configure \) -print0 | sort -z | xargs -0 sha256sum >/stderr-cap-proof/compiled-source-index.txt
+#8 DONE 87.4s
+
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers 9.7s done
+#9 exporting manifest sha256:4cba886e9972900ea44a0f4240bb34cb9ec6684567c8dd09586ba64943a5f99b 0.1s done
+#9 exporting config sha256:9ee2b5b4b7f98ba8c23769ed9953a8656fb344ddf7a57eb03c3365c25ea11166 0.1s done
+#9 exporting attestation manifest sha256:de39b56e6d2ff05a47128259107b5c61c44647dd5ed24865abb0a5b8f31c445c
+#9 exporting attestation manifest sha256:de39b56e6d2ff05a47128259107b5c61c44647dd5ed24865abb0a5b8f31c445c 0.2s done
+#9 exporting manifest list sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b 0.0s done
+#9 pushing layers
+#9 pushing layers 2.3s done
+#9 pushing manifest for 127.0.0.1:5001/neon/pg17-stderr-cap:20261101t133024z-21ad5a-TEST_ONLY@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b
+#9 pushing manifest for 127.0.0.1:5001/neon/pg17-stderr-cap:20261101t133024z-21ad5a-TEST_ONLY@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b 0.1s done
+#9 DONE 12.6s
+
+#10 resolving provenance for metadata file
+#10 DONE 0.0s

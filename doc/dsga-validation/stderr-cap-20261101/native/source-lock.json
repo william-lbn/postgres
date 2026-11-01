@@ -1,0 +1,14 @@
+{
+  "PG17_build": "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a",
+  "PG17_filter_sha256": "6fa0fe7f3d5d5fb89c19e6e18369f3f833522a01019398fdb0d2b357ef6a80d6",
+  "PG17_image": "127.0.0.1:5001/neon/pg17-stderr-cap@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b",
+  "no_PG18_binary_or_DSO_used_for_PG17": true,
+  "private_Python_original_manifest_sha256": "f60e09db59527e2169dc7c15ac60d03c08d0a1a4bbbe5fbe8e60e7114543433f",
+  "private_Python_runtime": "/data/neon-build/validation/pg18-native-guest-369-20261031T212059Z-7abd16/root",
+  "scope": "EXTERNAL_ONLY_PG17_HEADERS_DSO_AND_ACTUAL_KERNEL_PIPE_NO_BUSINESS_SOURCE_EDIT_NO_NORMAL",
+  "test_sources": {
+    "probe/driver.py": "5c48856649f54a7721aa00423c3bd24bd3eabbeca20426e47d09d5c23ca4c4af",
+    "probe/pipe_kernel_programs.py": "b4a1bc58fb6c6988cca7a2c74df09cd885e76cf44ff10e609e333b2095450d21",
+    "probe/pipe_probe17.c": "c7c4203f59139990e2858f72df525390c14e26379d7f825cd7c9c92acb9778ce"
+  }
+}

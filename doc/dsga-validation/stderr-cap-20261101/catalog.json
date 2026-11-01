@@ -1,0 +1,261 @@
+{
+  "PG": 17,
+  "base": "b95b142190cdc51de0d5603bfb9c46a0e0e7051f",
+  "branch": "codex/dsga-pg17-v3-20261019",
+  "scope": "ACTUAL_NATIVE_KERNEL_AND_POSTGRES_STDERR_CAP_COMPONENT_ONLY",
+  "owned_source": {
+    "src/backend/storage/buffer/dsg_envelope_filter.c": "6fa0fe7f3d5d5fb89c19e6e18369f3f833522a01019398fdb0d2b357ef6a80d6"
+  },
+  "build": "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a",
+  "build_result": {
+    "build_exit": 0,
+    "seconds": 101.25339674699353,
+    "Source": false,
+    "normal": false,
+    "image": "127.0.0.1:5001/neon/pg17-stderr-cap@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b",
+    "pull_exit": 0,
+    "copy_exit": 0,
+    "no_RPATH_RUNPATH": true,
+    "source_index_lines": 2869,
+    "status": "PASS_BUILD_NOT_RUNTIME"
+  },
+  "native": "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576",
+  "native_result": {
+    "Source": false,
+    "normal": false,
+    "E": 0,
+    "native_exit": 0,
+    "seconds": 12.562040378019447
+  },
+  "test_result": {
+    "testsRun": 2,
+    "passed": [
+      "__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs",
+      "__main__.Pipe17.test_PG17_S_PIPE_002_real_PM_backend_and_default_off"
+    ],
+    "subtests": [
+      {
+        "id": "test_PG17_S_PIPE_001_actual_three_kernel_programs (__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs) (stage='PMbase')",
+        "passed": true
+      },
+      {
+        "id": "test_PG17_S_PIPE_001_actual_three_kernel_programs (__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs) (stage='PMfinal')",
+        "passed": true
+      },
+      {
+        "id": "test_PG17_S_PIPE_001_actual_three_kernel_programs (__main__.Pipe17.test_PG17_S_PIPE_001_actual_three_kernel_programs) (stage='child')",
+        "passed": true
+      },
+      {
+        "id": "test_PG17_S_PIPE_002_real_PM_backend_and_default_off (__main__.Pipe17.test_PG17_S_PIPE_002_real_PM_backend_and_default_off) (filtered=False)",
+        "passed": true
+      },
+      {
+        "id": "test_PG17_S_PIPE_002_real_PM_backend_and_default_off (__main__.Pipe17.test_PG17_S_PIPE_002_real_PM_backend_and_default_off) (filtered=True)",
+        "passed": true
+      }
+    ],
+    "failures": [],
+    "errors": [],
+    "skips": [],
+    "Source": false,
+    "normal": false,
+    "E": 0
+  },
+  "directly_affected_prior_roots": 0,
+  "new_roots": 2,
+  "resources": {
+    "container_declared_cpus": 2,
+    "container_declared_memory_bytes": 3221225472,
+    "actual_memory_peak_bytes": 97116160,
+    "cpu_stat": {
+      "usage_usec": 1953152,
+      "user_usec": 1407661,
+      "system_usec": 545490,
+      "core_sched.force_idle_usec": 0,
+      "nr_periods": 32,
+      "nr_throttled": 0,
+      "throttled_usec": 0,
+      "nr_bursts": 0,
+      "burst_usec": 0
+    },
+    "io_stat": "253:16 rbytes=3645440 wbytes=176128 rios=262 wios=7 dbytes=0 dios=0\n"
+  },
+  "source_lock_sha256": "ab0b2f495103fbf22130e14dc01c9cb1afdec262cc2b4398f83295acb0e43ee9",
+  "historical_runs_preserved": [
+    "pg17-pipe-external-native-20261101T141358Z-48dde5"
+  ],
+  "Source": false,
+  "normal": false,
+  "E": 0,
+  "not_proven": [
+    "PG Guest exact18c",
+    "full Root original stderr Source/WAL/runtime closure",
+    "continuous force-I source and actual normal lowering",
+    "Linux end-to-end",
+    "Kubernetes end-to-end"
+  ],
+  "included_original_small_files": {
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/result.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/result.json",
+      "sha256": "8505a6193b6486b0731d5db0724ca8a2579efc5b7f261f8d21930b82c506859d"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/source-lock.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/source-lock.json",
+      "sha256": "c1ee8e937c4b08fb671e485a74c9179ece539a7df569fabf312f679812a8950b"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/build-command.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/build-command.json",
+      "sha256": "89d5b271633525b7604b8d3b56f8270807484622d3d263858886eb1c0d8f2891"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/budget-spec.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/budget-spec.json",
+      "sha256": "4ef949cbfaded37b8ab6457315a5468d4bc84f4ec89dd5f97e160e110986598b"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/metadata.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/metadata.json",
+      "sha256": "d36cbae773904dc9513dd292afa36b0a664c86ccb59fc5d22f3796e5666ccc23"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/build-metadata.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/build-metadata.json",
+      "sha256": "8586bf59a0fb2f56d1eb53a16ec9932d0a9e361fe5159dfe1f720db0c9865f71"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/image-visibility.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/image-visibility.json",
+      "sha256": "8437644b3d3cf2e31472e2c4cdd7adea3db90d55519ee3a91a49b45c00d935f2"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/Dockerfile": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/Dockerfile",
+      "sha256": "3fc29b1fe5b203043952a1dd49c8247a32a2706fc42f24e2de4cad6592b23b1c"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/worker.py": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/worker.py",
+      "sha256": "db502f1a8e898f69ef3b6fa63a0c4a6ecfce4ad2f546d8a55f657f15e15a1db3"
+    },
+    "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/build.log": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/build/build.log",
+      "sha256": "9e16568e1d807fa678a333b26dc52bb0120e88a652ac7d0c2d6c76e93d093732"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/result.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/result.json",
+      "sha256": "16ae78f4acf65f58abc10f34ef0411765536d52cc577aed60e817250595c4c25"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/source-lock.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/source-lock.json",
+      "sha256": "ab0b2f495103fbf22130e14dc01c9cb1afdec262cc2b4398f83295acb0e43ee9"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/command.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/command.json",
+      "sha256": "c43401b499dba0174bd6287db2fceb6ad56b05ea02b4e7d440580e2a4a1013db"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/spec.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/spec.json",
+      "sha256": "887d0b9177329e4c65fa4702da5dae4f8080128e9170c5f6e88629076adc41ae"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/container.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/container.json",
+      "sha256": "89b9fae440c547924cafc3d2d906690cbf1771591f0d59da4cfa6350e3e6a4be"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/worker.py": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/worker.py",
+      "sha256": "c7465185b8987d8ef848849855dd36a7bd1f54b43f384abe63a53204ccfc9bf2"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/run.sh": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/run.sh",
+      "sha256": "dfa045805feaac2ad1d8f8695647925013af30606159dee5a2b30b4e626bd4f0"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/run.log": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/run.log",
+      "sha256": "09c2d1ec1f065e0dc8571596ccf7ab9ccb49390890752771ef0624a843e33827"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/actual-pg17-PM-backend-pipe.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/actual-pg17-PM-backend-pipe.json",
+      "sha256": "58688066adb1fd07cfc716bd6c65bc0f30428c581f720cfd02bc45806e95539d"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/actual-pg17-three-kernel-programs.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/actual-pg17-three-kernel-programs.json",
+      "sha256": "3d25ec29457d3d7c3811cd0168234d89a65fd72e43b810b36c9abb2dbf5077f5"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/compile.exitcode": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/compile.exitcode",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/compile.log": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/cpu.stat": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/cpu.stat",
+      "sha256": "a6877c7fbeb021d8d12c8c657e8816f92e9e0ca2f70cc591baffe883042cc14e"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/io.stat": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/io.stat",
+      "sha256": "304185595a81b3b206029256bd7bf7cb4fb7e727641236d8af322bc57c8634ab"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/memory.current": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/memory.current",
+      "sha256": "7210533134cc026ff52d38fc6e73a56928e7d053477a9bae3d71df8161e5fe9c"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/memory.peak": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/memory.peak",
+      "sha256": "1698367527f84a7a7b701ff6acc4b082b339c636dcffeb96da46e2abb6407701"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/original-program-and-toolchain.txt": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/original-program-and-toolchain.txt",
+      "sha256": "44242bf10f5cde7e9740ade32d9d628f5a6e25a9e034bd6f05e85d4c4418fb4a"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/pg17-pipe-axgvo61h.log": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/pg17-pipe-axgvo61h.log",
+      "sha256": "59be6d7211ae947baf0b6ffe56201a216bf3289a2ad2814b7618aa924b05e53e"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/pg17-pipe-eblo016k.log": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/pg17-pipe-eblo016k.log",
+      "sha256": "f201de64b7488658f8ae4eee2ea953f6ed976193cd172634b3cd6d4b1b74dd69"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/test-DSO.sha256": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/test-DSO.sha256",
+      "sha256": "646b6cbb029ca5eccc74a684d6bf4e46b519f6e357da6cc6d491182f6c8e45c0"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/test-result.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/test-result.json",
+      "sha256": "f0701d26416481233cd2bcd02c1bcd476b1135bf0a93c264fb4b3fb6c88f4acd"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/evidence/test.exitcode": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/native/evidence/test.exitcode",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/probe/pipe_kernel_programs.py": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/probe/pipe_kernel_programs.py",
+      "sha256": "b4a1bc58fb6c6988cca7a2c74df09cd885e76cf44ff10e609e333b2095450d21"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/probe/driver.py": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/probe/driver.py",
+      "sha256": "5c48856649f54a7721aa00423c3bd24bd3eabbeca20426e47d09d5c23ca4c4af"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/probe/pipe_probe17.c": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/probe/pipe_probe17.c",
+      "sha256": "c7c4203f59139990e2858f72df525390c14e26379d7f825cd7c9c92acb9778ce"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T141358Z-48dde5/result.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/history/pg17-pipe-external-native-20261101T141358Z-48dde5/result.json",
+      "sha256": "d5f4f033e637f2e793d6692f9e58964d03baf57bc8aac1dd2cf2599601a14e94"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T141358Z-48dde5/source-lock.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/history/pg17-pipe-external-native-20261101T141358Z-48dde5/source-lock.json",
+      "sha256": "075393cecd071316e27b6ba37ffa4e01c6c1ae69ea69af483be3d3a3be5ef184"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T141358Z-48dde5/evidence/test-result.json": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/history/pg17-pipe-external-native-20261101T141358Z-48dde5/evidence/test-result.json",
+      "sha256": "c3fdc732908bb57963166809a9608904e7dced471f89295375307428650f7ec1"
+    },
+    "/data/neon-build/validation/pg17-pipe-external-native-20261101T141358Z-48dde5/run.log": {
+      "archive": "doc/dsga-validation/stderr-cap-20261101/history/pg17-pipe-external-native-20261101T141358Z-48dde5/run.log",
+      "sha256": "0aab57fcf1f11f7f22c8625b8322cacad57d61e32ba1e3930352fea221dc403f"
+    }
+  },
+  "external_test_DSO": {
+    "original": "/data/neon-build/validation/pg17-pipe-external-native-20261101T142002Z-1fa576/probe/pipe_probe17.so",
+    "sha256": "d176721b4e8c41928f9adcc289bc2f47b82aae5c15c2c8b5a0b3ddc5b378dda4",
+    "compiled_binary_not_in_git": true
+  }
+}

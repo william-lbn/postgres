@@ -1,0 +1,129 @@
+[
+  {
+    "pg_version_num": 170011,
+    "enabled": false,
+    "postmaster_installed": false,
+    "finalized": false,
+    "child_installed": false,
+    "pipe": {
+      "pid": 56,
+      "stderr_capacity_before": 65536,
+      "stderr_same_result": 65536,
+      "stderr_same_errno": 0,
+      "pipe_capacity_before": 65536,
+      "pipe_capacity_after": 131072,
+      "requests": [
+        65536,
+        4096,
+        131072
+      ],
+      "results": [
+        65536,
+        4096,
+        131072
+      ],
+      "errors": [
+        0,
+        0,
+        0
+      ],
+      "setfl": 0,
+      "setfd": 0,
+      "dup_errno": 0,
+      "nonblock": true,
+      "cloexec": true,
+      "roundtrip": true,
+      "closed": true,
+      "bad_set_errno": 9,
+      "bad_get_errno": 9
+    },
+    "filtered": false,
+    "Source": false,
+    "normal": false,
+    "logs": "2026-11-01 14:20:12.945 GMT [40] LOG:  redirecting log output to logging collector process\n2026-11-01 14:20:12.945 GMT [40] HINT:  Future log output will appear in directory \"logs\".\n\n2026-11-01 14:20:12.945 GMT [40] LOG:  starting PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit\n2026-11-01 14:20:12.945 GMT [40] LOG:  listening on Unix socket \"/tmp/pg17-pipe-axgvo61h/s/.s.PGSQL.55439\"\n2026-11-01 14:20:12.948 GMT [45] LOG:  database system was shut down at 2026-11-01 14:20:12 GMT\n2026-11-01 14:20:12.949 GMT [45] LOG:  Continue writing WAL at 0/14EDDC0\n2026-11-01 14:20:12.951 GMT [40] LOG:  database system is ready to accept connections\n2026-11-01 14:20:13.010 GMT [60] ERROR:  pipe probe requires original administrator\n2026-11-01 14:20:13.010 GMT [60] STATEMENT:  SET ROLE pipe17_ordinary;SELECT test_pg17_pipe()\n2026-11-01 14:20:13.019 GMT [43] LOG:  checkpoint starting: immediate force wait\n2026-11-01 14:20:13.020 GMT [43] LOG:  checkpoint complete: wrote 56 buffers (10.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=39, longest=0.001 s, average=0.000 s; distance=293 kB, estimate=293 kB; lsn=0/1537368, redo lsn=0/15372C8\n",
+    "actual_unique_PM_Wait_exit": 0
+  },
+  {
+    "pg_version_num": 170011,
+    "enabled": true,
+    "postmaster_installed": true,
+    "finalized": true,
+    "child_installed": true,
+    "pipe": {
+      "pid": 94,
+      "stderr_capacity_before": 65536,
+      "stderr_same_result": -1,
+      "stderr_same_errno": 1,
+      "pipe_capacity_before": 65536,
+      "pipe_capacity_after": 65536,
+      "requests": [
+        65536,
+        4096,
+        131072
+      ],
+      "results": [
+        -1,
+        -1,
+        -1
+      ],
+      "errors": [
+        1,
+        1,
+        1
+      ],
+      "setfl": 0,
+      "setfd": 0,
+      "dup_errno": 0,
+      "nonblock": true,
+      "cloexec": true,
+      "roundtrip": true,
+      "closed": true,
+      "bad_set_errno": 1,
+      "bad_get_errno": 9
+    },
+    "actual_PMfinal": {
+      "pg_version_num": 170011,
+      "enabled": true,
+      "postmaster_installed": true,
+      "finalized": true,
+      "child_installed": false,
+      "pipe": {
+        "pid": 78,
+        "stderr_capacity_before": -1,
+        "stderr_same_result": -1,
+        "stderr_same_errno": 1,
+        "pipe_capacity_before": 65536,
+        "pipe_capacity_after": 65536,
+        "requests": [
+          65536,
+          4096,
+          131072
+        ],
+        "results": [
+          -1,
+          -1,
+          -1
+        ],
+        "errors": [
+          1,
+          1,
+          1
+        ],
+        "setfl": 0,
+        "setfd": 0,
+        "dup_errno": 0,
+        "nonblock": true,
+        "cloexec": true,
+        "roundtrip": true,
+        "closed": true,
+        "bad_set_errno": 1,
+        "bad_get_errno": 9
+      }
+    },
+    "filtered": true,
+    "Source": false,
+    "normal": false,
+    "logs": "2026-11-01 14:20:13.526 GMT [78] LOG:  PG17_PIPE_PM {\"pg_version_num\":170011,\"enabled\":true,\"postmaster_installed\":true,\"finalized\":true,\"child_installed\":false,\"pipe\":{\"pid\":78,\"stderr_capacity_before\":-1,\"stderr_same_result\":-1,\"stderr_same_errno\":1,\"pipe_capacity_before\":65536,\"pipe_capacity_after\":65536,\"requests\":[65536,4096,131072],\"results\":[-1,-1,-1],\"errors\":[1,1,1],\"setfl\":0,\"setfd\":0,\"dup_errno\":0,\"nonblock\":true,\"cloexec\":true,\"roundtrip\":true,\"closed\":true,\"bad_set_errno\":1,\"bad_get_errno\":9}}\n2026-11-01 14:20:13.531 GMT [78] LOG:  redirecting log output to logging collector process\n2026-11-01 14:20:13.531 GMT [78] HINT:  Future log output will appear in directory \"logs\".\n\n2026-11-01 14:20:13.531 GMT [78] LOG:  starting PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit\n2026-11-01 14:20:13.531 GMT [78] LOG:  listening on Unix socket \"/tmp/pg17-pipe-eblo016k/s/.s.PGSQL.55439\"\n2026-11-01 14:20:13.537 GMT [83] LOG:  database system was shut down at 2026-11-01 14:20:13 GMT\n2026-11-01 14:20:13.537 GMT [83] LOG:  Continue writing WAL at 0/14EDDC0\n2026-11-01 14:20:13.545 GMT [78] LOG:  database system is ready to accept connections\n2026-11-01 14:20:13.596 GMT [98] ERROR:  pipe probe requires original administrator\n2026-11-01 14:20:13.596 GMT [98] STATEMENT:  SET ROLE pipe17_ordinary;SELECT test_pg17_pipe()\n2026-11-01 14:20:13.608 GMT [81] LOG:  checkpoint starting: immediate force wait\n2026-11-01 14:20:13.609 GMT [81] LOG:  checkpoint complete: wrote 56 buffers (10.9%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.002 s; sync files=39, longest=0.001 s, average=0.000 s; distance=293 kB, estimate=293 kB; lsn=0/1537368, redo lsn=0/15372C8\n",
+    "actual_unique_PM_Wait_exit": 0
+  }
+]

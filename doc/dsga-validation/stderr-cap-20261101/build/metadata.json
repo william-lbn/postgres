@@ -1,0 +1,13 @@
+{
+  "nonce": "20261101T133024Z-21ad5a",
+  "unit": "neon-pg17-stderr-cap-build-20261101t133024z-21ad5a.service",
+  "source_lock_sha256": "c1ee8e937c4b08fb671e485a74c9179ece539a7df569fabf312f679812a8950b",
+  "limits": {
+    "CPU": 6,
+    "MemoryGiB": 8,
+    "make_jobs": 6,
+    "single_RUN": true
+  },
+  "test_status": "NOT_RUN",
+  "scope": "PG17_ONE_FILTER_BUILD_NO_RUNTIME_OR_NORMAL"
+}

@@ -1,0 +1,12 @@
+{
+  "build_exit": 0,
+  "seconds": 101.25339674699353,
+  "Source": false,
+  "normal": false,
+  "image": "127.0.0.1:5001/neon/pg17-stderr-cap@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b",
+  "pull_exit": 0,
+  "copy_exit": 0,
+  "no_RPATH_RUNPATH": true,
+  "source_index_lines": 2869,
+  "status": "PASS_BUILD_NOT_RUNTIME"
+}

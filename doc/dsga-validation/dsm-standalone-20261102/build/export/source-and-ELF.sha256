@@ -1,0 +1,3 @@
+649f4535d07e682fe5015fd8df8be23f626e73bd772da21b16e1c032721c53c6  /usr/local/pgsql/bin/postgres
+89b0b89a0c1b86885ae9ae5d5c784e628136d3417bdbb801b6a10b8304e5fc06  /postgres/src/backend/storage/ipc/dsm.c
+508f62818d505f08b0da3c3702a6d742ce920a5d0030e18fe077634ec25695f2  /postgres/src/backend/storage/ipc/dsg_dsm.c

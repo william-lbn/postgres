@@ -1,0 +1,9 @@
+{
+  "source_lock_sha256": "e94ae53752cd08c917f1683d6d36d946ac6256d61938a634249bf678cd8c0cb6",
+  "Dockerfile_sha256": "c4f3d525cf2b76ff4bd13956f6ede3c158e49f5f6ef0775408ce48b60aba7f85",
+  "build_worker_sha256": "eaefbbc7ad7f790c8e5738911867a141594120f167582903e1d68ba7dc22fb7a",
+  "native_worker_sha256": "b9e531fe05cbb9c4b8194cd8375a41693d12059e50ae157e3a7693af14920bd7",
+  "native_target_source_lock_sha256": "2eb1a2dd627f3e0a8703a504116097c4ecd17d7fae87a81598fe6095c8e40450",
+  "native_spec_sha256": "65dd23bfa33afa1e95629d484c69063798955f7fc07b3969a7b2891427200cd8",
+  "scope": "new precise PG ELF, heavy6CPU8GiB incremental parent884 then native reservation2CPU3GiB actual1CPU512MiB; cap0 invalid assertion included"
+}

@@ -61,8 +61,15 @@ DsgDsmCapacity(void)
 Size
 DsgDsmShmemSize(void)
 {
+	/* 正数额度必须实际强制，不能让关闭native或standalone静默绕过。 */
 	if (!enable_dynamic_shared_buffers)
+	{
+		if (dynamic_shared_buffers_dsm_budget > 0)
+			elog(FATAL, "DSGA external DSM budget requires managed native buffer profile");
 		return 0;
+	}
+	if (dynamic_shared_buffers_dsm_budget > 0 && !IsPostmasterEnvironment)
+		elog(FATAL, "DSGA external DSM budget requires a fork Postmaster environment");
 	return add_size(offsetof(DsgDsmControl, slots),
 		mul_size(DsgDsmCapacity(), sizeof(DsgDsmSlot)));
 }
@@ -100,7 +107,8 @@ DsgDsmShmemInit(void)
 		dsm_registry->counters.external_budget_bytes =
 			(uint64) dynamic_shared_buffers_dsm_budget * 1024;
 		dsm_registry->counters.limit_enforced = dynamic_shared_buffers_dsm_budget > 0;
-		dsm_registry->counters.accounting_valid = supported;
+		/* standalone未登记payload，不得将零计数报告为有效预算。 */
+		dsm_registry->counters.accounting_valid = supported && IsPostmasterEnvironment;
 	}
 	if (dsm_registry->boot_id != DSBCtrl->boot_id)
 		elog(FATAL, "DSGA DSM registry does not match this PG boot");

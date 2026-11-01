@@ -1,0 +1,10 @@
+{
+  "parent_build": "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562",
+  "original_target_run": "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T184226Z-1ae562-native",
+  "image": "127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:884b1d0b2bedd87c4024d8c19b72a92988f8a211d0e3cdb95c0cdfd648a4827f",
+  "PG_ELF_sha256": "3b569382b4b84943e978cb12440189e158f65d77d08fccefa0c538e5f8b111bb",
+  "test_DSO_sha256": "f8566db65aa1d31ccf513f19e3b56c89b15678650bbce42d4e39de2fbaaa3841",
+  "test_shim_sha256": "1aed4f6f7810fc9b6435ca8fcbcf7d60dd8baf82a8526f7bbd254c593408b620",
+  "run_sh_sha256": "ee25013954df72a1d55c9706d1917231684f5beb813b9847c5181ccfffd733c7",
+  "scope": "supplement existing cap0 standalone check only; snapshot invalid/unenforced, no new PG build; not an additional U or E root"
+}

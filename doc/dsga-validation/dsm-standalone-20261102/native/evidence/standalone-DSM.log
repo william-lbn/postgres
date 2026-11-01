@@ -1,0 +1,13 @@
+2026-11-01 19:01:41.092 GMT [41] LOG:  Continue writing WAL at 0/14EDE70
+
+PostgreSQL stand-alone backend 17.11
+backend> backend> backend> backend> backend> backend> 	 1: case	(typeid = 25, len = -1, typmod = -1, byval = f)
+	----
+	 1: case = "PG17_STANDALONE_ACTUAL_DSM_OK"	(typeid = 25, len = -1, typmod = -1, byval = f)
+	----
+backend> 	 1: pg17_dsm_snapshot	(typeid = 25, len = -1, typmod = -1, byval = f)
+	----
+	 1: pg17_dsm_snapshot = "{"reserved_upper_bytes":0,"external_segments":0,"pending_creations":0,"unknown_segments":0,"external_budget_bytes":0,"accounting_valid":false,"limit_enforced":false,"Source":false}"	(typeid = 25, len = -1, typmod = -1, byval = f)
+	----
+backend> 2026-11-01 19:01:41.123 GMT [41] LOG:  checkpoint starting: shutdown immediate
+2026-11-01 19:01:41.189 GMT [41] LOG:  checkpoint complete: wrote 15 buffers (11.7%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.006 s, sync=0.056 s, total=0.081 s; sync files=12, longest=0.020 s, average=0.005 s; distance=69 kB, estimate=69 kB; lsn=0/14FF250, redo lsn=0/14FF250

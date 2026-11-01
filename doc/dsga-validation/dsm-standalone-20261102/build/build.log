@@ -1,0 +1,49 @@
+#0 building with "neon-data" instance using remote driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.75kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for 127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:884b1d0b2bedd87c4024d8c19b72a92988f8a211d0e3cdb95c0cdfd648a4827f
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [internal] setting cache mount permissions
+#4 CACHED
+
+#5 [internal] load build context
+#5 transferring context: 55.22kB done
+#5 DONE 0.0s
+
+#6 [stage-0 1/4] FROM 127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:884b1d0b2bedd87c4024d8c19b72a92988f8a211d0e3cdb95c0cdfd648a4827f
+#6 resolve 127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:884b1d0b2bedd87c4024d8c19b72a92988f8a211d0e3cdb95c0cdfd648a4827f 0.0s done
+#6 DONE 0.2s
+
+#7 [stage-0 2/4] COPY dsm.c /postgres/src/backend/storage/ipc/dsm.c
+#7 DONE 0.1s
+
+#8 [stage-0 3/4] COPY dsg_dsm.c /postgres/src/backend/storage/ipc/dsg_dsm.c
+#8 DONE 0.1s
+
+#9 [stage-0 4/4] RUN --network=none --mount=type=cache,id=neon-ccache-amd64,target=/home/nonroot/.cache/ccache,uid=1000,gid=1000,sharing=shared set -eu; test "$(cat /sys/fs/cgroup/memory.max)" = 8589934592; test "$(cat /sys/fs/cgroup/cpu.max)" = "600000 100000"; mkdir -p /dsm-fix-v2-proof; cat /sys/fs/cgroup/memory.max >/dsm-fix-v2-proof/memory.max; cat /sys/fs/cgroup/cpu.max >/dsm-fix-v2-proof/cpu.max; echo "89b0b89a0c1b86885ae9ae5d5c784e628136d3417bdbb801b6a10b8304e5fc06  /postgres/src/backend/storage/ipc/dsm.c" | sha256sum -c - >>/dsm-fix-v2-proof/source-overlay-check.txt; echo "508f62818d505f08b0da3c3702a6d742ce920a5d0030e18fe077634ec25695f2  /postgres/src/backend/storage/ipc/dsg_dsm.c" | sha256sum -c - >>/dsm-fix-v2-proof/source-overlay-check.txt; make -C /postgres -j6 -s >/dsm-fix-v2-proof/build.log 2>&1; make -C /postgres -s install >/dsm-fix-v2-proof/install.log 2>&1; sha256sum /usr/local/pgsql/bin/postgres /postgres/src/backend/storage/ipc/dsm.c /postgres/src/backend/storage/ipc/dsg_dsm.c >/dsm-fix-v2-proof/source-and-ELF.sha256; readelf -d /usr/local/pgsql/bin/postgres >/dsm-fix-v2-proof/dynamic-tags.txt; find /postgres -type f \( -name "*.c" -o -name "*.h" -o -name "*.mk" -o -name Makefile -o -name configure \) -print0 | sort -z | xargs -0 sha256sum >/dsm-fix-v2-proof/compiled-source-index.txt; cat /sys/fs/cgroup/cpu.stat >/dsm-fix-v2-proof/cpu.stat; cat /sys/fs/cgroup/memory.peak >/dsm-fix-v2-proof/memory.peak; cat /sys/fs/cgroup/io.stat >/dsm-fix-v2-proof/io.stat
+#9 DONE 50.6s
+
+#10 exporting to image
+#10 exporting layers
+#10 exporting layers 9.6s done
+#10 exporting manifest sha256:8bf9306feff74713599dc1139b01a5ff349c70a61e10446f2d58ff952abc3350 0.0s done
+#10 exporting config sha256:eb910ebda7b07764943ed7a8a2c94dd23361875467c47a900d9be3d665a20557 0.0s done
+#10 exporting attestation manifest sha256:52318f70bb42136a8ba73ec55dd5bbfbce9d3abcb351315576353be1df9f2cad 0.0s done
+#10 exporting manifest list sha256:b164d61a939502fa3ba983c0359f7832b9345ccefeb15c00326eaceab61a3a40
+#10 exporting manifest list sha256:b164d61a939502fa3ba983c0359f7832b9345ccefeb15c00326eaceab61a3a40 0.0s done
+#10 pushing layers
+#10 pushing layers 0.6s done
+#10 pushing manifest for 127.0.0.1:5001/neon/pg17-dsm-standalone-fix:20261101t190032z-f8fc68-TEST_ONLY@sha256:b164d61a939502fa3ba983c0359f7832b9345ccefeb15c00326eaceab61a3a40
+#10 pushing manifest for 127.0.0.1:5001/neon/pg17-dsm-standalone-fix:20261101t190032z-f8fc68-TEST_ONLY@sha256:b164d61a939502fa3ba983c0359f7832b9345ccefeb15c00326eaceab61a3a40 0.1s done
+#10 DONE 10.4s
+
+#11 resolving provenance for metadata file
+#11 DONE 0.0s

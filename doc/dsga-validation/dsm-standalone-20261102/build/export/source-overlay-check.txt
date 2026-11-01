@@ -1,0 +1,2 @@
+/postgres/src/backend/storage/ipc/dsm.c: OK
+/postgres/src/backend/storage/ipc/dsg_dsm.c: OK

@@ -1,0 +1,5 @@
+{
+  "exit": 0,
+  "stdout": "{\"cpu\": 2, \"kind\": \"native\", \"last_observation\": null, \"memory\": 3221225472, \"nonce\": \"20261101T190032Z-f8fc68-native\", \"process_exit_code\": null, \"queue_reason\": \"\", \"spec_sha256\": \"65dd23bfa33afa1e95629d484c69063798955f7fc07b3969a7b2891427200cd8\", \"state\": \"reserved\", \"test_verdict\": \"NOT_INTERPRETED\", \"unit\": \"neon-pg17-dsm-fix-20261101t190032z-f8fc68-native.service\", \"unit_result\": null, \"worker_sha256\": \"b9e531fe05cbb9c4b8194cd8375a41693d12059e50ae157e3a7693af14920bd7\"}\n",
+  "stderr": ""
+}

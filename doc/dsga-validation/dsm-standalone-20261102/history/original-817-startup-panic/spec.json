@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T183043Z-817305",
+  "unit": "neon-pg17-dsm-standalone-20261101t183043z-817305.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/worker.py"
+  ]
+}

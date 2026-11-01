@@ -1,0 +1,14 @@
+{
+  "build_exit": 0,
+  "seconds": 81.86781691000215,
+  "Source": false,
+  "normal": false,
+  "E": 0,
+  "test_only_visible_tag": "127.0.0.1:5001/neon/pg17-dsm-standalone-fix:20261101t184226z-1ae562-TEST_ONLY",
+  "image": "127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:884b1d0b2bedd87c4024d8c19b72a92988f8a211d0e3cdb95c0cdfd648a4827f",
+  "pull_exit": 0,
+  "copy_exit": 0,
+  "new_PG_ELF_sha256": "3b569382b4b84943e978cb12440189e158f65d77d08fccefa0c538e5f8b111bb",
+  "no_RPATH_RUNPATH": true,
+  "status": "PASS_BUILD_NOT_RUNTIME"
+}

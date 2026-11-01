@@ -1,0 +1,7 @@
+{
+  "parent_build": "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562",
+  "source2_lock_sha256": "c59922401a7297727e0f53681948d0068e1ca8ddb4b7e17270927153e5c4fea7",
+  "test_shim_sha256": "1aed4f6f7810fc9b6435ca8fcbcf7d60dd8baf82a8526f7bbd254c593408b620",
+  "script_sha256": "f54d10e23544548e89aafff129edd4728f7f203ba094957cbe6db8d1c0d6c9d0",
+  "scope": "four targeted DSM hook semantics only; measured baseline, no guessed zero; not Root Source/normal"
+}

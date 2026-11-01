@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T185752Z-90a9be",
+  "unit": "neon-pg17-dsm-snapshot-20261101t185752z-90a9be.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/worker.py"
+  ]
+}

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/worker.py", line 10, in <module>
+    snap=json.loads(re.search(r'\{[^\n]+\}',text).group(0));assert snap['accounting_valid'] is False and snap['limit_enforced'] is False and snap['reserved_upper_bytes']==0 and snap['external_segments']==0 and snap['pending_creations']==0 and snap['unknown_segments']==0
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

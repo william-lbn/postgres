@@ -176,6 +176,13 @@ ResourceOwnerForgetDSM(ResourceOwner owner, dsm_segment *seg)
  * CREATE 在 OS 前记账；撞名明确无效果时撤销预留，异常则保持未知预算。
  * 不将候选 handle 提前写入原生控制清理表，避免撞名时误删其他 PG 对象。
  */
+/* 只登记真实fork backend的payload；PM/standalone保原生无预算路径。 */
+static bool
+dsm_dsg_tracking_enabled(void)
+{
+	return enable_dynamic_shared_buffers && IsUnderPostmaster;
+}
+
 static bool
 dsm_dsg_impl_op(dsm_op op, dsm_handle handle, Size request_size,
 				void **impl_private, void **mapped_address, Size *mapped_size,
@@ -190,7 +197,7 @@ dsm_dsg_impl_op(dsm_op op, dsm_handle handle, Size request_size,
 	 * 固定控制成本已在启动登记，此路径必须原样无 backend 锁；不能为了
 	 * 一次找不到记录的 lookup 取得需要 MyProc 的 LWLock。
 	 */
-	if (!enable_dynamic_shared_buffers || !IsUnderPostmaster ||
+	if (!dsm_dsg_tracking_enabled() ||
 		(op != DSM_OP_CREATE && handle == dsm_control_handle))
 		return dsm_impl_op(op, handle, request_size, impl_private,
 						   mapped_address, mapped_size, elevel);
@@ -649,13 +656,13 @@ dsm_create(Size size, int flags)
 			seg->handle = pg_prng_uint32(&pg_global_prng_state) << 1;
 			if (seg->handle == DSM_HANDLE_INVALID)	/* Reserve sentinel */
 				continue;
-			seg->creating = enable_dynamic_shared_buffers;
+			seg->creating = dsm_dsg_tracking_enabled();
 			if (dsm_dsg_impl_op(DSM_OP_CREATE, seg->handle, size, &seg->impl_private,
 							&seg->mapped_address, &seg->mapped_size, ERROR))
 				break;
 			seg->creating = false;
 		}
-		if (enable_dynamic_shared_buffers)
+		if (dsm_dsg_tracking_enabled())
 			INJECTION_POINT("dsg-dsm-after-create");
 		LWLockAcquire(DynamicSharedMemoryControlLock, LW_EXCLUSIVE);
 	}
@@ -680,7 +687,7 @@ dsm_create(Size size, int flags)
 			dsm_control->item[i].impl_private_pm_handle = NULL;
 			dsm_control->item[i].pinned = false;
 			seg->control_slot = i;
-			if (!using_main_dsm_region)
+			if (!using_main_dsm_region && dsm_dsg_tracking_enabled())
 				DsgDsmPublishLocked(seg->handle);
 			seg->creating = false;
 			LWLockRelease(DynamicSharedMemoryControlLock);
@@ -723,7 +730,7 @@ dsm_create(Size size, int flags)
 	dsm_control->item[nitems].pinned = false;
 	seg->control_slot = nitems;
 	dsm_control->nitems++;
-	if (!using_main_dsm_region)
+	if (!using_main_dsm_region && dsm_dsg_tracking_enabled())
 		DsgDsmPublishLocked(seg->handle);
 	seg->creating = false;
 	LWLockRelease(DynamicSharedMemoryControlLock);

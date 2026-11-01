@@ -1,0 +1,10 @@
+{
+  "base": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "branch": "codex/dsga-pg17-v3-20261019",
+  "owned2": {
+    "src/backend/storage/ipc/dsm.c": "89b0b89a0c1b86885ae9ae5d5c784e628136d3417bdbb801b6a10b8304e5fc06",
+    "src/backend/storage/ipc/dsg_dsm.c": "7715de7fe50aa91c55575a1192c77adbd4dfee63d6a192162bec878338622b86"
+  },
+  "parent_image": "127.0.0.1:5001/neon/pg17-stderr-cap@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b",
+  "scope": "PG17_DSM_UNIFIED_RUNTIME_TRACKING_AND_POSITIVE_UNENFORCEABLE_STARTUP_REJECT_ONLY"
+}

@@ -1,0 +1,3 @@
+/dev/shm/PostgreSQL.1054399050 1048576
+/dev/shm/PostgreSQL.1102144686 5976
+/dev/shm/PostgreSQL.123824456 8192

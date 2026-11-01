@@ -1,0 +1,610 @@
+{
+  "original_small_files": {
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/Dockerfile": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/Dockerfile",
+      "sha256": "c4f3d525cf2b76ff4bd13956f6ede3c158e49f5f6ef0775408ce48b60aba7f85",
+      "bytes": 1715
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/build-command.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/build-command.json",
+      "sha256": "6b78505669967a30d716187d832c6f63e163b85c32a0fec96ed5fe555872a695",
+      "bytes": 700
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/build-metadata.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/build-metadata.json",
+      "sha256": "7edd0f16db81f0c71013770fb8a2bcf0dbbabe4f4edb4245f54c6099b9cebc81",
+      "bytes": 1889
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/build.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/build.log",
+      "sha256": "0594d53abe42c43f2c3aff9f2e93ec0392e52f3d7c9d6bc55f62c1deadff3a05",
+      "bytes": 3617
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/implementation.diff": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/implementation.diff",
+      "sha256": "db6b216353967a5e46aa85b9342c5a8544cefc2511c7683a92b6b097ba35f757",
+      "bytes": 3639
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/launch-receipt.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/launch-receipt.json",
+      "sha256": "c13738fa4b5886a3d6ca5c75226cd0eafab3f9a3f1e0eecb33bef679dfeac3dc",
+      "bytes": 572
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/native-launch.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/native-launch.json",
+      "sha256": "4d82c58cc3ed5efd22173dac9da6f540f57f6051f192874e33411462def9608c",
+      "bytes": 570
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/native-reserve.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/native-reserve.json",
+      "sha256": "fb973b8e3c3bba30beb93e2427afe5072eecfe1350c0ed0a10c0580ac0cce70f",
+      "bytes": 571
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/native-successor.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/native-successor.json",
+      "sha256": "1d67d7328ac971ea1073c95bfecc6c8dd553447766af45d4b3304789674c63e5",
+      "bytes": 106
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/pull.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/pull.log",
+      "sha256": "3fe806a8144936568da9d1f309fda8b662650ef6538f1b0fb0702239e640288d",
+      "bytes": 1209
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/reserve-receipt.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/reserve-receipt.json",
+      "sha256": "fb1d254abf7552bdfdc0d0fc358fdea85f4237518cb487ff19ad611a971b35e2",
+      "bytes": 573
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/result.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/result.json",
+      "sha256": "0998d561b3b3ffcfe00ff01b264da4bbe1a5b11939e6524f4a4a5416a17f52c6",
+      "bytes": 534
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/source-lock.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/source-lock.json",
+      "sha256": "e94ae53752cd08c917f1683d6d36d946ac6256d61938a634249bf678cd8c0cb6",
+      "bytes": 787
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/spec.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/spec.json",
+      "sha256": "557687229f6889c5f97ad42a3917f63910211959b934b80b0548533e0622ca54",
+      "bytes": 407
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/worker.py": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/worker.py",
+      "sha256": "eaefbbc7ad7f790c8e5738911867a141594120f167582903e1d68ba7dc22fb7a",
+      "bytes": 3043
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/workflow-lock.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/workflow-lock.json",
+      "sha256": "3a2b27868559666a2b227c07541a2aadc50c4e4953b5f171da98a216ad127d85",
+      "bytes": 723
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/build.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/compiled-source-index.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/compiled-source-index.txt",
+      "sha256": "a740f97155ab1de5dc960f9577e2c6e43ef480a0198763c5bbf78b1df8426cf0",
+      "bytes": 317711
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/cpu.max": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/cpu.max",
+      "sha256": "2f8bd783be33cf80b6a2a0cf810f81ccf85f988c72c9bb76fa6172b6e4ec2b02",
+      "bytes": 14
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/cpu.stat": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/cpu.stat",
+      "sha256": "3fd6cacc91ef3cedb8c22f429e0986e9e8a57fefa7441141a3b56a1ed9c16005",
+      "bytes": 158
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/dynamic-tags.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/dynamic-tags.txt",
+      "sha256": "c54ed4b36acedef89038e13125db78e616263f4fbb429c5cf398137e67d99000",
+      "bytes": 2068
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/install.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/install.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/io.stat": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/io.stat",
+      "sha256": "bdb2982afa988bbcb1153121578081329d446e2a2fc01041dbb437fca6184a4c",
+      "bytes": 75
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/memory.max": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/memory.max",
+      "sha256": "8528d39f97fdd9c9689c4373fe4c7b18f2c3bef6b044a2c4be74b07bf9cd07d8",
+      "bytes": 11
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/memory.peak": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/memory.peak",
+      "sha256": "7ec1acf98820f279d7bc60f9e6a400d6e7a46e7e576f6b190aa8239ed04e6533",
+      "bytes": 11
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/source-and-ELF.sha256": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/source-and-ELF.sha256",
+      "sha256": "588a4acb0498fa564b0fdb09eca65a1af4b54c26a8eec27c1abe4948ec2e067c",
+      "bytes": 312
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/export/source-overlay-check.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/build/export/source-overlay-check.txt",
+      "sha256": "680e86d787815d1dd107605687f0d7fb4495e577557a2f46aaff3dc8ecb88980",
+      "bytes": 92
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/actual-artifact-input.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/actual-artifact-input.json",
+      "sha256": "0898db18cc45e60f2ddcf7481d239ab4afae2e6e32bd4199c5088a34c0e35703",
+      "bytes": 410
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/cleanup.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/cleanup.json",
+      "sha256": "344566e8f4e2091bac946ddc2293ca7deaba2e34814abbe899c07ede5ff43ba0",
+      "bytes": 111
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/command.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/command.json",
+      "sha256": "e827a9e0658b59acbad80746938f7a3957f1c7d2356d44c9314a9ecd52fe9e61",
+      "bytes": 973
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/container.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/container.json",
+      "sha256": "38fc95d720ed6ae5bb4fc433b824477e80277700ec70a684500e95a23bbfdfc8",
+      "bytes": 887
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/result.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/result.json",
+      "sha256": "deb53812fa76e95f74cd466b1a0ea7fb6b5f97c06288f6e6a5fea2bfe3b74a0a",
+      "bytes": 2123
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/run.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/run.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/run.sh": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/run.sh",
+      "sha256": "49f17340abe4bffbab374abababa6f8ee3b6507abb82cfebb25a0be169a1cacd",
+      "bytes": 6072
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/spec.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/spec.json",
+      "sha256": "65dd23bfa33afa1e95629d484c69063798955f7fc07b3969a7b2891427200cd8",
+      "bytes": 421
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/target-source-lock.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/target-source-lock.json",
+      "sha256": "2eb1a2dd627f3e0a8703a504116097c4ecd17d7fae87a81598fe6095c8e40450",
+      "bytes": 497
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/worker.py": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/worker.py",
+      "sha256": "b9e531fe05cbb9c4b8194cd8375a41693d12059e50ae157e3a7693af14920bd7",
+      "bytes": 4720
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/probe/shim17.c": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/probe/shim17.c",
+      "sha256": "1aed4f6f7810fc9b6435ca8fcbcf7d60dd8baf82a8526f7bbd254c593408b620",
+      "bytes": 1988
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/OS-after-rejected-create.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/OS-after-rejected-create.txt",
+      "sha256": "69bc67122cc67f1e7e25362af657cc202eac35e44099540ffbf34173d1d9fa27",
+      "bytes": 110
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/OS-before-rejected-create.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/OS-before-rejected-create.txt",
+      "sha256": "69bc67122cc67f1e7e25362af657cc202eac35e44099540ffbf34173d1d9fa27",
+      "bytes": 110
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/actual-header-sha256.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/actual-header-sha256.txt",
+      "sha256": "2ffac2da7507d3e064a790f148ba0eed158925c2b5746f04930368fb2ef1fa5a",
+      "bytes": 104620
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/actual-held-handle.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/actual-held-handle.txt",
+      "sha256": "876b761c4f21e42f280e7c3eeb642f13b1e9e37585ecd0aa2e46b1cc8d0b5864",
+      "bytes": 10
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/base.conf": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/base.conf",
+      "sha256": "b4af6c6a5f207699904fec139f9093fc6da43fa0aac11d52c774417ab34e863a",
+      "bytes": 445
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/baseline-dump-query.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/baseline-dump-query.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/baseline-server.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/baseline-server.log",
+      "sha256": "7c35d1a3162164e7c58ab2d1c79004423c247c729db242e48b5689438444c1a3",
+      "bytes": 4563
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/baseline-start.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/baseline-start.log",
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad",
+      "bytes": 52
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/baseline-stop.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/baseline-stop.log",
+      "sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d",
+      "bytes": 56
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/baseline.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/baseline.json",
+      "sha256": "cec18647b85e1c8eea429dd034791fa6f836a930b4cca0a8b9fe2f36b72e71d8",
+      "bytes": 186
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/cpu.stat": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/cpu.stat",
+      "sha256": "f4db6fea082ab3295e522bca4a4afa486813c1fad180a20e08aa4ed712f65cb0",
+      "bytes": 158
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/ddl.sql": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/ddl.sql",
+      "sha256": "6aac27f3c663bb289820178c1d2f7ea7d3140bd22bb063dca7f1393e07e3cb47",
+      "bytes": 595
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/fixed-positive-cap-kB.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/fixed-positive-cap-kB.txt",
+      "sha256": "a87867aa17f97181fa399559dbeaee46d99f8a06777c681671b71640c33e57ad",
+      "bytes": 5
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/fork-positive.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/fork-positive.exitcode",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/initdb.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/initdb.log",
+      "sha256": "ea4b3f1879d214760b0431ecd902153be03bea9f07b16411ef0a003eb1c93a3a",
+      "bytes": 1091
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/io.stat": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/io.stat",
+      "sha256": "87539a2861c4815f89ad4c5790589de913ecd8f955f51fe6893fe31f9d1d9d17",
+      "bytes": 130
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/measured-baseline-bytes.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/measured-baseline-bytes.txt",
+      "sha256": "be3b3a973edc5f34763d5808c7d0866e068ff309898e83e80bb37674405ce7a7",
+      "bytes": 8
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/memory.current": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/memory.current",
+      "sha256": "faf89cbe307da46159cc776d258abe7a74e03ca175de936d73c39ec5c068b489",
+      "bytes": 9
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/memory.peak": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/memory.peak",
+      "sha256": "275b123df46274592a8fc653303218c8ab73e47a5e4af094e750a5071e499f2c",
+      "bytes": 9
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/over-cap.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/over-cap.exitcode",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/over-cap.stderr": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/over-cap.stderr",
+      "sha256": "b992eb7d726f759c0dee1afc4d145c7a1d9e43b36847384a4c1f5b7e25faf3b9",
+      "bytes": 67
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/over-cap.stdout": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/over-cap.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-dump-query.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-dump-query.log",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-held.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-held.json",
+      "sha256": "7c392611cd86b8791c8ca1cda04d7a8e4e0d80b1c63aacea6c2e92f5c5945112",
+      "bytes": 191
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-initial.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-initial.json",
+      "sha256": "35a090a1193a5d984d2962d450a1d6921639d880f22470dc6745d8067d6fe34e",
+      "bytes": 191
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-nativeoff.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-nativeoff.exitcode",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-nativeoff.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-nativeoff.log",
+      "sha256": "19ffe0aba2ff6b0e6292ce572202c2ca022e9d2849a055c75246d66e2f27c5de",
+      "bytes": 105
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-rejected.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-rejected.json",
+      "sha256": "7c392611cd86b8791c8ca1cda04d7a8e4e0d80b1c63aacea6c2e92f5c5945112",
+      "bytes": 191
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-released.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-released.json",
+      "sha256": "35a090a1193a5d984d2962d450a1d6921639d880f22470dc6745d8067d6fe34e",
+      "bytes": 191
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-server.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-server.log",
+      "sha256": "cd12d3d3fa947e21b34990444e1f8b710af1a12ea361eaf3bddd49f26e622b18",
+      "bytes": 4735
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-standalone.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-standalone.exitcode",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-standalone.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-standalone.log",
+      "sha256": "127910f8cdc0fb5dbfcff578e5a6977fb458a3a5af5716332dafc46f09ecd7ad",
+      "bytes": 105
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-start.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-start.log",
+      "sha256": "66afd0411ccc09366e99fdd99b85f21899c8d2d064f5835126859618802153ad",
+      "bytes": 52
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/positive-stop.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/positive-stop.log",
+      "sha256": "ca19178a35ab4153b75b494963b66ce8243e1b94c173107c87b44d09db23652d",
+      "bytes": 56
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/program-and-toolchain.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/program-and-toolchain.txt",
+      "sha256": "476936e3c4c11a5814a41dae0ae0f448260efb572505b4f1f13dbcc9ef72552d",
+      "bytes": 346
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/release.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/release.log",
+      "sha256": "fe8edeeb98cc6d3b93cf2d57000254b84bd9eba34b4df7ce4b87db8b937b7703",
+      "bytes": 2
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/shim-DSO.sha256": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/shim-DSO.sha256",
+      "sha256": "571537aa1584b40268b7a2c9a9cf4a0cb69aeba721f849daeb8012de78bf49bb",
+      "bytes": 86
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/shim-compile.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/shim-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/standalone-DSM.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/standalone-DSM.log",
+      "sha256": "496be2e78b437047ebf49a23d2071abf23af3668692b59a08ea012046ca80e77",
+      "bytes": 1052
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/standalone-startup.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/standalone-startup.log",
+      "sha256": "48e059a1845b488e60b2a7a7f37e562e00c447ae22329d18958cd3bac5b0dc6d",
+      "bytes": 665
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/standalone.sql": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/standalone.sql",
+      "sha256": "51bfccd9f5028f479e3e72baebe2c319cdbad3c97af8295862cae02e878f55f7",
+      "bytes": 711
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native/evidence/zero-standalone.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/native/evidence/zero-standalone.exitcode",
+      "sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+      "bytes": 1
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562/result.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/first-fix-build/result.json",
+      "sha256": "ee4c85b1e0f4438ca72d9ca9d758177878bf05174b2cfba330783038fedf34d0",
+      "bytes": 533
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562/source-lock.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/first-fix-build/source-lock.json",
+      "sha256": "c59922401a7297727e0f53681948d0068e1ca8ddb4b7e17270927153e5c4fea7",
+      "bytes": 556
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562/implementation.diff": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/first-fix-build/implementation.diff",
+      "sha256": "9bbdb4ea4c8976cfd12f41c8be9e1a71d1e5b81a05903afe57fc2ae22868f4eb",
+      "bytes": 3092
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562/export/source-and-ELF.sha256": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/first-fix-build/export/source-and-ELF.sha256",
+      "sha256": "fb210d2e31e8841443d4d5103928482d81895a0d7e3567b28b2a90e6584950c4",
+      "bytes": 312
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T184226Z-1ae562-native/result.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/first-fix-native/result.json",
+      "sha256": "40eddd4105ce1371936e8e6c8565ebe737a697244fd755264bebd97a4cbaaf11",
+      "bytes": 1857
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T184226Z-1ae562-native/target-source-lock.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/first-fix-native/target-source-lock.json",
+      "sha256": "96088a533a8f55e51c0a539fcd8653064624f6d619345f5bd247319aadcc2741",
+      "bytes": 488
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T184226Z-1ae562-native/run.sh": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/first-fix-native/run.sh",
+      "sha256": "f54d10e23544548e89aafff129edd4728f7f203ba094957cbe6db8d1c0d6c9d0",
+      "bytes": 6006
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/result.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/result.json",
+      "sha256": "f8f72a3c7b2f9623bf33b2767624139e640d4b374ff4592f76ccb2a67e287622",
+      "bytes": 259
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/source-lock.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/source-lock.json",
+      "sha256": "f8f1167a67962fde3b4a9bda73809029ddb93792454250d22b569f85c5be3656",
+      "bytes": 845
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/worker.py": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/worker.py",
+      "sha256": "e27278aa23ef8e14268600d2006469edcdee6f2545eafecbac6a7dcd8c2c1f3a",
+      "bytes": 2593
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/run.sh": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/run.sh",
+      "sha256": "ee25013954df72a1d55c9706d1917231684f5beb813b9847c5181ccfffd733c7",
+      "bytes": 820
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/driver-error.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/driver-error.txt",
+      "sha256": "f683f17567849d434e22e432d5ffa24bf948cadf58a924b07232f2b481dcd092",
+      "bytes": 721
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/command.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/command.json",
+      "sha256": "c40e28d3aa364c7f41739a604af62cac012261b529566bb8b253a3743dc0a4a4",
+      "bytes": 954
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/spec.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/spec.json",
+      "sha256": "526a605a63caf3b44ee656810ddcc2ad83378a06fdb57856dac9fec28ba2ff1c",
+      "bytes": 408
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/reserve-receipt.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/reserve-receipt.json",
+      "sha256": "30c3f7f277b3722e78afafe54a6661bacf001a87d4d93f66ec85d090b5f00d51",
+      "bytes": 562
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/launch-receipt.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/launch-receipt.json",
+      "sha256": "7865fd0141203a4bc41ba551d83c86ba3b89138a4ebe0c5eb5709247e1eb58dc",
+      "bytes": 561
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/container.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/container.json",
+      "sha256": "1856828a6b059c4f56e591873e7c1f4f35199ce90e2fffbe1613c5bcd50bcd7d",
+      "bytes": 739
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/cleanup.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/cleanup.json",
+      "sha256": "0805ec9873a5b252e175b37547c40a30327f18a811abdd8ca0e0ef7c42192c6e",
+      "bytes": 109
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/evidence/standalone-snapshot.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/evidence/standalone-snapshot.log",
+      "sha256": "bdbeb4d79fc409f0e3a8fc943dda41027694768726e60b206331526a9c9a4c03",
+      "bytes": 843
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/evidence/actual-artifacts.sha256": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/evidence/actual-artifacts.sha256",
+      "sha256": "c3f3a278576fd0dd808e5423b0c5cd9881f1e28868e4975210dd54936b78522a",
+      "bytes": 179
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/evidence/cpu.stat": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/evidence/cpu.stat",
+      "sha256": "7e18b8e913ce18618c8ed962282aafe90c9ac05404c61ddaf72a47c149478d7b",
+      "bytes": 157
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/evidence/memory.peak": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/evidence/memory.peak",
+      "sha256": "69118372b658f1e2ca2fcf64480b49377e9d21d75749a31114e4ea0cc8121be2",
+      "bytes": 9
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be/evidence/io.stat": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/invalid-accounting-failure/evidence/io.stat",
+      "sha256": "dfee67c825e5ed249b5b010c4d8c1a5813a3fc5c6e350c95a6ccc2fb946fe023",
+      "bytes": 63
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/result.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/result.json",
+      "sha256": "f5f1bc713f9b5153287d3f18768eaa16bc75b870f3e74d2dac79f8a890ca1dbc",
+      "bytes": 324
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/source-lock.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/source-lock.json",
+      "sha256": "684169b567b6a88ff2c1a22cd75c0928e6a80962aabb90f18c9c0625024e62ba",
+      "bytes": 1477
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/worker.py": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/worker.py",
+      "sha256": "e2dc84ecfd0b2c0e2029970de5cf81e3e81fdb4b4d14b2540bb994854abb1f36",
+      "bytes": 2584
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/run.sh": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/run.sh",
+      "sha256": "e36f6462f3ed61892abc33c6e0a993842d43b90794cf831b4a5274d782d405e7",
+      "bytes": 2306
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/command.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/command.json",
+      "sha256": "f03640cdb544cf8948465bd3d911cab4980dd634683ab063dbeb5aba97d25e23",
+      "bytes": 913
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/spec.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/spec.json",
+      "sha256": "de1a59bf7c263087a522bfcd682e8bcf305c597034adbf49ac60a1ec071d3702",
+      "bytes": 390
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/reserve-receipt.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/reserve-receipt.json",
+      "sha256": "16b36f5c4c444c889ad5df60ac6f376a4f5c584b68471a580f5f0e1c1d1683fe",
+      "bytes": 125
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/reserve-receipt-attempt2.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/reserve-receipt-attempt2.json",
+      "sha256": "d55e359d9cb97fa14ff1c9473707e3728bd36a5b4fd3708cd8a3c7364ea8e0f9",
+      "bytes": 564
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/launch-receipt.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/launch-receipt.json",
+      "sha256": "67ff55e5ad3c4e5ae7dd0f219735d698437c5bff524ced07cbc391379990104a",
+      "bytes": 563
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/container.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/container.json",
+      "sha256": "0dc80307b50e39391c3acbf6a28add3f1c1b9a335a6e058d8d65547c7e4ae60a",
+      "bytes": 888
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/cleanup.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/cleanup.json",
+      "sha256": "2ff26fe6280cc717fb80999d3c9c0655889f04dd8d6e6950fc346588d07806c9",
+      "bytes": 99
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/interpretation.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/interpretation.txt",
+      "sha256": "0dd61a11f7f17dafcf4fe42d7977e50c72b880399e85a794328106899fb227e9",
+      "bytes": 1461
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/interpretation.json": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/interpretation.json",
+      "sha256": "5e62d9ef6bb21666d791c1ce4b3f7163253e52328e6157a924fa1f08083cdf14",
+      "bytes": 1355
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/evidence/startup-console.log": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/evidence/startup-console.log",
+      "sha256": "bb35c7e9315ab7430cabc3cce28a9fdca065f3351525541a1c6ebef95427297c",
+      "bytes": 92
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/evidence/startup.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/evidence/startup.exitcode",
+      "sha256": "e726b440cc164001999e718b51780d80314709efe06e7857282377be9111127b",
+      "bytes": 4
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/evidence/program-and-limits.txt": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/evidence/program-and-limits.txt",
+      "sha256": "9e4d4b59f08e5b6ad93415212996450a8a9591edda5819693c6a1ba371ecbe97",
+      "bytes": 1732
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/evidence/compile.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/evidence/compile.exitcode",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305/evidence/initdb.exitcode": {
+      "archive": "doc/dsga-validation/dsm-standalone-20261102/history/original-817-startup-panic/evidence/initdb.exitcode",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    }
+  },
+  "binary_policy": "No ELF/DSO or database copied; hashes and raw /data locations retained"
+}

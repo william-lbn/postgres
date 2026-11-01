@@ -1,0 +1,12 @@
+{
+  "base": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "branch": "codex/dsga-pg17-v3-20261019",
+  "owned2": {
+    "src/backend/storage/ipc/dsm.c": "89b0b89a0c1b86885ae9ae5d5c784e628136d3417bdbb801b6a10b8304e5fc06",
+    "src/backend/storage/ipc/dsg_dsm.c": "508f62818d505f08b0da3c3702a6d742ce920a5d0030e18fe077634ec25695f2"
+  },
+  "parent_image": "127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:884b1d0b2bedd87c4024d8c19b72a92988f8a211d0e3cdb95c0cdfd648a4827f",
+  "supersedes_build": "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562",
+  "prior_true_snapshot_failure": "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be",
+  "scope": "PG17_DSM_UNIFIED_RUNTIME_TRACKING_AND_STANDALONE_INVALID_ACCOUNTING_ONLY"
+}

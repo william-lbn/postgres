@@ -1,0 +1,6 @@
+{
+  "image": "127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:b164d61a939502fa3ba983c0359f7832b9345ccefeb15c00326eaceab61a3a40",
+  "PG_ELF_sha256": "649f4535d07e682fe5015fd8df8be23f626e73bd772da21b16e1c032721c53c6",
+  "build_source_lock_sha256": "e94ae53752cd08c917f1683d6d36d946ac6256d61938a634249bf678cd8c0cb6",
+  "target_lock_sha256": "2eb1a2dd627f3e0a8703a504116097c4ecd17d7fae87a81598fe6095c8e40450"
+}

@@ -1,0 +1,82 @@
+2026-11-01 19:01:41.245 GMT [53] LOG:  too many background workers
+2026-11-01 19:01:41.245 GMT [53] DETAIL:  Up to 0 background workers can be registered with the current settings.
+2026-11-01 19:01:41.245 GMT [53] HINT:  Consider increasing the configuration parameter "max_worker_processes".
+2026-11-01 19:01:41.251 GMT [53] LOG:  starting PostgreSQL 17.11 on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+2026-11-01 19:01:41.255 GMT [53] LOG:  listening on Unix socket "/evidence/socket/.s.PGSQL.55432"
+2026-11-01 19:01:41.268 GMT [56] LOG:  database system was shut down at 2026-11-01 19:01:41 GMT
+2026-11-01 19:01:41.269 GMT [56] LOG:  Continue writing WAL at 0/14FF2C8
+2026-11-01 19:01:41.280 GMT [53] LOG:  database system is ready to accept connections
+PG17_DSM_NATIVE_BASELINE_BEGIN pid=61
+dsa_area handle 0:
+  max_total_segment_size: 18446744073709551615
+  total_segment_size: 1310720
+  refcnt: 6
+  pinned: t
+  segment bins:
+    segment bin 4 (at least 8 contiguous pages free):
+      segment index 0, usable_pages = 62, contiguous_pages = 13, mapped at 0x770387d5ec38
+    segment bin 8 (at least 128 contiguous pages free):
+      segment index 1, usable_pages = 255, contiguous_pages = 159, mapped at 0x770387a24000
+  pools:
+    pool for blocks of span objects:
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 0000000000002000, superblock at 0000000000002000, pages = 1, objects free = 63/72
+      fullness class 2 is empty
+      fullness class 3 is empty
+    pool for size class 7 (object size 48 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 00000000000020a8, superblock at 0000000000023000, pages = 16, objects free = 1060/1365
+      fullness class 2 is empty
+      fullness class 3 is empty
+    pool for size class 16 (object size 224 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 00000000000021f8, superblock at 0000010000051000, pages = 16, objects free = 282/292
+      fullness class 2 is empty
+      fullness class 3:
+        span descriptor at 00000000000020e0, superblock at 0000010000001000, pages = 16, objects free = 0/292
+    pool for size class 18 (object size 320 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 00000000000021c0, superblock at 0000010000041000, pages = 16, objects free = 201/204
+      fullness class 2 is empty
+      fullness class 3 is empty
+    pool for size class 25 (object size 1024 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 0000000000002070, superblock at 0000000000013000, pages = 16, objects free = 64/64
+      fullness class 2 is empty
+      fullness class 3 is empty
+    pool for size class 29 (object size 2048 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 0000000000002118, superblock at 0000010000011000, pages = 16, objects free = 32/32
+      fullness class 2 is empty
+      fullness class 3 is empty
+    pool for size class 31 (object size 3120 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 0000000000002038, superblock at 0000000000003000, pages = 16, objects free = 20/21
+      fullness class 2 is empty
+      fullness class 3 is empty
+    pool for size class 33 (object size 4096 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 0000000000002150, superblock at 0000010000021000, pages = 16, objects free = 16/16
+      fullness class 2 is empty
+      fullness class 3 is empty
+    pool for size class 37 (object size 8192 bytes):
+      fullness class 0 is empty
+      fullness class 1:
+        span descriptor at 0000000000002188, superblock at 0000010000031000, pages = 16, objects free = 7/8
+      fullness class 2 is empty
+      fullness class 3 is empty
+PG17_DSM_NATIVE_BASELINE_END pid=61
+2026-11-01 19:01:41.367 GMT [53] LOG:  received fast shutdown request
+2026-11-01 19:01:41.373 GMT [53] LOG:  aborting any active transactions
+2026-11-01 19:01:41.375 GMT [54] LOG:  shutting down
+2026-11-01 19:01:41.390 GMT [54] LOG:  checkpoint starting: shutdown immediate
+2026-11-01 19:01:41.403 GMT [54] LOG:  checkpoint complete: wrote 4 buffers (3.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.005 s, sync=0.004 s, total=0.028 s; sync files=3, longest=0.003 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/14FF2C8, redo lsn=0/14FF2C8
+2026-11-01 19:01:41.406 GMT [53] LOG:  database system is shut down

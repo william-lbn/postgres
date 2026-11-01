@@ -1,0 +1,11 @@
+{
+  "Source": false,
+  "normal": false,
+  "E": 0,
+  "supplements": "PG17-S-DSM-STANDALONE-AND-CAP-001",
+  "counts_as_new_root": false,
+  "container_unique_Wait_exit": 0,
+  "OOMKilled": false,
+  "status": "FAIL_SUPPLEMENTAL",
+  "seconds": 1.8175534709880594
+}

@@ -1,0 +1,301 @@
+{
+  "schema_version": 1,
+  "PG": 17,
+  "postgres_versions_actually_tested": [
+    17
+  ],
+  "target_backend_versions": [
+    17
+  ],
+  "base": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "branch": "codex/dsga-pg17-v3-20261019",
+  "scope": "PG17 DSM standalone/nativeoff boundary component regression only",
+  "stable_id": "PG17-S-DSM-STANDALONE-AND-CAP-001",
+  "classification": {
+    "unit_roots": 0,
+    "single_service_component_roots": 1,
+    "check_groups": 4,
+    "build_artifacts": 1,
+    "artifact_smoke_roots": 0,
+    "E": 0,
+    "Kubernetes_E": 0,
+    "new_public_protocols": 0
+  },
+  "counting_note": "one original shell/worker service target with four check groups; not four unittest roots; historical attempts and supplemental snapshot do not add passed roots; no PG18 counts borrowed",
+  "owned_source": {
+    "src/backend/storage/ipc/dsm.c": "89b0b89a0c1b86885ae9ae5d5c784e628136d3417bdbb801b6a10b8304e5fc06",
+    "src/backend/storage/ipc/dsg_dsm.c": "508f62818d505f08b0da3c3702a6d742ce920a5d0030e18fe077634ec25695f2"
+  },
+  "build": {
+    "raw_path": "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68",
+    "nonce": "20261101T190032Z-f8fc68",
+    "unit": "neon-pg17-dsm-standalone-fix-build-20261101t190032z-f8fc68.service",
+    "source_lock_sha256": "e94ae53752cd08c917f1683d6d36d946ac6256d61938a634249bf678cd8c0cb6",
+    "result": {
+      "build_exit": 0,
+      "seconds": 61.827643096999964,
+      "Source": false,
+      "normal": false,
+      "E": 0,
+      "test_only_visible_tag": "127.0.0.1:5001/neon/pg17-dsm-standalone-fix:20261101t190032z-f8fc68-TEST_ONLY",
+      "image": "127.0.0.1:5001/neon/pg17-dsm-standalone-fix@sha256:b164d61a939502fa3ba983c0359f7832b9345ccefeb15c00326eaceab61a3a40",
+      "pull_exit": 0,
+      "copy_exit": 0,
+      "new_PG_ELF_sha256": "649f4535d07e682fe5015fd8df8be23f626e73bd772da21b16e1c032721c53c6",
+      "no_RPATH_RUNPATH": true,
+      "status": "PASS_BUILD_NOT_RUNTIME"
+    },
+    "reservation": {
+      "cpu": 6,
+      "memory_bytes": 8589934592
+    },
+    "actual_make_jobs": 6,
+    "compiled_index_parent_delta": {
+      "/postgres/src/backend/storage/ipc/dsg_dsm.c": {
+        "before": "7715de7fe50aa91c55575a1192c77adbd4dfee63d6a192162bec878338622b86",
+        "after": "508f62818d505f08b0da3c3702a6d742ce920a5d0030e18fe077634ec25695f2"
+      }
+    }
+  },
+  "native": {
+    "raw_path": "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T190032Z-f8fc68-native",
+    "nonce": "20261101T190032Z-f8fc68-native",
+    "unit": "neon-pg17-dsm-fix-20261101t190032z-f8fc68-native.service",
+    "target_lock_sha256": "2eb1a2dd627f3e0a8703a504116097c4ecd17d7fae87a81598fe6095c8e40450",
+    "executed_PG_ELF_sha256": "649f4535d07e682fe5015fd8df8be23f626e73bd772da21b16e1c032721c53c6",
+    "test_only_DSO_sha256": "f8566db65aa1d31ccf513f19e3b56c89b15678650bbce42d4e39de2fbaaa3841",
+    "test_shim_sha256": "1aed4f6f7810fc9b6435ca8fcbcf7d60dd8baf82a8526f7bbd254c593408b620",
+    "test_driver_sha256": "49f17340abe4bffbab374abababa6f8ee3b6507abb82cfebb25a0be169a1cacd",
+    "result": {
+      "Source": false,
+      "normal": false,
+      "E": 0,
+      "stable_id": "PG17-S-DSM-STANDALONE-AND-CAP-001",
+      "container_unique_Wait_exit": 0,
+      "OOMKilled": false,
+      "checks": {
+        "zero_cap_standalone_actual_cycle": true,
+        "positive_standalone_startup_rejected": true,
+        "positive_nativeoff_startup_rejected": true,
+        "positive_fork_actual_OS_before_cap_rejection": true
+      },
+      "zero_cap_standalone_snapshot": {
+        "reserved_upper_bytes": 0,
+        "external_segments": 0,
+        "pending_creations": 0,
+        "unknown_segments": 0,
+        "external_budget_bytes": 0,
+        "accounting_valid": false,
+        "limit_enforced": false,
+        "Source": false
+      },
+      "measured_native_baseline": {
+        "reserved_upper_bytes": 1048576,
+        "external_segments": 1,
+        "pending_creations": 0,
+        "unknown_segments": 0,
+        "external_budget_bytes": 0,
+        "accounting_valid": true,
+        "limit_enforced": false,
+        "Source": false
+      },
+      "positive_initial": {
+        "reserved_upper_bytes": 1048576,
+        "external_segments": 1,
+        "pending_creations": 0,
+        "unknown_segments": 0,
+        "external_budget_bytes": 1056768,
+        "accounting_valid": true,
+        "limit_enforced": true,
+        "Source": false
+      },
+      "actual_held": {
+        "reserved_upper_bytes": 1056768,
+        "external_segments": 2,
+        "pending_creations": 0,
+        "unknown_segments": 0,
+        "external_budget_bytes": 1056768,
+        "accounting_valid": true,
+        "limit_enforced": true,
+        "Source": false
+      },
+      "actual_after_rejected": {
+        "reserved_upper_bytes": 1056768,
+        "external_segments": 2,
+        "pending_creations": 0,
+        "unknown_segments": 0,
+        "external_budget_bytes": 1056768,
+        "accounting_valid": true,
+        "limit_enforced": true,
+        "Source": false
+      },
+      "actual_released": {
+        "reserved_upper_bytes": 1048576,
+        "external_segments": 1,
+        "pending_creations": 0,
+        "unknown_segments": 0,
+        "external_budget_bytes": 1056768,
+        "accounting_valid": true,
+        "limit_enforced": true,
+        "Source": false
+      },
+      "actual_absolute_test_cap_bytes": 1056768,
+      "no_guessed_zero": true,
+      "status": "PASS_TARGETED_COMPONENT_ONLY",
+      "seconds": 3.526065498997923
+    },
+    "reservation": {
+      "cpu": 2,
+      "memory_bytes": 3221225472
+    },
+    "actual_container": {
+      "cpu": 1,
+      "memory_bytes": 536870912,
+      "memory_swap_bytes": 536870912,
+      "network": "none",
+      "read_only_rootfs": true,
+      "UID": 1000,
+      "NNP": true,
+      "cap_drop": "ALL",
+      "pids": 128,
+      "shm_bytes": 67108864
+    }
+  },
+  "checks": [
+    {
+      "id": "cap0-standalone",
+      "category": "single-service/component",
+      "executed_functions": [
+        "pg17_dsm_cycle",
+        "pg17_dsm_snapshot"
+      ],
+      "assertions": [
+        "fresh --single starts",
+        "real dsm_create4096 writes/reads42 and detaches",
+        "snapshot accounting_valid=false and limit_enforced=false and zero counters"
+      ],
+      "evidence": [
+        "native/evidence/standalone-startup.log",
+        "native/evidence/standalone-DSM.log"
+      ]
+    },
+    {
+      "id": "positive-standalone-reject",
+      "category": "single-service/component",
+      "assertions": [
+        "8KiB cap FATAL requires fork Postmaster environment"
+      ],
+      "evidence": [
+        "native/evidence/positive-standalone.log",
+        "native/evidence/positive-standalone.exitcode"
+      ]
+    },
+    {
+      "id": "positive-nativeoff-reject",
+      "category": "single-service/component",
+      "assertions": [
+        "native disabled with positive cap FATAL requires managed native profile"
+      ],
+      "evidence": [
+        "native/evidence/positive-nativeoff.log",
+        "native/evidence/positive-nativeoff.exitcode"
+      ]
+    },
+    {
+      "id": "positive-fork-accounting-and-preOS-reject",
+      "category": "single-service/component",
+      "executed_functions": [
+        "pg17_dsm_snapshot",
+        "pg17_dsm_pgstat_area",
+        "pg17_dsm_hold",
+        "pg17_dsm_release"
+      ],
+      "assertions": [
+        "measure actual native baseline before fixing positive cap",
+        "real fork accounting_valid=true and limit_enforced=true",
+        "real 8192B pinned DSM adds one external segment",
+        "4096B create rejected before OS and exact OS names/sizes unchanged",
+        "pending=0 and unknown=0; real release restores measured baseline"
+      ],
+      "evidence": [
+        "native/evidence/baseline.json",
+        "native/evidence/baseline-server.log",
+        "native/evidence/positive-server.log",
+        "native/evidence/positive-initial.json",
+        "native/evidence/positive-held.json",
+        "native/evidence/positive-rejected.json",
+        "native/evidence/positive-released.json",
+        "native/evidence/OS-before-rejected-create.txt",
+        "native/evidence/OS-after-rejected-create.txt",
+        "native/evidence/over-cap.stderr"
+      ]
+    }
+  ],
+  "resources": {
+    "build": {
+      "cpu_stat": {
+        "usage_usec": 8217155,
+        "user_usec": 4917106,
+        "system_usec": 3300049,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 481,
+        "nr_throttled": 0,
+        "throttled_usec": 0,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 1142071296,
+      "io_stat": "253:16 rbytes=423948288 wbytes=3031040 rios=11734 wios=237 dbytes=0 dios=0\n",
+      "scope": "actual BuildKit RUN cgroup"
+    },
+    "native": {
+      "cpu_stat": {
+        "usage_usec": 1190043,
+        "user_usec": 775683,
+        "system_usec": 414359,
+        "core_sched.force_idle_usec": 0,
+        "nr_periods": 27,
+        "nr_throttled": 1,
+        "throttled_usec": 1811,
+        "nr_bursts": 0,
+        "burst_usec": 0
+      },
+      "memory_peak_bytes": 80998400,
+      "io_stat": "253:16 rbytes=2170880 wbytes=19206144 rios=212 wios=134 dbytes=0 dios=0\n253:0 rbytes=36864 wbytes=0 rios=4 wios=0 dbytes=0 dios=0\n",
+      "scope": "actual native Docker container cgroup"
+    }
+  },
+  "history_preserved": [
+    {
+      "raw_path": "/data/neon-build/validation/pg17-dsm-standalone-repro-20261101T183043Z-817305",
+      "status": "actual startup PANIC134 before requested SQL; original driver label preserved; interpretation corrects classification without rewriting raw result"
+    },
+    {
+      "raw_path": "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T184226Z-1ae562",
+      "status": "first fixed ELF build passed; not final fixed accounting source"
+    },
+    {
+      "raw_path": "/data/neon-build/validation/pg17-dsm-standalone-fix-native-20261101T184226Z-1ae562-native",
+      "status": "four checks passed but no standalone snapshot assertion; does not prove invalid accounting"
+    },
+    {
+      "raw_path": "/data/neon-build/validation/pg17-dsm-standalone-snapshot-native-20261101T185752Z-90a9be",
+      "status": "actual standalone snapshot valid=true; assertion FAIL with Docker Wait0; triggered fix2 new C/new ELF"
+    }
+  ],
+  "artifact_manifest": "artifact-manifest.json",
+  "Source": false,
+  "normal": false,
+  "safe_normal_lowering": false,
+  "realRootComputeSource": false,
+  "E": 0,
+  "Kubernetes_E": 0,
+  "not_proven": [
+    "exact18c Guest DSM integration",
+    "Root-held cross-boot external DSM removal proof",
+    "actual Root Compute PG source closure",
+    "continuous normal hard-limit safe lowering",
+    "Linux full end-to-end",
+    "117/118/119 Helm Kubernetes regression"
+  ]
+}

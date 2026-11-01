@@ -1,0 +1,78 @@
+{
+  "Source": false,
+  "normal": false,
+  "E": 0,
+  "stable_id": "PG17-S-DSM-STANDALONE-AND-CAP-001",
+  "container_unique_Wait_exit": 0,
+  "OOMKilled": false,
+  "checks": {
+    "zero_cap_standalone_actual_cycle": true,
+    "positive_standalone_startup_rejected": true,
+    "positive_nativeoff_startup_rejected": true,
+    "positive_fork_actual_OS_before_cap_rejection": true
+  },
+  "zero_cap_standalone_snapshot": {
+    "reserved_upper_bytes": 0,
+    "external_segments": 0,
+    "pending_creations": 0,
+    "unknown_segments": 0,
+    "external_budget_bytes": 0,
+    "accounting_valid": false,
+    "limit_enforced": false,
+    "Source": false
+  },
+  "measured_native_baseline": {
+    "reserved_upper_bytes": 1048576,
+    "external_segments": 1,
+    "pending_creations": 0,
+    "unknown_segments": 0,
+    "external_budget_bytes": 0,
+    "accounting_valid": true,
+    "limit_enforced": false,
+    "Source": false
+  },
+  "positive_initial": {
+    "reserved_upper_bytes": 1048576,
+    "external_segments": 1,
+    "pending_creations": 0,
+    "unknown_segments": 0,
+    "external_budget_bytes": 1056768,
+    "accounting_valid": true,
+    "limit_enforced": true,
+    "Source": false
+  },
+  "actual_held": {
+    "reserved_upper_bytes": 1056768,
+    "external_segments": 2,
+    "pending_creations": 0,
+    "unknown_segments": 0,
+    "external_budget_bytes": 1056768,
+    "accounting_valid": true,
+    "limit_enforced": true,
+    "Source": false
+  },
+  "actual_after_rejected": {
+    "reserved_upper_bytes": 1056768,
+    "external_segments": 2,
+    "pending_creations": 0,
+    "unknown_segments": 0,
+    "external_budget_bytes": 1056768,
+    "accounting_valid": true,
+    "limit_enforced": true,
+    "Source": false
+  },
+  "actual_released": {
+    "reserved_upper_bytes": 1048576,
+    "external_segments": 1,
+    "pending_creations": 0,
+    "unknown_segments": 0,
+    "external_budget_bytes": 1056768,
+    "accounting_valid": true,
+    "limit_enforced": true,
+    "Source": false
+  },
+  "actual_absolute_test_cap_bytes": 1056768,
+  "no_guessed_zero": true,
+  "status": "PASS_TARGETED_COMPONENT_ONLY",
+  "seconds": 3.526065498997923
+}

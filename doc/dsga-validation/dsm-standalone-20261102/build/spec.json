@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261101T190032Z-f8fc68",
+  "unit": "neon-pg17-dsm-standalone-fix-build-20261101t190032z-f8fc68.service",
+  "kind": "heavy",
+  "evidence_dir": "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68/worker.py"
+  ]
+}

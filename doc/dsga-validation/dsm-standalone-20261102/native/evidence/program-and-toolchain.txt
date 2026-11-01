@@ -1,0 +1,4 @@
+649f4535d07e682fe5015fd8df8be23f626e73bd772da21b16e1c032721c53c6  /usr/local/pgsql/bin/postgres
+PostgreSQL 17.11
+ 'CFLAGS=-O2 -g3 -fsigned-char' '--enable-debug' '--with-openssl' '--with-uuid=ossp' '--with-icu' '--with-libxml' '--with-libxslt' '--with-lz4' '--with-zstd' '--disable-rpath'
+uid=1000(nonroot) gid=1000(nonroot) groups=1000(nonroot)

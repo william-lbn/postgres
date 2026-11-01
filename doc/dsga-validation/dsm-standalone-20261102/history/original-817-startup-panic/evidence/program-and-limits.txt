@@ -1,0 +1,25 @@
+f88365d24889478e4ff88abb91f40cc735b565fd7078a2495fa84fb017812794  /usr/local/pgsql/bin/postgres
+PostgreSQL 17.11
+cc (Debian 12.2.0-14+deb12u1) 12.2.0
+Copyright (C) 2022 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+uid=1000(nonroot) gid=1000(nonroot) groups=1000(nonroot)
+Limit                     Soft Limit           Hard Limit           Units     
+Max cpu time              unlimited            unlimited            seconds   
+Max file size             unlimited            unlimited            bytes     
+Max data size             unlimited            unlimited            bytes     
+Max stack size            8388608              unlimited            bytes     
+Max core file size        0                    0                    bytes     
+Max resident set          unlimited            unlimited            bytes     
+Max processes             unlimited            unlimited            processes 
+Max open files            1048576              1048576              files     
+Max locked memory         8388608              8388608              bytes     
+Max address space         unlimited            unlimited            bytes     
+Max file locks            unlimited            unlimited            locks     
+Max pending signals       95851                95851                signals   
+Max msgqueue size         819200               819200               bytes     
+Max nice priority         0                    0                    
+Max realtime priority     0                    0                    
+Max realtime timeout      unlimited            unlimited            us        

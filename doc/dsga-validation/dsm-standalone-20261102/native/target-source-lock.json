@@ -1,0 +1,7 @@
+{
+  "parent_build": "/data/neon-build/validation/pg17-dsm-standalone-fix-build-20261101T190032Z-f8fc68",
+  "source2_lock_sha256": "e94ae53752cd08c917f1683d6d36d946ac6256d61938a634249bf678cd8c0cb6",
+  "test_shim_sha256": "1aed4f6f7810fc9b6435ca8fcbcf7d60dd8baf82a8526f7bbd254c593408b620",
+  "script_sha256": "49f17340abe4bffbab374abababa6f8ee3b6507abb82cfebb25a0be169a1cacd",
+  "scope": "same four targeted DSM checks; cap0 now includes actual invalid/unenforced snapshot; no Root Source/normal"
+}

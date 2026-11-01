@@ -1,0 +1,6 @@
+PG17 DSM standalone/cap0真实复现说明
+精确81794a/46c3e2a镜像、PG f88365d2，原编译索引DSM/DSB/Work/ipci/header逐SHA同817；已复制6个原源小快照。镜像原cc/headers编最小仅测试DSM SQL shim成功，无生产源码或镜像重建。
+原请求先SELECT1确认startup，再调用dsm_create4096/写42/detach；实际在第一步standalone启动时，原内置DSM已先触发新publication PANIC，故SELECT1与shim调用均未达到。启动原Wait134、容器原Wait134、无OOM；compile/initdb均0。确切PANIC见evidence/startup-console.log，不能把此结果称SQL shim已执行或生产通过。
+原result.json标签保留NOT_REPRODUCED_OR_FIXTURE_FAILURE（原driver严格期待第二步骤），准确归类见interpretation.json，未覆盖/重标原失败。它实证并非被更早profile FATAL拒绝，而是实际到达无预留的DSM publication。
+同shape静态：wrapper对!IsUnderPostmaster bypass，而Publish/creating只看enable；cap0 standalone未被显式拒。Root已收到最窄同步修复建议。另817 cap>0/enableoff的启动Guard缺口只读报Root，未额外运行。
+所有源码、shim、命令、原headers/ELF/DSO哈希、console、容器实际约束、budget nonce/unit/终态均在本run。首次reserve因spec0644被策略拒，原receipt保留；改spec0600再原nonce首次成功预约/launch，没有重复实际启动。此为新hook回归的隔离复现，Source/normal/E均false/0。

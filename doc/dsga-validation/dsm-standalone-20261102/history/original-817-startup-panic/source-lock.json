@@ -1,0 +1,18 @@
+{
+  "PG17_HEAD": "81794a0ef0deac73c80614867f8741ef1397e097",
+  "PG17_image": "127.0.0.1:5001/neon/pg17-stderr-cap@sha256:46c3e2a3b0eddc18e6bf57911556254d74af65246c827706f4a6d8c3d62f815b",
+  "PG17_ELF_sha256": "f88365d24889478e4ff88abb91f40cc735b565fd7078a2495fa84fb017812794",
+  "compiled_source_index": "/data/neon-build/validation/pg17-stderr-cap-build-20261101T133024Z-21ad5a/export/compiled-source-index.txt",
+  "compiled_source_index_sha256": "26370e3c6d955933c06fb1eab0d33960aa43c4af5bb12e346f684c43b01bb989",
+  "owned_reviewed_source": {
+    "src/backend/storage/ipc/dsg_dsm.c": "031149ed244b471a510801a5a8753e5b3406f8cfa582aca6644a505f0048f503",
+    "src/backend/storage/ipc/dsm.c": "db141fdacc18aedfcabb6a89bce39e3478db3e7ae6665846fb4a9b3b1e1cfc49",
+    "src/backend/storage/ipc/ipci.c": "79f59d2c13c4523ee9b8dbfe3f8dc1e3cc3258a67bb280c572de1091639be3f1",
+    "src/backend/storage/buffer/dsg_work.c": "1eba41c1da1ce6b7c1cbbb66ab6357f86d78b05e066896d6a0571566deb36952",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "2634c9fab59da0c51ef669729f9d0e7fcc06d1c4666179aca6309161e0b84b99",
+    "src/include/storage/dsg_dsm.h": "227d4da561554421028dd55ef4e6dc6880e83b919f54730c7d6d6bb3e388d59c"
+  },
+  "test_shim_sha256": "e171ee47646b1ebb7871b9fd09466e578653c43d68f128bd37e2bee5236ade82",
+  "run_script_sha256": "e36f6462f3ed61892abc33c6e0a993842d43b90794cf831b4a5274d782d405e7",
+  "scope": "REPRO_ONLY_NO_PRODUCTION_SOURCE_CHANGE_NO_ROOT_BOUND_SOURCE_NORMAL"
+}

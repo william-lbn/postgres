@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261102T022608Z-27595d",
+  "unit": "neon-pg18-aio-waiter-20261102t022608z-27595d.service",
+  "kind": "native",
+  "evidence_dir": "/data/neon-build/validation/pg18-neon-aio-waiter-native-20261102T022608Z-27595d",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-neon-aio-waiter-native-20261102T022608Z-27595d/worker.py"
+  ]
+}

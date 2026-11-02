@@ -1,0 +1,4 @@
+{
+  "src/backend/storage/aio/aio.o": true,
+  "src/backend/postgres": true
+}

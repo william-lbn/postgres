@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261102T012118Z-ff51b4",
+  "unit": "neon-pg18-smgr-aio-20261102t012118z-ff51b4.service",
+  "kind": "heavy",
+  "evidence_dir": "/data/neon-build/validation/pg18-neon-aio-error-holdoff-fix-build-20261102T012118Z-ff51b4",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-neon-aio-error-holdoff-fix-build-20261102T012118Z-ff51b4/worker.py"
+  ]
+}

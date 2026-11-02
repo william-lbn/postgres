@@ -479,6 +479,60 @@ pgaio_io_stage(PgAioHandle *ioh, PgAioOp op)
 	RESUME_INTERRUPTS();
 }
 
+/*-
+ * 只为真实同步存储读接入原AIO生命周期。目标已经由smgr设置，调用方的上层
+ * Buffer回调也已登记；本函数绝不构造FD，不向IO worker/uring提交替身操作。
+ * 与原stage相同，先发布原wait ref/IO_IN_PROGRESS，再执行可能失败的RPC。
+ * ERROR时用零完成页让全部目标Buffer走原失败完成和pin释放，然后重新抛出
+ * 同一个原错误；成功才发布nblocks。不能在回调前宣称完成或丢掉原错误。
+ */
+void
+pgaio_io_start_readv_synchronous(PgAioHandle *ioh, int nblocks,
+							void (*read_callback) (void *), void *arg)
+{
+	if (nblocks <= 0 || read_callback == NULL)
+		elog(ERROR, "invalid synchronous storage read callback");
+	Assert(ioh->state == PGAIO_HS_HANDED_OUT);
+	Assert(pgaio_my_backend->handed_out_io == ioh);
+	Assert(ioh->target == PGAIO_TID_SMGR);
+
+	/* 同步RPC不进内核ring；并发waiter必须走原latch等待实际完成。 */
+	pgaio_io_set_flag(ioh, PGAIO_HF_SYNCHRONOUS);
+
+	HOLD_INTERRUPTS();
+	ioh->op = PGAIO_OP_READV;
+	ioh->result = 0;
+	/* 此操作不占OS FD，避免复用handle时把旧fd当成本次远端IO持有。 */
+	MemSet(&ioh->op_data, 0, sizeof(ioh->op_data));
+	ioh->op_data.read.fd = -1;
+	pgaio_io_update_state(ioh, PGAIO_HS_DEFINED);
+	pgaio_my_backend->handed_out_io = NULL;
+	pgaio_io_call_stage(ioh);
+	pgaio_io_update_state(ioh, PGAIO_HS_STAGED);
+	pgaio_io_prepare_submit(ioh);
+
+	PG_TRY();
+	{
+		read_callback(arg);
+	}
+	PG_CATCH();
+	{
+		/* errfinish(ERROR)在长跳前清零holdoff；清理须重新保护，不能减零。 */
+		HOLD_INTERRUPTS();
+		START_CRIT_SECTION();
+		pgaio_io_process_completion(ioh, 0);
+		END_CRIT_SECTION();
+		RESUME_INTERRUPTS();
+		PG_RE_THROW();
+	}
+	PG_END_TRY();
+
+	START_CRIT_SECTION();
+	pgaio_io_process_completion(ioh, nblocks);
+	END_CRIT_SECTION();
+	RESUME_INTERRUPTS();
+}
+
 bool
 pgaio_io_needs_synchronous_execution(PgAioHandle *ioh)
 {

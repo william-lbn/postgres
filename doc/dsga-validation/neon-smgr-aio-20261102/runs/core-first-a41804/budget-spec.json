@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261102T001336Z-a41804",
+  "unit": "neon-pg18-smgr-aio-20261102t001336z-a41804.service",
+  "kind": "heavy",
+  "evidence_dir": "/data/neon-build/validation/pg18-neon-smgr-aio-adapter-build-20261102T001336Z-a41804",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-neon-smgr-aio-adapter-build-20261102T001336Z-a41804/worker.py"
+  ]
+}

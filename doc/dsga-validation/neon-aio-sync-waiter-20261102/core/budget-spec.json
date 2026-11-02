@@ -1,0 +1,11 @@
+{
+  "protocol_version": 1,
+  "nonce": "20261102T021437Z-ea898b",
+  "unit": "neon-pg18-smgr-aio-20261102t021437z-ea898b.service",
+  "kind": "heavy",
+  "evidence_dir": "/data/neon-build/validation/pg18-neon-aio-synchronous-flag-fix-build-20261102T021437Z-ea898b",
+  "argv": [
+    "/usr/bin/python3",
+    "/data/neon-build/validation/pg18-neon-aio-synchronous-flag-fix-build-20261102T021437Z-ea898b/worker.py"
+  ]
+}

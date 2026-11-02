@@ -298,6 +298,15 @@ extern PgAioOpData *pgaio_io_get_op_data(PgAioHandle *ioh);
 
 extern void pgaio_io_start_readv(PgAioHandle *ioh,
 								 int fd, int iovcnt, uint64 offset);
+
+/*-
+ * Neon远端smgr没有可交给OS readv的本地FD。同步回调必须完成全部nblocks或ERROR；
+ * AIO状态、Buffer stage/完成和资源释放仍由核心控制，不允许扩展写opaque状态。
+ */
+#define NEON_PGAIO_SYNC_READV_API_VERSION 1
+extern void pgaio_io_start_readv_synchronous(PgAioHandle *ioh, int nblocks,
+										   void (*read_callback) (void *), void *arg);
+
 extern void pgaio_io_start_writev(PgAioHandle *ioh,
 								  int fd, int iovcnt, uint64 offset);
 

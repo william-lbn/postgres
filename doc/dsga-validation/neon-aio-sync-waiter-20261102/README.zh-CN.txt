@@ -1,0 +1,9 @@
+PG18 同步AIO并发等待修复（2026-11-02）
+
+独立审查发现：原同步远端RPC桥没有PGAIO_HF_SYNCHRONOUS。io_uring下，另一backend看到SUBMITTED会调method.wait_one等待本不存在的ring CQE。仅worker下原4项组件通过不能排除此路径。原冻结与4项运行记录原样保留；本批仅在HANDED_OUT时调用原pgaio_io_set_flag标记同步，随后原stage/submit/shared/local completion与ERROR清理不改。
+
+实际增量编译ea898b仅aio.o+原全部对象链接，6.982秒，旧缓存原件哈希保留，PG新242b0919b091ae2a2d686d2bd1ad578d28ecd93f406a22d059850e34826568de。两个头未改，正式Neon11/DSO沿用已实测产物。旧4项S仍对应原95b PG，不能重标成已在242b全量重跑。
+
+新27595d为1个稳定S组件目标，实际io_method=io_uring。协议模型暂缓原GetPage响应；原pg_aios真见owner SUBMITTED且f_sync=true，独立backend原pg_stat_activity真见AioIoCompletion；原响应放行后二者各600行/sum180300，active_completions=0且原完成数等于释放pin数。实际PM唯一Wait0。模型传的是隔离真实PG CHECKPOINT后表页，路径/长度/SHA在证据，不是正式Pageserver时间线。
+
+容器仅放开自身seccomp以使用io_uring_setup；仍UID1000/cap0/NNP/RO/networknone/2CPU3GiB，未改宿主内核knobs或网络。此运行新增1S；与原4稳定目标合计5S，旧执行与新执行不是重复目标累加。U=0、正式Storage E=0、Source/normal=false；全relation生产selector和正式PG18 PS/SK仍后继。

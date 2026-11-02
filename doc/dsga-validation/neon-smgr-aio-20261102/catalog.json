@@ -1,0 +1,45 @@
+{
+  "targets": [
+    {
+      "id": "test_dsg_pg18_formal_extension.FormalExtension.test_PG18_S_NEON_FORMAL_SQL_001_shared_contract_resize_and_observers",
+      "status": "PASS",
+      "final_original_run": "/data/neon-build/validation/pg18-neon-formal-sql-native-20261102T013404Z-a14568",
+      "peer_is_model": false,
+      "scope": "native PG component; protocol model peer where stated; not formal storage E"
+    },
+    {
+      "id": "test_dsg_pg18_remote_aio.RemoteAio.test_PG18_S_NEON_REMOTE_AIO_001_real_rpc_success",
+      "status": "PASS",
+      "final_original_run": "/data/neon-build/validation/pg18-neon-formal-sql-native-20261102T013404Z-a14568",
+      "peer_is_model": true,
+      "scope": "native PG component; protocol model peer where stated; not formal storage E"
+    },
+    {
+      "id": "test_dsg_pg18_remote_aio.RemoteAio.test_PG18_S_NEON_REMOTE_AIO_002_real_rpc_ERROR_pin_cleanup_same_backend_retry",
+      "status": "PASS",
+      "final_original_run": "/data/neon-build/validation/pg18-neon-formal-sql-native-20261102T013404Z-a14568",
+      "peer_is_model": true,
+      "scope": "native PG component; protocol model peer where stated; not formal storage E"
+    },
+    {
+      "id": "test_dsg_pg18_remote_aio.RemoteAio.test_PG18_S_NEON_SLRU3_001_real_rpc_and_narrowing_rejections",
+      "status": "PASS",
+      "final_original_run": "/data/neon-build/validation/pg18-neon-formal-sql-native-20261102T014723Z-24d151",
+      "peer_is_model": true,
+      "scope": "native PG component; protocol model peer where stated; not formal storage E"
+    }
+  ],
+  "unique_targets": 4,
+  "PG17_compiler_translation_units": 7,
+  "U": 0,
+  "S": 4,
+  "E": 0,
+  "normal": false,
+  "Source": false,
+  "not_qualified": [
+    "production all-relation remote selector runtime",
+    "formal PG18 Pageserver/timeline",
+    "Root birth/normal/physical VM shrink",
+    "K8s end-to-end"
+  ]
+}

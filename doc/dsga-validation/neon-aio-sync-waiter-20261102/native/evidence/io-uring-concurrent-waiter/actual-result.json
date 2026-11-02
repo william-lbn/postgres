@@ -1,0 +1,62 @@
+{
+  "io_method": "io_uring",
+  "owner_pid": 53,
+  "waiter_pid": 54,
+  "results": {
+    "waiter": [
+      [
+        "600",
+        "180300"
+      ]
+    ],
+    "owner": [
+      [
+        "600",
+        "180300"
+      ]
+    ]
+  },
+  "snapshot": {
+    "enabled": true,
+    "maximum_buffers": 8192,
+    "startup_buffers": 256,
+    "active_completions": 0,
+    "paused_completions": 0,
+    "completed_aio": "986",
+    "released_aio_pins": "986",
+    "completion_lock_available": true,
+    "resize_authorized": false,
+    "normal_permit": false,
+    "arrays": [
+      {
+        "base": "134349644181504",
+        "maximum_bytes": "524288",
+        "reserved_bytes": "524288",
+        "committed_bytes": "16384"
+      },
+      {
+        "base": "134349577072640",
+        "maximum_bytes": "67108864",
+        "reserved_bytes": "67108864",
+        "committed_bytes": "2097152"
+      },
+      {
+        "base": "134349576941568",
+        "maximum_bytes": "131072",
+        "reserved_bytes": "131072",
+        "committed_bytes": "4096"
+      },
+      {
+        "base": "134349576777728",
+        "maximum_bytes": "163840",
+        "reserved_bytes": "163840",
+        "committed_bytes": "8192"
+      }
+    ]
+  },
+  "relation_bytes": 4915200,
+  "relation_sha256": "f450c98648ed079a50c9c47eaec1bd3c7571e55cfcdd78498f815871b16eb6a3",
+  "peer_is_model": true,
+  "Source": false,
+  "E": 0
+}

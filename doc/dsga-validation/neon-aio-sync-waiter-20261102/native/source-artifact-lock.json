@@ -1,0 +1,21 @@
+{
+  "scope": "ONE_ACTUAL_SHARED_WAITER_TARGET_ON_REAL_SYNC_AIO_FLAG_CORE",
+  "core_build": "/data/neon-build/validation/pg18-neon-aio-synchronous-flag-fix-build-20261102T021437Z-ea898b",
+  "core_source_lock_sha256": "329a6afa69c1dade5d05ee6ef040343bd7c1cc30d4169f19735a862b200a057b",
+  "Neon11_extension_build": "/data/neon-build/validation/pg18-neon-formal-error-slot-fix-build-20261102T013023Z-36bcc1",
+  "probe_reused_exact_source_and_unchanged_AIO_headers": "/data/neon-build/validation/pg18-neon-formal-sql-native-20261102T013404Z-a14568",
+  "driver_sha256": "a5528b4cebbf0fbd3774c0f147ea6b0bd2f429b8aa9ce0e35a2c7fd15796633c",
+  "original_model_helper_sha256": "ee9de9493c0570d1917171f6d04203e8241fdf9c9d67124883d7591da5ac31ba",
+  "probe_ELF_sha256": "a75b485475b9f307f4643e23f1de39fe09e9c00214a308ccb3a143bf58218262",
+  "artifacts": {
+    "bin/postgres": "242b0919b091ae2a2d686d2bd1ad578d28ecd93f406a22d059850e34826568de",
+    "lib/postgresql/neon.so": "be227e578ebfee0a13772619e0095009b4aaf5461022dca1936424e6af80ea88",
+    "lib/postgresql/neon_rmgr.so": "f0924debffffd9daa7819a1807ecb552fe42f13ac3eb756674ed54cfeb045f2c"
+  },
+  "runtime_image": "127.0.0.1:5001/neon/pg18-native-tools@sha256:68c6b14f76f04bdcebbf15dba0c97de2bdcb2bed5850654797cc6d631f694ee6",
+  "container_seccomp": "unconfined for required io_uring_setup; cap0 NNP user1000 readOnly networknone cgroup2CPU3GiB unchanged; host knobs unchanged",
+  "peer_is_model": true,
+  "normal": false,
+  "Source": false,
+  "E": 0
+}

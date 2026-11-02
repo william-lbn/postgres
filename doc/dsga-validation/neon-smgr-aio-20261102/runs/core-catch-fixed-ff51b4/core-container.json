@@ -1,0 +1,31 @@
+{
+  "ID": "1b1569d15af56e8b53b1c1d19be2c3e29aca75594dd2bf9b34967cc7aa93277a",
+  "Image": "sha256:76f5ecc895d360bfc9acadb6e4cf6059b85d9840a5e3dbaba6f0e19505d1f922",
+  "State": {
+    "Status": "exited",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2026-11-02T01:21:44.869748775Z",
+    "FinishedAt": "2026-11-02T01:21:47.551072132Z"
+  },
+  "HostConfig": {
+    "Memory": 8589934592,
+    "MemorySwap": 8589934592,
+    "NanoCpus": 6000000000,
+    "ReadonlyRootfs": true,
+    "NetworkMode": "none",
+    "PidsLimit": 256,
+    "SecurityOpt": [
+      "no-new-privileges"
+    ],
+    "CapDrop": [
+      "ALL"
+    ]
+  }
+}

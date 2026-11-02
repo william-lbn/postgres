@@ -155,6 +155,8 @@ extern finish_unlogged_build_phase_1_hook_type finish_unlogged_build_phase_1_hoo
 extern end_unlogged_build_hook_type end_unlogged_build_hook;
 
 /* NEON: Hook for reading an SLRU segment from e.g. remote storage */
+/* 真实现有int64 segment签名；区别于PG17的int版本v2。 */
+#define NEON_SLRU_DOWNLOAD_API_VERSION 3
 typedef bool (*read_slru_segment_hook_type) (const char *path, int64 segno);
 extern read_slru_segment_hook_type read_slru_segment_hook;
 

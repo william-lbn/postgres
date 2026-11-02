@@ -1,0 +1,166 @@
+{
+  "stable_targets": 4,
+  "final_SLRU_run": "/data/neon-build/validation/pg18-neon-formal-sql-native-20261102T014723Z-24d151",
+  "inherited_three_run": "/data/neon-build/validation/pg18-neon-formal-sql-native-20261102T013404Z-a14568",
+  "driver_AST_only_changed": [
+    "test_PG18_S_NEON_SLRU3_001_real_rpc_and_narrowing_rejections"
+  ],
+  "current_PG3": {
+    "src/backend/storage/aio/aio.c": "bffaae642dc8a720187756363ce6eed03488e9f5ca940ab7f81f26121025d33c",
+    "src/include/storage/aio.h": "bda300f618746be26a07c156e33503fa8229d03b8ec0618dc13239cb85c59bba",
+    "src/include/storage/smgr.h": "3bcbf24ae4c54ef4275ba3baad7f138f2aaf5c9c1fefe987264ffac9effa994b"
+  },
+  "current_Neon11": {
+    "pgxn/neon/neon_pgversioncompat.h": "48b20bbf251a7e132f6eb0032847abc00f7868cbe46c079d880771c956285ff0",
+    "pgxn/neon/logical_replication_monitor.c": "4c3d2a008fd86aed564151ea6235af3f8cad92b8f6f74f8c5488bcb2babcbbd2",
+    "pgxn/neon/libpagestore.c": "341f1e346b8432072c9f83c09e858d650bd0a5ea6e6b1718a8245e0129e5a99c",
+    "pgxn/neon/pagestore_smgr.c": "e5c266ced9e20f8c0cae68bec8c063564035d79f84c80957e4170a6edbf92100",
+    "pgxn/neon/pagestore_client.h": "1d2c6c272d9c8531448bd21c00a4243069aba9fa0469acccf8423030004fcf3f",
+    "pgxn/neon/slru_download.h": "5b22da5bdfa1ac91c21cf8a328b797306640f9e5560b3db012ccfbad12ac2840",
+    "pgxn/neon/slru_download.c": "e8e11e5eebd957176fff40ca9c91e383f5bb57ba167e0a81376cf4ce8147cd12",
+    "pgxn/neon/walproposer_pg.c": "508acdf5257fe5436a209967ff1b706ffd80a8c2f1c1302e38bfb15666b882a9",
+    "pgxn/neon_rmgr/neon_rmgr_decode.c": "1c7b1b39831bd3a781941aa826d58b8c59d76f5b270bdbe92373c77a3239e110",
+    "pgxn/neon_rmgr/neon_rmgr.h": "d9529e5b79bace628962c33e74b9c4ed5ca87b6a01b9270d43353aedde1722f2",
+    "pgxn/neon/communicator.c": "8c880e257119431cddc20741208d37f85edc4b43d8f08c891c6d139b7d094a80"
+  },
+  "current_tests3": {
+    "ci/test_dsg_pg18_formal_extension.py": "1643bd28350f640730182df1b0e08c19ad63dd79abfe430adb26aff1e34a5006",
+    "ci/test_dsg_pg18_remote_aio.py": "ee9de9493c0570d1917171f6d04203e8241fdf9c9d67124883d7591da5ac31ba",
+    "ci/pg18_neon_aio_probe.c": "40a3decf3d62066117c0471c20cda96e306e810652e89b493bc131da5248a5a8"
+  },
+  "runtime_artifacts": {
+    "bin/postgres": "95b4c4a86b0e365aaef080572959ade5f0ab7875aa55c40f38aef95abcb431d9",
+    "lib/postgresql/test_dsg_region18.so": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+    "lib/postgresql/neon.so": "be227e578ebfee0a13772619e0095009b4aaf5461022dca1936424e6af80ea88",
+    "lib/postgresql/neon_rmgr.so": "f0924debffffd9daa7819a1807ecb552fe42f13ac3eb756674ed54cfeb045f2c"
+  },
+  "runtime_PG_core_build": "/data/neon-build/validation/pg18-neon-aio-error-holdoff-fix-build-20261102T012118Z-ff51b4",
+  "extension_compiler_PG_build": "/data/neon-build/validation/pg18-neon-smgr-aio-adapter-build-20261102T001336Z-a41804",
+  "extension_compile_PG_sha256": "95001525a1e80c07e337fa001a3e04680f8a6cd4e9b2f0c006dca314b497bd6d",
+  "compile_runtime_API_header_identity": "aio.h/smgr.h exact identical; only runtime CATCH body was fixed, no ABI layout/signature change",
+  "extension_build": "/data/neon-build/validation/pg18-neon-formal-error-slot-fix-build-20261102T013023Z-36bcc1",
+  "legacy_PG17_C_compiler_targets": {
+    "logical_replication_monitor": {
+      "compiler_exit": 0,
+      "run": "/data/neon-build/validation/pg17-neon-compat-owned-syntax-diagnostic-20261102T013805Z-ca2f25",
+      "original_exit_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "compiler_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "C translation unit syntax/headers only; not U/S/E"
+    },
+    "libpagestore": {
+      "compiler_exit": 0,
+      "run": "/data/neon-build/validation/pg17-neon-compat-libpagestore-include-fix-20261102T014031Z-cc9858",
+      "original_exit_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "compiler_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "C translation unit syntax/headers only; not U/S/E"
+    },
+    "pagestore_smgr": {
+      "compiler_exit": 0,
+      "run": "/data/neon-build/validation/pg17-neon-compat-owned-syntax-diagnostic-20261102T013805Z-ca2f25",
+      "original_exit_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "compiler_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "C translation unit syntax/headers only; not U/S/E"
+    },
+    "slru_download": {
+      "compiler_exit": 0,
+      "run": "/data/neon-build/validation/pg17-neon-compat-owned-syntax-diagnostic-20261102T013805Z-ca2f25",
+      "original_exit_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "compiler_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "C translation unit syntax/headers only; not U/S/E"
+    },
+    "walproposer_pg": {
+      "compiler_exit": 0,
+      "run": "/data/neon-build/validation/pg17-neon-compat-owned-syntax-diagnostic-20261102T013805Z-ca2f25",
+      "original_exit_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "compiler_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "C translation unit syntax/headers only; not U/S/E"
+    },
+    "neon_rmgr_decode": {
+      "compiler_exit": 0,
+      "run": "/data/neon-build/validation/pg17-neon-compat-owned-syntax-diagnostic-20261102T013805Z-ca2f25",
+      "original_exit_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "compiler_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "C translation unit syntax/headers only; not U/S/E"
+    },
+    "communicator": {
+      "compiler_exit": 0,
+      "run": "/data/neon-build/validation/pg17-neon-compat-owned-syntax-diagnostic-20261102T013805Z-ca2f25",
+      "original_exit_receipt_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "compiler_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "classification": "C translation unit syntax/headers only; not U/S/E"
+    }
+  },
+  "RPC_pin_evidence": {
+    "remote-success": {
+      "same_backend_pid": 113,
+      "before_retry": {
+        "calls": "600",
+        "errors": "0"
+      },
+      "after_retry": {
+        "calls": "1168",
+        "errors": "0"
+      },
+      "pins_after_first": {
+        "active_completions": 0,
+        "completed_aio": "939",
+        "released_aio_pins": "939"
+      },
+      "pins_after_retry": {
+        "active_completions": 0,
+        "completed_aio": "1507",
+        "released_aio_pins": "1507"
+      },
+      "peer_is_model": true,
+      "relation_source": {
+        "peer_is_model": true,
+        "model_program": "ci/test_dsg_pg18_remote_aio.py::PageStream",
+        "original_path_inside_isolated_PG": "/tmp/pg18-rpc-4yq4bq0d/data/base/5/16410",
+        "relation_path": "base/5/16410",
+        "checkpointed_relation_bytes": 4915200,
+        "checkpointed_relation_sha256": "d10a28b3246fcf224e723c26faac1163200b3fae1a5f789d95892e09f4fcc81f",
+        "formal_Pageserver": false,
+        "storage_E": false
+      }
+    },
+    "remote-error": {
+      "same_backend_pid": 156,
+      "before_retry": {
+        "calls": "1",
+        "errors": "1"
+      },
+      "after_retry": {
+        "calls": "601",
+        "errors": "1"
+      },
+      "pins_after_first": {
+        "active_completions": 0,
+        "completed_aio": "340",
+        "released_aio_pins": "340"
+      },
+      "pins_after_retry": {
+        "active_completions": 0,
+        "completed_aio": "940",
+        "released_aio_pins": "940"
+      },
+      "peer_is_model": true,
+      "relation_source": {
+        "peer_is_model": true,
+        "model_program": "ci/test_dsg_pg18_remote_aio.py::PageStream",
+        "original_path_inside_isolated_PG": "/tmp/pg18-rpc-1u3gaq4r/data/base/5/16410",
+        "relation_path": "base/5/16410",
+        "checkpointed_relation_bytes": 4915200,
+        "checkpointed_relation_sha256": "d10a28b3246fcf224e723c26faac1163200b3fae1a5f789d95892e09f4fcc81f",
+        "formal_Pageserver": false,
+        "storage_E": false
+      }
+    }
+  },
+  "peer_is_model": true,
+  "formal_SQL_uses_storage_peer": false,
+  "U": 0,
+  "S": 4,
+  "E": 0,
+  "normal": false,
+  "Source": false
+}

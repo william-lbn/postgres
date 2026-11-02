@@ -1,0 +1,10 @@
+{
+  "core_build_exit": 0,
+  "postgres_sha256": "95b4c4a86b0e365aaef080572959ade5f0ab7875aa55c40f38aef95abcb431d9",
+  "test_DSO_sha256": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+  "seconds": 5.3709288369864225,
+  "scope": "ERROR_CATCH_HOLDOFF_ONLY_NO_EXTENSION_REBUILD",
+  "normal": false,
+  "Source": false,
+  "E": 0
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS_ACTUAL_IO_URING_SYNCHRONOUS_SHARED_WAITER",
+  "exit": 0,
+  "OOMKilled": false,
+  "seconds": 6.850455563981086,
+  "targets": 1,
+  "peer_is_model": true,
+  "normal": false,
+  "Source": false,
+  "E": 0
+}

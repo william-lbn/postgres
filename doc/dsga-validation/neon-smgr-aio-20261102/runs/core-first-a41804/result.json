@@ -1,0 +1,11 @@
+{
+  "core_build_exit": 0,
+  "extension_build_exit": 0,
+  "extension_make_exit": 2,
+  "postgres_sha256": "95001525a1e80c07e337fa001a3e04680f8a6cd4e9b2f0c006dca314b497bd6d",
+  "test_DSO_sha256": "cada2bc8f6b62de9e92be5b3863c9603dc2ef099ae53966d1e27b16c065c5b49",
+  "seconds": 61.394177294976544,
+  "normal": false,
+  "Source": false,
+  "E": 0
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "io": [
+      {
+        "pid": 53,
+        "io_id": 7,
+        "io_generation": 36,
+        "state": "SUBMITTED",
+        "operation": "readv",
+        "off": 0,
+        "length": 0,
+        "target": "smgr",
+        "handle_data_len": 1,
+        "raw_result": null,
+        "result": "UNKNOWN",
+        "target_desc": "block 0 in file \"base/5/16410\"",
+        "f_sync": true,
+        "f_localmem": false,
+        "f_buffered": false
+      }
+    ],
+    "waiter": {
+      "pid": 54,
+      "state": "active",
+      "wait_event_type": "IO",
+      "wait_event": "AioIoCompletion"
+    }
+  }
+]

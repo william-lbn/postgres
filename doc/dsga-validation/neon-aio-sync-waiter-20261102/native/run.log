@@ -1,0 +1,6 @@
+test_PG18_S_AIO_SYNC_WAITER_001_actual_uring_waiter_latch_and_shared_completion (__main__.ConcurrentWaiter.test_PG18_S_AIO_SYNC_WAITER_001_actual_uring_waiter_latch_and_shared_completion) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.985s
+
+OK

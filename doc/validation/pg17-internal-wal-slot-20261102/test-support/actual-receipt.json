@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "classification": "actual Core mechanism with test-only fake Neon callback; NOT production Neon/Root",
+  "status": "PASS_MECHANISM_COMPONENT_ONLY",
+  "actual_result": {
+    "path": "/data/neon-build/validation/pg17-static-origin-mechanism-native-20261102T102124Z-8afab1/result.json",
+    "sha256": "350819b84315f5be331192bc751059a0cfcdde2f5605d61b5df4e9ccda825427",
+    "native_unique_Wait_exit": 0,
+    "driver_exit": 0,
+    "seconds": 1.954134861996863
+  },
+  "actual_source_lock": {
+    "path": "/data/neon-build/validation/pg17-static-origin-mechanism-native-20261102T102124Z-8afab1/source-lock.json",
+    "sha256": "37270790e2de692564dac69e1870a10f6eb8f98226d28672e5609b31945d6c0d"
+  },
+  "actual_compiled_source": {
+    "path": "/data/neon-build/validation/pg17-static-origin-mechanism-native-20261102T101402Z-094283/static_origin_probe.c",
+    "sha256": "0f4439fc213f14a833c93bf084bf9a98496e63f88c27725fd762e2ff9a9e562d",
+    "compiler_exit": 0,
+    "artifact_not_copied": true
+  },
+  "archive_source_equals_executed": {
+    "C": true,
+    "Host_driver": true
+  },
+  "facts": {
+    "status": "PASS_MECHANISM_COMPONENT_ONLY",
+    "classification": "test-shim component exercising actual core source bit/API, not real Neon",
+    "normal": false,
+    "Source": false,
+    "E": 0,
+    "static_PM_probe": {
+      "pid": 37,
+      "getter": true,
+      "database_invalid": true,
+      "under_postmaster": true,
+      "actual_proc_pid_matched": true,
+      "actual_parent_is_postmaster": true
+    },
+    "dynamic_same_descriptor_probe": {
+      "pid": 74,
+      "getter": false,
+      "database_invalid": true,
+      "under_postmaster": true,
+      "original_core_handle_pid_matched": true,
+      "original_handle_reached_STOPPED": true
+    },
+    "dynamic_forged_private_bit": {
+      "actual_RegisterDynamicBackgroundWorker_return": false,
+      "new_child_fact_count": 0,
+      "no_child_probe_created": true
+    }
+  },
+  "old_NOT_RUN_and_failed_runs_retained": true,
+  "DSB_enabled": false,
+  "shim_not_for_release": true,
+  "forbidden_production_ELF_sha256": "99447c3cfacd4b3430e744b3d0bd8d142ae0426ed9714628c6d4d8936e962e18",
+  "Source": false,
+  "normal": false,
+  "E": 0
+}

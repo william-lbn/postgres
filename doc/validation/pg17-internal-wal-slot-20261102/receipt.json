@@ -1,0 +1,47 @@
+{
+  "source_sha256": {
+    "src/include/postmaster/bgworker_internals.h": "a517bd9bed3aadff2d87c698a6dbc8f7754967bdd4f059d6f9152ad44c141f20",
+    "src/backend/postmaster/bgworker.c": "9285e73734a2df937039a25e75cf55185e1e5f977628bbb18ecd92bade257c16",
+    "src/backend/replication/slot.c": "deddd5f6ca4979b907d30e2bca4d5b2867e355301d00516b94c456df255583c4"
+  },
+  "compiled_base": "adecb5ecaf131fffde035a56f88c634403309b46",
+  "build_run": "/data/neon-build/validation/pg17-walproposer-static-slot-build-20261102T090309Z-cefa02",
+  "build_exit": 0,
+  "postgres_sha256": "a766574d095a40d00c70bd753fa9d0fcfde9f48767e883ab3e2e59014c4956af",
+  "positive_run": "/data/neon-build/validation/pg17-trusted-control-full-native-20261102T091405Z-5183db",
+  "positive_scope": "actual extension/table/insert all three complete; prior internal WAL blockage crossed",
+  "positive_whole_native_exit": 1,
+  "positive_seconds": 54.68306205800036,
+  "subsequent_failure": "neon.so optional metrics NULL write on actual storage corruption feedback; not normal acceptance",
+  "external_negative_summary": {
+    "path": "/data/neon-build/validation/pg17-walproposer-static-slot-fix-20261102/tests/actual-external-negative-summary.json",
+    "sha256": "9efb1abcd8d72a1e1433a514dd818f0e6a8f5ec840409f0e6624f06059162d71",
+    "distinct_scenarios": 4,
+    "actual_attempts": 5,
+    "all_sqlstate": "42501",
+    "slots_and_container_limits_unchanged": true,
+    "raw_results": {
+      "SQL3_then_protocol_client_failure": {
+        "path": "/data/neon-build/validation/pg17-wal-slot-external-native-20261102T094003Z-8216ef/result.json",
+        "sha256": "ef21c4d1899cf599d8d79a2b5f33797f93e274e0a17c6e8e6227956831d74918",
+        "native_unique_Wait_exit": 0,
+        "whole_driver_exit": 1,
+        "whole_result_not_relabelled": true
+      },
+      "physical_startup_two_connections": {
+        "path": "/data/neon-build/validation/pg17-wal-slot-external-native-20261102T094409Z-a558ee/result.json",
+        "sha256": "0fc7b95d4a2aa258511d3ad04d7c573fb04e6c6c1610fc0fed73aa25ec930f52",
+        "native_unique_Wait_exit": 0,
+        "driver_exit": 0
+      }
+    },
+    "physical_command_dispatch_tested": false,
+    "container_cap_scope_only": true
+  },
+  "dynamic_descriptor_clone": "NOT_RUN",
+  "dynamic_forged_private_bit": "NOT_RUN",
+  "normal_accepted": false,
+  "Linux_full_E": 0,
+  "K8s_E": 0,
+  "parent_gitlink_or_release_lock_moved": false
+}

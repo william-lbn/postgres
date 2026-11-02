@@ -47,6 +47,7 @@
 #include "miscadmin.h"
 #include "pgstat.h"
 #include "postmaster/interrupt.h"
+#include "postmaster/bgworker_internals.h"
 #include "replication/slotsync.h"
 #include "replication/slot.h"
 #include "replication/walsender_private.h"
@@ -336,6 +337,14 @@ ReplicationSlotValidateNameInternal(const char *name, int *err_code,
  *     that logical replication can be resumed after failover.
  * synced: True if the slot is synchronized from the primary server.
  */
+/* 只允许原静态WAL worker的固定内部槽，不升SU、不改外部复制协议门。 */
+static bool
+ReplicationSlotStaticWalProposer(const char *name)
+{
+	return strcmp(name, "wal_proposer_slot") == 0 && am_walsender &&
+		BackgroundWorkerIsStaticWalProposer();
+}
+
 void
 ReplicationSlotCreate(const char *name, bool db_specific,
 					  ReplicationSlotPersistency persistency,
@@ -349,7 +358,9 @@ ReplicationSlotCreate(const char *name, bool db_specific,
 	ReplicationSlotValidateName(name, ERROR);
 
 	/*- 同时覆盖SQL函数与复制协议；拒绝必须早于目录/磁盘槽分配。 */
-	if (!db_specific)
+	if (!db_specific &&
+		!(persistency == RS_PERSISTENT && !two_phase && !failover && !synced &&
+		  ReplicationSlotStaticWalProposer(name)))
 		DsgBufferCheckPhysicalReplication();
 
 	if (failover)
@@ -601,7 +612,9 @@ retry:
 	 * active_pid。不能在外层按名字检查再解锁后执行DROP/ADVANCE/COPY，否则
 	 * 同名槽重建会穿透类型边界。拒绝时PG ERROR清理释放LWLock，不认领槽。
 	 */
-	if (SlotIsPhysical(s))
+	if (SlotIsPhysical(s) &&
+		!(s->data.persistency == RS_PERSISTENT &&
+		  ReplicationSlotStaticWalProposer(name)))
 		DsgBufferCheckPhysicalReplication();
 
 	/*

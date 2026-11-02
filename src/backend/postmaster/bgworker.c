@@ -377,7 +377,9 @@ BackgroundWorkerStateChange(bool allow_new_workers)
 		 * remaining fields will only be examined by the child process.  It
 		 * might crash, but we won't.
 		 */
-		rw->rw_worker.bgw_flags = slot->worker.bgw_flags;
+		/* PM独立拒绝shared-slot伪造，不依赖backend动态API自报。 */
+		rw->rw_worker.bgw_flags =
+			slot->worker.bgw_flags & ~BGWORKER_DSG_STATIC_WAL_PROPOSER;
 		rw->rw_worker.bgw_start_time = slot->worker.bgw_start_time;
 		rw->rw_worker.bgw_restart_time = slot->worker.bgw_restart_time;
 		rw->rw_worker.bgw_main_arg = slot->worker.bgw_main_arg;
@@ -858,11 +860,38 @@ BackgroundWorkerMain(char *startup_data, size_t startup_data_len)
  * function of a module library that's loaded by shared_preload_libraries;
  * otherwise it will have no effect.
  */
+/* Descriptor只是形状；权限还须PM原shared_preload静态登记生成的私有位。 */
+static bool
+BackgroundWorkerWalProposerDescriptor(const BackgroundWorker *worker)
+{
+	return worker != NULL &&
+		(worker->bgw_flags & ~BGWORKER_DSG_STATIC_WAL_PROPOSER) == BGWORKER_SHMEM_ACCESS &&
+		worker->bgw_start_time == BgWorkerStart_RecoveryFinished &&
+		worker->bgw_notify_pid == 0 &&
+		strcmp(worker->bgw_name, "WAL proposer") == 0 &&
+		strcmp(worker->bgw_type, "WAL proposer") == 0 &&
+		strcmp(worker->bgw_library_name, "neon") == 0 &&
+		strcmp(worker->bgw_function_name, "WalProposerMain") == 0;
+}
+
+bool
+BackgroundWorkerIsStaticWalProposer(void)
+{
+	return IsUnderPostmaster && MyDatabaseId == InvalidOid &&
+		MyBgworkerEntry != NULL &&
+		(MyBgworkerEntry->bgw_flags & BGWORKER_DSG_STATIC_WAL_PROPOSER) != 0 &&
+		BackgroundWorkerWalProposerDescriptor(MyBgworkerEntry);
+}
+
 void
 RegisterBackgroundWorker(BackgroundWorker *worker)
 {
 	RegisteredBgWorker *rw;
 	static int	numworkers = 0;
+	BackgroundWorker registration = *worker;
+
+	registration.bgw_flags &= ~BGWORKER_DSG_STATIC_WAL_PROPOSER;
+	worker = &registration;
 
 	/*
 	 * Static background workers can only be registered in the postmaster
@@ -947,6 +976,9 @@ RegisterBackgroundWorker(BackgroundWorker *worker)
 	}
 
 	rw->rw_worker = *worker;
+	if (process_shared_preload_libraries_in_progress &&
+		BackgroundWorkerWalProposerDescriptor(worker))
+		rw->rw_worker.bgw_flags |= BGWORKER_DSG_STATIC_WAL_PROPOSER;
 	rw->rw_backend = NULL;
 	rw->rw_pid = 0;
 	rw->rw_child_slot = 0;
@@ -984,6 +1016,10 @@ RegisterDynamicBackgroundWorker(BackgroundWorker *worker,
 	 * structure.
 	 */
 	if (!IsUnderPostmaster)
+		return false;
+
+	/* 复制完整descriptor也不能从动态入口携带静态来源。 */
+	if ((worker->bgw_flags & BGWORKER_DSG_STATIC_WAL_PROPOSER) != 0)
 		return false;
 
 	if (!SanityCheckBackgroundWorker(worker, ERROR))

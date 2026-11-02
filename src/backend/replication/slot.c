@@ -47,10 +47,12 @@
 #include "miscadmin.h"
 #include "pgstat.h"
 #include "postmaster/interrupt.h"
+#include "postmaster/bgworker_internals.h"
 #include "replication/slotsync.h"
 #include "replication/slot.h"
 #include "replication/walsender_private.h"
 #include "replication/message.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
 #include "storage/proc.h"
@@ -350,6 +352,14 @@ ReplicationSlotValidateNameInternal(const char *name, int *err_code,
  *     that logical replication can be resumed after failover.
  * synced: True if the slot is synchronized from the primary server.
  */
+/* 只允许原静态WAL worker的固定内部槽，不升SU、不改外部复制协议门。 */
+static bool
+ReplicationSlotStaticWalProposer(const char *name)
+{
+	return strcmp(name, "wal_proposer_slot") == 0 && am_walsender &&
+		BackgroundWorkerIsStaticWalProposer();
+}
+
 void
 ReplicationSlotCreate(const char *name, bool db_specific,
 					  ReplicationSlotPersistency persistency,
@@ -361,6 +371,12 @@ ReplicationSlotCreate(const char *name, bool db_specific,
 	Assert(MyReplicationSlot == NULL);
 
 	ReplicationSlotValidateName(name, ERROR);
+
+	/* normal物理复制保留原权限门，仅原静态WalProposer固定持久槽例外。 */
+	if (!db_specific &&
+		!(persistency == RS_PERSISTENT && !two_phase && !failover && !synced &&
+		  ReplicationSlotStaticWalProposer(name)))
+		DsgBufferCheckPhysicalReplication();
 
 	if (failover)
 	{
@@ -610,6 +626,12 @@ retry:
 				 errmsg("replication slot \"%s\" does not exist",
 						name)));
 	}
+
+	/* 槽真实类型已知后再检查，外部或动态同名调用不能继承静态来源。 */
+	if (SlotIsPhysical(s) &&
+		!(s->data.persistency == RS_PERSISTENT &&
+		  ReplicationSlotStaticWalProposer(name)))
+		DsgBufferCheckPhysicalReplication();
 
 	/*
 	 * This is the slot we want; check if it's active under some other

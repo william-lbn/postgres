@@ -79,6 +79,7 @@
 #include "replication/walreceiver.h"
 #include "replication/walsender.h"
 #include "replication/walsender_private.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/condition_variable.h"
 #include "storage/aio_subsys.h"
 #include "storage/fd.h"
@@ -2115,6 +2116,27 @@ exec_replication_command(const char *cmd_string)
 	initStringInfo(&output_message);
 	initStringInfo(&reply_message);
 	initStringInfo(&tmpbuf);
+
+	/* physical命令按PG17同合同检查；逻辑复制和只读标识保留原语义。 */
+	switch (cmd_node->type)
+	{
+		case T_BaseBackupCmd:
+		case T_TimeLineHistoryCmd:
+		case T_UploadManifestCmd:
+		case T_ReadReplicationSlotCmd:
+			DsgBufferCheckPhysicalReplication();
+			break;
+		case T_CreateReplicationSlotCmd:
+			if (((CreateReplicationSlotCmd *) cmd_node)->kind == REPLICATION_KIND_PHYSICAL)
+				DsgBufferCheckPhysicalReplication();
+			break;
+		case T_StartReplicationCmd:
+			if (((StartReplicationCmd *) cmd_node)->kind == REPLICATION_KIND_PHYSICAL)
+				DsgBufferCheckPhysicalReplication();
+			break;
+		default:
+			break;
+	}
 
 	switch (cmd_node->type)
 	{

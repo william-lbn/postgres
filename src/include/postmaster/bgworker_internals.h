@@ -42,6 +42,10 @@ typedef struct RegisteredBgWorker
 extern PGDLLIMPORT dlist_head BackgroundWorkerList;
 
 extern Size BackgroundWorkerShmemSize(void);
+/* Core私有静态来源位，动态API拒绝，PM复制动态shared slot时再次剥离。 */
+#define BGWORKER_DSG_STATIC_WAL_PROPOSER (1U << 30)
+extern bool BackgroundWorkerIsStaticWalProposer(void);
+
 extern void BackgroundWorkerShmemInit(void);
 extern void BackgroundWorkerStateChange(bool allow_new_workers);
 extern void ForgetBackgroundWorker(RegisteredBgWorker *rw);

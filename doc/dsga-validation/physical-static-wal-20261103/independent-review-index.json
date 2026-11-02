@@ -1,0 +1,15 @@
+{
+  "scope": "独立源等价性与实际组件票核对，非正常内存/Source验收",
+  "static_review_path": "/data/neon-build/validation/pg18-physical-readonly-review-20261102T202713Z-3297b1/review.json",
+  "static_review_sha256": "0b04827789ab5672b989b7ff60235dd4fda4d6c0baa5657f49e136c0d795b9ac",
+  "runtime_review_path": "/data/neon-build/validation/pg18-physical-readonly-review-20261102T202713Z-3297b1/runtime-addendum-b13c9f.json",
+  "runtime_review_sha256": "2d4cf4d60fe3412c7d77a20ca25cf53e6422df18cbf767eb58e8a7433675fbe2",
+  "public_component_receipt_sha256": "bfdf064115e9ac5920b89ae569d9c25fb1f10e1117eaa61b72b62aeb328f270a",
+  "parser_before_guard": true,
+  "aborted_transaction_25P02_precedence_retained": true,
+  "only_normal_valid_unauthorized_physical_paths_assert42501": true,
+  "Source": false,
+  "normal": false,
+  "E": 0,
+  "K8s": false
+}

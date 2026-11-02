@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "stable_component_id": "PG18_S_STATIC_WAL_PHYSICAL_BOUNDARY",
+  "classification": "single real PG component with test-only neon substitute",
+  "driver_roots": 1,
+  "assertion_groups": 10,
+  "PASS_COMPONENT_ONLY": true,
+  "nonce": "20261102T204048Z-b13c9f",
+  "seconds": 11.109348188969307,
+  "run": "/data/neon-build/validation/pg18-physical-static-wal-component-20261102T204048Z-b13c9f",
+  "result_sha256": "9b6d0f4d588100057d9fe1c28c528b5b5b97927d9f5738c940506af9c90f99b4",
+  "source_lock_sha256": "71c2e121f9a0859b5bf801316156a33914b61f4b0791001c717492b4ccf4522f",
+  "PG_ELF_sha256": "ed13468f3b81070bdcfd0d27f9d31a4cf0f0345c80c01777c0d2696d298299b4",
+  "owned5": {
+    "src/include/postmaster/bgworker_internals.h": {
+      "before_sha256": "d001989e260572f1b987684bae7de589e5bf6bb969514c1840ea1d17a7907eae",
+      "after_sha256": "305197a41828ba24dca0e04c7085e5ee7ecefe2afb3bab5c9b79d0ad3f935661"
+    },
+    "src/backend/postmaster/bgworker.c": {
+      "before_sha256": "b254fc4e39694a56ac511c4c9246b9b1c8b9b5c7fc86d2808c13edd9b7e21750",
+      "after_sha256": "260ac3b4a54149839fca2b8fd613c28a6d485bffaa62ad43a5f59ed7526732e8"
+    },
+    "src/backend/replication/slot.c": {
+      "before_sha256": "0712352a069d76b5514386d3664977075ced92790c2f6f23e8805de11fb17597",
+      "after_sha256": "48f53a759a23bf82beeb0e3ced3f9d7ad095bcf00316507eea824a729e7a44e1"
+    },
+    "src/backend/replication/walsender.c": {
+      "before_sha256": "28872da33b7329f49d18720ff11f97bf12eb53418e21240a22dfe20b33018547",
+      "after_sha256": "2e562834bc39717e90cbac86fd1e880e2efc6b32859a208d46cfd0cf9d2e0ac7"
+    },
+    "src/backend/utils/init/postinit.c": {
+      "before_sha256": "abcf80637b153d3aa6f0d2b600943af0a2b4d9a393d05a844db91f8b6b66d0d7",
+      "after_sha256": "62ba71374195fa1ac5e3b2e21b5b9bda297a2697e9e28e2c06e0808e969d865d"
+    }
+  },
+  "DSGA_enabled": true,
+  "actual_birth": "existing test-v1:2048; real 4 imported arrays; AS env and actual soft/hard2GiB; NNP1; unbound test profile",
+  "static_getter_and_am_walsender_true_actual_fixed_persistent_Create_Acquire": true,
+  "dynamic_same_tuple_am_walsender_true_getter_false_actual_42501": true,
+  "dynamic_forged_private_bit_API_false_no_child": true,
+  "seven_actual_external_denials": [
+    {
+      "case": "SQL_same_slot",
+      "SQLSTATE": "42501",
+      "actual_gate_source": true
+    },
+    {
+      "case": "SQL_other_slot",
+      "SQLSTATE": "42501",
+      "actual_gate_source": true
+    },
+    {
+      "case": "SQL_acquire",
+      "SQLSTATE": "42501",
+      "actual_gate_source": true
+    },
+    {
+      "case": "physical_startup",
+      "SQLSTATE": "42501",
+      "actual_gate_source": true
+    },
+    {
+      "case": "database_BASE_BACKUP",
+      "SQLSTATE": "42501",
+      "actual_gate_source": true
+    },
+    {
+      "case": "database_CREATE_PHYSICAL",
+      "SQLSTATE": "42501",
+      "actual_gate_source": true
+    },
+    {
+      "case": "database_START_PHYSICAL",
+      "SQLSTATE": "42501",
+      "actual_gate_source": true
+    }
+  ],
+  "observed_slot_name_type_active_unchanged": true,
+  "observed_memory_max_unchanged": true,
+  "other_slot_fields_not_claimed": true,
+  "terminal": {
+    "Running": false,
+    "OOMKilled": false,
+    "ExitCode": 0,
+    "Status": "exited"
+  },
+  "core_build_final": "afeab9 build0/4.8806s original noRPATH relink from immutable compiled five-source snapshot",
+  "old_driver_and_fixture_failures_preserved": [
+    "811189",
+    "6d2355",
+    "dd3b18",
+    "b32c89",
+    "b1c78e",
+    "3977f8",
+    "1d1dc3",
+    "52ffe0",
+    "da201e"
+  ],
+  "vendor18_and_PG17_unchanged": true,
+  "test_shim_never_install_in_production": true,
+  "Source": false,
+  "normal": false,
+  "E": 0,
+  "K8s": false,
+  "portable_worker_functions_AST_same_actual": true,
+  "portable_only_CFG_loading_changed": true
+}

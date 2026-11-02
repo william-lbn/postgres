@@ -43,6 +43,7 @@
 #include "replication/slot.h"
 #include "replication/slotsync.h"
 #include "replication/walsender.h"
+#include "storage/dynamic_shared_buffers.h"
 #include "storage/aio_subsys.h"
 #include "storage/bufmgr.h"
 #include "storage/fd.h"
@@ -962,6 +963,10 @@ InitPostgres(const char *in_dbname, Oid dboid,
 					 errmsg("permission denied to start WAL sender"),
 					 errdetail("Only roles with the %s attribute may start a WAL sender process.",
 							   "REPLICATION")));
+
+		/* 仅物理walsender过内存工作域原权限门，逻辑入口不变。 */
+		if (!am_db_walsender)
+			DsgBufferCheckPhysicalReplication();
 	}
 
 	/*

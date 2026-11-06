@@ -22,6 +22,7 @@ bool		enable_dynamic_shared_buffers = false;
 int			max_shared_buffers = 0;
 bool		dynamic_shared_buffers_require_admission = false;
 int			dynamic_shared_buffers_startup_budget = 0;
+int			dynamic_shared_buffers_admission_policy = DSG_ADMISSION_LEASE_V1;
 int			dynamic_shared_buffers_admission_lease_timeout = 30000;
 
 /*-
@@ -71,6 +72,18 @@ StaticAssertDecl(sizeof(DsgAdmissionLeaseState) <= PG_CACHE_LINE_SIZE,
 				 "DSGA admission lease must fit reserved directory cache line");
 static DsgAdmissionLeaseState *admission_lease;
 
+/*-
+ * 硬预算模式下，本地已发布的准入位只由显式预算协议改变。它与普通连接门、
+ * boot、fencing 和容量代次独立于远程续租周期；该模式本身不签发任何预算。
+ * 策略为 PGC_POSTMASTER，同一共享内存生命周期内不会切换。
+ */
+static bool
+DsgUsesTimedAdmission(void)
+{
+	return dynamic_shared_buffers_require_admission &&
+		dynamic_shared_buffers_admission_policy == DSG_ADMISSION_LEASE_V1;
+}
+
 /*- 时钟失败/溢出按已过期处理，不在spinlock中报错或产生未初始化时间。 */
 static uint64
 DsgAdmissionNow(void)
@@ -88,7 +101,7 @@ DsgAdmissionNow(void)
 void
 DsgBufferAdmissionExpireLocked(void)
 {
-	if (!dynamic_shared_buffers_require_admission || admission_lease == NULL ||
+	if (!DsgUsesTimedAdmission() || admission_lease == NULL ||
 		!admission_lease->armed || admission_lease->expired ||
 		DsgAdmissionNow() < pg_atomic_read_u64(&admission_lease->deadline_ns))
 		return;
@@ -101,7 +114,7 @@ DsgBufferAdmissionExpireLocked(void)
 void
 DsgBufferAdmissionExpire(void)
 {
-	if (DSBCtrl == NULL || !dynamic_shared_buffers_require_admission)
+	if (DSBCtrl == NULL || !DsgUsesTimedAdmission())
 		return;
 	SpinLockAcquire(&DSBCtrl->status_lock);
 	DsgBufferAdmissionExpireLocked();
@@ -113,7 +126,7 @@ DsgBufferAdmissionLeaseAllowsConnections(void)
 {
 	uint64 deadline;
 
-	if (!dynamic_shared_buffers_require_admission || admission_lease == NULL)
+	if (!DsgUsesTimedAdmission() || admission_lease == NULL)
 		return true;
 	deadline = pg_atomic_read_u64(&admission_lease->deadline_ns);
 	return deadline != 0 && DsgAdmissionNow() < deadline;
@@ -130,7 +143,7 @@ DsgBufferAdmissionLeaseFenceLocked(uint64 epoch)
 	uint64 now;
 	uint64 duration = (uint64) dynamic_shared_buffers_admission_lease_timeout * NS_PER_MS;
 
-	if (!dynamic_shared_buffers_require_admission || admission_lease->armed)
+	if (!DsgUsesTimedAdmission() || admission_lease->armed)
 		return;
 	now = DsgAdmissionNow();
 	admission_lease->epoch = epoch;
@@ -160,6 +173,9 @@ DsgBufferAdmissionLease(const DsgAdmissionLeaseRequest *request,
 	if (DSBCtrl == NULL || !IsUnderPostmaster || !dynamic_shared_buffers_require_admission)
 		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
 						errmsg("DSGA admission lease requires managed dynamic buffers")));
+	if (!DsgUsesTimedAdmission())
+		ereport(ERROR, (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+						errmsg("native admission leases are unavailable under the enforced budget policy")));
 	MemSet(response, 0, sizeof(*response));
 	SpinLockAcquire(&DSBCtrl->status_lock);
 	DsgBufferAdmissionExpireLocked();
@@ -216,6 +232,9 @@ DsgBufferAdmissionRearmStatus(const DsgAdmissionLeaseRequest *request,
 	if (DSBCtrl == NULL || !IsUnderPostmaster || !dynamic_shared_buffers_require_admission)
 		ereport(ERROR, (errcode(ERRCODE_OBJECT_NOT_IN_PREREQUISITE_STATE),
 						errmsg("DSGA admission rearm status requires managed dynamic buffers")));
+	if (!DsgUsesTimedAdmission())
+		ereport(ERROR, (errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+						errmsg("native admission leases are unavailable under the enforced budget policy")));
 	MemSet(response, 0, sizeof(*response));
 	SpinLockAcquire(&DSBCtrl->status_lock);
 	DsgBufferAdmissionExpireLocked();
@@ -261,6 +280,11 @@ DsgBufferCheckStartupBudget(Size main_segment_bytes)
 	sizeof(ConditionVariableMinimallyPadded), sizeof(CkptSortItem)};
 	int			i;
 
+	/*- 启动、SQL 及 Postmaster 连接门必须全部就绪，旧配置不会隐式选择新策略。 */
+	if (dynamic_shared_buffers_admission_policy == DSG_ADMISSION_ENFORCED_BUDGET_V1 &&
+		(!enable_dynamic_shared_buffers || !dynamic_shared_buffers_require_admission ||
+		 !dynamic_shared_buffers_require_connection_gate))
+		ereport(FATAL, (errmsg("enforced budget admission requires managed dynamic buffers and the connection gate")));
 	if (!enable_dynamic_shared_buffers)
 	{
 		if (dynamic_shared_buffers_require_admission || dynamic_shared_buffers_startup_budget != 0 ||

@@ -1,0 +1,25 @@
+{
+  "范围": "PG17 准入与 Neon 原生 SQL 接口；三节点内存动作另行验收",
+  "PG17父提交": "6c6ac086bc5aa69ff2da0b40da7ae087e08e5265",
+  "已测内核源码": {
+    "src/include/storage/dynamic_shared_buffers.h": "6d203069dc6139f487b4dc958120b00e6723c75edd82b2d3d2f12a316660b8b7",
+    "src/backend/utils/misc/guc_tables.c": "0dfa27646c6a7ebb2abd15835e890585195c11cb03c88f19a44e10d4b3f07009",
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "d92c4a705e00caac6c80ae8fdb4e85fd7a06e53f453af528e122aa64f652754d"
+  },
+  "postgres_sha256": "c0b241006eb8625866b59b30e368a31b1ebf9ed565c1bc5adaee145eac139c7d",
+  "neon_so_sha256": "e3d40f909fd4367f1dfee085c509f3eee8a65099a13f4bb4c519032d317fb0ee",
+  "Neon用例源码SHA256": "da2d2e21477ce7220a524463338188952b3e6b7f071084f2bbfd3b51b3c2325c",
+  "真实SQL用例": [
+    "test_enforced_budget_keeps_sql_across_management_silence",
+    "test_enforced_budget_rejects_saved_config_and_incomplete_gates",
+    "test_background_loss_closes_without_external_coordinator_or_new_queries"
+  ],
+  "通过": 3,
+  "跳过": 0,
+  "用例进程退出": 0,
+  "原测试日志SHA256": "c825808b7fcb9b086a18244c520cd3a0a97eb3bb9e496749f7c412d28c4e8c95",
+  "Linux构建记录": "/data/neon-build/validation/PG17-admission-startup-policy-20261106T074424Z-8a82e9",
+  "Linux单服务记录": "/data/neon-build/validation/PG17-admission-policy-real-SQL-20261106T074744Z-29c575",
+  "Linux扩展记录": "/data/neon-build/validation/PG17-budget-policy-extension-20261106T074013Z-2b1905",
+  "三节点内存动作验收": false
+}

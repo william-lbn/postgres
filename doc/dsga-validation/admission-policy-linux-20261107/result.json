@@ -1,0 +1,32 @@
+{
+  "目的": "PG18 与 PG17 统一使用持续硬预算准入规则。管理通道短暂静默时，已受到硬约束的 SQL 可继续服务，任何不完整预算继续拒绝。",
+  "上游基点": "1e9bf010a841195752f2948ef54ecb34a0fcc749",
+  "分支": "codex/dsga-pg18-v1-20261031",
+  "内核文件": {
+    "src/backend/storage/buffer/dynamic_shared_buffers.c": "39cc877d40f820a59749faea98efcd3338753af76ea1f97b1ad1fa2c42566f38",
+    "src/backend/utils/misc/guc_tables.c": "45b5eed6f378aa84078ce7e6a5f3c0449d35e87ca13e0316b834e8bf6e888ca0",
+    "src/include/storage/dynamic_shared_buffers.h": "6d203069dc6139f487b4dc958120b00e6723c75edd82b2d3d2f12a316660b8b7"
+  },
+  "服务端版本": "postgres (PostgreSQL) 18.2",
+  "发布内核SHA256": "162e8f20c7a2e2b34f25b74288ee495e61fd70519d62829ab1899ca8501bd4ef",
+  "配套Neon源提交": "ecb12557200406d94f34df202351f4792ca3321e",
+  "配套发布扩展": {
+    "neon.so": "e7bdce4dde4fee58b1113bd51f5a2f67eed1562ca3ee9602a6e8242c272f3eeb",
+    "neon_rmgr.so": "cfa452195c35da7f4bd46dc22184fd91b28362e0a530544097149d754424415e"
+  },
+  "原生实测用例": [
+    "test_enforced_budget_keeps_sql_across_management_silence",
+    "test_enforced_budget_rejects_saved_config_and_incomplete_gates"
+  ],
+  "用例统计": {
+    "ran": 2,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0,
+    "expected_failures": 0,
+    "unexpected_successes": 0
+  },
+  "实际日志SHA256": "cc6ae5ef6ce6f502e79d55396c9930fe238170d12c0d1ae50d4920735822289c",
+  "单机测试边界": "在非特权隔离环境用真实发布内核和扩展执行 SQL。此用例用 test-v1 建立原生数组测试出生身份。三节点需另用正式 Root 出生、独立 PG18 数据与真实 WAL 确认。",
+  "三节点内存动作通过数": 0
+}

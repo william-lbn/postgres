@@ -375,6 +375,14 @@ typedef struct DsgBufferAccess
 extern PGDLLIMPORT bool enable_dynamic_shared_buffers;
 extern PGDLLIMPORT int max_shared_buffers;
 extern PGDLLIMPORT bool dynamic_shared_buffers_require_admission;
+/*- Postmaster 出生时固定。该策略只决定管理失联行为，开放仍需同 boot 的显式授权。 */
+typedef enum DsgAdmissionPolicy
+{
+	DSG_ADMISSION_LEASE_V1,
+	DSG_ADMISSION_ENFORCED_BUDGET_V1
+} DsgAdmissionPolicy;
+
+extern PGDLLIMPORT int dynamic_shared_buffers_admission_policy;
 extern PGDLLIMPORT int dynamic_shared_buffers_admission_lease_timeout;
 
 /*- 独立失联关闭事实，不扩充已有Buffer ABI或准入原请求的摘要布局。 */

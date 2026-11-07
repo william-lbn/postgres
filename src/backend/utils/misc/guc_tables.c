@@ -122,6 +122,27 @@
  * NOTE! Option values may not contain double quotes!
  */
 
+/*-
+ * 只有 Compute 本次启动传入的 -c 参数可选择硬预算策略。防止备份中的
+ * postgresql.conf / ALTER SYSTEM 遗留项改变旧启动规格的失联语义。
+ */
+static bool
+check_dsg_admission_policy(int *newval, void **extra, GucSource source)
+{
+	if (*newval == DSG_ADMISSION_ENFORCED_BUDGET_V1 && source != PGC_S_ARGV)
+	{
+		GUC_check_errdetail("The enforced budget policy must be selected on the postmaster command line.");
+		return false;
+	}
+	return true;
+}
+
+static const struct config_enum_entry dsg_admission_policy_options[] = {
+	{"lease_v1", DSG_ADMISSION_LEASE_V1, false},
+	{"enforced_budget_v1", DSG_ADMISSION_ENFORCED_BUDGET_V1, false},
+	{NULL, 0, false}
+};
+
 static const struct config_enum_entry bytea_output_options[] = {
 	{"escape", BYTEA_OUTPUT_ESCAPE, false},
 	{"hex", BYTEA_OUTPUT_HEX, false},
@@ -5138,6 +5159,15 @@ struct config_string ConfigureNamesString[] =
 
 struct config_enum ConfigureNamesEnum[] =
 {
+	{
+		{"dynamic_shared_buffers_admission_policy", PGC_POSTMASTER, RESOURCES_MEM,
+			gettext_noop("Selects the admission policy for managed dynamic shared buffers."),
+			NULL, GUC_NOT_IN_SAMPLE
+		},
+		&dynamic_shared_buffers_admission_policy,
+		DSG_ADMISSION_LEASE_V1, dsg_admission_policy_options,
+		check_dsg_admission_policy, NULL, NULL
+	},
 	{
 		{"backslash_quote", PGC_USERSET, COMPAT_OPTIONS_PREVIOUS,
 			gettext_noop("Sets whether \"\\'\" is allowed in string literals."),

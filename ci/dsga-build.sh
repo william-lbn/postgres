@@ -8,6 +8,25 @@ root=$(git rev-parse --show-toplevel)
 cd "$root"
 prefix="$root/build/dsga-install"
 mkdir -p build/dsga-pg build/evidence
+# SQL 回归与 isolation 的差异文件位于不同输出目录；失败时必须把真实差异
+# 写入 job 日志，避免只归档 SQL 日志而丢失 isolation 失败原因。诊断自身失败
+# 也不能覆盖原始门禁退出码，更不能使失败回归被当作成功继续签发验证收据。
+report_failed_regression_diffs() {
+  local gate_status=$?
+  local diff_path
+  trap - EXIT
+  if (( gate_status != 0 )); then
+    set +e
+    while IFS= read -r -d '' diff_path; do
+      [[ -s "$diff_path" ]] || continue
+      printf '\n::group::失败回归差异：%s\n' "$diff_path"
+      cat "$diff_path"
+      printf '\n::endgroup::\n'
+    done < <(find build/dsga-pg -type f -name regression.diffs -print0)
+  fi
+  exit "$gate_status"
+}
+trap report_failed_regression_diffs EXIT
 configure=(--prefix="$prefix" --enable-debug --enable-cassert --enable-injection-points
            --enable-tap-tests --without-icu --without-readline --with-openssl)
 if [[ "$major" == 18 ]]; then configure+=(--with-liburing); fi

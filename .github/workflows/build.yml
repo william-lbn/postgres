@@ -58,5 +58,6 @@ jobs:
             build/dsga-pg/src/test/regress/log/
             build/dsga-pg/src/test/modules/test_dsg_region/log/
             build/dsga-pg/src/test/modules/test_dsg_region/regression.diffs
+            build/dsga-pg/src/test/modules/test_dsg_region/output_iso/
           if-no-files-found: error
           retention-days: 30

@@ -1,5 +1,8 @@
 # 暂停真实扩容的发布前阶段，验证旧容量仍可见、竞争者有超时、取消
 # 不发布容量。随后用新操作完成扩容，并验证注入错误保留未知分配预算。
+# 四个数组分别按本机系统页大小计费；256 -> 512 的 charged_tail 在 4 KiB
+# 页上为 4，在 16 KiB 页上为 2。这里严格核对各数组的 512-buffer 预算，
+# 并要求把同一账本误报为 256-buffer 预算时失败，不能只屏蔽平台差异。
 setup
 {
     CREATE EXTENSION test_dsg_region;
@@ -20,18 +23,19 @@ setup { SET application_name = 'dsg-grow-test'; }
 step grow { SELECT test_dsg_grow(1, 1, 1, 512, 60000); }
 
 session observer
-step preparing { SELECT test_dsg_grow_snapshot(); }
+step preparing { SELECT test_dsg_grow_snapshot(512); }
+step wrong_budget { SELECT test_dsg_grow_snapshot(256); }
 step competing { SELECT test_dsg_grow(2, 2, 1, 512, 20); }
 step cancel_grow
 {
     SELECT pg_cancel_backend(pid) FROM pg_stat_activity
     WHERE application_name = 'dsg-grow-test';
 }
-step denied { SELECT test_dsg_grow_snapshot(); }
+step denied { SELECT test_dsg_grow_snapshot(512); }
 step replay_denied { SELECT test_dsg_grow(1, 1, 1, 512); }
 step detach { SELECT injection_points_detach('dsg-buffer-grow-before-publish'); }
 step blocked_publish { SELECT test_dsg_grow(2, 2, 1, 512, 100); }
-step publish_denied { SELECT test_dsg_grow_snapshot(); }
+step publish_denied { SELECT test_dsg_grow_snapshot(512); }
 step wake_scan { SELECT injection_points_wakeup('dsg-buffercache-before-scan'); }
 step detach_scan { SELECT injection_points_detach('dsg-buffercache-before-scan'); }
 step retry { SELECT test_dsg_grow(3, 3, 1, 512); }
@@ -65,4 +69,4 @@ session responder
 setup { SET application_name = 'dsg-grow-response-test'; }
 step grow_response { SELECT test_dsg_grow(8, 8, 5, 1536, 60000); }
 
-permutation grow preparing competing cancel_grow(grow) denied replay_denied detach scan blocked_publish publish_denied wake_scan(scan) detach_scan retry inject_error failed unknown detach_error smaller_retry still_unknown reconciled known inject_response_error response_error committed_without_response detach_response_error replay_committed pause_response grow_response terminate_grower(grow_response) committed_after_exit replay_after_exit detach_response_pause
+permutation grow preparing wrong_budget competing cancel_grow(grow) denied replay_denied detach scan blocked_publish publish_denied wake_scan(scan) detach_scan retry inject_error failed unknown detach_error smaller_retry still_unknown reconciled known inject_response_error response_error committed_without_response detach_response_error replay_committed pause_response grow_response terminate_grower(grow_response) committed_after_exit replay_after_exit detach_response_pause

@@ -1,18 +1,20 @@
 Parsed test spec with 4 sessions
 
-starting permutation: grow preparing competing cancel_grow denied replay_denied detach scan blocked_publish publish_denied wake_scan detach_scan retry inject_error failed unknown detach_error smaller_retry still_unknown reconciled known inject_response_error response_error committed_without_response detach_response_error replay_committed pause_response grow_response terminate_grower committed_after_exit replay_after_exit detach_response_pause
+starting permutation: grow preparing wrong_budget competing cancel_grow denied replay_denied detach scan blocked_publish publish_denied wake_scan detach_scan retry inject_error failed unknown detach_error smaller_retry still_unknown reconciled known inject_response_error response_error committed_without_response detach_response_error replay_committed pause_response grow_response terminate_grower committed_after_exit replay_after_exit detach_response_pause
 injection_points_attach
 -----------------------
                        
 (1 row)
 
 step grow: SELECT test_dsg_grow(1, 1, 1, 512, 60000); <waiting ...>
-step preparing: SELECT test_dsg_grow_snapshot();
-test_dsg_grow_snapshot                                         
----------------------------------------------------------------
-phase=1 reason=0 high=256 generation=1 unknown=0 charged_tail=2
+step preparing: SELECT test_dsg_grow_snapshot(512);
+test_dsg_grow_snapshot                                                
+----------------------------------------------------------------------
+phase=1 reason=0 high=256 generation=1 unknown=0 prepared_budget=exact
 (1 row)
 
+step wrong_budget: SELECT test_dsg_grow_snapshot(256);
+ERROR:  DSGA provider test failed: prepared array budget does not match native page geometry
 step competing: SELECT test_dsg_grow(2, 2, 1, 512, 20);
 test_dsg_grow                            
 -----------------------------------------
@@ -31,10 +33,10 @@ pg_cancel_backend
 t                
 (1 row)
 
-step denied: SELECT test_dsg_grow_snapshot();
-test_dsg_grow_snapshot                                         
----------------------------------------------------------------
-phase=3 reason=3 high=256 generation=1 unknown=0 charged_tail=2
+step denied: SELECT test_dsg_grow_snapshot(512);
+test_dsg_grow_snapshot                                                
+----------------------------------------------------------------------
+phase=3 reason=3 high=256 generation=1 unknown=0 prepared_budget=exact
 (1 row)
 
 step replay_denied: SELECT test_dsg_grow(1, 1, 1, 512);
@@ -56,10 +58,10 @@ test_dsg_grow
 denied high=256 generation=1 replay=false
 (1 row)
 
-step publish_denied: SELECT test_dsg_grow_snapshot();
-test_dsg_grow_snapshot                                         
----------------------------------------------------------------
-phase=3 reason=1 high=256 generation=1 unknown=0 charged_tail=2
+step publish_denied: SELECT test_dsg_grow_snapshot(512);
+test_dsg_grow_snapshot                                                
+----------------------------------------------------------------------
+phase=3 reason=1 high=256 generation=1 unknown=0 prepared_budget=exact
 (1 row)
 
 step wake_scan: SELECT injection_points_wakeup('dsg-buffercache-before-scan'); <waiting ...>

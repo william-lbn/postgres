@@ -827,16 +827,27 @@ test_dsg_collision_unpin(PG_FUNCTION_ARGS)
 #endif
 }
 
+/*-
+ * 无参接口保留真实观察计数；有参接口逐数组核对指定准备容量的精确预算。
+ * charged_tail 是页对齐后仍超出 H 的数组个数，4 KiB 与 16 KiB 页可以
+ * 合法地产生不同计数。只有真实账本全部匹配本机几何后才输出稳定的通过值，
+ * 不能把计数直接归一化而掩盖漏计某个数组的预算。几何在本 boot 内不可变。
+ */
 Datum
 test_dsg_grow_snapshot(PG_FUNCTION_ARGS)
 {
 	DsgBufferSnapshot snapshot;
+	bool		check_prepared = PG_NARGS() == 1;
+	int			prepared_buffers = check_prepared ? PG_GETARG_INT32(0) : 0;
 	int			unknown = 0;
 	int			charged_tail = 0;
 	int			i;
 
 	(void) test_dsg_shared_value();
 	DsgBufferGetSnapshot(&snapshot);
+	test_dsg_check(!check_prepared ||
+				   (prepared_buffers > 0 && prepared_buffers <= GetMaxNBuffers()),
+				   "invalid prepared buffer budget");
 	for (i = 0; i < DSG_BUFFER_ARRAY_COUNT; i++)
 	{
 		DsgBufferArray *array = &DSBCtrl->arrays[i];
@@ -844,7 +855,16 @@ test_dsg_grow_snapshot(PG_FUNCTION_ARGS)
 		unknown += snapshot.allocation_unknown[i] ? 1 : 0;
 		charged_tail += snapshot.committed_upper_bytes[i] >
 			TYPEALIGN(array->region.page_bytes, mul_size(snapshot.high, array->element_bytes)) ? 1 : 0;
+		if (check_prepared)
+			test_dsg_check(snapshot.committed_upper_bytes[i] ==
+						   TYPEALIGN(array->region.page_bytes,
+									 mul_size(prepared_buffers, array->element_bytes)),
+						   "prepared array budget does not match native page geometry");
 	}
+	if (check_prepared)
+		PG_RETURN_TEXT_P(cstring_to_text(psprintf("phase=%d reason=%d high=%d generation=" UINT64_FORMAT " unknown=%d prepared_budget=exact",
+												  snapshot.operation.phase, snapshot.operation.reason, snapshot.high,
+												  snapshot.generation, unknown)));
 	PG_RETURN_TEXT_P(cstring_to_text(psprintf("phase=%d reason=%d high=%d generation=" UINT64_FORMAT " unknown=%d charged_tail=%d",
 											  snapshot.operation.phase, snapshot.operation.reason, snapshot.high,
 											  snapshot.generation, unknown, charged_tail)));

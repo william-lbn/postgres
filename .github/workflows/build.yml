@@ -1,34 +1,62 @@
-name: Build Postgres
-
+name: PostgreSQL 17 DSGA native checks
 on:
   push:
     branches:
-    - REL_17_STABLE_neon
+      - REL_17_STABLE_neon
+      - 'codex/dsga-pg17-*'
+      - 'ci/dsga-pg17-*'
   pull_request:
     branches:
-    - REL_17_STABLE_neon
-
+      - REL_17_STABLE_neon
+      - 'codex/dsga-pg17-*'
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      source_sha:
+        description: Exact PostgreSQL source commit selected by the Neon lock
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: pg17-${{ github.repository }}-${{ inputs.source_sha && github.run_id || github.ref }}
+  # 复用门禁按调用 run 隔离，不能让两个 Neon 分支互相取消；单仓 PR 仍可去重。
+  cancel-in-progress: ${{ inputs.source_sha == '' }}
 jobs:
-  build_postgres:
-    name: Build Postgres
-    runs-on: ubuntu-latest
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
     steps:
-      - name: Install Postgres Build Dependencies
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          repository: william-lbn/postgres
+          ref: ${{ inputs.source_sha || github.sha }}
+          persist-credentials: false
+      - name: Verify exact source and native major
+        env:
+          EXPECTED_SOURCE: ${{ inputs.source_sha || github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$(git rev-parse HEAD)" == "$EXPECTED_SOURCE" ]]
+          grep -Eq 'AC_INIT\(\[PostgreSQL\], \[17\.' configure.ac
+      - name: Install native build and test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install build-essential coreutils libreadline-dev zlib1g-dev flex bison libxml2-dev libxslt-dev libssl-dev libxml2-utils xsltproc git
-
-      - name: Checkout postgres repository
-        uses: actions/checkout@v4
-
-      - name: Configure Postgres build
-        run: |
-          ./configure --prefix=/usr/local/bin
-
-      - name: Build PostgreSQL
-        run: |
-          make -s -j`nproc`
-
-      - name: Run PostgreSQL Test Suite
-        run: |
-          make -s -j`nproc` check
+          sudo apt-get install -y build-essential bison flex pkg-config libssl-dev \
+            libcurl4-openssl-dev libxml2-dev libxslt1-dev zlib1g-dev liburing-dev \
+            libipc-run-perl libio-pty-perl python3
+      - name: Build and run real native regression and DSGA gates
+        run: bash ci/dsga-build.sh 17
+      - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+        if: always()
+        with:
+          name: postgres-dsga-v17-${{ inputs.source_sha || github.sha }}-attempt${{ github.run_attempt }}
+          path: |
+            build/evidence/
+            build/dsga-pg/src/test/regress/regression.diffs
+            build/dsga-pg/src/test/regress/log/
+            build/dsga-pg/src/test/modules/test_dsg_region/log/
+            build/dsga-pg/src/test/modules/test_dsg_region/regression.diffs
+          if-no-files-found: error
+          retention-days: 30

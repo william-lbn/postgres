@@ -68,8 +68,24 @@ class Resize(unittest.TestCase):
   functions=('test_dsg_resize18_state()','test_dsg_resize18_prepare()','test_dsg_resize18_request(text,integer,bigint,bigint,integer)','test_dsg_resize18_hold_tail(regclass,integer)','test_dsg_resize18_find_tail(regclass)','test_dsg_arrays18_pause_before_unpin(boolean)')
   for fn in functions:self.assertEqual(p.sql("SELECT has_function_privilege('resize18_ordinary','"+fn+"','EXECUTE')").stdout.strip(),'f')
   p.sql('GRANT EXECUTE ON FUNCTION test_dsg_resize18_state() TO resize18_ordinary')
-  for sql in ('SET ROLE resize18_ordinary;SELECT test_dsg_resize18_state()',):
-   r=p.sql(sql,check=False);self.assertNotEqual(r.returncode,0);self.assertIn('original administrator',r.stderr)
+  # prepare() 已关闭准入；SET ROLE 后的下一条顶层语句必须先被准入层拒绝，
+  # 不能把这层拒绝误认为函数内部的当前用户／原会话身份检查已经执行。
+  gated=p.sql('SET ROLE resize18_ordinary;SELECT test_dsg_resize18_state()',check=False)
+  self.assertNotEqual(gated.returncode,0);self.assertIn('dynamic shared buffer admission is closed for this boot',gated.stderr)
+  # 先以管理员身份进入一条顶层语句，再在块内实际降权，触达真实 C 身份检查。
+  # 不重新开放准入，也不改变上面既有的函数授权。
+  r=p.sql("""DO $acl$
+BEGIN
+ SET LOCAL ROLE resize18_ordinary;
+ IF current_user <> 'resize18_ordinary' THEN
+  RAISE EXCEPTION 'ACL fixture did not switch to the ordinary role';
+ END IF;
+ PERFORM test_dsg_resize18_state();
+END;
+$acl$;""",check=False)
+  self.assertNotEqual(r.returncode,0);self.assertIn('original administrator',r.stderr)
+  self.assertNotIn('admission is closed for this boot',r.stderr)
+  self.save('actual-resize-api-acl',{'closedAdmission':{'returncode':gated.returncode,'stderr':gated.stderr},'functionACL':{'returncode':r.returncode,'stderr':r.stderr},'normal':False})
  def test_PG18_S_RESIZE_005_real_worker_IO_pin_denies_then_retry(self):
   p=self.cluster(aio=True);self.committed(p.resize('grow',2048,1),2048);self.table(p)
   tail=json.loads(p.sql("SELECT test_dsg_resize18_find_tail('resize18_data')").stdout)

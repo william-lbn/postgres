@@ -37,6 +37,7 @@
 #include <sys/file.h>
 #include <unistd.h>
 
+#include "access/parallel.h"
 #include "access/tableam.h"
 #include "access/xloginsert.h"
 #include "access/xlogutils.h"
@@ -71,6 +72,7 @@
 #include "utils/timestamp.h"
 
 uint32		(*get_pin_limit_hook) (void);
+shared_buffer_demand_hook_type shared_buffer_demand_hook = NULL;
 
 /* Note: these two macros only work on shared buffers, not local ones! */
 #define BufHdrGetBlock(bufHdr)	((Block) (BufferBlocks + ((Size) (bufHdr)->buf_id) * BLCKSZ))
@@ -1375,6 +1377,13 @@ StartReadBuffersImpl(ReadBuffersOperation *operation,
 										   blockNum + i,
 										   operation->strategy,
 										   &found);
+
+			if (shared_buffer_demand_hook != NULL &&
+				operation->rel != NULL && !BufferIsLocal(buffers[i]) &&
+				!am_wal_redo_postgres &&
+				(AmRegularBackendProcess() || IsParallelWorker()))
+				shared_buffer_demand_hook(&operation->smgr->smgr_rlocator.locator,
+											  operation->forknum, blockNum + i, found);
 		}
 
 		if (found)

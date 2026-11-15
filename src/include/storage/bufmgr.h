@@ -327,6 +327,18 @@ extern void FreeAccessStrategy(BufferAccessStrategy strategy);
 
 extern uint32 (*get_pin_limit_hook) (void);
 
+/*
+ * Optional observation of demand reads into shared buffers.  Called once when a
+ * foreground or parallel query first pins the requested block, with the
+ * observed cache result.  The callback must not block or change buffer state.
+ */
+typedef void (*shared_buffer_demand_hook_type) (const RelFileLocator *locator,
+												ForkNumber forknum,
+												BlockNumber blocknum,
+												bool shared_hit);
+extern PGDLLIMPORT shared_buffer_demand_hook_type shared_buffer_demand_hook;
+#define PG_HAVE_SHARED_BUFFER_DEMAND_HOOK 1
+
 /* inline functions */
 
 /*
